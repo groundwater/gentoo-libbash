@@ -23,6 +23,7 @@
 
 #include "cppbash_builtin.h"
 #include "builtins/echo_builtin.h"
+#include "builtins/boolean_builtins.h"
 
 cppbash_builtin::cppbash_builtin(std::ostream &outstream, std::ostream &errstream, std::istream &instream): _out_stream(&outstream), _err_stream(&errstream), _inp_stream(&instream)
 {
@@ -30,7 +31,9 @@ cppbash_builtin::cppbash_builtin(std::ostream &outstream, std::ostream &errstrea
 
 cppbash_builtin::builtins_type& cppbash_builtin::builtins() {
   static boost::scoped_ptr<builtins_type> p(new builtins_type {
-      {"echo", boost::factory<echo_builtin*>()}
+      {"echo", boost::factory<echo_builtin*>()},
+      {"true", boost::factory<true_builtin*>()},
+      {"false", boost::factory<false_builtin*>()}
   });
   return *p;
 }

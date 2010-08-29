@@ -31,6 +31,7 @@ TESTS += builtin_unittests
 check_PROGRAMS = builtin_unittests
 builtin_unittests_SOURCES = src/builtins/tests/run_tests.cpp
 builtin_unittests_SOURCES += src/builtins/tests/echo_tests.cpp
+builtin_unittests_SOURCES += src/builtins/tests/boolean_tests.cpp
 builtin_unittests_LDADD = ${GTEST_LIBS} libcppbash.la
 endif
 
