@@ -34,12 +34,11 @@ builtin_unittests_SOURCES += src/builtins/tests/echo_tests.cpp
 builtin_unittests_LDADD = ${GTEST_LIBS} libcppbash.la
 endif
 
-AM_CXXFLAGS=-std=c++0x
+AM_CXXFLAGS=$(BOOST_CPPFLAGS) -std=c++0x
 
 lib_LTLIBRARIES = libcppbash.la
 libcppbash_la_SOURCES = src/cppbash_builtin.cpp
 libcppbash_la_SOURCES += src/builtins/echo_builtin.cpp
-libcppbash_la_CPPFLAGS = $(BOOST_CPPFLAGS)
 
 coding_standard.pdf: coding_standard/coding_standard.tex
 	@PDFLATEX@ coding_standard/coding_standard.tex 2&>1 > /dev/null

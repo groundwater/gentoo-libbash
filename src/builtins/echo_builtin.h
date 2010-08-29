@@ -35,13 +35,8 @@
 class echo_builtin: public virtual cppbash_builtin
 {
   public:
-    ///
-    /// \brief default constructor, sets default streams
-    /// \param outstream where to send standard output. Default: cout
-    /// \param errstream where to send standard error. Default: cerr
-    /// \param instream where to get standard input from.  Default cin
-    ///
-    echo_builtin(std::ostream &outstream=std::cout, std::ostream &errstream=std::cerr, std::istream &instream=std::cin);
+    BUILTIN_CONSTRUCTOR(echo)
+
     ///
     /// \brief runs the echo plugin on the supplied arguments
     /// \param bash_args the arguments to the echo builtin

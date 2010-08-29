@@ -26,7 +26,13 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 #include <string>
+#include <boost/scoped_ptr.hpp>
+#include <boost/functional/factory.hpp>
+#include <boost/function.hpp>
+
+#define STREAM_ARGS std::ostream &out, std::ostream &err, std::istream &in
 
 ///
 /// \class cppbash_builtin
@@ -41,7 +47,9 @@ class cppbash_builtin
     /// \param errstream where to send standard error.  Default: cerr
     /// \param instream where to get standard input from.  Default: stdin
     ///
-    cppbash_builtin(std::ostream &outstream, std::ostream &errstream, std::istream &instream);
+    cppbash_builtin(STREAM_ARGS);
+
+    virtual ~cppbash_builtin() {};
     ///
     /// \brief executes the code associated with the builtin
     /// \param bash_args arguments passed to the builtin
@@ -63,6 +71,13 @@ class cppbash_builtin
     /// \return input buffer for the builtin
     ///
     std::istream& input_buffer() {return *_inp_stream;}
+
+    static int exec(const std::string& builtin, const std::vector<std::string>& args, STREAM_ARGS)
+    {
+      boost::scoped_ptr<cppbash_builtin> p(builtins()[builtin](out,err,in));
+      return p->exec(args);
+    }
+
   protected:
     ///
     /// \var *_out_stream
@@ -79,6 +94,15 @@ class cppbash_builtin
     /// \brief current standard input stream
     ///
     std::istream *_inp_stream;
+    ///
+    /// \var builtins
+    /// \brief holds factories for creating instances of child classes
+    ///
+    typedef std::map<std::string, boost::function< cppbash_builtin*(STREAM_ARGS) >> builtins_type;
+    static builtins_type& builtins();
 };
+
+#define BUILTIN_CONSTRUCTOR(name) \
+  name ## _builtin(STREAM_ARGS) : cppbash_builtin(out, err, in) {}
 
 #endif

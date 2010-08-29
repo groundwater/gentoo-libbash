@@ -21,7 +21,7 @@ along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 /// \author Nathan Eloe
 ///
 #include <iostream>
-#include "../builtins.h"
+#include "../../cppbash_builtin.h"
 #include <sstream>
 #include <vector>
 #include <gtest/gtest.h>
@@ -30,10 +30,9 @@ using namespace std;
 
 static void test_echo(const string& expected, std::initializer_list<string> args)
 {
-	stringstream test_output;
-	echo_builtin my_echo(test_output,cerr,cin);
-	my_echo.exec(vector<string>(args));
-	ASSERT_EQ(expected, test_output.str());
+  stringstream test_output;
+  cppbash_builtin::exec("echo",args,test_output,cerr,cin);
+  ASSERT_EQ(expected, test_output.str());
 }
 
 #define TEST_ECHO(name, expected, ...) \

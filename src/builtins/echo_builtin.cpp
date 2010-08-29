@@ -35,10 +35,6 @@ class suppress_output
 {
 };
 
-echo_builtin::echo_builtin(std::ostream &outstream, std::ostream &errstream, std::istream&instream) : cppbash_builtin(outstream, errstream, instream)
-{
-}
-
 int echo_builtin::exec(const std::vector<std::string>& bash_args)
 {
   bool suppress_nl = false;

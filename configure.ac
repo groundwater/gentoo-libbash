@@ -22,7 +22,7 @@ AC_INIT([libbash],[0.1],[powerofazure@gmail.com])
 AM_INIT_AUTOMAKE([parallel-tests subdir-objects])
 AC_PROG_CXX
 LT_INIT
-AX_BOOST_BASE
+AX_BOOST_BASE(1.43.0,[:],[AC_MSG_ERROR([Needed boost not found])])
 AC_PATH_PROG([JAVA],[java],"no")
 if test "$JAVA" = "no"; then
 	AC_MSG_ERROR([No java executable found])
