@@ -38,6 +38,7 @@ AM_CXXFLAGS=-std=c++0x
 
 GENERATED_C = bashastLexer.c bashastParser.c
 GENERATED_H = bashastLexer.h bashastParser.h
+CLEANFILES = $(GENERATED_C) $(GENERATED_H) bashast.g
 lib_LTLIBRARIES = libcppbash.la
 libcppbash_la_SOURCES = src/cppbash_builtin.cpp
 libcppbash_la_SOURCES += src/builtins/echo_builtin.cpp
