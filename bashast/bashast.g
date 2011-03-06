@@ -82,7 +82,7 @@ start	:	(flcomment! EOL!)? EOL!* list^ ;
 flcomment
 	:	BLANK? '#' commentpart*;
 commentpart
-	:	nqstr|BLANK|LBRACE|RBRACE|SEMIC|DOUBLE_SEMIC|TICK|LPAREN|RPAREN|LLPAREN|RRPAREN|PIPE|COMMA|SQUOTE|QUOTE|LT|GT;
+	:	nqstr|BLANK|LBRACE|RBRACE|SEMIC|DOUBLE_SEMIC|TICK|LPAREN|RPAREN|LLPAREN|RRPAREN|PIPE|COMMA|SQUOTE|QUOTE|LESS_THAN|GREATER_THAN;
 list	:	list_level_2 BLANK* (';'|'&'|EOL)? -> ^(LIST list_level_2);
 clist
 options{greedy=false;}
@@ -132,15 +132,15 @@ here_string_op
 here_doc_op
 	:	LSHIFT MINUS -> OP["<<-"]
 	|	LSHIFT -> OP["<<"];
-redir_op:	AMP LT -> OP["&<"]
-	|	GT AMP -> OP[">&"]
-	|	LT AMP -> OP["<&"]
-	|	LT GT -> OP["<>"]
+redir_op:	AMP LESS_THAN -> OP["&<"]
+	|	GREATER_THAN AMP -> OP[">&"]
+	|	LESS_THAN AMP -> OP["<&"]
+	|	LESS_THAN GREATER_THAN -> OP["<>"]
 	|	RSHIFT -> OP[">>"]
-	|	AMP GT -> OP["&>"]
+	|	AMP GREATER_THAN -> OP["&>"]
 	|	AMP RSHIFT -> OP ["&>>"]
-	|	LT
-	|	GT
+	|	LESS_THAN
+	|	GREATER_THAN
 	|	DIGIT redir_op;
 brace_expansion
 	:	pre=fname? brace post=fname? -> ^(BRACE_EXP ($pre)? brace ($post)?);
@@ -216,7 +216,7 @@ cond_comparison
 	:	cond_expr -> ^(COMPOUND_COND cond_expr);
 //Variables
 //Defining a variable
-var_def	:	BLANK* name LSQUARE BLANK? index BLANK* RSQUARE EQUALS value BLANK* -> ^(EQUALS ^(name  index) value)
+var_def	:	BLANK* name LSQUARE BLANK? var_index BLANK* RSQUARE EQUALS value BLANK* -> ^(EQUALS ^(name  var_index) value)
 	|	BLANK!* name EQUALS^ value BLANK!*
 	|	BLANK!* LET! name EQUALS^ arithmetic BLANK!*;
 //Possible values of a variable
@@ -227,14 +227,14 @@ value	:	num
 //allow the parser to create array variables
 arr_val	:
 	|	(ag+=val wspace?)+ -> ^(ARRAY $ag+);
-val	:	'['!BLANK!*index BLANK!?']'!EQUALS^ pos_val
+val	:	'['!BLANK!*var_index BLANK!?']'!EQUALS^ pos_val
 	|	pos_val;
 pos_val	: command_sub
 	|	var_ref
 	|	num
 	|	fname;
 //possible indexes for the variable.  Names are used when it acts more like a map/hash than an array
-index	:	num
+var_index	:	num
 	|	name;
 //Referencing a variable (different possible ways/special parameters)
 var_ref
@@ -307,8 +307,8 @@ binary_str_op_keyword
 	|	EQUALS EQUALS -> OP["=="]
 	|	EQUALS
 	|	BANG EQUALS -> OP["!="]
-	|	LT
-	|	GT;
+	|	LESS_THAN
+	|	GREATER_THAN;
 binary_string_op_builtin
 	:	BOP
 	|	EQUALS
@@ -366,12 +366,12 @@ ns_str_part_no_res
 ns_str	:	ns_str_part* -> ^(STRING ns_str_part*);
 //Allowable parts of double quoted strings
 dq_str_part
-	:	BLANK|EOL|AMP|LOGICAND|LOGICOR|LT|GT|PIPE|SQUOTE|SEMIC|COMMA|LPAREN|RPAREN|LLPAREN|RRPAREN|DOUBLE_SEMIC|LBRACE|RBRACE|TICK|LEQ|GEQ
+	:	BLANK|EOL|AMP|LOGICAND|LOGICOR|LESS_THAN|GREATER_THAN|PIPE|SQUOTE|SEMIC|COMMA|LPAREN|RPAREN|LLPAREN|RRPAREN|DOUBLE_SEMIC|LBRACE|RBRACE|TICK|LEQ|GEQ
 	|	str_part_with_pound;
 //Allowable parts of single quoted strings
 sq_str_part
 	:	str_part_with_pound
-	|	BLANK|EOL|AMP|LOGICAND|LOGICOR|LT|GT|PIPE|QUOTE|SEMIC|COMMA|LPAREN|RPAREN|LLPAREN|RRPAREN|DOUBLE_SEMIC|LBRACE|RBRACE|DOLLAR|TICK|BOP|UOP;
+	|	BLANK|EOL|AMP|LOGICAND|LOGICOR|LESS_THAN|GREATER_THAN|PIPE|QUOTE|SEMIC|COMMA|LPAREN|RPAREN|LLPAREN|RRPAREN|DOUBLE_SEMIC|LBRACE|RBRACE|DOLLAR|TICK|BOP|UOP;
 //Generic strings/filenames.
 fname	:	nqstr -> ^(STRING nqstr);
 //A string that is NOT a bash reserved word
@@ -433,7 +433,7 @@ pattern_class_match
 	|	LSQUARE DOT NAME DOT RSQUARE -> ^(COLLATING_SYMBOL NAME);
 //Characters allowed in matching equivalence classes
 pattern_char
-	:	LETTER|DIGIT|NQCHAR_NO_ALPHANUM|QMARK|COLON|AT|SEMIC|POUND|SLASH|BANG|TIMES|COMMA|PIPE|AMP|MINUS|PLUS|PCT|EQUALS|LSQUARE|RSQUARE|RPAREN|LPAREN|RBRACE|LBRACE|DOLLAR|TICK|DOT|LT|GT|SQUOTE|QUOTE;
+	:	LETTER|DIGIT|NQCHAR_NO_ALPHANUM|QMARK|COLON|AT|SEMIC|POUND|SLASH|BANG|TIMES|COMMA|PIPE|AMP|MINUS|PLUS|PCT|EQUALS|LSQUARE|RSQUARE|RPAREN|LPAREN|RBRACE|LBRACE|DOLLAR|TICK|DOT|LESS_THAN|GREATER_THAN|SQUOTE|QUOTE;
 //extended pattern matching
 extended_pattern_match
 	:	QMARK LPAREN fname (PIPE fname)* RPAREN -> ^(MATCH_AT_MOST_ONE fname+)
@@ -477,7 +477,7 @@ exponential
 tdm	:	exponential (BLANK!*(TIMES^|SLASH^|PCT^)BLANK!* exponential)*;
 addsub	:	tdm (BLANK!* (PLUS^|MINUS^)BLANK!* tdm)*;
 shifts	:	addsub (BLANK!* (LSHIFT^|RSHIFT^) BLANK!* addsub)*;
-compare	:	shifts (BLANK!* (LEQ^|GEQ^|LT^|GT^)BLANK!* shifts)?;
+compare	:	shifts (BLANK!* (LEQ^|GEQ^|LESS_THAN^|GREATER_THAN^)BLANK!* shifts)?;
 bitwiseand
 	:	compare (BLANK!* AMP^ BLANK!* compare)*;
 bitwisexor
@@ -492,7 +492,7 @@ arithmetic_condition
 arithmetic_assignment
 	:	(name BLANK!* (EQUALS^|ARITH_ASSIGN^) BLANK!*)? logicor;
 //process substitution
-proc_sub:	(dir=LT|dir=GT)LPAREN BLANK* clist BLANK* RPAREN -> ^(PROC_SUB $dir clist);
+proc_sub:	(dir=LESS_THAN|dir=GREATER_THAN)LPAREN BLANK* clist BLANK* RPAREN -> ^(PROC_SUB $dir clist);
 //the biggie: functions
 function:	FUNCTION BLANK+ fname (BLANK* parens)? wspace compound_command redirect* -> ^(FUNCTION fname compound_command redirect*)
 	|	fname BLANK* parens wspace compound_command redirect* -> ^(FUNCTION["function"] fname compound_command redirect*);
@@ -554,8 +554,8 @@ AMP	:	'&';
 LEQ	:	'<=';
 GEQ	:	'>=';
 CARET	:	'^';
-LT	:	'<';
-GT	:	'>';
+LESS_THAN	:	'<';
+GREATER_THAN	:	'>';
 LSHIFT	:	'<<';
 RSHIFT	:	'>>';
 ARITH_ASSIGN
@@ -613,5 +613,5 @@ ESC_GT	:	'\\''>';
 ESC_CHAR:	'\\' (('0'..'7')('0'..'7')('0'..'7')?|'x'('0'..'9'|'a'..'f'|'A'..'F')('0'..'9'|'a'..'f'|'A'..'F')?|'c'.|.);
 NAME	:	(LETTER|'_')(ALPHANUM|'_')+;
 NQCHAR_NO_ALPHANUM
-	:	~('\n'|'\r'|' '|'\t'|'\\'|CARET|QMARK|COLON|AT|SEMIC|POUND|SLASH|BANG|TIMES|COMMA|PIPE|AMP|MINUS|PLUS|PCT|EQUALS|LSQUARE|RSQUARE|RPAREN|LPAREN|RBRACE|LBRACE|DOLLAR|TICK|DOT|LT|GT|SQUOTE|QUOTE|'a'..'z'|'A'..'Z'|'0'..'9')+;
+	:	~('\n'|'\r'|' '|'\t'|'\\'|CARET|QMARK|COLON|AT|SEMIC|POUND|SLASH|BANG|TIMES|COMMA|PIPE|AMP|MINUS|PLUS|PCT|EQUALS|LSQUARE|RSQUARE|RPAREN|LPAREN|RBRACE|LBRACE|DOLLAR|TICK|DOT|LESS_THAN|GREATER_THAN|SQUOTE|QUOTE|'a'..'z'|'A'..'Z'|'0'..'9')+;
 NQSTR	:	(NQCHAR_NO_ALPHANUM|ALPHANUM)+;

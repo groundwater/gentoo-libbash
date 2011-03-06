@@ -1,25 +1,25 @@
-#############################################
-#Copyright 2010 Nathan Eloe
-#
-#This file is part of libbash.
-#
-#libbash is free software: you can redistribute it and/or modify
-#it under the terms of the GNU General Public License as published by
-#the Free Software Foundation, either version 2 of the License, or
-#(at your option) any later version.
-#
-#libbash is distributed in the hope that it will be useful,but WITHOUT ANY WARRANTY; without even the implied warranty of
-#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#GNU General Public License for more details.
-#
-#You should have received a copy of the GNU General Public License
-#along with libbash.  If not, see <http://www.gnu.org/licenses/>.
-##############################################
+dnl ############################################
+dnl Copyright 2010 Nathan Eloe
+dnl
+dnl This file is part of libbash.
+dnl
+dnl libbash is free software: you can redistribute it and/or modify
+dnl it under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation, either version 2 of the License, or
+dnl (at your option) any later version.
+dnl
+dnl libbash is distributed in the hope that it will be useful,but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+dnl GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with libbash.  If not, see <http://www.gnu.org/licenses/>.
+dnl #############################################
 
 AC_PREREQ(2.65)
 AC_CONFIG_MACRO_DIR([m4])
 AC_INIT([libbash],[0.1],[powerofazure@gmail.com])
-AM_INIT_AUTOMAKE([parallel-tests subdir-objects])
+AM_INIT_AUTOMAKE([foreign parallel-tests subdir-objects])
 AC_PROG_CXX
 LT_INIT
 AX_BOOST_BASE(1.43.0,[:],[AC_MSG_ERROR([Needed boost not found])])

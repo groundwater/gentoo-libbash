@@ -37,9 +37,14 @@ endif
 
 AM_CXXFLAGS=$(BOOST_CPPFLAGS) -std=c++0x
 
+GENERATED_C = bashastLexer.c bashastParser.c
+GENERATED_H = bashastLexer.h bashastParser.h
+CLEANFILES = $(GENERATED_C) $(GENERATED_H) bashast.g
 lib_LTLIBRARIES = libcppbash.la
 libcppbash_la_SOURCES = src/cppbash_builtin.cpp
 libcppbash_la_SOURCES += src/builtins/echo_builtin.cpp
+libcppbash_la_SOURCES += $(GENERATED_C)
+libcppbash_la_CPPFLAGS = $(BOOST_CPPFLAGS)
 
 coding_standard.pdf: coding_standard/coding_standard.tex
 	@PDFLATEX@ coding_standard/coding_standard.tex 2&>1 > /dev/null
@@ -47,6 +52,9 @@ coding_standard.pdf: coding_standard/coding_standard.tex
 grammar.run: bashast.g
 	@JAVA@ -classpath @antlr_cp@ -Xmx1024m org.antlr.Tool -Xconversiontimeout 20000 $<
 	touch $@
+
+$(GENERATED_C): grammar.run
+$(GENERATED_H): grammar.run
 
 bashast.g: bashast/bashast.g
 	sed -e 's/CommonTree/pANTLR3_BASE_TREE/g' -e 's/Java/C/g' $< > $@
