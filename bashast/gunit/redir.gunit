@@ -24,7 +24,7 @@ redirect:
 "2>&1" -> (REDIR 2 >& 1)
 ">> /this/is/append" -> (REDIR >> (STRING / this / is / append))
 "&> allout" -> (REDIR &> (STRING allout))
-"< this.is.1input" -> (REDIR < (STRING this . is . 1input))
+"< this.is.1input" -> (REDIR < (STRING this . is . 1 input))
 "3< \"input from file\"" -> (REDIR 3 < (STRING (DOUBLE_QUOTED_STRING input   from   file)))
 "2<&0" -> (REDIR 2 <& 0)
 "<< asdf

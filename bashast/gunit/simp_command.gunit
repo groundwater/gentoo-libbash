@@ -8,5 +8,5 @@ simple_command:
 "i=3 g=4 h=18 grep asdf" -> (COMMAND (STRING grep) (STRING asdf) (= i 3) (= g 4) (= h 18))
 "./configure --prefix=/usr/local" -> (COMMAND (STRING . / configure) (STRING -- prefix = / usr / local))
 "[[while" -> (COMMAND (STRING [ [ while))
-"./foobär" -> (COMMAND (STRING . / foobär))
+"./foobär" -> (COMMAND (STRING . / foob ä r))
 "cat ~/Documents/todo.txt" -> (COMMAND (STRING cat) (STRING ~ / Documents / todo . txt))

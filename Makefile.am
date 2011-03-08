@@ -27,12 +27,19 @@ TEST_EXTENSIONS= .sh
 SH_LOG_COMPILER = /bin/bash
 
 if HAVE_GTEST
-TESTS += builtin_unittests
-check_PROGRAMS = builtin_unittests
-builtin_unittests_SOURCES = src/builtins/tests/run_tests.cpp
+TESTS += builtin_unittests post_check
+check_PROGRAMS = builtin_unittests post_check
+builtin_unittests_SOURCES = test/run_tests.cpp
 builtin_unittests_SOURCES += src/builtins/tests/echo_tests.cpp
 builtin_unittests_SOURCES += src/builtins/tests/boolean_tests.cpp
 builtin_unittests_LDADD = ${GTEST_LIBS} libcppbash.la
+
+post_check_SOURCES = test/run_tests.cpp
+post_check_SOURCES += test/post_check.cpp
+post_check_LDADD = ${GTEST_LIBS}\
+				   $(BOOST_SYSTEM_LIB)\
+				   $(BOOST_FILESYSTEM_LIB)\
+				   libcppbash.la
 endif
 
 AM_CXXFLAGS=$(BOOST_CPPFLAGS) -std=c++0x

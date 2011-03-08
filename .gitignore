@@ -14,6 +14,7 @@ missing
 Makefile
 autom4te.cache
 builtin_unittests
+post_check
 bashast.g
 bashast.tokens
 bashast/.DS_Store

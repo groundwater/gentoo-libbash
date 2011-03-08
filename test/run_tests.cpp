@@ -1,5 +1,5 @@
 /*
-   Copyright 2010 Nathan Eloe
+   Copyright 2010 Mu Qiao
 
    This file is part of libbash.
 
@@ -17,7 +17,7 @@
    */
 ///
 /// \file run_tests.cpp
-/// \brief runs unit tests for builtin bash functionality
+/// \brief runs unit tests for post_check
 ///
 
 #include<gtest/gtest.h>
