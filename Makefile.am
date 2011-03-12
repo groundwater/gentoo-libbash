@@ -23,7 +23,7 @@ include doxygen.am
 ACLOCAL_AMFLAGS = -I m4
 
 TEST_EXTENSIONS= .gunit
-GUNIT_LOG_COMPILER = bashast/gunit/runtests.sh
+GUNIT_LOG_COMPILER = $(srcdir)/bashast/gunit/runtests.sh
 AM_GUNIT_LOG_FLAGS = @antlr_cp@:.
 GUNIT_TESTS = bashast/gunit/arith_main.gunit \
 		bashast/gunit/array.gunit \
@@ -70,18 +70,30 @@ AM_CXXFLAGS=$(BOOST_CPPFLAGS) -std=c++0x
 
 GENERATED_C = bashastLexer.c bashastParser.c
 GENERATED_H = bashastLexer.h bashastParser.h
-CLEANFILES = $(GENERATED_C) $(GENERATED_H) bashast.g $(check_JAVA) bashast/grammar.run grammar.run
+CLEANFILES = $(GENERATED_C) \
+			 $(GENERATED_H) \
+			 bashast.g \
+			 $(check_JAVA) \
+			 bashast/grammar.run \
+			 grammar.run \
+			 bashast/bashast.tokens \
+			 bashast.tokens
 lib_LTLIBRARIES = libcppbash.la
-libcppbash_la_SOURCES = src/cppbash_builtin.cpp
-libcppbash_la_SOURCES += src/builtins/echo_builtin.cpp
-libcppbash_la_SOURCES += $(GENERATED_C)
+libcppbash_la_SOURCES = src/cppbash_builtin.cpp \
+						src/cppbash_builtin.h \
+						src/builtins/echo_builtin.cpp \
+						src/builtins/echo_builtin.h \
+						src/builtins/boolean_builtins.h \
+						$(GENERATED_C)
 libcppbash_la_CPPFLAGS = $(BOOST_CPPFLAGS)
+
+EXTRA_DIST = bashast/bashast.g $(GUNIT_TESTS) $(GUNIT_LOG_COMPILER)
 
 coding_standard.pdf: coding_standard/coding_standard.tex
 	@PDFLATEX@ coding_standard/coding_standard.tex 2&>1 > /dev/null
 
 grammar.run: bashast.g
-	@JAVA@ -classpath @antlr_cp@ -Xmx1024m org.antlr.Tool -Xconversiontimeout 20000 $<
+	@JAVA@ -classpath @antlr_cp@ -Xmx1024m org.antlr.Tool -Xconversiontimeout 20000 -fo . $<
 	touch $@
 
 $(GENERATED_C): grammar.run
@@ -91,7 +103,7 @@ bashast.g: bashast/bashast.g
 	sed -e 's/CommonTree/pANTLR3_BASE_TREE/g' -e 's/Java/C/g' $< > $@
 
 bashast/grammar.run: bashast/bashast.g
-	@JAVA@ -classpath @antlr_cp@ -Xmx1024m org.antlr.Tool -Xconversiontimeout 20000 $<
+	@JAVA@ -classpath @antlr_cp@ -Xmx1024m org.antlr.Tool -Xconversiontimeout 20000 -fo bashast $<
 	touch $@
 
 $(check_JAVA): bashast/grammar.run
