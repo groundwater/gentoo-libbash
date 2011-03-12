@@ -3,9 +3,11 @@
 *.la
 *.lo
 *.log
+*.class
 .deps
 .libs
 .dirstamp
+classcheck.stamp
 Makefile.in
 aclocal.m4
 depcomp
