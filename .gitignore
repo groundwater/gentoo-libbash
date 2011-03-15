@@ -29,6 +29,11 @@ bashast/tmp/
 bashast/tokens.png
 bashastLexer.*
 bashastParser.*
+bashwalker.g
+bashwalker.h
+bashwalker.c
+bashwalker.cpp
+bashwalker.tokens
 coding_standard/*.pdf
 coding_standard/*.log
 coding_standard/*.aux

@@ -50,6 +50,11 @@ TESTS = $(GUNIT_TESTS)
 check_JAVA = bashast/bashastLexer.java bashast/bashastParser.java
 AM_JAVACFLAGS = -classpath @antlr_cp@
 
+AM_CXXFLAGS=$(BOOST_CPPFLAGS) -std=c++0x -I$(top_srcdir)/src/
+# We use -x c++ to compile all C source files as C++ because there's C++
+# code embedded in them.
+AM_CFLAGS=-x c++ $(AM_CXXFLAGS)
+
 if HAVE_GTEST
 TESTS += builtin_unittests post_check
 check_PROGRAMS = builtin_unittests post_check
@@ -60,34 +65,45 @@ builtin_unittests_LDADD = ${GTEST_LIBS} libcppbash.la
 
 post_check_SOURCES = test/run_tests.cpp
 post_check_SOURCES += test/post_check.cpp
+post_check_SOURCES += test/walker_test.cpp
 post_check_LDADD = ${GTEST_LIBS}\
 				   $(BOOST_SYSTEM_LIB)\
 				   $(BOOST_FILESYSTEM_LIB)\
 				   libcppbash.la
 endif
 
-AM_CXXFLAGS=$(BOOST_CPPFLAGS) -std=c++0x
-
-GENERATED_C = bashastLexer.c bashastParser.c
-GENERATED_H = bashastLexer.h bashastParser.h
-CLEANFILES = $(GENERATED_C) \
-			 $(GENERATED_H) \
-			 bashast.g \
+GENERATED_PARSER_C = bashastLexer.c bashastParser.c
+GENERATED_PARSER_H = bashastLexer.h bashastParser.h
+GENERATED_WALKER_C = bashwalker.c
+GENERATED_WALKER_H = bashwalker.h
+CLEANFILES = $(GENERATED_PARSER_C) \
+			 $(GENERATED_PARSER_H) \
+			 $(GENERATED_WALKER_C) \
+			 $(GENERATED_WALKER_H) \
 			 $(check_JAVA) \
+			 bashast.g \
+			 bashast.tokens \
+			 bashast/bashast.tokens \
+			 bashwalker.tokens \
 			 bashast/grammar.run \
 			 grammar.run \
-			 bashast/bashast.tokens \
-			 bashast.tokens
+			 walker.run
+
 lib_LTLIBRARIES = libcppbash.la
 libcppbash_la_SOURCES = src/cppbash_builtin.cpp \
 						src/cppbash_builtin.h \
 						src/builtins/echo_builtin.cpp \
 						src/builtins/echo_builtin.h \
 						src/builtins/boolean_builtins.h \
-						$(GENERATED_C)
-libcppbash_la_CPPFLAGS = $(BOOST_CPPFLAGS)
+						$(GENERATED_PARSER_C) \
+						src/core/interpreter.cpp \
+						src/core/interpreter.h \
+						$(GENERATED_WALKER_C)
 
-EXTRA_DIST = bashast/bashast.g $(GUNIT_TESTS) $(GUNIT_LOG_COMPILER)
+EXTRA_DIST = bashast/bashast.g \
+			 bashast/bashwalker.g \
+			 $(GUNIT_TESTS) \
+			 $(GUNIT_LOG_COMPILER)
 
 coding_standard.pdf: coding_standard/coding_standard.tex
 	@PDFLATEX@ coding_standard/coding_standard.tex 2&>1 > /dev/null
@@ -96,11 +112,22 @@ grammar.run: bashast.g
 	@JAVA@ -classpath @antlr_cp@ -Xmx1024m org.antlr.Tool -Xconversiontimeout 20000 -fo . $<
 	touch $@
 
-$(GENERATED_C): grammar.run
-$(GENERATED_H): grammar.run
-
 bashast.g: bashast/bashast.g
 	sed -e 's/CommonTree/pANTLR3_BASE_TREE/g' -e 's/Java/C/g' $< > $@
+
+walker.run: bashast/bashwalker.g
+	@JAVA@ -classpath @antlr_cp@ -Xmx1024m org.antlr.Tool -Xconversiontimeout 20000 bashast.g -fo . $<
+	touch $@
+
+$(GENERATED_PARSER_C): grammar.run
+$(GENERATED_PARSER_H): grammar.run
+
+# Avoid initializing C++ type to NULL by sed, variables whose name
+# starts with libbash_ will be stripped
+$(GENERATED_WALKER_C): walker.run
+	sed -i -e 's/\(libbash_.*\) = NULL/\1/' $@
+
+$(GENERATED_WALKER_H): walker.run
 
 bashast/grammar.run: bashast/bashast.g
 	@JAVA@ -classpath @antlr_cp@ -Xmx1024m org.antlr.Tool -Xconversiontimeout 20000 -fo bashast $<

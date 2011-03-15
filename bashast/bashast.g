@@ -75,6 +75,9 @@ tokens{
 	COLLATING_SYMBOL;
 	SINGLE_QUOTED_STRING;
 	DOUBLE_QUOTED_STRING;
+	// Avoid ambiguity (being a sign or an operator)
+	PLUS_SIGN;
+	MINUS_SIGN;
 }
 
 start	:	(flcomment! EOL!)? EOL!* list^ ;
@@ -468,8 +471,8 @@ pre_inc_dec
 unary	:	post_inc_dec
 	|	pre_inc_dec
 	|	primary
-	|	PLUS^ primary
-	|	MINUS^ primary;
+	|	PLUS primary -> ^(PLUS_SIGN primary)
+	|	MINUS primary -> ^(MINUS_SIGN primary);
 negation
 	:	(BANG^BLANK!?|TILDE^BLANK!?)?unary;
 exponential

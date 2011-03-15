@@ -1,5 +1,5 @@
 /*
-   Copyright 2010 Mu Qiao
+   Copyright 2011 Mu Qiao
 
    This file is part of libbash.
 
@@ -14,19 +14,9 @@
 
    You should have received a copy of the GNU General Public License
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
-   */
+*/
 ///
-/// \file run_tests.cpp
-/// \brief runs unit tests for post_check
+/// \file interpreter.cpp
+/// \author Mu Qiao
+/// \brief implementations for bash interpreter (visitor pattern).
 ///
-
-#include<gtest/gtest.h>
-
-///
-/// \brief runs all the unit tests linked to this file
-///
-int main(int argc, char* argv[])
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

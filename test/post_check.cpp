@@ -17,8 +17,8 @@ along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
 ///
 /// \file post_check.cpp
-/// \brief series of unit tests for generated source files.
 /// \author Mu Qiao
+/// \brief series of unit tests for generated source files.
 ///
 
 #include <boost/filesystem.hpp>
@@ -41,4 +41,9 @@ TEST(post_check, lexer_size)
 TEST(post_check, parser_size)
 {
   check_file_size("bashastParser.c", 4096 * 1024);
+}
+
+TEST(post_check, walker_size)
+{
+  check_file_size("bashwalker.c", 4096 * 1024);
 }
