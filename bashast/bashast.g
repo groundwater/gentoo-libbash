@@ -275,7 +275,7 @@ arr_var_ref
 cond_expr
 	:	LSQUARE LSQUARE wspace keyword_cond wspace RSQUARE RSQUARE -> ^(KEYWORD_TEST keyword_cond)
 	|	LSQUARE wspace builtin_cond wspace RSQUARE -> ^(BUILTIN_TEST builtin_cond)
-	|	TEST wspace builtin_cond-> ^(BUILTIN_TEST builtin_cond);
+	|	TEST_EXPR wspace builtin_cond-> ^(BUILTIN_TEST builtin_cond);
 cond_primary
 	:	LPAREN! BLANK!* keyword_cond BLANK!* RPAREN!
 	|	keyword_cond_binary
@@ -361,7 +361,7 @@ ns_str_part
 //Parts of strings, no slashes, no reserved words
 ns_str_part_no_res
 	:	num
-	|	name|OTHER|EQUALS|PCT|PCTPCT|MINUS|DOT|DOTDOT|COLON|BOP|UOP|TEST|'_'|TILDE|INC|DEC|ARITH_ASSIGN|ESC_CHAR|CARET;
+	|	name|OTHER|EQUALS|PCT|PCTPCT|MINUS|DOT|DOTDOT|COLON|BOP|UOP|TEST_EXPR|'_'|TILDE|INC|DEC|ARITH_ASSIGN|ESC_CHAR|CARET;
 //strings with no slashes, used in certain variable expansions
 ns_str	:	ns_str_part* -> ^(STRING ns_str_part*);
 //Allowable parts of double quoted strings
@@ -592,7 +592,7 @@ WORDOP	:	(':-'|':='|':?'|':+');
 COLON	:	':';
 QMARK	:	'?';
 //Operators for conditional statements
-TEST	:	'test';
+TEST_EXPR	:	'test';
 LOGICAND
 	:	'&&';
 LOGICOR	:	'||';
