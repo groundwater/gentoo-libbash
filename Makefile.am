@@ -56,8 +56,12 @@ AM_CXXFLAGS=$(BOOST_CPPFLAGS) -std=c++0x -I$(top_srcdir)/src/
 AM_CFLAGS=-x c++ $(AM_CXXFLAGS)
 
 if HAVE_GTEST
-TESTS += builtin_unittests post_check
-check_PROGRAMS = builtin_unittests post_check
+TESTS += core_unittests builtin_unittests post_check
+check_PROGRAMS = core_unittests builtin_unittests post_check
+core_unittests_SOURCES = test/run_tests.cpp
+core_unittests_SOURCES += src/core/tests/symbols_test.cpp
+core_unittests_LDADD = ${GTEST_LIBS}
+
 builtin_unittests_SOURCES = test/run_tests.cpp
 builtin_unittests_SOURCES += src/builtins/tests/echo_tests.cpp
 builtin_unittests_SOURCES += src/builtins/tests/boolean_tests.cpp
@@ -96,8 +100,10 @@ libcppbash_la_SOURCES = src/cppbash_builtin.cpp \
 						src/builtins/echo_builtin.h \
 						src/builtins/boolean_builtins.h \
 						$(GENERATED_PARSER_C) \
+						src/core/interpreter_exception.h \
 						src/core/interpreter.cpp \
 						src/core/interpreter.h \
+						src/core/symbols.hpp \
 						$(GENERATED_WALKER_C)
 
 EXTRA_DIST = bashast/bashast.g \

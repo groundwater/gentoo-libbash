@@ -32,6 +32,7 @@
 #include <antlr3basetree.h>
 
 #include "bashastLexer.h"
+#include "core/symbols.hpp"
 
 ///
 /// \class interpreter
@@ -39,6 +40,9 @@
 ///
 class interpreter{
 public:
+  /// \var public::members
+  /// \brief global symbol table
+  scope members;
 
   /// \brief parse the text value of a tree to integer
   /// \param the target tree
