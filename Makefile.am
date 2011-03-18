@@ -60,8 +60,9 @@ TESTS += core_unittests builtin_unittests post_check
 check_PROGRAMS = core_unittests builtin_unittests post_check
 
 core_unittests_SOURCES = test/run_tests.cpp \
-						 src/core/tests/symbols_test.cpp
-core_unittests_LDADD = ${GTEST_LIBS}
+						 src/core/tests/symbols_test.cpp \
+						 src/core/tests/interpreter_test.cpp
+core_unittests_LDADD = ${GTEST_LIBS} libcppbash.la
 
 builtin_unittests_SOURCES = test/run_tests.cpp \
 							src/builtins/tests/echo_tests.cpp \

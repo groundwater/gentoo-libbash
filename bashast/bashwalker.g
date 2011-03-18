@@ -22,6 +22,11 @@ void set_interpreter(std::shared_ptr<interpreter> w)
 }
 }
 
+name	returns[std::string libbash_value]:
+	NAME {$libbash_value = walker->get_string($NAME);}
+	|	LETTER {$libbash_value = walker->get_string($LETTER);}
+	|	'_' {$libbash_value="_";};
+
 // shell arithmetic
 arithmetics returns[int value]
 :
@@ -49,6 +54,13 @@ arithmetics returns[int value]
 	|^(ARITHMETIC_CONDITION cnd=arithmetics l=arithmetics r=arithmetics){
 		$value = walker->arithmetic_condition(cnd, l, r);
 	}
+	|^(VAR_REF libbash_name=name) {
+		$value = walker->resolve<int>(libbash_name);
+	}
+	|^(PRE_INCR libbash_name=name){ $value = walker->pre_incr(libbash_name); }
+	|^(PRE_DECR libbash_name=name){ $value = walker->pre_decr(libbash_name); }
+	|^(POST_INCR libbash_name=name){ $value = walker->post_incr(libbash_name); }
+	|^(POST_DECR libbash_name=name){ $value = walker->post_decr(libbash_name); }
 	| NUMBER { $value = walker->parse_int($NUMBER);}
 	| DIGIT { $value = walker->parse_int($DIGIT);}
 	;

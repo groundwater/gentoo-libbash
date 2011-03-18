@@ -39,10 +39,10 @@
 /// \brief implementation for bash interpreter
 ///
 class interpreter{
-public:
-  /// \var public::members
+  /// \var private::members
   /// \brief global symbol table
   scope members;
+public:
 
   /// \brief parse the text value of a tree to integer
   /// \param the target tree
@@ -50,6 +50,19 @@ public:
   static int parse_int(ANTLR3_BASE_TREE* tree)
   {
     return tree->getText(tree)->toInt32(tree->getText(tree));
+  }
+
+  /// \brief a helper function that get the string value
+  ///        of the given pANTLR3_BASE_TREE node.
+  /// \param the target tree node
+  /// \return the value of node->text
+  static std::string get_string(pANTLR3_BASE_TREE node)
+  {
+    pANTLR3_COMMON_TOKEN token = node->getToken(node);
+    // Use reinterpret_cast here because we have to cast C code.
+    // The real type here is int64_t which is used as a pointer.
+    return std::string(reinterpret_cast<const char *>(token->start),
+                       token->stop - token->start + 1);
   }
 
   /// \brief perform logic or
@@ -233,6 +246,86 @@ public:
   static int arithmetic_condition(int cnd, int left, int right)
   {
     return (cnd? left : right);
+  }
+
+  /// \brief perform pre-increment
+  /// \param the variable name
+  /// \return the increased value
+  int pre_incr(const std::string& name)
+  {
+    int value = resolve<int>(name);
+    set_value(name, ++value);
+    return value;
+  }
+
+  /// \brief perform pre-decrement
+  /// \param the variable name
+  /// \return the decreased value
+  int pre_decr(const std::string& name)
+  {
+    int value = resolve<int>(name);
+    set_value(name, --value);
+    return value;
+  }
+
+  /// \brief perform post-increment
+  /// \param the variable name
+  /// \return the original value
+  int post_incr(const std::string& name)
+  {
+    int value = resolve<int>(name);
+    set_value(name, value + 1);
+    return value;
+  }
+
+  /// \brief perform post-decrement
+  /// \param the variable name
+  /// \return the original value
+  int post_decr(const std::string& name)
+  {
+    int value = resolve<int>(name);
+    set_value(name, value - 1);
+    return value;
+  }
+
+  /// \brief resolve any variable
+  /// \param variable name
+  /// \return the value of the variable, call default constructor if
+  //          it's undefined
+  template <typename T>
+  T resolve(const std::string& name)
+  {
+    std::shared_ptr<symbol> value = members.resolve(name);
+    if(!value)
+      return T();
+    return std::static_pointer_cast<variable>(value)->get_value<T>();
+  }
+
+  /// \brief update the variable value, raise interpreter_exception if
+  ///        it's readonly, do thing if the variable doesn't exist
+  /// \param variable name
+  /// \param new value
+  template <typename T>
+  void set_value(const std::string& name, const T& new_value)
+  {
+    std::shared_ptr<symbol> value = members.resolve(name);
+    if(!value)
+      return;
+    std::static_pointer_cast<variable>(value)->set_value(new_value);
+  }
+
+  /// \brief define a new variable
+  /// \param the name of the variable
+  /// \param the value of the variable
+  /// \param whether it's readonly, default is false
+  template <typename T>
+  void define(const std::string& name,
+              const T& value,
+              bool readonly=false)
+  {
+    std::shared_ptr<variable> target(
+        new variable(name, value, readonly));
+    members.define(target);
   }
 };
 #endif

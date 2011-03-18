@@ -40,7 +40,6 @@ class walker_test: public ::testing::Test
   pbashastParser psr;
   bashastParser_arithmetics_return langAST;
   pANTLR3_COMMON_TREE_NODE_STREAM nodes;
-  shared_ptr<interpreter> walker;
 protected:
   virtual void SetUp()
   {
@@ -57,6 +56,7 @@ protected:
   }
 public:
   pbashwalker treePsr;
+  shared_ptr<interpreter> walker;
   void init_walker(const char *script);
 };
 
@@ -102,6 +102,8 @@ void walker_test::init_walker(const char *script){
   nodes   = antlr3CommonTreeNodeStreamNewTree(langAST.tree,
                                               ANTLR3_SIZE_HINT);
   treePsr = bashwalkerNew(nodes);
+  walker->define("value", 100);
+  set_interpreter(walker);
 }
 
 #define TEST_BINARY_ARITHMETIC(name, script, exp_value)\
@@ -135,5 +137,13 @@ TEST_BINARY_ARITHMETIC(negation,            "!10",          0)
 TEST_BINARY_ARITHMETIC(complement,          "~   10",       -11)
 TEST_BINARY_ARITHMETIC(arithmetic_cnd,      "1?10:5",       10)
 TEST_BINARY_ARITHMETIC(arithmetic_cnd2,     "0?10:5",       5)
+TEST_BINARY_ARITHMETIC(var_ref,             "$value",       100)
+TEST_BINARY_ARITHMETIC(pre_incr,            "++value",       101)
+TEST_BINARY_ARITHMETIC(pre_decr,            "--value",       99)
+TEST_BINARY_ARITHMETIC(post_incr,           "value++",       100)
+TEST_BINARY_ARITHMETIC(post_decr,           "value--",       100)
+TEST_BINARY_ARITHMETIC(complex_incr_decr,   "value+++value++", 201)
+TEST_BINARY_ARITHMETIC(complex_incr_decr2,  "++value+value++", 202)
 TEST_BINARY_ARITHMETIC(complex_cal,         "10*(2+5)<<3%2**5", 560)
-TEST_BINARY_ARITHMETIC(complex_cal2,        "(20&5|3||1*100-20&5*10)+~(2*5)", -10)
+TEST_BINARY_ARITHMETIC(complex_cal2,        "10*${value}<<3%2**5", 8000)
+TEST_BINARY_ARITHMETIC(complex_cal3,        "(20&5|3||1*100-20&5*10)+~(2*5)", -10)
