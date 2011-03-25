@@ -63,11 +63,13 @@ core_unittests_SOURCES = test/run_tests.cpp \
 						 src/core/tests/symbols_test.cpp \
 						 src/core/tests/interpreter_test.cpp
 core_unittests_LDADD = ${GTEST_LIBS} libcppbash.la
+core_unittests_LDFLAGS = -static
 
 builtin_unittests_SOURCES = test/run_tests.cpp \
 							src/builtins/tests/echo_tests.cpp \
 							src/builtins/tests/boolean_tests.cpp
 builtin_unittests_LDADD = ${GTEST_LIBS} libcppbash.la
+builtin_unittests_LDFLAGS = -static
 
 post_check_SOURCES = test/run_tests.cpp \
 					 test/post_check.cpp \
@@ -76,6 +78,7 @@ post_check_LDADD = ${GTEST_LIBS}\
 				   $(BOOST_SYSTEM_LIB)\
 				   $(BOOST_FILESYSTEM_LIB)\
 				   libcppbash.la
+post_check_LDFLAGS = -static
 endif
 
 GENERATED_PARSER_C = bashastLexer.c bashastParser.c
@@ -107,6 +110,9 @@ libcppbash_la_SOURCES = src/cppbash_builtin.cpp \
 						src/core/interpreter.h \
 						src/core/symbols.hpp \
 						$(GENERATED_WALKER_C)
+libcppbash_la_CXXFLAGS = $(AM_CXXFLAGS) \
+						 -fvisibility=hidden \
+						 -fvisibility-inlines-hidden
 
 EXTRA_DIST = bashast/bashast.g \
 			 bashast/bashwalker.g \
