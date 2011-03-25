@@ -122,9 +122,11 @@ EXTRA_DIST = bashast/bashast.g \
 coding_standard.pdf: coding_standard/coding_standard.tex
 	@PDFLATEX@ coding_standard/coding_standard.tex 2&>1 > /dev/null
 
+ANTLR = @JAVA@ -classpath @antlr_cp@ org.antlr.Tool
+
 cgrammar.run: bashast.g
 	touch $@.tmp
-	@JAVA@ -classpath @antlr_cp@ -Xmx1024m org.antlr.Tool -Xconversiontimeout 20000 -fo . $<
+	$(ANTLR) -fo . $<
 	mv $@.tmp $@
 
 bashast.g: bashast/bashast.g
@@ -134,7 +136,7 @@ bashast.g: bashast/bashast.g
 # starts with libbash_ will be stripped
 walker.run: bashast/bashwalker.g cgrammar.run
 	touch $@.tmp
-	@JAVA@ -classpath @antlr_cp@ -Xmx1024m org.antlr.Tool -Xconversiontimeout 20000 -fo . $<
+	$(ANTLR) -fo . $<
 	sed -i -e 's/\(libbash_.*\) = NULL/\1/' bashwalker.c
 	mv $@.tmp $@
 
@@ -146,7 +148,7 @@ $(GENERATED_WALKER_H): walker.run
 
 bashast/javagrammar.run: bashast/bashast.g
 	touch $@.tmp
-	@JAVA@ -classpath @antlr_cp@ -Xmx1024m org.antlr.Tool -Xconversiontimeout 20000 -fo bashast $<
+	$(ANTLR) -fo bashast $<
 	mv $@.tmp $@
 
 $(check_JAVA): bashast/javagrammar.run
