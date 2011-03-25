@@ -94,8 +94,8 @@ CLEANFILES = $(GENERATED_PARSER_C) \
 			 bashast.tokens \
 			 bashast/bashast.tokens \
 			 bashwalker.tokens \
-			 bashast/grammar.run \
-			 grammar.run \
+			 bashast/javagrammar.run \
+			 cgrammar.run \
 			 walker.run
 
 lib_LTLIBRARIES = libcppbash.la
@@ -122,29 +122,31 @@ EXTRA_DIST = bashast/bashast.g \
 coding_standard.pdf: coding_standard/coding_standard.tex
 	@PDFLATEX@ coding_standard/coding_standard.tex 2&>1 > /dev/null
 
-grammar.run: bashast.g
+cgrammar.run: bashast.g
+	touch $@.tmp
 	@JAVA@ -classpath @antlr_cp@ -Xmx1024m org.antlr.Tool -Xconversiontimeout 20000 -fo . $<
-	touch $@
+	mv $@.tmp $@
 
 bashast.g: bashast/bashast.g
 	sed -e 's/CommonTree/pANTLR3_BASE_TREE/g' -e 's/Java/C/g' $< > $@
 
-walker.run: bashast/bashwalker.g
-	@JAVA@ -classpath @antlr_cp@ -Xmx1024m org.antlr.Tool -Xconversiontimeout 20000 bashast.g -fo . $<
-	touch $@
-
-$(GENERATED_PARSER_C): grammar.run
-$(GENERATED_PARSER_H): grammar.run
-
 # Avoid initializing C++ type to NULL by sed, variables whose name
 # starts with libbash_ will be stripped
-$(GENERATED_WALKER_C): walker.run
-	sed -i -e 's/\(libbash_.*\) = NULL/\1/' $@
+walker.run: bashast/bashwalker.g
+	touch $@.tmp
+	@JAVA@ -classpath @antlr_cp@ -Xmx1024m org.antlr.Tool -Xconversiontimeout 20000 bashast.g -fo . $<
+	sed -i -e 's/\(libbash_.*\) = NULL/\1/' bashwalker.c
+	mv $@.tmp $@
 
+$(GENERATED_PARSER_C): cgrammar.run
+$(GENERATED_PARSER_H): cgrammar.run
+
+$(GENERATED_WALKER_C): walker.run
 $(GENERATED_WALKER_H): walker.run
 
-bashast/grammar.run: bashast/bashast.g
+bashast/javagrammar.run: bashast/bashast.g
+	touch $@.tmp
 	@JAVA@ -classpath @antlr_cp@ -Xmx1024m org.antlr.Tool -Xconversiontimeout 20000 -fo bashast $<
-	touch $@
+	mv $@.tmp $@
 
-$(check_JAVA): bashast/grammar.run
+$(check_JAVA): bashast/javagrammar.run
