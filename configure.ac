@@ -22,7 +22,13 @@ AC_INIT([libbash],[0.1],[powerofazure@gmail.com])
 AM_INIT_AUTOMAKE([foreign parallel-tests color-tests subdir-objects])
 AC_PROG_CXX
 LT_INIT
-AX_BOOST_BASE(1.43.0,[:],[AC_MSG_ERROR([Needed boost not found])])
+
+AC_ARG_ENABLE([developer],
+			  [AS_HELP_STRING([--enable-developer],[makes compiler warnings errors])],
+			  [AS_IF([test "x$enable_developer" != xno],[AC_SUBST(DEVELOPER_FLAGS,["-Wall -Werror"])]]))
+AS_IF([test "x$enable_developer" != xno],[boost_version="1.46.1"],[boost_version="1.43.0"])
+AX_BOOST_BASE([$boost_version],[:],
+			  [AC_MSG_ERROR([Needed boost not found])])
 AX_BOOST_SYSTEM
 AX_BOOST_FILESYSTEM
 AC_PATH_PROG([JAVA],[java],"no")

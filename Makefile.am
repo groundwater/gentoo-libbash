@@ -50,10 +50,12 @@ TESTS = $(GUNIT_TESTS)
 check_JAVA = bashast/bashastLexer.java bashast/bashastParser.java
 AM_JAVACFLAGS = -classpath @antlr_cp@
 
-AM_CXXFLAGS=$(BOOST_CPPFLAGS) -std=c++0x -I$(top_srcdir)/src/
+COMMON_FLAGS = $(BOOST_CPPFLAGS) -std=c++0x -I$(top_srcdir)/src/
 # We use -x c++ to compile all C source files as C++ because there's C++
 # code embedded in them.
-AM_CFLAGS=-x c++ $(AM_CXXFLAGS)
+# no DEVELOPER_FLAGS to as the generated files don't pass -Werror
+AM_CFLAGS = -x c++ $(COMMON_FLAGS)
+AM_CXXFLAGS = $(COMMON_FLAGS) @DEVELOPER_FLAGS@
 
 if HAVE_GTEST
 TESTS += core_unittests builtin_unittests post_check
