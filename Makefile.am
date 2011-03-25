@@ -132,9 +132,9 @@ bashast.g: bashast/bashast.g
 
 # Avoid initializing C++ type to NULL by sed, variables whose name
 # starts with libbash_ will be stripped
-walker.run: bashast/bashwalker.g
+walker.run: bashast/bashwalker.g cgrammar.run
 	touch $@.tmp
-	@JAVA@ -classpath @antlr_cp@ -Xmx1024m org.antlr.Tool -Xconversiontimeout 20000 bashast.g -fo . $<
+	@JAVA@ -classpath @antlr_cp@ -Xmx1024m org.antlr.Tool -Xconversiontimeout 20000 -fo . $<
 	sed -i -e 's/\(libbash_.*\) = NULL/\1/' bashwalker.c
 	mv $@.tmp $@
 
