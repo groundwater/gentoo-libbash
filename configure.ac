@@ -1,5 +1,5 @@
 dnl ############################################
-dnl Copyright 2010 Nathan Eloe
+dnl Please use git log for copyright holder and year information
 dnl
 dnl This file is part of libbash.
 dnl

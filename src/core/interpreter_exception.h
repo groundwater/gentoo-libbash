@@ -1,5 +1,5 @@
 /*
-   Copyright 2011 Mu Qiao
+   Please use git log for copyright holder and year information
 
    This file is part of libbash.
 

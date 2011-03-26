@@ -1,6 +1,6 @@
 #!/bin/bash
 #############################################
-#Copyright 2010 Petteri Räty
+#Please use git log for copyright holder and year information
 #
 #This file is part of libbash.
 #

@@ -2,7 +2,7 @@
 # A "featureful" script that demonstrates all the functionality of the parser
 
 #############################################
-#Copyright 2010 Nathan Eloe
+#Please use git log for copyright holder and year information
 #
 #This file is part of libbash.
 #
