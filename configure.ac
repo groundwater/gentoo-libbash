@@ -19,7 +19,8 @@ dnl #############################################
 AC_PREREQ(2.65)
 AC_CONFIG_MACRO_DIR([m4])
 AC_INIT([libbash],[0.1],[powerofazure@gmail.com])
-AM_INIT_AUTOMAKE([foreign parallel-tests color-tests subdir-objects])
+AM_INIT_AUTOMAKE([foreign parallel-tests color-tests subdir-objects 1.11])
+AM_SILENT_RULES([yes])
 AC_PROG_CXX
 LT_INIT
 

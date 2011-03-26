@@ -118,25 +118,25 @@ EXTRA_DIST = bashast/bashast.g \
 			 $(GUNIT_LOG_COMPILER)
 
 coding_standard.pdf: coding_standard/coding_standard.tex
-	@PDFLATEX@ coding_standard/coding_standard.tex 2&>1 > /dev/null
+	$(AM_V_GEN)@PDFLATEX@ coding_standard/coding_standard.tex 2&>1 > /dev/null
 
 ANTLR = @JAVA@ -classpath @antlr_cp@ org.antlr.Tool
 
 cgrammar.run: bashast.g
-	touch $@.tmp
-	$(ANTLR) -fo . $<
-	mv $@.tmp $@
+	$(AM_V_at)touch $@.tmp
+	$(AM_V_GEN)$(ANTLR) -fo . $<
+	$(AM_V_at)mv $@.tmp $@
 
 bashast.g: bashast/bashast.g
-	sed -e 's/CommonTree/pANTLR3_BASE_TREE/g' -e 's/Java/C/g' $< > $@
+	$(AM_V_at)sed -e 's/CommonTree/pANTLR3_BASE_TREE/g' -e 's/Java/C/g' $< > $@
 
 # Avoid initializing C++ type to NULL by sed, variables whose name
 # starts with libbash_ will be stripped
 walker.run: bashast/bashwalker.g cgrammar.run
-	touch $@.tmp
-	$(ANTLR) -fo . $<
-	sed -i -e 's/\(libbash_.*\) = NULL/\1/' bashwalker.c
-	mv $@.tmp $@
+	$(AM_V_at)touch $@.tmp
+	$(AM_V_GEN)$(ANTLR) -fo . $<
+	$(AM_V_at)sed -i -e 's/\(libbash_.*\) = NULL/\1/' bashwalker.c
+	$(AM_V_GEN)mv $@.tmp $@
 
 $(GENERATED_PARSER_C): cgrammar.run
 $(GENERATED_PARSER_H): cgrammar.run
@@ -145,8 +145,8 @@ $(GENERATED_WALKER_C): walker.run
 $(GENERATED_WALKER_H): walker.run
 
 bashast/javagrammar.run: bashast/bashast.g
-	touch $@.tmp
-	$(ANTLR) -fo bashast $<
-	mv $@.tmp $@
+	$(AM_V_at)touch $@.tmp
+	$(AM_V_GEN)$(ANTLR) -fo bashast $<
+	$(AM_V_at)mv $@.tmp $@
 
 $(check_JAVA): bashast/javagrammar.run
