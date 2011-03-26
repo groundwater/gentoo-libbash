@@ -47,10 +47,6 @@ class symbol
   std::string name;
 
 public:
-  symbol(){}
-
-  symbol(const std::string& n): name(n){}
-
   /// \brief retrieve symbol name
   /// \return const string value of symbol name
   const std::string& get_name() const
@@ -58,6 +54,9 @@ public:
     return name;
   }
 
+protected:
+  symbol(const std::string& n): name(n){}
+  ~symbol() {}
 };
 
 ///

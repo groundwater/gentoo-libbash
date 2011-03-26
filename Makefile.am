@@ -58,7 +58,15 @@ COMMON_FLAGS = $(BOOST_CPPFLAGS) -std=c++0x -I$(top_srcdir)/src/
 AM_CFLAGS = -x c++ $(COMMON_FLAGS)
 AM_CXXFLAGS = $(COMMON_FLAGS)
 if DEVELOPER_MODE
-AM_CXXFLAGS += -Wall -Werror
+# -Weffc++ seems to be giving false positives on protected non
+# virtual destructors in base classes
+AM_CXXFLAGS += -Wall \
+			   -Wextra \
+			   -Wold-style-cast \
+			   -Woverloaded-virtual \
+			   -Wsign-promo \
+			   -pedantic-errors \
+			   -Werror
 AM_CPPFLAGS = -D_GLIBCXX_DEBUG
 endif
 

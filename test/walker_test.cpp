@@ -64,7 +64,8 @@ public:
 
 void walker_test::init_walker(const char *script){
 
-  input  = antlr3NewAsciiStringInPlaceStream((pANTLR3_UINT8)script,
+  auto start = reinterpret_cast<pANTLR3_UINT8>(const_cast<char *>(script));
+  input  = antlr3NewAsciiStringInPlaceStream(start,
                                              strlen(script),
                                              NULL);
   if ( input == NULL )

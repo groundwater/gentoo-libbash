@@ -26,11 +26,11 @@
 struct true_builtin : public virtual cppbash_builtin
 {
   BUILTIN_CONSTRUCTOR(true)
-  virtual int exec(const std::vector<std::string>& bash_args) { return 0; }
+  virtual int exec(const std::vector<std::string>& ) { return 0; }
 };
 
 struct false_builtin : public virtual cppbash_builtin
 {
   BUILTIN_CONSTRUCTOR(false)
-  virtual int exec(const std::vector<std::string>& bash_args) { return 1; }
+  virtual int exec(const std::vector<std::string>& ) { return 1; }
 };

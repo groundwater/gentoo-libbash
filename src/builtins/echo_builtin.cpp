@@ -128,7 +128,8 @@ void echo_builtin::transform_escapes(const std::string &string)
     (
      lit('a')[this->out_buffer() << val("\a")] |
      lit('b')[this->out_buffer() << val("\b")] |
-     lit('e')[this->out_buffer() << val("\e")] |
+     // \e is a GNU extension
+     lit('e')[this->out_buffer() << val("\033")] |
      lit('f')[this->out_buffer() << val("\f")] |
      lit('n')[this->out_buffer() << val("\n")] |
      lit('r')[this->out_buffer() << val("\r")] |

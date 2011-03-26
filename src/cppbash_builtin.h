@@ -49,6 +49,9 @@ class cppbash_builtin
     /// \param instream where to get standard input from.  Default: stdin
     ///
     cppbash_builtin(STREAM_ARGS);
+    /// prevent copying
+    cppbash_builtin(const cppbash_builtin& ) = delete;
+    const cppbash_builtin& operator=( const cppbash_builtin& ) = delete;
 
     virtual ~cppbash_builtin() {};
     ///
