@@ -55,7 +55,11 @@ COMMON_FLAGS = $(BOOST_CPPFLAGS) -std=c++0x -I$(top_srcdir)/src/
 # code embedded in them.
 # no DEVELOPER_FLAGS to as the generated files don't pass -Werror
 AM_CFLAGS = -x c++ $(COMMON_FLAGS)
-AM_CXXFLAGS = $(COMMON_FLAGS) @DEVELOPER_FLAGS@
+AM_CXXFLAGS = $(COMMON_FLAGS)
+if DEVELOPER_MODE
+AM_CXXFLAGS += -Wall -Werror
+AM_CPPFLAGS = -D_GLIBCXX_DEBUG
+endif
 
 if HAVE_GTEST
 TESTS += core_unittests builtin_unittests post_check
