@@ -16,9 +16,7 @@ install-sh
 missing
 Makefile
 autom4te.cache
-core_unittests
-builtin_unittests
-post_check
+cppunittests
 bashast.g
 bashast.tokens
 bashast/.DS_Store

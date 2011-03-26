@@ -62,29 +62,21 @@ AM_CPPFLAGS = -D_GLIBCXX_DEBUG
 endif
 
 if HAVE_GTEST
-TESTS += core_unittests builtin_unittests post_check
-check_PROGRAMS = core_unittests builtin_unittests post_check
+TESTS += cppunittests
+check_PROGRAMS = cppunittests
 
-core_unittests_SOURCES = test/run_tests.cpp \
-						 src/core/tests/symbols_test.cpp \
-						 src/core/tests/interpreter_test.cpp
-core_unittests_LDADD = ${GTEST_LIBS} libcppbash.la
-core_unittests_LDFLAGS = -static
-
-builtin_unittests_SOURCES = test/run_tests.cpp \
-							src/builtins/tests/echo_tests.cpp \
-							src/builtins/tests/boolean_tests.cpp
-builtin_unittests_LDADD = ${GTEST_LIBS} libcppbash.la
-builtin_unittests_LDFLAGS = -static
-
-post_check_SOURCES = test/run_tests.cpp \
-					 test/post_check.cpp \
-					 test/walker_test.cpp
-post_check_LDADD = ${GTEST_LIBS}\
-				   $(BOOST_SYSTEM_LIB)\
-				   $(BOOST_FILESYSTEM_LIB)\
-				   libcppbash.la
-post_check_LDFLAGS = -static
+cppunittests_SOURCES =  test/run_tests.cpp \
+						src/core/tests/symbols_test.cpp \
+						src/core/tests/interpreter_test.cpp \
+						src/builtins/tests/echo_tests.cpp \
+						src/builtins/tests/boolean_tests.cpp \
+						test/post_check.cpp \
+						test/walker_test.cpp
+cppunittests_LDADD = libcppbash.la \
+					 $(GTEST_LIBS) \
+					 $(BOOST_SYSTEM_LIB) \
+					 $(BOOST_FILESYSTEM_LIB)
+cppunittests_LDFLAGS = -static
 endif
 
 GENERATED_PARSER_C = bashastLexer.c bashastParser.c
