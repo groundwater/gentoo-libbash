@@ -117,9 +117,12 @@ libcppbash_la_SOURCES = src/cppbash_builtin.cpp \
 						src/core/interpreter.h \
 						src/core/symbols.hpp \
 						$(GENERATED_WALKER_C)
-libcppbash_la_CXXFLAGS = $(AM_CXXFLAGS) \
-						 -fvisibility=hidden \
-						 -fvisibility-inlines-hidden
+
+HIDDEN_FLAGS = -fvisibility=hidden \
+			   -fvisibility-inlines-hidden
+
+libcppbash_la_CXXFLAGS = $(AM_CXXFLAGS) $(HIDDEN_FLAGS)
+libcppbash_la_CFLAGS = $(AM_CFLAGS) $(HIDDEN_FLAGS)
 
 EXTRA_DIST = bashast/bashast.g \
 			 bashast/bashwalker.g \
