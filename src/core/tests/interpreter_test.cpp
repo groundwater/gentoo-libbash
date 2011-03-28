@@ -48,10 +48,10 @@ TEST(interpreter, set_int_value)
 {
   interpreter walker;
   walker.define("aint", 4);
-  walker.set_value("aint", 10);
+  EXPECT_EQ(4, walker.set_value("aint", 10));
   EXPECT_EQ(10, walker.resolve<int>("aint"));
-  walker.set_value("undefined", 10);
-  EXPECT_EQ(0, walker.resolve<int>("undefined"));
+  EXPECT_EQ(0, walker.set_value("undefined", 10));
+  EXPECT_EQ(10, walker.resolve<int>("undefined"));
 
   walker.define("aint_ro", 4, true);
   EXPECT_THROW(walker.set_value("aint_ro", 10),
@@ -63,13 +63,13 @@ TEST(interpreter, set_string_value)
 {
   interpreter walker;
   walker.define("astring", "hi");
-  walker.set_value("astring", "hello");
+  EXPECT_STREQ("hi", walker.set_value<string>("astring", "hello").c_str());
   EXPECT_STREQ("hello", walker.resolve<string>("astring").c_str());
-  walker.set_value("undefined", "hello");
-  EXPECT_STREQ("", walker.resolve<string>("undefined").c_str());
+  EXPECT_STREQ("", walker.set_value<string>("undefined", "hello").c_str());
+  EXPECT_STREQ("hello", walker.resolve<string>("undefined").c_str());
 
   walker.define("astring_ro", "hi", true);
-  EXPECT_THROW(walker.set_value("astring_ro", "hello"),
+  EXPECT_THROW(walker.set_value<string>("astring_ro", "hello"),
                interpreter_exception);
   EXPECT_STREQ("hi", walker.resolve<string>("astring_ro").c_str());
 }
