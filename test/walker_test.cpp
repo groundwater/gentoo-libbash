@@ -168,3 +168,13 @@ TEST_BINARY_ARITHMETIC(complex_cal3,        "(20&5|3||1*100-20&5*10)+~(2*5)", -1
 
 TEST_INT_VARIABLE_VALUE(assignment,             "new_var=10",   "new_var",      10)
 TEST_INT_VARIABLE_VALUE(assignment2,            "value=10+5/2", "value",        12)
+TEST_INT_VARIABLE_VALUE(mul_assignment,         "value*=10",    "value",        1000)
+TEST_INT_VARIABLE_VALUE(divide_assignment,      "value/=10",    "value",        10)
+TEST_INT_VARIABLE_VALUE(mod_assignment,         "value%=9",     "value",        1)
+TEST_INT_VARIABLE_VALUE(plus_assignment,        "value+=10",    "value",        110)
+TEST_INT_VARIABLE_VALUE(minus_assignment,       "value-=10",    "value",        90)
+TEST_INT_VARIABLE_VALUE(left_shift_assignment,  "value<<=2",    "value",        400)
+TEST_INT_VARIABLE_VALUE(right_shift_assignment, "value>>=2",    "value",        25)
+TEST_INT_VARIABLE_VALUE(and_assignment,         "value&=10",    "value",        0)
+TEST_INT_VARIABLE_VALUE(xor_assignment,         "value^=5",     "value",        97)
+TEST_INT_VARIABLE_VALUE(or_assignment,          "value|=10",    "value",        110)

@@ -80,6 +80,46 @@ arithmetics returns[int value]
 	|^(POST_INCR libbash_name=name){ $value = walker->post_incr(libbash_name); }
 	|^(POST_DECR libbash_name=name){ $value = walker->post_decr(libbash_name); }
 	|^(EQUALS libbash_name=name l=arithmetics) { walker->set_value(libbash_name, l); }
+	|^(MUL_ASSIGN libbash_name=name l=arithmetics) {
+		walker->set_value(libbash_name,
+						  walker->multiply(walker->resolve<int>(libbash_name), l));
+	}
+	|^(DIVIDE_ASSIGN libbash_name=name l=arithmetics) {
+		walker->set_value(libbash_name,
+						  walker->divide(walker->resolve<int>(libbash_name), l));
+	}
+	|^(MOD_ASSIGN libbash_name=name l=arithmetics) {
+		walker->set_value(libbash_name,
+						  walker->mod(walker->resolve<int>(libbash_name), l));
+	}
+	|^(PLUS_ASSIGN libbash_name=name l=arithmetics) {
+		walker->set_value(libbash_name,
+						  walker->plus(walker->resolve<int>(libbash_name), l));
+	}
+	|^(MINUS_ASSIGN libbash_name=name l=arithmetics) {
+		walker->set_value(libbash_name,
+						  walker->minus(walker->resolve<int>(libbash_name), l));
+	}
+	|^(LSHIFT_ASSIGN libbash_name=name l=arithmetics) {
+		walker->set_value(libbash_name,
+						  walker->left_shift(walker->resolve<int>(libbash_name), l));
+	}
+	|^(RSHIFT_ASSIGN libbash_name=name l=arithmetics) {
+		walker->set_value(libbash_name,
+						  walker->right_shift(walker->resolve<int>(libbash_name), l));
+	}
+	|^(AND_ASSIGN libbash_name=name l=arithmetics) {
+		walker->set_value(libbash_name,
+						  walker->bitwiseand(walker->resolve<int>(libbash_name), l));
+	}
+	|^(XOR_ASSIGN libbash_name=name l=arithmetics) {
+		walker->set_value(libbash_name,
+						  walker->bitwisexor(walker->resolve<int>(libbash_name), l));
+	}
+	|^(OR_ASSIGN libbash_name=name l=arithmetics) {
+		walker->set_value(libbash_name,
+						  walker->bitwiseor(walker->resolve<int>(libbash_name), l));
+	}
 	| NUMBER { $value = walker->parse_int($NUMBER);}
 	| DIGIT { $value = walker->parse_int($DIGIT);}
 	;
