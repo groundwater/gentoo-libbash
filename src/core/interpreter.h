@@ -29,6 +29,7 @@
 
 #include <memory>
 #include <string>
+#include <functional>
 
 #include <antlr3basetree.h>
 
@@ -287,6 +288,15 @@ public:
     int value = resolve<int>(name);
     set_value(name, value - 1);
     return value;
+  }
+
+  /// \brief assign with an operator (for example multiply)
+  /// \param a function object to do an operation while assigning
+  /// \param the name of the variable
+  /// \param the value to assign
+  void assign(std::function<int(int,int)> f, const std::string& name, int value)
+  {
+    set_value(name,f(resolve<int>(name), value));
   }
 
   /// \brief resolve any variable
