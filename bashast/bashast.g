@@ -509,8 +509,8 @@ name	:	NAME
 //****************
 
 COMMENT
-    :  (BLANK|EOL) '#' ~('\n'|'\r')* {$channel=HIDDEN;}
-    ;
+	:	(BLANK|EOL) '#' ~('\n'|'\r')* {$channel=HIDDEN;}
+	;
 //Bash "reserved words"
 BANG	:	'!';
 CASE	:	'case';
