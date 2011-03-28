@@ -364,7 +364,7 @@ ns_str_part
 //Parts of strings, no slashes, no reserved words
 ns_str_part_no_res
 	:	num
-	|	name|OTHER|EQUALS|PCT|PCTPCT|MINUS|DOT|DOTDOT|COLON|BOP|UOP|TEST_EXPR|'_'|TILDE|INC|DEC|ARITH_ASSIGN|ESC_CHAR|CARET;
+	|	name|OTHER|EQUALS|PCT|PCTPCT|MINUS|DOT|DOTDOT|COLON|BOP|UOP|TEST_EXPR|'_'|TILDE|INC|DEC|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN|OR_ASSIGN|ESC_CHAR|CARET;
 //strings with no slashes, used in certain variable expansions
 ns_str	:	ns_str_part* -> ^(STRING ns_str_part*);
 //Allowable parts of double quoted strings
@@ -493,7 +493,7 @@ logicor	:	logicand (BLANK!* LOGICOR^ BLANK!* logicand)*;
 arithmetic_condition
 	:	cnd=logicor QMARK t=logicor COLON f=logicor -> ^(ARITHMETIC_CONDITION $cnd $t $f);
 arithmetic_assignment
-	:	(name BLANK!* (EQUALS^|ARITH_ASSIGN^) BLANK!*)? logicor;
+	:	(name BLANK!* (EQUALS|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN|OR_ASSIGN)^ BLANK!*)? logicor;
 //process substitution
 proc_sub:	(dir=LESS_THAN|dir=GREATER_THAN)LPAREN BLANK* clist BLANK* RPAREN -> ^(PROC_SUB $dir clist);
 //the biggie: functions
@@ -561,8 +561,16 @@ LESS_THAN	:	'<';
 GREATER_THAN	:	'>';
 LSHIFT	:	'<<';
 RSHIFT	:	'>>';
-ARITH_ASSIGN
-	:	(TIMES|SLASH|PCT|PLUS|MINUS|LSHIFT|RSHIFT|AMP|CARET|PIPE) EQUALS;
+MUL_ASSIGN	:	'*=';
+DIVIDE_ASSIGN	:	'/=';
+MOD_ASSIGN	:	'%=';
+PLUS_ASSIGN	:	'+=';
+MINUS_ASSIGN	:	'-=';
+LSHIFT_ASSIGN	:	'<<=';
+RSHIFT_ASSIGN	:	'>>=';
+AND_ASSIGN	:	'&=';
+XOR_ASSIGN	:	'^=';
+OR_ASSIGN	:	'|=';
 //some separators
 SEMIC	:	';';
 DOUBLE_SEMIC
