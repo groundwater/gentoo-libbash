@@ -65,6 +65,12 @@ public:
     init_walker(script);
     return treePsr->arithmetics(treePsr);
   }
+
+  int get_arithmetic_variable(const char* script, const string& name)
+  {
+    run_arithmetic(script);
+    return walker->resolve<int>(name);
+  }
 };
 
 
@@ -155,3 +161,10 @@ TEST_BINARY_ARITHMETIC(complex_incr_decr2,  "++value+value++", 202)
 TEST_BINARY_ARITHMETIC(complex_cal,         "10*(2+5)<<3%2**5", 560)
 TEST_BINARY_ARITHMETIC(complex_cal2,        "10*${value}<<3%2**5", 8000)
 TEST_BINARY_ARITHMETIC(complex_cal3,        "(20&5|3||1*100-20&5*10)+~(2*5)", -10)
+
+#define TEST_INT_VARIABLE_VALUE(name, script, var_name, exp_value)\
+  TEST_F(walker_test, name) \
+  { EXPECT_EQ(exp_value, get_arithmetic_variable(script, var_name)); }
+
+TEST_INT_VARIABLE_VALUE(assignment,             "new_var=10",   "new_var",      10)
+TEST_INT_VARIABLE_VALUE(assignment2,            "value=10+5/2", "value",        12)

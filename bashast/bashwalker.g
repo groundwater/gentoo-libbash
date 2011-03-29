@@ -79,6 +79,7 @@ arithmetics returns[int value]
 	|^(PRE_DECR libbash_name=name){ $value = walker->pre_decr(libbash_name); }
 	|^(POST_INCR libbash_name=name){ $value = walker->post_incr(libbash_name); }
 	|^(POST_DECR libbash_name=name){ $value = walker->post_decr(libbash_name); }
+	|^(EQUALS libbash_name=name l=arithmetics) { walker->set_value(libbash_name, l); }
 	| NUMBER { $value = walker->parse_int($NUMBER);}
 	| DIGIT { $value = walker->parse_int($DIGIT);}
 	;
