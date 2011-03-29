@@ -55,10 +55,16 @@ protected:
     lxr->free(lxr);
     input->close(input);
   }
+  void init_walker(const char* script);
 public:
   pbashwalker treePsr;
   shared_ptr<interpreter> walker;
-  void init_walker(const char *script);
+
+  int run_arithmetic(const char* script)
+  {
+    init_walker(script);
+    return treePsr->arithmetics(treePsr);
+  }
 };
 
 
@@ -110,7 +116,7 @@ void walker_test::init_walker(const char *script){
 
 #define TEST_BINARY_ARITHMETIC(name, script, exp_value)\
   TEST_F(walker_test, name)\
-  {init_walker(script); EXPECT_EQ(exp_value, treePsr->arithmetics(treePsr));}
+  {EXPECT_EQ(exp_value, run_arithmetic(script));}
 
 TEST_BINARY_ARITHMETIC(logicor_true,        "0 || -2",      1)
 TEST_BINARY_ARITHMETIC(logicor_false,       "0 || 0",       0)
