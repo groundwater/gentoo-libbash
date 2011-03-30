@@ -80,8 +80,7 @@ arithmetics returns[int value]
 	|^(POST_INCR libbash_name=name){ $value = walker->post_incr(libbash_name); }
 	|^(POST_DECR libbash_name=name){ $value = walker->post_decr(libbash_name); }
 	|^(EQUALS libbash_name=name l=arithmetics) {
-		walker->set_value(libbash_name, l);
-		$value = l;
+		$value = walker->set_value(libbash_name, l);
 	}
 	|^(MUL_ASSIGN libbash_name=name l=arithmetics) {
 		$value = walker->assign(&interpreter::multiply, libbash_name, l);

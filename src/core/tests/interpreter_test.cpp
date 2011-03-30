@@ -48,9 +48,9 @@ TEST(interpreter, set_int_value)
 {
   interpreter walker;
   walker.define("aint", 4);
-  EXPECT_EQ(4, walker.set_value("aint", 10));
+  EXPECT_EQ(10, walker.set_value("aint", 10));
   EXPECT_EQ(10, walker.resolve<int>("aint"));
-  EXPECT_EQ(0, walker.set_value("undefined", 10));
+  EXPECT_EQ(10, walker.set_value("undefined", 10));
   EXPECT_EQ(10, walker.resolve<int>("undefined"));
 
   walker.define("aint_ro", 4, true);
@@ -63,9 +63,9 @@ TEST(interpreter, set_string_value)
 {
   interpreter walker;
   walker.define("astring", "hi");
-  EXPECT_STREQ("hi", walker.set_value<string>("astring", "hello").c_str());
+  EXPECT_STREQ("hello", walker.set_value<string>("astring", "hello").c_str());
   EXPECT_STREQ("hello", walker.resolve<string>("astring").c_str());
-  EXPECT_STREQ("", walker.set_value<string>("undefined", "hello").c_str());
+  EXPECT_STREQ("hello", walker.set_value<string>("undefined", "hello").c_str());
   EXPECT_STREQ("hello", walker.resolve<string>("undefined").c_str());
 
   walker.define("astring_ro", "hi", true);

@@ -319,23 +319,16 @@ public:
   ///        it's readonly, will define the variable if it doesn't exist
   /// \param variable name
   /// \param new value
-  /// \return the original value of the variable, will call default
-  ///         constructor if the variable doesn't exist
+  /// \return the new value of the variable
   template <typename T>
-  T set_value(const std::string& name, const T& new_value)
+  const T& set_value(const std::string& name, const T& new_value)
   {
     std::shared_ptr<symbol> value = members.resolve(name);
-    T old_value{};
     if(!value)
-    {
       define(name, new_value, false);
-    }
     else
-    {
-      old_value = std::static_pointer_cast<variable>(value)->get_value<T>();
       std::static_pointer_cast<variable>(value)->set_value(new_value);
-    }
-    return old_value;
+    return new_value;
   }
 
   /// \brief define a new variable
