@@ -79,36 +79,39 @@ arithmetics returns[int value]
 	|^(PRE_DECR libbash_name=name){ $value = walker->pre_decr(libbash_name); }
 	|^(POST_INCR libbash_name=name){ $value = walker->post_incr(libbash_name); }
 	|^(POST_DECR libbash_name=name){ $value = walker->post_decr(libbash_name); }
-	|^(EQUALS libbash_name=name l=arithmetics) { walker->set_value(libbash_name, l); }
+	|^(EQUALS libbash_name=name l=arithmetics) {
+		walker->set_value(libbash_name, l);
+		$value = l;
+	}
 	|^(MUL_ASSIGN libbash_name=name l=arithmetics) {
-		walker->assign(&interpreter::multiply, libbash_name, l);
+		$value = walker->assign(&interpreter::multiply, libbash_name, l);
 	}
 	|^(DIVIDE_ASSIGN libbash_name=name l=arithmetics) {
-		walker->assign(&interpreter::divide, libbash_name, l);
+		$value = walker->assign(&interpreter::divide, libbash_name, l);
 	}
 	|^(MOD_ASSIGN libbash_name=name l=arithmetics) {
-		walker->assign(&interpreter::mod, libbash_name, l);
+		$value = walker->assign(&interpreter::mod, libbash_name, l);
 	}
 	|^(PLUS_ASSIGN libbash_name=name l=arithmetics) {
-		walker->assign(&interpreter::plus, libbash_name, l);
+		$value = walker->assign(&interpreter::plus, libbash_name, l);
 	}
 	|^(MINUS_ASSIGN libbash_name=name l=arithmetics) {
-		walker->assign(&interpreter::minus, libbash_name, l);
+		$value = walker->assign(&interpreter::minus, libbash_name, l);
 	}
 	|^(LSHIFT_ASSIGN libbash_name=name l=arithmetics) {
-		walker->assign(&interpreter::left_shift, libbash_name, l);
+		$value = walker->assign(&interpreter::left_shift, libbash_name, l);
 	}
 	|^(RSHIFT_ASSIGN libbash_name=name l=arithmetics) {
-		walker->assign(&interpreter::right_shift, libbash_name, l);
+		$value = walker->assign(&interpreter::right_shift, libbash_name, l);
 	}
 	|^(AND_ASSIGN libbash_name=name l=arithmetics) {
-		walker->assign(&interpreter::bitwiseand, libbash_name, l);
+		$value = walker->assign(&interpreter::bitwiseand, libbash_name, l);
 	}
 	|^(XOR_ASSIGN libbash_name=name l=arithmetics) {
-		walker->assign(&interpreter::bitwisexor, libbash_name, l);
+		$value = walker->assign(&interpreter::bitwisexor, libbash_name, l);
 	}
 	|^(OR_ASSIGN libbash_name=name l=arithmetics) {
-		walker->assign(&interpreter::bitwiseor, libbash_name, l);
+		$value = walker->assign(&interpreter::bitwiseor, libbash_name, l);
 	}
 	| NUMBER { $value = walker->parse_int($NUMBER);}
 	| DIGIT { $value = walker->parse_int($DIGIT);}

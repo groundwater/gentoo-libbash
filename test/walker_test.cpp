@@ -66,10 +66,14 @@ public:
     return treePsr->arithmetics(treePsr);
   }
 
-  int get_arithmetic_variable(const char* script, const string& name)
+  void check_arithmetic_assignment(const char* script,
+                                   const string& name,
+                                   int exp_value)
   {
-    run_arithmetic(script);
-    return walker->resolve<int>(name);
+    // the return value of the arithmetic expression should be equal to
+    // the new value of the variable
+    EXPECT_EQ(exp_value, run_arithmetic(script));
+    EXPECT_EQ(exp_value, walker->resolve<int>(name));
   }
 };
 
@@ -162,19 +166,19 @@ TEST_BINARY_ARITHMETIC(complex_cal,         "10*(2+5)<<3%2**5", 560)
 TEST_BINARY_ARITHMETIC(complex_cal2,        "10*${value}<<3%2**5", 8000)
 TEST_BINARY_ARITHMETIC(complex_cal3,        "(20&5|3||1*100-20&5*10)+~(2*5)", -10)
 
-#define TEST_INT_VARIABLE_VALUE(name, script, var_name, exp_value)\
+#define TEST_ARITHMETIC_ASSIGNMENT(name, script, var_name, exp_value)\
   TEST_F(walker_test, name) \
-  { EXPECT_EQ(exp_value, get_arithmetic_variable(script, var_name)); }
+  { check_arithmetic_assignment(script, var_name, exp_value); }
 
-TEST_INT_VARIABLE_VALUE(assignment,             "new_var=10",   "new_var",      10)
-TEST_INT_VARIABLE_VALUE(assignment2,            "value=10+5/2", "value",        12)
-TEST_INT_VARIABLE_VALUE(mul_assignment,         "value*=10",    "value",        1000)
-TEST_INT_VARIABLE_VALUE(divide_assignment,      "value/=10",    "value",        10)
-TEST_INT_VARIABLE_VALUE(mod_assignment,         "value%=9",     "value",        1)
-TEST_INT_VARIABLE_VALUE(plus_assignment,        "value+=10",    "value",        110)
-TEST_INT_VARIABLE_VALUE(minus_assignment,       "value-=10",    "value",        90)
-TEST_INT_VARIABLE_VALUE(left_shift_assignment,  "value<<=2",    "value",        400)
-TEST_INT_VARIABLE_VALUE(right_shift_assignment, "value>>=2",    "value",        25)
-TEST_INT_VARIABLE_VALUE(and_assignment,         "value&=10",    "value",        0)
-TEST_INT_VARIABLE_VALUE(xor_assignment,         "value^=5",     "value",        97)
-TEST_INT_VARIABLE_VALUE(or_assignment,          "value|=10",    "value",        110)
+TEST_ARITHMETIC_ASSIGNMENT(assignment,             "new_var=10",   "new_var",      10)
+TEST_ARITHMETIC_ASSIGNMENT(assignment2,            "value=10+5/2", "value",        12)
+TEST_ARITHMETIC_ASSIGNMENT(mul_assignment,         "value*=10",    "value",        1000)
+TEST_ARITHMETIC_ASSIGNMENT(divide_assignment,      "value/=10",    "value",        10)
+TEST_ARITHMETIC_ASSIGNMENT(mod_assignment,         "value%=9",     "value",        1)
+TEST_ARITHMETIC_ASSIGNMENT(plus_assignment,        "value+=10",    "value",        110)
+TEST_ARITHMETIC_ASSIGNMENT(minus_assignment,       "value-=10",    "value",        90)
+TEST_ARITHMETIC_ASSIGNMENT(left_shift_assignment,  "value<<=2",    "value",        400)
+TEST_ARITHMETIC_ASSIGNMENT(right_shift_assignment, "value>>=2",    "value",        25)
+TEST_ARITHMETIC_ASSIGNMENT(and_assignment,         "value&=10",    "value",        0)
+TEST_ARITHMETIC_ASSIGNMENT(xor_assignment,         "value^=5",     "value",        97)
+TEST_ARITHMETIC_ASSIGNMENT(or_assignment,          "value|=10",    "value",        110)

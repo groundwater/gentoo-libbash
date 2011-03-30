@@ -294,9 +294,12 @@ public:
   /// \param a function object to do an operation while assigning
   /// \param the name of the variable
   /// \param the value to assign
-  void assign(std::function<int(int,int)> f, const std::string& name, int value)
+  /// \return the new value of the variable
+  int assign(std::function<int(int,int)> f, const std::string& name, int value)
   {
-    set_value(name,f(resolve<int>(name), value));
+    int new_value = f(resolve<int>(name), value);
+    set_value(name, new_value);
+    return new_value;
   }
 
   /// \brief resolve any variable
