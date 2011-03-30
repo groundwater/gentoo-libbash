@@ -101,7 +101,7 @@ CLEANFILES = $(GENERATED_PARSER_C) \
 			 libbash.tokens \
 			 bashast/bashast.tokens \
 			 libbashWalker.tokens \
-			 bashast/javagrammar.run \
+			 javagrammar.run \
 			 cgrammar.run \
 			 walker.run
 
@@ -158,9 +158,9 @@ $(GENERATED_PARSER_H): cgrammar.run
 $(GENERATED_WALKER_C): walker.run
 $(GENERATED_WALKER_H): walker.run
 
-bashast/javagrammar.run: bashast/bashast.g
+javagrammar.run: bashast/bashast.g
 	$(AM_V_at)touch $@.tmp
 	$(AM_V_GEN)$(ANTLR) -fo bashast $<
 	$(AM_V_at)mv $@.tmp $@
 
-$(check_JAVA): bashast/javagrammar.run
+$(check_JAVA): javagrammar.run
