@@ -16,12 +16,12 @@
    You should have received a copy of the GNU General Public License
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
-tree grammar bashwalker;
+tree grammar libbashWalker;
 
 options
 {
 	language = C;
-	tokenVocab = bashast;
+	tokenVocab = libbash;
 	ASTLabelType = pANTLR3_BASE_TREE;
 }
 

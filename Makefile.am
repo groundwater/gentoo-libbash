@@ -88,19 +88,19 @@ cppunittests_LDADD = libcppbash.la \
 cppunittests_LDFLAGS = -static
 endif
 
-GENERATED_PARSER_C = bashastLexer.c bashastParser.c
-GENERATED_PARSER_H = bashastLexer.h bashastParser.h
-GENERATED_WALKER_C = bashwalker.c
-GENERATED_WALKER_H = bashwalker.h
+GENERATED_PARSER_C = libbashLexer.c libbashParser.c
+GENERATED_PARSER_H = libbashLexer.h libbashParser.h
+GENERATED_WALKER_C = libbashWalker.c
+GENERATED_WALKER_H = libbashWalker.h
 CLEANFILES = $(GENERATED_PARSER_C) \
 			 $(GENERATED_PARSER_H) \
 			 $(GENERATED_WALKER_C) \
 			 $(GENERATED_WALKER_H) \
 			 $(check_JAVA) \
-			 bashast.g \
-			 bashast.tokens \
+			 libbash.g \
+			 libbash.tokens \
 			 bashast/bashast.tokens \
-			 bashwalker.tokens \
+			 libbashWalker.tokens \
 			 bashast/javagrammar.run \
 			 cgrammar.run \
 			 walker.run
@@ -125,7 +125,7 @@ libcppbash_la_CXXFLAGS = $(AM_CXXFLAGS) $(HIDDEN_FLAGS)
 libcppbash_la_CFLAGS = $(AM_CFLAGS) $(HIDDEN_FLAGS)
 
 EXTRA_DIST = bashast/bashast.g \
-			 bashast/bashwalker.g \
+			 bashast/libbashWalker.g \
 			 $(GUNIT_TESTS) \
 			 $(GUNIT_LOG_COMPILER)
 
@@ -134,20 +134,22 @@ coding_standard.pdf: coding_standard/coding_standard.tex
 
 ANTLR = @JAVA@ -classpath @antlr_cp@ org.antlr.Tool
 
-cgrammar.run: bashast.g
+cgrammar.run: libbash.g
 	$(AM_V_at)touch $@.tmp
 	$(AM_V_GEN)$(ANTLR) -fo . $<
 	$(AM_V_at)mv $@.tmp $@
 
-bashast.g: bashast/bashast.g
-	$(AM_V_at)sed -e 's/CommonTree/pANTLR3_BASE_TREE/g' -e 's/Java/C/g' $< > $@
+libbash.g: bashast/bashast.g
+	$(AM_V_at)sed -e 's/ASTLabelType	= CommonTree;/ASTLabelType	= pANTLR3_BASE_TREE;/g' \
+				  -e 's/language	= Java;/language	= C;/g' \
+				  -e 's/grammar bashast;/grammar libbash;/g' $< > $@
 
 # Avoid initializing C++ type to NULL by sed, variables whose name
 # starts with libbash_ will be stripped
-walker.run: bashast/bashwalker.g cgrammar.run
+walker.run: bashast/libbashWalker.g cgrammar.run
 	$(AM_V_at)touch $@.tmp
 	$(AM_V_GEN)$(ANTLR) -fo . $<
-	$(AM_V_at)sed -i -e 's/\(libbash_.*\) = NULL/\1/' bashwalker.c
+	$(AM_V_at)sed -i -e 's/\(libbash_.*\) = NULL/\1/' libbashWalker.c
 	$(AM_V_GEN)mv $@.tmp $@
 
 $(GENERATED_PARSER_C): cgrammar.run

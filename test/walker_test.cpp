@@ -26,9 +26,9 @@
 
 #include <gtest/gtest.h>
 
-#include "bashastLexer.h"
-#include "bashastParser.h"
-#include "bashwalker.h"
+#include "libbashLexer.h"
+#include "libbashParser.h"
+#include "libbashWalker.h"
 #include "core/interpreter.h"
 
 using namespace std;
@@ -36,10 +36,10 @@ using namespace std;
 class walker_test: public ::testing::Test
 {
   pANTLR3_INPUT_STREAM input;
-  pbashastLexer lxr;
+  plibbashLexer lxr;
   pANTLR3_COMMON_TOKEN_STREAM tstream;
-  pbashastParser psr;
-  bashastParser_arithmetics_return langAST;
+  plibbashParser psr;
+  libbashParser_arithmetics_return langAST;
   pANTLR3_COMMON_TREE_NODE_STREAM nodes;
 protected:
   virtual void SetUp()
@@ -57,7 +57,7 @@ protected:
   }
   void init_walker(const char* script);
 public:
-  pbashwalker treePsr;
+  plibbashWalker treePsr;
   shared_ptr<interpreter> walker;
 
   int run_arithmetic(const char* script)
@@ -88,7 +88,7 @@ void walker_test::init_walker(const char *script){
     FAIL();
   }
 
-  lxr = bashastLexerNew(input);
+  lxr = libbashLexerNew(input);
   if ( lxr == NULL )
   {
     ANTLR3_FPRINTF(stderr,
@@ -105,7 +105,7 @@ void walker_test::init_walker(const char *script){
     FAIL();
   }
 
-  psr = bashastParserNew(tstream);
+  psr = libbashParserNew(tstream);
   if (psr == NULL)
   {
     ANTLR3_FPRINTF(stderr, "Out of memory trying to allocate parser\n");
@@ -115,7 +115,7 @@ void walker_test::init_walker(const char *script){
   langAST = psr->arithmetics(psr);
   nodes   = antlr3CommonTreeNodeStreamNewTree(langAST.tree,
                                               ANTLR3_SIZE_HINT);
-  treePsr = bashwalkerNew(nodes);
+  treePsr = libbashWalkerNew(nodes);
   walker->define("value", 100);
   set_interpreter(walker);
 }

@@ -32,7 +32,7 @@
 
 #include <antlr3basetree.h>
 
-#include "bashastLexer.h"
+#include "libbashLexer.h"
 #include "core/symbols.hpp"
 
 ///

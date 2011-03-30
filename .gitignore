@@ -18,7 +18,8 @@ missing
 Makefile
 autom4te.cache
 cppunittests
-bashast.g
+libbash.g
+libbash.tokens
 bashast.tokens
 bashast/.DS_Store
 bashast/*.ebuild
@@ -29,11 +30,12 @@ bashast/tmp/
 bashast/tokens.png
 bashastLexer.*
 bashastParser.*
-bashwalker.g
-bashwalker.h
-bashwalker.c
-bashwalker.cpp
-bashwalker.tokens
+libbashLexer.*
+libbashParser.*
+libbashWalker.h
+libbashWalker.c
+libbashWalker.cpp
+libbashWalker.tokens
 coding_standard/*.pdf
 coding_standard/*.log
 coding_standard/*.aux
