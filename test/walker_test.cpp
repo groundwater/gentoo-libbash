@@ -38,10 +38,9 @@ class walker_test: public ::testing::Test
   pANTLR3_INPUT_STREAM input;
   plibbashLexer lxr;
   pANTLR3_COMMON_TOKEN_STREAM tstream;
-  plibbashParser psr;
-  libbashParser_arithmetics_return langAST;
-  pANTLR3_COMMON_TREE_NODE_STREAM nodes;
 protected:
+  pANTLR3_COMMON_TREE_NODE_STREAM nodes;
+  plibbashParser psr;
   virtual void SetUp()
   {
     walker = shared_ptr<interpreter>(new interpreter);
@@ -55,30 +54,13 @@ protected:
     lxr->free(lxr);
     input->close(input);
   }
-  void init_walker(const char* script);
+  void init_parser(const char*);
 public:
   plibbashWalker treePsr;
   shared_ptr<interpreter> walker;
-
-  int run_arithmetic(const char* script)
-  {
-    init_walker(script);
-    return treePsr->arithmetics(treePsr);
-  }
-
-  void check_arithmetic_assignment(const char* script,
-                                   const string& name,
-                                   int exp_value)
-  {
-    // the return value of the arithmetic expression should be equal to
-    // the new value of the variable
-    EXPECT_EQ(exp_value, run_arithmetic(script));
-    EXPECT_EQ(exp_value, walker->resolve<int>(name));
-  }
 };
 
-
-void walker_test::init_walker(const char *script){
+void walker_test::init_parser(const char *script){
 
   auto start = reinterpret_cast<pANTLR3_UINT8>(const_cast<char *>(script));
   input  = antlr3NewAsciiStringInPlaceStream(start,
@@ -115,17 +97,42 @@ void walker_test::init_walker(const char *script){
     ANTLR3_FPRINTF(stderr, "Out of memory trying to allocate parser\n");
     FAIL();
   }
-
-  langAST = psr->arithmetics(psr);
-  nodes   = antlr3CommonTreeNodeStreamNewTree(langAST.tree,
-                                              ANTLR3_SIZE_HINT);
-  treePsr = libbashWalkerNew(nodes);
-  walker->define("value", 100);
-  set_interpreter(walker);
 }
 
+class arithmetic_walker: public walker_test
+{
+  libbashParser_arithmetics_return langAST;
+protected:
+  void init_walker(const char* script)
+  {
+    init_parser(script);
+    langAST = psr->arithmetics(psr);
+    nodes = antlr3CommonTreeNodeStreamNewTree(langAST.tree,
+                                              ANTLR3_SIZE_HINT);
+    treePsr = libbashWalkerNew(nodes);
+    walker->define("value", 100);
+    set_interpreter(walker);
+  }
+
+  int run_arithmetic(const char* script)
+  {
+    init_walker(script);
+    return treePsr->arithmetics(treePsr);
+  }
+
+  void check_arithmetic_assignment(const char* script,
+                                   const string& name,
+                                   int exp_value)
+  {
+    // the return value of the arithmetic expression should be equal to
+    // the new value of the variable
+    EXPECT_EQ(exp_value, run_arithmetic(script));
+    EXPECT_EQ(exp_value, walker->resolve<int>(name));
+  }
+};
+
 #define TEST_BINARY_ARITHMETIC(name, script, exp_value)\
-  TEST_F(walker_test, name)\
+  TEST_F(arithmetic_walker, name)\
   {EXPECT_EQ(exp_value, run_arithmetic(script));}
 
 TEST_BINARY_ARITHMETIC(logicor_true,        "0 || -2",      1)
@@ -167,7 +174,7 @@ TEST_BINARY_ARITHMETIC(complex_cal2,        "10*${value}<<3%2**5", 8000)
 TEST_BINARY_ARITHMETIC(complex_cal3,        "(20&5|3||1*100-20&5*10)+~(2*5)", -10)
 
 #define TEST_ARITHMETIC_ASSIGNMENT(name, script, var_name, exp_value)\
-  TEST_F(walker_test, name) \
+  TEST_F(arithmetic_walker, name) \
   { check_arithmetic_assignment(script, var_name, exp_value); }
 
 TEST_ARITHMETIC_ASSIGNMENT(assignment,             "new_var=10",   "new_var",      10)
