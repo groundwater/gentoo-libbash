@@ -27,6 +27,7 @@ options
 
 @includes{
 #include <memory>
+#include <string>
 
 class interpreter;
 void set_interpreter(std::shared_ptr<interpreter> w);
@@ -45,6 +46,11 @@ name	returns[std::string libbash_value]:
 	|	LETTER {$libbash_value = walker->get_string($LETTER);}
 	|	'_' {$libbash_value="_";};
 
+num returns[std::string libbash_value]
+options{ k=1; }:
+	DIGIT { $libbash_value = walker->get_string($DIGIT); }
+	|NUMBER { $libbash_value = walker->get_string($NUMBER); };
+
 var_def:
 	^(EQUALS libbash_name=name libbash_value=string_expr){
 		walker->define(libbash_name, libbash_value);
@@ -52,9 +58,49 @@ var_def:
 
 string_expr	returns[std::string libbash_value]:
 	^(STRING libbash_string=string_expr) { $libbash_value = libbash_string; }
-	|^(DOUBLE_QUOTED_STRING (libbash_tmp=name { libbash_string += libbash_tmp; })+) {
+	|^(DOUBLE_QUOTED_STRING (dq_str_part { libbash_string += $dq_str_part.libbash_value; })+) {
 		$libbash_value = libbash_string;
 	};
+
+//A rule for filenames/strings
+res_word_str returns[std::string libbash_value]
+@after {
+	$libbash_value = walker->get_string($res_word_str.start);
+}:
+	CASE|DO|DONE|ELIF|ELSE|ESAC|FI|FOR|FUNCTION|IF|IN|SELECT|THEN|UNTIL|WHILE|TIME;
+
+//Parts of strings, no slashes, no reserved words
+ns_str_part_no_res returns[std::string libbash_value]
+options{ backtrack=true; }
+@after {
+	$libbash_value = walker->get_string($ns_str_part_no_res.start);
+}:
+	num|name|EQUALS|PCT|PCTPCT|MINUS|DOT|DOTDOT|COLON|BOP|UOP|TEST_EXPR|'_'|TILDE|INC|DEC|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN|OR_ASSIGN|ESC_CHAR|CARET|OTHER;
+
+//Parts of strings, no slashes
+ns_str_part returns[std::string libbash_value]:
+	ns_str_part_no_res { $libbash_value = $ns_str_part_no_res.libbash_value; }
+	|res_word_str {$libbash_value = $res_word_str.libbash_value; };
+
+//Any allowable part of a string, including slashes, no pounds
+str_part returns[std::string libbash_value]:
+	libbash_string=ns_str_part { $libbash_value = libbash_string; }
+	|SLASH { $libbash_value = "/"; };
+
+//Any allowable part of a string, with pounds
+str_part_with_pound returns[std::string libbash_value]
+@after {
+	$libbash_value = walker->get_string($str_part_with_pound.start);
+}:
+	str_part|POUND|POUNDPOUND;
+
+//Allowable parts of double quoted strings
+dq_str_part returns[std::string libbash_value]
+@after {
+	$libbash_value = walker->get_string($dq_str_part.start);
+}:
+	BLANK|EOL|AMP|LOGICAND|LOGICOR|LESS_THAN|GREATER_THAN|PIPE|SQUOTE|SEMIC|COMMA|LPAREN|RPAREN|LLPAREN|RRPAREN|DOUBLE_SEMIC|LBRACE|RBRACE|TICK|LEQ|GEQ|str_part_with_pound;
+
 
 // shell arithmetic
 arithmetics returns[int value]

@@ -220,3 +220,16 @@ TEST_ARITHMETIC_ASSIGNMENT(or_assignment,          "value|=10",    "value",     
 
 TEST_STRING_ASSIGNMENT(str_assignment,          "str=\"abc\"",          "str",    "abc")
 TEST_STRING_ASSIGNMENT(str_assignment2,         "str=\"abc_def\"",      "str",    "abc_def")
+TEST_STRING_ASSIGNMENT(str_assignment3,         "str=\"abc def\"",      "str",    "abc def")
+TEST_STRING_ASSIGNMENT(str_assignment4,
+                       "str=\"case esac do done elif else fi if for function in select then until while time\"",
+                       "str",
+                       "case esac do done elif else fi if for function in select then until while time")
+TEST_STRING_ASSIGNMENT(str_assignment5,
+                       "str=\"123 abc = % %% - . .. :  -a -aa test _ ~ ++ -- *= /= %= += -= <<= >>= &= ^= |= \\a ^ aä\"",
+                       "str",
+                       "123 abc = % %% - . .. :  -a -aa test _ ~ ++ -- *= /= %= += -= <<= >>= &= ^= |= \\a ^ aä")
+TEST_STRING_ASSIGNMENT(str_assignment6,
+                       "str=\"/ \n \r\n & && ||| || > < ' : ; , ( (( ) )) ;;  { } ` >= <=\"",
+                       "str",
+                       "/ \n \r\n & && ||| || > < ' : ; , ( (( ) )) ;;  { } ` >= <=")
