@@ -45,6 +45,17 @@ name	returns[std::string libbash_value]:
 	|	LETTER {$libbash_value = walker->get_string($LETTER);}
 	|	'_' {$libbash_value="_";};
 
+var_def:
+	^(EQUALS libbash_name=name libbash_value=string_expr){
+		walker->define(libbash_name, libbash_value);
+	};
+
+string_expr	returns[std::string libbash_value]:
+	^(STRING libbash_string=string_expr) { $libbash_value = libbash_string; }
+	|^(DOUBLE_QUOTED_STRING (libbash_tmp=name { libbash_string += libbash_tmp; })+) {
+		$libbash_value = libbash_string;
+	};
+
 // shell arithmetic
 arithmetics returns[int value]
 :

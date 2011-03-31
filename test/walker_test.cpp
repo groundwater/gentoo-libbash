@@ -131,6 +131,30 @@ protected:
   }
 };
 
+class string_assignment_walker: public walker_test
+{
+  libbashParser_var_def_return langAST;
+protected:
+  void init_walker(const char* script)
+  {
+    init_parser(script);
+    langAST = psr->var_def(psr);
+    nodes   = antlr3CommonTreeNodeStreamNewTree(langAST.tree,
+                                                ANTLR3_SIZE_HINT);
+    treePsr = libbashWalkerNew(nodes);
+    set_interpreter(walker);
+  }
+
+  void check_string_assignment(const char* script,
+                               const string& name,
+                               const char* exp_value)
+  {
+    init_walker(script);
+    treePsr->var_def(treePsr);
+    EXPECT_STREQ(exp_value, walker->resolve<string>(name).c_str());
+  }
+};
+
 #define TEST_BINARY_ARITHMETIC(name, script, exp_value)\
   TEST_F(arithmetic_walker, name)\
   {EXPECT_EQ(exp_value, run_arithmetic(script));}
@@ -189,3 +213,10 @@ TEST_ARITHMETIC_ASSIGNMENT(right_shift_assignment, "value>>=2",    "value",     
 TEST_ARITHMETIC_ASSIGNMENT(and_assignment,         "value&=10",    "value",        0)
 TEST_ARITHMETIC_ASSIGNMENT(xor_assignment,         "value^=5",     "value",        97)
 TEST_ARITHMETIC_ASSIGNMENT(or_assignment,          "value|=10",    "value",        110)
+
+#define TEST_STRING_ASSIGNMENT(name, script, var_name, exp_value)\
+  TEST_F(string_assignment_walker, name) \
+  { check_string_assignment(script, var_name, exp_value); }
+
+TEST_STRING_ASSIGNMENT(str_assignment,          "str=\"abc\"",          "str",    "abc")
+TEST_STRING_ASSIGNMENT(str_assignment2,         "str=\"abc_def\"",      "str",    "abc_def")
