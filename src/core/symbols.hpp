@@ -175,6 +175,54 @@ class scope
 public:
   typedef std::unordered_map<std::string, std::shared_ptr<symbol>>
     table_type;
+  typedef table_type::iterator iterator;
+  typedef table_type::const_iterator const_iterator;
+  typedef table_type::size_type size_type;
+  typedef table_type::value_type value_type;
+
+  ///
+  /// \brief return the number of symbols in current scope
+  /// \return the number of symbols
+  size_type size()
+  {
+    return members.size();
+  }
+
+  ///
+  /// \brief return an iterator referring to the first symbol
+  /// \return iterator referring to the first symbol
+  iterator begin()
+  {
+    return members.begin();
+  }
+
+  ///
+  /// \brief return a const iterator referring to the first symbol
+  /// \return const iterator referring to the first symbol
+  const_iterator begin() const
+  {
+    return members.begin();
+  }
+
+  ///
+  /// \brief return an iterator referring to the next element after
+  ///        the last symbol in current scope
+  /// \return iterator referring to he next element after the last
+  ///         symbol in current scope
+  iterator end()
+  {
+    return members.end();
+  }
+
+  ///
+  /// \brief return a const iterator referring to the next element
+  ///        after the last symbol in current scope
+  /// \return const iterator referring to he next element after the
+  ///         last symbol in current scope
+  const_iterator end() const
+  {
+    return members.end();
+  }
 
   /// \brief define a new symbol
   /// \param the new symbol

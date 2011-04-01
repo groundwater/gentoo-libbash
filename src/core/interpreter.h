@@ -46,6 +46,49 @@ class interpreter{
   scope members;
 public:
 
+  ///
+  /// \brief return the number of variables
+  /// \return the number of variables
+  scope::size_type size()
+  {
+    return members.size();
+  }
+
+  ///
+  /// \brief return an iterator referring to the first variable
+  /// \return iterator referring to the first variable
+  scope::iterator begin()
+  {
+    return members.begin();
+  }
+
+  ///
+  /// \brief return a const iterator referring to the first variable
+  /// \return const iterator referring to the first variable
+  scope::const_iterator begin() const
+  {
+    return members.begin();
+  }
+
+  ///
+  /// \brief return an iterator referring to the next element after the
+  ///        last variable
+  /// \return iterator referring to he next element after the last variable
+  scope::iterator end()
+  {
+    return members.end();
+  }
+
+  ///
+  /// \brief return a const iterator referring to the next element after
+  ///        the last variable
+  /// \return const iterator referring to he next element after the last
+  ///         variable
+  scope::const_iterator end() const
+  {
+    return members.end();
+  }
+
   /// \brief parse the text value of a tree to integer
   /// \param the target tree
   /// \return the parsed value
