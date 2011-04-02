@@ -24,11 +24,9 @@
 
 #include <algorithm>
 #include <iostream>
-#include <vector>
+#include <map>
 
-#include <boost/range/adaptor/map.hpp>
 #include <boost/range/algorithm/for_each.hpp>
-#include <boost/range/algorithm/sort.hpp>
 #include <gtest/gtest.h>
 
 #include "libbash.h"
@@ -46,11 +44,9 @@ int main(int argc, char** argv)
   unordered_map<string, string> variables;
   libbash::interpret(argv[1], variables);
 
-  auto keys = variables | boost::adaptors::map_keys;
-  vector<string> names(keys.begin(), keys.end());
-  auto sorted = boost::sort(names);
-  boost::for_each(boost::sort(names), [&](const string& key){
-    cout << key << '=' << variables[key] << endl;
+  std::map<string, string> sorted(variables.begin(), variables.end());
+  boost::for_each(sorted, [&](const std::pair<string,string>& pair){
+    cout << pair.first << '=' << pair.second << endl;
   });
 
   return 0;
