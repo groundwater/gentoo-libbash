@@ -41,6 +41,8 @@ void set_interpreter(std::shared_ptr<interpreter> w)
 }
 }
 
+list: ^(LIST var_def+);
+
 name	returns[std::string libbash_value]:
 	NAME {$libbash_value = walker->get_string($NAME);}
 	|	LETTER {$libbash_value = walker->get_string($LETTER);}
