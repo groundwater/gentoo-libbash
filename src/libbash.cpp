@@ -63,6 +63,13 @@ namespace libbash
     plibbashWalker treePsr = libbashWalkerNew(nodes);
     treePsr->start(treePsr);
 
+    treePsr->free(treePsr);
+    nodes->free(nodes);
+    psr->free(psr);
+    tstream->free(tstream);
+    lxr->free(lxr);
+    input->close(input);
+
     for(auto iter = walker->begin(); iter != walker->end(); ++iter)
     {
       variables[iter->first]=std::static_pointer_cast<variable>(iter->second)->get_value<std::string>();
