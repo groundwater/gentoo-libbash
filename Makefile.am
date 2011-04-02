@@ -170,7 +170,7 @@ walker.run: bashast/libbashWalker.g cgrammar.run
 	$(AM_V_at)touch $@.tmp
 	$(AM_V_GEN)$(ANTLR) -fo . $<
 	$(AM_V_at)sed -i -e 's/\(libbash_.*\) = NULL/\1/' libbashWalker.c
-	$(AM_V_GEN)mv $@.tmp $@
+	$(AM_V_at)mv $@.tmp $@
 
 $(GENERATED_PARSER_C): cgrammar.run
 $(GENERATED_PARSER_H): cgrammar.run
