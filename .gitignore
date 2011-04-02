@@ -18,6 +18,7 @@ missing
 Makefile
 autom4te.cache
 cppunittests
+variable_printer
 libbash.g
 libbash.tokens
 bashast.tokens

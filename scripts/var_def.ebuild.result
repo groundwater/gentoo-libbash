@@ -1,0 +1,10 @@
+DESCRIPTION=SunPinyin is a SLM (Statistical Language Model) based IME
+EAPI=1
+HOMEPAGE=http://sunpinyin.googlecode.com
+IUSE=abc
+KEYWORDS=~amd64 ~x86
+LICENSE=LGPL-2.1 CDDL
+RDEPEND=dev-db/sqlite:3
+SLOT=0
+SRC_URI=http://open-gram.googlecode.com/files/dict.utf8.tar.bz2
+		http://open-gram.googlecode.com/files/lm_sc.t3g.arpa.tar.bz2
