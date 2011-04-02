@@ -17,28 +17,20 @@
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
 ///
-/// \file interpreter_exception.h
+/// \file api_test.cpp
 /// \author Mu Qiao
-/// \brief implementation for interpreter_exception
+/// \brief series of unit tests for the public interface
 ///
 
-#ifndef INTERPRETER_EXCEPTION_H_
-#define INTERPRETER_EXCEPTION_H_
+#include <gtest/gtest.h>
 
-#include <stdexcept>
-#include <string>
+#include "libbash.h"
 
-#include "common.h"
+using namespace std;
 
-///
-/// \class interpreter_exception
-/// \brief runtime exception occured during interpreting
-///
-class LIBBASH_API interpreter_exception: public std::runtime_error
+TEST(libbashapi, bad_path)
 {
-public:
-  explicit interpreter_exception(const std::string& err_msg):
-    runtime_error(err_msg){}
-};
-
-#endif
+  std::unordered_map<std::string, std::string> variables;
+  EXPECT_THROW(libbash::interpret("not exist", variables),
+               interpreter_exception);
+}

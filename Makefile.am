@@ -80,6 +80,7 @@ cppunittests_SOURCES =  test/run_tests.cpp \
 						src/builtins/tests/echo_tests.cpp \
 						src/builtins/tests/boolean_tests.cpp \
 						test/post_check.cpp \
+						test/api_test.cpp \
 						test/walker_test.cpp
 cppunittests_LDADD = libcppbash.la \
 					 $(GTEST_LIBS) \
@@ -92,6 +93,10 @@ GENERATED_PARSER_C = libbashLexer.c libbashParser.c
 GENERATED_PARSER_H = libbashLexer.h libbashParser.h
 GENERATED_WALKER_C = libbashWalker.c
 GENERATED_WALKER_H = libbashWalker.h
+BUILT_SOURCES = $(GENERATED_PARSER_C) \
+				$(GENERATED_PARSER_H) \
+				$(GENERATED_WALKER_C) \
+				$(GENERATED_WALKER_H)
 CLEANFILES = $(GENERATED_PARSER_C) \
 			 $(GENERATED_PARSER_H) \
 			 $(GENERATED_WALKER_C) \
@@ -106,17 +111,22 @@ CLEANFILES = $(GENERATED_PARSER_C) \
 			 walker.run
 
 lib_LTLIBRARIES = libcppbash.la
-libcppbash_la_SOURCES = src/cppbash_builtin.cpp \
+libcppbash_la_SOURCES = src/common.h \
+						src/libbash.h \
+						src/libbash.cpp \
+						src/cppbash_builtin.cpp \
 						src/cppbash_builtin.h \
 						src/builtins/echo_builtin.cpp \
 						src/builtins/echo_builtin.h \
 						src/builtins/boolean_builtins.h \
 						$(GENERATED_PARSER_C) \
+						$(GENERATED_PARSER_H) \
 						src/core/interpreter_exception.h \
 						src/core/interpreter.cpp \
 						src/core/interpreter.h \
 						src/core/symbols.hpp \
-						$(GENERATED_WALKER_C)
+						$(GENERATED_WALKER_C) \
+						$(GENERATED_WALKER_H)
 
 HIDDEN_FLAGS = -fvisibility=hidden \
 			   -fvisibility-inlines-hidden

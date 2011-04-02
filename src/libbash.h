@@ -17,28 +17,30 @@
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
 ///
-/// \file interpreter_exception.h
+/// \file libbash.h
 /// \author Mu Qiao
-/// \brief implementation for interpreter_exception
+/// \brief public interface for libbash
 ///
 
-#ifndef INTERPRETER_EXCEPTION_H_
-#define INTERPRETER_EXCEPTION_H_
+#ifndef LIBBASH_H
+#define LIBBASH_H
 
-#include <stdexcept>
+#include <memory>
 #include <string>
+#include <unordered_map>
 
 #include "common.h"
+#include "core/interpreter.h"
 
-///
-/// \class interpreter_exception
-/// \brief runtime exception occured during interpreting
-///
-class LIBBASH_API interpreter_exception: public std::runtime_error
+namespace libbash
 {
-public:
-  explicit interpreter_exception(const std::string& err_msg):
-    runtime_error(err_msg){}
-};
+  ///
+  /// \brief interpret a script specifid by path, return a map filled with
+  ///        variables defined in the script
+  /// \param the path of target script
+  /// \param the map to store variables
+  void LIBBASH_API interpret(const std::string& path,
+                             std::unordered_map<std::string, std::string>& variables);
+}
 
 #endif
