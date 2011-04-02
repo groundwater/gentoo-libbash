@@ -41,6 +41,8 @@ void set_interpreter(std::shared_ptr<interpreter> w)
 }
 }
 
+start: list|EOF;
+
 list: ^(LIST var_def+);
 
 name	returns[std::string libbash_value]:
