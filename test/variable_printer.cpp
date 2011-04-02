@@ -26,28 +26,27 @@
 #include <iostream>
 #include <map>
 
-#include <boost/range/algorithm/for_each.hpp>
 #include <gtest/gtest.h>
+#include <boost/spirit/include/karma.hpp>
+#include <boost/fusion/include/std_pair.hpp>
 
 #include "libbash.h"
-
-using namespace std;
 
 int main(int argc, char** argv)
 {
   if(argc != 2)
   {
-    cerr<<"Please provide your script as an argument"<<endl;
+    std::cerr<<"Please provide your script as an argument"<<std::endl;
     exit(EXIT_FAILURE);
   }
 
-  unordered_map<string, string> variables;
+  std::unordered_map<std::string, std::string> variables;
   libbash::interpret(argv[1], variables);
 
-  std::map<string, string> sorted(variables.begin(), variables.end());
-  boost::for_each(sorted, [&](const std::pair<string,string>& pair){
-    cout << pair.first << '=' << pair.second << endl;
-  });
+  std::map<std::string, std::string> sorted(variables.begin(), variables.end());
+
+  using namespace boost::spirit::karma;
+  std::cout << format((string << '=' << string) % eol, sorted) << std::endl;
 
   return 0;
 }
