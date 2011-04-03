@@ -47,7 +47,8 @@ GUNIT_TESTS = bashast/gunit/arith_main.gunit \
 			  bashast/gunit/simp_prog.gunit
 
 EBUILD_LOG_COMPILER = $(srcdir)/test/script_compiler.sh
-EBUILD_TESTS = scripts/var_def.ebuild
+EBUILD_TESTS = scripts/var_def.ebuild \
+			   scripts/var_expansion.ebuild
 EBUILD_RESULT = scripts/var_def.ebuild.result
 
 TESTS = $(GUNIT_TESTS) $(EBUILD_TESTS)

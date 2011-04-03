@@ -60,6 +60,7 @@ tokens{
 	FILE_DESCRIPTOR_MOVE;
 	REDIR;
 	ARITHMETIC_CONDITION;
+	ARITHMETIC_EXPRESSION;
 	KEYWORD_TEST;
 	BUILTIN_TEST;
 	MATCH_ANY_EXCEPT;
@@ -446,7 +447,7 @@ extended_pattern_match
 	|	BANG LPAREN fname (PIPE fname)* RPAREN -> ^(MATCH_NONE fname+);
 //Arithmetic expansion
 arithmetic_expansion
-	:	DOLLAR! LLPAREN! BLANK!* arithmetic_part BLANK!* RRPAREN!;
+	:	DOLLAR LLPAREN BLANK* arithmetic_part BLANK* RRPAREN -> ^(ARITHMETIC_EXPRESSION arithmetic_part);
 arithmetic_part
 	:	arithmetics
 	|	arithmetic;

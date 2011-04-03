@@ -119,6 +119,6 @@ arithmetics:
 "5+4, 3+2, $a*$b" -> (+ 5 4) (+ 3 2) (* (VAR_REF a) (VAR_REF b))
 
 start:
-"echo $(( 3 + 2 ))" -> (LIST (COMMAND (STRING echo) (STRING (+ 3 2))))
-"echo $((++i))" -> (LIST (COMMAND (STRING echo) (STRING (PRE_INCR i))))
-"echo \"The solution is: $(( 3+2 ))\""-> (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING The   solution   is :   (+ 3 2)))))
+"echo $(( 3 + 2 ))" -> (LIST (COMMAND (STRING echo) (STRING (ARITHMETIC_EXPRESSION (+ 3 2)))))
+"echo $((++i))" -> (LIST (COMMAND (STRING echo) (STRING (ARITHMETIC_EXPRESSION (PRE_INCR i)))))
+"echo \"The solution is: $(( 3+2 ))\""-> (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING The   solution   is :   (ARITHMETIC_EXPRESSION (+ 3 2))))))

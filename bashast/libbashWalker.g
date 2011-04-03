@@ -106,7 +106,8 @@ dq_str_part returns[std::string libbash_value]
 //double quoted string rule, allows expansions
 dqstr returns[std::string libbash_value]:
 	dq_str_part { $libbash_value = $dq_str_part.libbash_value; }
-	| libbash_string=var_ref { $libbash_value = libbash_string; };
+	| libbash_string=var_ref { $libbash_value = libbash_string; }
+	| ^(ARITHMETIC_EXPRESSION value=arithmetics) { $libbash_value = boost::lexical_cast<std::string>(value); };
 
 //variable reference
 var_ref returns[std::string libbash_value]:
