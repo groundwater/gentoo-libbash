@@ -6,5 +6,5 @@ SRC_URI="http://open-gram.googlecode.com/files/dict.utf8.tar.bz2
 LICENSE="LGPL-2.1 CDDL"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="abc"
+IUSE=""
 RDEPEND="dev-db/sqlite:3"

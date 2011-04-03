@@ -1,7 +1,7 @@
 DESCRIPTION=SunPinyin is a SLM (Statistical Language Model) based IME
 EAPI=1
 HOMEPAGE=http://sunpinyin.googlecode.com
-IUSE=abc
+IUSE=
 KEYWORDS=~amd64 ~x86
 LICENSE=LGPL-2.1 CDDL
 RDEPEND=dev-db/sqlite:3

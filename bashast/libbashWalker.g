@@ -62,7 +62,7 @@ var_def:
 
 string_expr	returns[std::string libbash_value]:
 	^(STRING libbash_string=string_expr) { $libbash_value = libbash_string; }
-	|^(DOUBLE_QUOTED_STRING (dq_str_part { libbash_string += $dq_str_part.libbash_value; })+) {
+	|^(DOUBLE_QUOTED_STRING (dq_str_part { libbash_string += $dq_str_part.libbash_value; })*) {
 		$libbash_value = libbash_string;
 	};
 
