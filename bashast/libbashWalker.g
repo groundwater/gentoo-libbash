@@ -62,9 +62,7 @@ var_def:
 
 string_expr	returns[std::string libbash_value]:
 	^(STRING libbash_string=string_expr) { $libbash_value = libbash_string; }
-	|^(DOUBLE_QUOTED_STRING (dq_str_part { libbash_string += $dq_str_part.libbash_value; })*) {
-		$libbash_value = libbash_string;
-	};
+	|^(DOUBLE_QUOTED_STRING (libbash_string=dqstr { $libbash_value += libbash_string; })*);
 
 //A rule for filenames/strings
 res_word_str returns[std::string libbash_value]
@@ -105,6 +103,14 @@ dq_str_part returns[std::string libbash_value]
 }:
 	BLANK|EOL|AMP|LOGICAND|LOGICOR|LESS_THAN|GREATER_THAN|PIPE|SQUOTE|SEMIC|COMMA|LPAREN|RPAREN|LLPAREN|RRPAREN|DOUBLE_SEMIC|LBRACE|RBRACE|TICK|LEQ|GEQ|str_part_with_pound;
 
+//double quoted string rule, allows expansions
+dqstr returns[std::string libbash_value]:
+	dq_str_part { $libbash_value = $dq_str_part.libbash_value; }
+	| libbash_string=var_ref { $libbash_value = libbash_string; };
+
+//variable reference
+var_ref returns[std::string libbash_value]:
+	^(VAR_REF libbash_name=name) { $libbash_value=walker->resolve<std::string>(libbash_name); };
 
 // shell arithmetic
 arithmetics returns[int value]
