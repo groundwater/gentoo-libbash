@@ -356,10 +356,10 @@ public:
   template <typename T>
   T resolve(const std::string& name)
   {
-    std::shared_ptr<symbol> value = members.resolve(name);
+    std::shared_ptr<variable> value = members.resolve(name);
     if(!value)
       return T();
-    return std::static_pointer_cast<variable>(value)->get_value<T>();
+    return value->get_value<T>();
   }
 
   /// \brief check whether the value of the variable is null, return true
@@ -368,9 +368,9 @@ public:
   /// \return whether the value of the variable is null
   bool is_null(const std::string& name)
   {
-    std::shared_ptr<symbol> value = members.resolve(name);
+    std::shared_ptr<variable> value = members.resolve(name);
     if(value)
-      return std::static_pointer_cast<variable>(value)->is_null();
+      return value->is_null();
     else
       return true;
   }
@@ -391,11 +391,11 @@ public:
   template <typename T>
   const T& set_value(const std::string& name, const T& new_value)
   {
-    std::shared_ptr<symbol> value = members.resolve(name);
+    std::shared_ptr<variable> value = members.resolve(name);
     if(!value)
       define(name, new_value, false);
     else
-      std::static_pointer_cast<variable>(value)->set_value(new_value);
+      value->set_value(new_value);
     return new_value;
   }
 

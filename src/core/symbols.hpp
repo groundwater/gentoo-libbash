@@ -37,29 +37,6 @@
 #include "core/interpreter_exception.h"
 
 ///
-/// \class symbol
-/// \brief base class for symbols such as variables and functions
-///
-class symbol
-{
-  /// \var private::name
-  /// \brief symbol name
-  std::string name;
-
-public:
-  /// \brief retrieve symbol name
-  /// \return const string value of symbol name
-  const std::string& get_name() const
-  {
-    return name;
-  }
-
-protected:
-  symbol(const std::string& n): name(n){}
-  ~symbol() {}
-};
-
-///
 /// \class converter
 /// \brief template class of converter
 ///
@@ -131,30 +108,41 @@ public:
 /// \class variable
 /// \brief implementation for all variable types
 ///
-class variable: public symbol
+class variable
 {
+  /// \var private::name
+  /// \brief variable name
+  std::string name;
+
   /// \var private::value
-  /// \brief actual value of the symbol
+  /// \brief actual value of the variable
   boost::variant<int, std::string> value;
 
   /// \var private::readonly
-  /// \brief whether the symbol is readonly
+  /// \brief whether the variable is readonly
   bool readonly;
 
   /// \var private::null_value
-  /// \brief whether the symbol is null 
+  /// \brief whether the variable is null
   bool null_value;
 
 public:
+  /// \brief retrieve variable name
+  /// \return const string value of variable name
+  const std::string& get_name() const
+  {
+    return name;
+  }
+
   template <typename T>
   variable(const std::string& name,
            T v,
            bool ro=false,
            bool is_null=false)
-    : symbol(name), value(v), readonly(ro), null_value(is_null){}
+    : name(name), value(v), readonly(ro), null_value(is_null){}
 
-  /// \brief retrieve actual value of the symbol
-  /// \return the value of the symbol
+  /// \brief retrieve actual value of the variable
+  /// \return the value of the variable
   template<typename T>
   T get_value() const
   {
@@ -162,7 +150,7 @@ public:
     return boost::apply_visitor(visitor, value);
   }
 
-  /// \brief set the value of the symbol, raise exception if it's readonly
+  /// \brief set the value of the variable, raise exception if it's readonly
   /// \param the new value to be set
   /// \param whether to set the variable to null value, default is false
   template <typename T>
@@ -189,7 +177,7 @@ public:
 class scope
 {
 public:
-  typedef std::unordered_map<std::string, std::shared_ptr<symbol>>
+  typedef std::unordered_map<std::string, std::shared_ptr<variable>>
     table_type;
   typedef table_type::iterator iterator;
   typedef table_type::const_iterator const_iterator;
@@ -197,24 +185,24 @@ public:
   typedef table_type::value_type value_type;
 
   ///
-  /// \brief return the number of symbols in current scope
-  /// \return the number of symbols
+  /// \brief return the number of variables in current scope
+  /// \return the number of variables
   size_type size()
   {
     return members.size();
   }
 
   ///
-  /// \brief return an iterator referring to the first symbol
-  /// \return iterator referring to the first symbol
+  /// \brief return an iterator referring to the first variable
+  /// \return iterator referring to the first variable
   iterator begin()
   {
     return members.begin();
   }
 
   ///
-  /// \brief return a const iterator referring to the first symbol
-  /// \return const iterator referring to the first symbol
+  /// \brief return a const iterator referring to the first variable
+  /// \return const iterator referring to the first variable
   const_iterator begin() const
   {
     return members.begin();
@@ -222,9 +210,9 @@ public:
 
   ///
   /// \brief return an iterator referring to the next element after
-  ///        the last symbol in current scope
+  ///        the last variable in current scope
   /// \return iterator referring to he next element after the last
-  ///         symbol in current scope
+  ///         variable in current scope
   iterator end()
   {
     return members.end();
@@ -232,28 +220,28 @@ public:
 
   ///
   /// \brief return a const iterator referring to the next element
-  ///        after the last symbol in current scope
+  ///        after the last variable in current scope
   /// \return const iterator referring to he next element after the
-  ///         last symbol in current scope
+  ///         last variable in current scope
   const_iterator end() const
   {
     return members.end();
   }
 
-  /// \brief define a new symbol
-  /// \param the new symbol
-  void define(std::shared_ptr<symbol> s)
+  /// \brief define a new variable
+  /// \param the new variable
+  void define(std::shared_ptr<variable> s)
   {
     members[s->get_name()] = s;
   }
 
-  /// \brief resolve a symbol
-  /// \param the symbol name
-  /// \return target symbol passed by reference
-  std::shared_ptr<symbol> resolve(const std::string& name)
+  /// \brief resolve a variable
+  /// \param the variable name
+  /// \return target variable passed by reference
+  std::shared_ptr<variable> resolve(const std::string& name)
   {
     auto iter = members.find(name);
-    return (iter == members.end()? std::shared_ptr<symbol>() : iter->second);
+    return (iter == members.end()? std::shared_ptr<variable>() : iter->second);
   }
 protected:
   /// \var protected::member

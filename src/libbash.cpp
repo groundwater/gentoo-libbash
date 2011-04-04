@@ -72,7 +72,7 @@ namespace libbash
 
     for(auto iter = walker->begin(); iter != walker->end(); ++iter)
     {
-      variables[iter->first]=std::static_pointer_cast<variable>(iter->second)->get_value<std::string>();
+      variables[iter->first]=iter->second->get_value<std::string>();
     }
   }
 }
