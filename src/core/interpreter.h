@@ -371,6 +371,14 @@ public:
       return true;
   }
 
+  /// \brief check whether the value of the variable is unset
+  /// \param variable name
+  /// \return whether the value of the variable is unset
+  bool is_unset(const std::string& name)
+  {
+    return !members.resolve(name);
+  }
+
   /// \brief update the variable value, raise interpreter_exception if
   ///        it's readonly, will define the variable if it doesn't exist
   /// \param variable name

@@ -53,6 +53,14 @@ TEST(interpreter, is_null)
   EXPECT_TRUE(walker.is_null("foo"));
 }
 
+TEST(interpreter, is_unset)
+{
+  interpreter walker;
+  walker.define("foo", "hello");
+  EXPECT_FALSE(walker.is_unset("foo"));
+  EXPECT_TRUE(walker.is_unset("bar"));
+}
+
 TEST(interpreter, set_int_value)
 {
   interpreter walker;
