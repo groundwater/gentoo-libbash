@@ -252,7 +252,8 @@ public:
   /// \return target symbol passed by reference
   std::shared_ptr<symbol> resolve(const std::string& name)
   {
-    return members[name];
+    auto iter = members.find(name);
+    return (iter == members.end()? std::shared_ptr<symbol>() : iter->second);
   }
 protected:
   /// \var protected::member

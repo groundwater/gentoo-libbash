@@ -80,4 +80,5 @@ TEST(scope_test, define_resolve)
   auto an_int = shared_ptr<variable>(new variable("integer_symbol", 100));
   members.define(an_int);
   EXPECT_EQ(an_int, members.resolve("integer_symbol"));
+  EXPECT_FALSE(members.resolve("not exist"));
 }
