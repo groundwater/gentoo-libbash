@@ -56,13 +56,14 @@ options{ k=1; }:
 	|NUMBER { $libbash_value = walker->get_string($NUMBER); };
 
 var_def:
-	^(EQUALS libbash_name=name libbash_value=string_expr){
+	^(EQUALS libbash_name=name libbash_value=word){
 		walker->define(libbash_name, libbash_value);
 	};
 
 string_expr	returns[std::string libbash_value]:
 	^(STRING(
 		(DOUBLE_QUOTED_STRING) => ^(DOUBLE_QUOTED_STRING (libbash_string=double_quoted_string { $libbash_value += libbash_string; })*)
+		|(ARITHMETIC_EXPRESSION) => ^(ARITHMETIC_EXPRESSION value=arithmetics { $libbash_value = boost::lexical_cast<std::string>(value); })
 		|libbash_string=any_string { $libbash_value = libbash_string; }
 	));
 
