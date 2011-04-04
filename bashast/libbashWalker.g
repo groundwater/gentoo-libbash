@@ -61,54 +61,22 @@ var_def:
 	};
 
 string_expr	returns[std::string libbash_value]:
-	^(STRING libbash_string=string_expr) { $libbash_value = libbash_string; }
-	|^(DOUBLE_QUOTED_STRING (libbash_string=dqstr { $libbash_value += libbash_string; })*)
-	|^(STRING libbash_string=dqstr) { $libbash_value = libbash_string; };
-
-//A rule for filenames/strings
-res_word_str returns[std::string libbash_value]
-@after {
-	$libbash_value = walker->get_string($res_word_str.start);
-}:
-	CASE|DO|DONE|ELIF|ELSE|ESAC|FI|FOR|FUNCTION|IF|IN|SELECT|THEN|UNTIL|WHILE|TIME;
-
-//Parts of strings, no slashes, no reserved words
-ns_str_part_no_res returns[std::string libbash_value]
-options{ backtrack=true; }
-@after {
-	$libbash_value = walker->get_string($ns_str_part_no_res.start);
-}:
-	num|name|EQUALS|PCT|PCTPCT|MINUS|DOT|DOTDOT|COLON|BOP|UOP|TEST_EXPR|'_'|TILDE|INC|DEC|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN|OR_ASSIGN|ESC_CHAR|CARET|OTHER;
-
-//Parts of strings, no slashes
-ns_str_part returns[std::string libbash_value]:
-	ns_str_part_no_res { $libbash_value = $ns_str_part_no_res.libbash_value; }
-	|res_word_str {$libbash_value = $res_word_str.libbash_value; };
-
-//Any allowable part of a string, including slashes, no pounds
-str_part returns[std::string libbash_value]:
-	libbash_string=ns_str_part { $libbash_value = libbash_string; }
-	|SLASH { $libbash_value = "/"; };
-
-//Any allowable part of a string, with pounds
-str_part_with_pound returns[std::string libbash_value]
-@after {
-	$libbash_value = walker->get_string($str_part_with_pound.start);
-}:
-	str_part|POUND|POUNDPOUND;
-
-//Allowable parts of double quoted strings
-dq_str_part returns[std::string libbash_value]
-@after {
-	$libbash_value = walker->get_string($dq_str_part.start);
-}:
-	BLANK|EOL|AMP|LOGICAND|LOGICOR|LESS_THAN|GREATER_THAN|PIPE|SQUOTE|SEMIC|COMMA|LPAREN|RPAREN|LLPAREN|RRPAREN|DOUBLE_SEMIC|LBRACE|RBRACE|TICK|LEQ|GEQ|str_part_with_pound;
+	^(STRING(
+		(DOUBLE_QUOTED_STRING) => ^(DOUBLE_QUOTED_STRING (libbash_string=double_quoted_string { $libbash_value += libbash_string; })*)
+		|libbash_string=any_string { $libbash_value = libbash_string; }
+	));
 
 //double quoted string rule, allows expansions
-dqstr returns[std::string libbash_value]:
-	dq_str_part { $libbash_value = $dq_str_part.libbash_value; }
-	| libbash_string=var_ref { $libbash_value = libbash_string; }
-	| ^(ARITHMETIC_EXPRESSION value=arithmetics) { $libbash_value = boost::lexical_cast<std::string>(value); };
+double_quoted_string returns[std::string libbash_value]:
+	(var_ref) => libbash_string=var_ref { $libbash_value = libbash_string; }
+	|(ARITHMETIC_EXPRESSION) => ^(ARITHMETIC_EXPRESSION value=arithmetics) { $libbash_value = boost::lexical_cast<std::string>(value); }
+	|libbash_string=any_string { $libbash_value = libbash_string; };
+
+any_string returns[std::string libbash_value]
+@declarations {
+	pANTLR3_BASE_TREE any_token;
+}:
+	any_token=. { $libbash_value = walker->get_string(any_token); };
 
 //Allowable variable names in the variable expansion
 var_name returns[std::string libbash_value]
@@ -117,7 +85,7 @@ var_name returns[std::string libbash_value]
 }:
 	num|name|TIMES|AT;
 
-var_exp returns[std::string libbash_value]:
+var_expansion returns[std::string libbash_value]:
 	^(USE_DEFAULT var_name libbash_word=word) {
 		libbash_value = walker->do_default_expansion($var_name.libbash_value, libbash_word);
 	};
@@ -133,7 +101,7 @@ word returns[std::string libbash_value]:
 //variable reference
 var_ref returns[std::string libbash_value]:
 	^(VAR_REF libbash_name=name) { $libbash_value = walker->resolve<std::string>(libbash_name); }
-	|^(VAR_REF libbash_string=var_exp) { $libbash_value = libbash_string; };
+	|^(VAR_REF libbash_string=var_expansion) { $libbash_value = libbash_string; };
 
 // shell arithmetic
 arithmetics returns[int value]

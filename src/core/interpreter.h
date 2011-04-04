@@ -104,6 +104,10 @@ public:
   static std::string get_string(pANTLR3_BASE_TREE node)
   {
     pANTLR3_COMMON_TOKEN token = node->getToken(node);
+    // The tree walker may send null pointer here, so return an empty
+    // string if that's the case.
+    if(!token->start)
+      return "";
     // Use reinterpret_cast here because we have to cast C code.
     // The real type here is int64_t which is used as a pointer.
     return std::string(reinterpret_cast<const char *>(token->start),
