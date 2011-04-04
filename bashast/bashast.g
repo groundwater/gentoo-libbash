@@ -253,7 +253,7 @@ var_ref
 	|	DOLLAR BANG -> ^(VAR_REF BANG)
 	|	DOLLAR '_' -> ^(VAR_REF '_');
 //Variable expansions
-var_exp	:	var_name WORDOP^ word
+var_exp	:	var_name (USE_DEFAULT|USE_ALTERNATE|DISPLAY_ERROR|ASSIGN_DEFAULT)^ word
 	|	var_name COLON os=num (COLON len=num)? -> ^(OFFSET var_name $os ^($len)?)
 	|	BANG^ var_name (TIMES|AT)
 	|	BANG var_name LSQUARE (op=TIMES|op=AT) RSQUARE -> ^(LIST_EXPAND var_name $op)
@@ -600,7 +600,10 @@ POUNDPOUND
 PCT	:	'%';
 PCTPCT	:	'%%';
 SLASH	:	'/';
-WORDOP	:	(':-'|':='|':?'|':+');
+USE_DEFAULT	:	':-';
+ASSIGN_DEFAULT:	':=';
+DISPLAY_ERROR:	':?';
+USE_ALTERNATE:	':+';
 COLON	:	':';
 QMARK	:	'?';
 //Operators for conditional statements
