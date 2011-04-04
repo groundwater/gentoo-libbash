@@ -62,7 +62,8 @@ var_def:
 
 string_expr	returns[std::string libbash_value]:
 	^(STRING libbash_string=string_expr) { $libbash_value = libbash_string; }
-	|^(DOUBLE_QUOTED_STRING (libbash_string=dqstr { $libbash_value += libbash_string; })*);
+	|^(DOUBLE_QUOTED_STRING (libbash_string=dqstr { $libbash_value += libbash_string; })*)
+	|^(STRING libbash_string=dqstr) { $libbash_value = libbash_string; };
 
 //A rule for filenames/strings
 res_word_str returns[std::string libbash_value]
@@ -109,9 +110,30 @@ dqstr returns[std::string libbash_value]:
 	| libbash_string=var_ref { $libbash_value = libbash_string; }
 	| ^(ARITHMETIC_EXPRESSION value=arithmetics) { $libbash_value = boost::lexical_cast<std::string>(value); };
 
+//Allowable variable names in the variable expansion
+var_name returns[std::string libbash_value]
+@after {
+	$libbash_value = walker->get_string($var_name.start);
+}:
+	num|name|TIMES|AT;
+
+var_exp returns[std::string libbash_value]:
+	^(USE_DEFAULT var_name libbash_word=word) {
+		libbash_value = walker->do_default_expansion($var_name.libbash_value, libbash_word);
+	};
+
+word returns[std::string libbash_value]:
+	// Avoid conflict with arithmetics (both have VAR_DEF)
+	(var_ref) => libbash_string=var_ref { $libbash_value = libbash_string; }
+	// Avoid conflict with arithmetics (both have num)
+	|(num) => libbash_string=num { $libbash_value = libbash_string; }
+	|libbash_string=string_expr { $libbash_value = libbash_string; }
+	|value=arithmetics { $libbash_value = boost::lexical_cast<std::string>(value); };
+
 //variable reference
 var_ref returns[std::string libbash_value]:
-	^(VAR_REF libbash_name=name) { $libbash_value=walker->resolve<std::string>(libbash_name); };
+	^(VAR_REF libbash_name=name) { $libbash_value = walker->resolve<std::string>(libbash_name); }
+	|^(VAR_REF libbash_string=var_exp) { $libbash_value = libbash_string; };
 
 // shell arithmetic
 arithmetics returns[int value]

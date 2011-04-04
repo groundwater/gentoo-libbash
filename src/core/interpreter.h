@@ -410,5 +410,11 @@ public:
         new variable(name, value, readonly, is_null));
     members.define(target);
   }
+
+  const std::string do_default_expansion(const std::string& name,
+                                         const std::string& value)
+  {
+    return (is_null(name)? value : resolve<std::string>(name));
+  }
 };
 #endif

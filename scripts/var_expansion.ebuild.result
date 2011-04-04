@@ -1,2 +1,4 @@
 EAPI=3
 EAPI4=4
+FOO=3
+FOO2=hello
