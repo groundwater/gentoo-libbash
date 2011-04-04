@@ -65,6 +65,15 @@ TEST(symbol_test, string_variable)
   EXPECT_EQ(123, int_string.get_value<int>());
 }
 
+TEST(symbol_test, is_null)
+{
+  variable var("foo", 10);
+  EXPECT_FALSE(var.is_null());
+  var.set_value("bar", true);
+  EXPECT_TRUE(var.is_null());
+  EXPECT_TRUE(variable("foo", "", false, true).is_null());
+}
+
 TEST(scope_test, define_resolve)
 {
   scope members;

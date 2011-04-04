@@ -358,6 +358,19 @@ public:
     return std::static_pointer_cast<variable>(value)->get_value<T>();
   }
 
+  /// \brief check whether the value of the variable is null, return true
+  ///        if the variable is undefined
+  /// \param variable name
+  /// \return whether the value of the variable is null
+  bool is_null(const std::string& name)
+  {
+    std::shared_ptr<symbol> value = members.resolve(name);
+    if(value)
+      return std::static_pointer_cast<variable>(value)->is_null();
+    else
+      return true;
+  }
+
   /// \brief update the variable value, raise interpreter_exception if
   ///        it's readonly, will define the variable if it doesn't exist
   /// \param variable name
@@ -378,13 +391,15 @@ public:
   /// \param the name of the variable
   /// \param the value of the variable
   /// \param whether it's readonly, default is false
+  /// \param whether it's null, default is false
   template <typename T>
   void define(const std::string& name,
               const T& value,
-              bool readonly=false)
+              bool readonly=false,
+              bool is_null=false)
   {
     std::shared_ptr<variable> target(
-        new variable(name, value, readonly));
+        new variable(name, value, readonly, is_null));
     members.define(target);
   }
 };

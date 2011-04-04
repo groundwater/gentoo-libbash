@@ -141,10 +141,17 @@ class variable: public symbol
   /// \brief whether the symbol is readonly
   bool readonly;
 
+  /// \var private::null_value
+  /// \brief whether the symbol is null 
+  bool null_value;
+
 public:
   template <typename T>
-  variable(const std::string& name, T v, bool ro=false)
-    : symbol(name), value(v), readonly(ro){}
+  variable(const std::string& name,
+           T v,
+           bool ro=false,
+           bool is_null=false)
+    : symbol(name), value(v), readonly(ro), null_value(is_null){}
 
   /// \brief retrieve actual value of the symbol
   /// \return the value of the symbol
@@ -157,12 +164,21 @@ public:
 
   /// \brief set the value of the symbol, raise exception if it's readonly
   /// \param the new value to be set
+  /// \param whether to set the variable to null value, default is false
   template <typename T>
-  void set_value(T new_value)
+  void set_value(T new_value, bool is_null=false)
   {
     if(readonly)
       throw interpreter_exception(get_name() + " is readonly variable");
+    null_value = is_null;
     value = new_value;
+  }
+
+  /// \brief check whether the value of the variable is null
+  /// \return whether the value of the variable is null
+  bool is_null() const
+  {
+    return null_value;
   }
 };
 

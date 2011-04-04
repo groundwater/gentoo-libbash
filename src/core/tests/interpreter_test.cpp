@@ -44,6 +44,15 @@ TEST(interpreter, define_resolve_string)
   EXPECT_STREQ("", walker.resolve<string>("undefined").c_str());
 }
 
+TEST(interpreter, is_null)
+{
+  interpreter walker;
+  walker.define("foo", "hello");
+  EXPECT_FALSE(walker.is_null("foo"));
+  walker.define("foo", "hello", false, true);
+  EXPECT_TRUE(walker.is_null("foo"));
+}
+
 TEST(interpreter, set_int_value)
 {
   interpreter walker;
