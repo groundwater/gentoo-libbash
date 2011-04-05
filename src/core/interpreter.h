@@ -44,6 +44,18 @@ class interpreter{
   /// \var private::members
   /// \brief global symbol table
   scope members;
+
+  /// \brief calculate the correct offset when offset < 0 and check whether
+  ///        the real offset is in legal range
+  /// \param[in,out] a value/result argument referring to offset
+  /// \param[in] the original string
+  /// \return whether the real offset is in legal range
+  bool get_real_offset(int& offset, const std::string& str)
+  {
+    offset = (offset >= 0? offset : str.size() + offset);
+    return !(offset < 0 || offset >= static_cast<int>(str.size()));
+  }
+
 public:
 
   ///
@@ -444,5 +456,34 @@ public:
   {
     return (is_unset_or_null(name)? "" : value);
   }
+
+  /// \brief perform substring expansion
+  /// \param the offset of the substring
+  /// \return the expansion result
+  const std::string do_substring_expansion(const std::string& name,
+                                           int offset)
+  {
+    std::string value = resolve<std::string>(name);
+    if(!get_real_offset(offset, value))
+      return "";
+    return value.substr(offset);
+  }
+
+  /// \brief perform substring expansion
+  /// \param the offset of the substring
+  /// \param the length of the substring
+  /// \return the expansion result
+  const std::string do_substring_expansion(const std::string& name,
+                                           int offset,
+                                           int length)
+  {
+    if(length < 0)
+      throw interpreter_exception("length of substring expression should be greater or equal to zero");
+    std::string value = resolve<std::string>(name);
+    if(!get_real_offset(offset, value))
+      return "";
+    return value.substr(offset, length);
+  }
+
 };
 #endif

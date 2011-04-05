@@ -90,3 +90,9 @@ TEST(interpreter, set_string_value)
                interpreter_exception);
   EXPECT_STREQ("hi", walker.resolve<string>("astring_ro").c_str());
 }
+
+TEST(interperter, substring_expansion_exception)
+{
+  interpreter walker;
+  EXPECT_THROW(walker.do_substring_expansion("", 0, -1), interpreter_exception);
+}

@@ -86,7 +86,10 @@ var_name returns[std::string libbash_value]
 }:
 	num|name|TIMES|AT;
 
-var_expansion returns[std::string libbash_value]:
+var_expansion returns[std::string libbash_value]
+@declarations {
+	bool use_length;
+}:
 	^(USE_DEFAULT var_name libbash_word=word) {
 		libbash_value = walker->do_default_expansion($var_name.libbash_value, libbash_word);
 	}
@@ -95,6 +98,12 @@ var_expansion returns[std::string libbash_value]:
 	}
 	|^(USE_ALTERNATE var_name libbash_word=word) {
 		libbash_value = walker->do_alternate_expansion($var_name.libbash_value, libbash_word);
+	}
+	|^(OFFSET var_name offset=arithmetics { use_length = false; } (length=arithmetics { use_length = true; })?) {
+		if(use_length)
+			libbash_value = walker->do_substring_expansion($var_name.libbash_value, offset, length);
+		else
+			libbash_value = walker->do_substring_expansion($var_name.libbash_value, offset);
 	};
 
 word returns[std::string libbash_value]:
