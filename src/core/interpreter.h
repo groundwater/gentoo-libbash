@@ -415,6 +415,10 @@ public:
     members.define(target);
   }
 
+  /// \brief perform ${parameter:−word} expansion
+  /// \param the name of the parameter
+  /// \param the value of the word
+  /// \return the expansion result
   const std::string do_default_expansion(const std::string& name,
                                          const std::string& value)
   {
