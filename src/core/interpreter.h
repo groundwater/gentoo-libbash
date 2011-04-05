@@ -424,5 +424,25 @@ public:
   {
     return (is_unset_or_null(name)? value : resolve<std::string>(name));
   }
+
+  /// \brief perform ${parameter:=word} expansion
+  /// \param the name of the parameter
+  /// \param the value of the word
+  /// \return the expansion result
+  const std::string do_assign_expansion(const std::string& name,
+                                        const std::string& value)
+  {
+    return (is_unset_or_null(name)? set_value(name, value) : resolve<std::string>(name));
+  }
+
+  /// \brief perform ${parameter:+word} expansion
+  /// \param the name of the parameter
+  /// \param the value of the word
+  /// \return the expansion result
+  const std::string do_alternate_expansion(const std::string& name,
+                                           const std::string& value)
+  {
+    return (is_unset_or_null(name)? "" : value);
+  }
 };
 #endif

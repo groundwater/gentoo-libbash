@@ -89,6 +89,12 @@ var_name returns[std::string libbash_value]
 var_expansion returns[std::string libbash_value]:
 	^(USE_DEFAULT var_name libbash_word=word) {
 		libbash_value = walker->do_default_expansion($var_name.libbash_value, libbash_word);
+	}
+	|^(ASSIGN_DEFAULT var_name libbash_word=word) {
+		libbash_value = walker->do_assign_expansion($var_name.libbash_value, libbash_word);
+	}
+	|^(USE_ALTERNATE var_name libbash_word=word) {
+		libbash_value = walker->do_alternate_expansion($var_name.libbash_value, libbash_word);
 	};
 
 word returns[std::string libbash_value]:

@@ -1,7 +1,12 @@
 EAPI=3
 EAPI4=4
 FOO=3
+FOO10=
 FOO2=hello
 FOO3=123
 FOO4=3
 FOO5=2
+FOO6=3
+FOO7=hello
+FOO8=hello
+FOO9=hello
