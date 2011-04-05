@@ -254,7 +254,7 @@ var_ref
 	|	DOLLAR '_' -> ^(VAR_REF '_');
 //Variable expansions
 var_exp	:	var_name (USE_DEFAULT|USE_ALTERNATE|DISPLAY_ERROR|ASSIGN_DEFAULT)^ word
-	|	var_name COLON os=num (COLON len=num)? -> ^(OFFSET var_name $os ^($len)?)
+	|	var_name COLON wspace* LPAREN? os=arithmetic RPAREN? (COLON len=arithmetic)? -> ^(OFFSET var_name $os ^($len)?)
 	|	BANG^ var_name (TIMES|AT)
 	|	BANG var_name LSQUARE (op=TIMES|op=AT) RSQUARE -> ^(LIST_EXPAND var_name $op)
 	|	POUND^ var_name

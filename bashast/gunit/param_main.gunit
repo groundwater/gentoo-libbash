@@ -23,6 +23,8 @@ var_ref:
 "${asdf}" -> (VAR_REF asdf)
 "${asdf:-foo}" -> (VAR_REF (:- asdf (STRING foo)))
 "${bar:7}" -> (VAR_REF (OFFSET bar 7))
+"${bar: -10}" -> (VAR_REF (OFFSET bar (MINUS_SIGN 10)))
+"${bar:(-10 + 5)}" -> (VAR_REF (OFFSET bar (+ (MINUS_SIGN 10) 5)))
 "${foo:5:2}" -> (VAR_REF (OFFSET foo 5 2))
 "${!asdf*}" -> (VAR_REF (! asdf *))
 "${!asdf@}" -> (VAR_REF (! asdf @))
