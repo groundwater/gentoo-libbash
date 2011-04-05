@@ -366,7 +366,7 @@ public:
   ///        if the variable is undefined
   /// \param variable name
   /// \return whether the value of the variable is null
-  bool is_null(const std::string& name)
+  bool is_unset_or_null(const std::string& name)
   {
     std::shared_ptr<variable> value = members.resolve(name);
     if(value)
@@ -422,7 +422,7 @@ public:
   const std::string do_default_expansion(const std::string& name,
                                          const std::string& value)
   {
-    return (is_null(name)? value : resolve<std::string>(name));
+    return (is_unset_or_null(name)? value : resolve<std::string>(name));
   }
 };
 #endif

@@ -44,13 +44,13 @@ TEST(interpreter, define_resolve_string)
   EXPECT_STREQ("", walker.resolve<string>("undefined").c_str());
 }
 
-TEST(interpreter, is_null)
+TEST(interpreter, is_unset_or_null)
 {
   interpreter walker;
   walker.define("foo", "hello");
-  EXPECT_FALSE(walker.is_null("foo"));
+  EXPECT_FALSE(walker.is_unset_or_null("foo"));
   walker.define("foo", "hello", false, true);
-  EXPECT_TRUE(walker.is_null("foo"));
+  EXPECT_TRUE(walker.is_unset_or_null("foo"));
 }
 
 TEST(interpreter, is_unset)
