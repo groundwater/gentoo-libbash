@@ -32,6 +32,8 @@ var_ref:
 "${!asdf[@]}" -> (VAR_REF (LIST_EXPAND asdf @))
 "${#foo}" -> (VAR_REF (# foo))
 "${foo#bar}" -> (VAR_REF (# foo (STRING bar)))
+"${fo*o#bar}" FAIL
+"${fo@o#bar}" FAIL
 "${foo##bar}" -> (VAR_REF (## foo (STRING bar)))
 "${foo%bar}" -> (VAR_REF (% foo (STRING bar)))
 "${foo%%bar}" -> (VAR_REF (%% foo (STRING bar)))

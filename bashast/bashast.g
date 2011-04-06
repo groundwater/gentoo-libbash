@@ -269,9 +269,11 @@ var_exp	:	var_name (USE_DEFAULT|USE_ALTERNATE|DISPLAY_ERROR|ASSIGN_DEFAULT)^ wor
 	|	var_name SLASH PCT ns_str SLASH? -> ^(REPLACE_LAST var_name ns_str)
 	|	var_name SLASH ns_str SLASH? -> ^(REPLACE_FIRST var_name ns_str)
 	|	arr_var_ref
-	|	var_name;
+	|	var_name
+	|	TIMES
+	|	AT;
 //Allowable variable names in the variable expansion
-var_name:	num|name|TIMES|AT;
+var_name:	num|name;
 //Referencing an array variable
 arr_var_ref
 	:	name^ LSQUARE! DIGIT+ RSQUARE!;

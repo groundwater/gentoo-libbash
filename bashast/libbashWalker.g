@@ -84,7 +84,7 @@ var_name returns[std::string libbash_value]
 @after {
 	$libbash_value = walker->get_string($var_name.start);
 }:
-	num|name|TIMES|AT;
+	num|name;
 
 var_expansion returns[std::string libbash_value]:
 	^(USE_DEFAULT var_name libbash_word=word) {
