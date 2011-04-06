@@ -485,5 +485,13 @@ public:
     return value.substr(offset, length);
   }
 
+  /// \brief get the length of a string variable
+  /// \param the name of the variable
+  /// \return the length
+  int get_length(const std::string& name)
+  {
+    return resolve<std::string>(name).size();
+  }
+
 };
 #endif

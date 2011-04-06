@@ -104,6 +104,9 @@ var_expansion returns[std::string libbash_value]
 			libbash_value = walker->do_substring_expansion($var_name.libbash_value, offset, length);
 		else
 			libbash_value = walker->do_substring_expansion($var_name.libbash_value, offset);
+	}
+	|^(POUND var_name) {
+		libbash_value = boost::lexical_cast<std::string>(walker->get_length($var_name.libbash_value));
 	};
 
 word returns[std::string libbash_value]:
