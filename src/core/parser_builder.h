@@ -58,6 +58,8 @@ public:
   /// \brief factory method that creates walker_builder
   /// \return walker_builder object
   walker_builder create_walker_builder();
+  std::string get_dot_graph();
+  std::string get_string_tree();
 };
 
 #endif

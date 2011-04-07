@@ -76,3 +76,16 @@ walker_builder parser_builder::create_walker_builder()
 {
   return walker_builder(nodes);
 }
+
+std::string parser_builder::get_dot_graph()
+{
+  pANTLR3_STRING graph = nodes->adaptor->makeDot(nodes->adaptor, langAST->tree);
+  return std::string(reinterpret_cast<char*>(graph->chars));
+}
+
+std::string parser_builder::get_string_tree()
+{
+  return std::string(reinterpret_cast<char*>(
+        langAST->tree->toStringTree(langAST->tree)->chars));
+}
+

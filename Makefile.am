@@ -78,7 +78,7 @@ endif
 
 if HAVE_GTEST
 TESTS += cppunittests
-check_PROGRAMS = cppunittests variable_printer
+check_PROGRAMS = cppunittests variable_printer ast_printer
 
 cppunittests_SOURCES =  test/run_tests.cpp \
 						src/core/tests/symbols_test.cpp \
@@ -96,6 +96,10 @@ cppunittests_LDFLAGS = -static
 
 variable_printer_SOURCES = test/variable_printer.cpp
 variable_printer_LDADD = libcppbash.la
+
+ast_printer_SOURCES = test/ast_printer.cpp
+ast_printer_LDADD = libcppbash.la
+ast_printer_LDFLAGS = -static
 endif
 
 GENERATED_PARSER_C = libbashLexer.c libbashParser.c
