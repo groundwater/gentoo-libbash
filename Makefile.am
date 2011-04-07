@@ -122,7 +122,9 @@ CLEANFILES = $(GENERATED_PARSER_C) \
 			 libbashWalker.tokens \
 			 javagrammar.run \
 			 cgrammar.run \
-			 walker.run
+			 walker.run \
+			 massif.out \
+			 long.sh
 
 lib_LTLIBRARIES = libcppbash.la
 libcppbash_la_SOURCES = src/common.h \
@@ -195,3 +197,15 @@ javagrammar.run: bashast/bashast.g
 	$(AM_V_at)mv $@.tmp $@
 
 $(check_JAVA): javagrammar.run
+
+long.sh:
+	rm -f $@
+	for i in $$(seq 1 10000); do echo 'FOO="bar"' >> $@; done
+
+massif.out: variable_printer long.sh
+		libtool --mode=execute valgrind \
+		--tool=massif --massif-out-file=massif.out \
+		./variable_printer long.sh
+
+massif: massif.out
+	ms_print --threshold=10 $<

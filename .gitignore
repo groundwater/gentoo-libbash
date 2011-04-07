@@ -20,6 +20,8 @@ autom4te.cache
 cppunittests
 variable_printer
 ast_printer
+long.sh
+massif.out
 libbash.g
 libbash.tokens
 bashast.tokens
