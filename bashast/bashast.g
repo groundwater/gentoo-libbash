@@ -488,8 +488,8 @@ arithmetic_assignment
 //process substitution
 proc_sub:	(dir=LESS_THAN|dir=GREATER_THAN)LPAREN BLANK* clist BLANK* RPAREN -> ^(PROC_SUB $dir clist);
 //the biggie: functions
-function:	FUNCTION BLANK+ fname (BLANK* parens)? wspace compound_command redirect* -> ^(FUNCTION fname compound_command redirect*)
-	|	fname BLANK* parens wspace compound_command redirect* -> ^(FUNCTION["function"] fname compound_command redirect*);
+function:	FUNCTION BLANK+ name (BLANK* parens)? wspace compound_command redirect* -> ^(FUNCTION name compound_command redirect*)
+	|	name BLANK* parens wspace compound_command redirect* -> ^(FUNCTION["function"] name compound_command redirect*);
 parens	:	LPAREN BLANK* RPAREN;
 name	:	NAME
 	|	LETTER
