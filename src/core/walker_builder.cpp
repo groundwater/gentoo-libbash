@@ -17,30 +17,20 @@
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
 ///
-/// \file libbash.cpp
+/// \file walker_builder.cpp
 /// \author Mu Qiao
-/// \brief implementation for libbash interface
+/// \brief a class that helps build a libbashWalker from istream
 ///
 
-#include "libbash.h"
-
-#include <fstream>
-
-#include "core/parser_builder.h"
 #include "core/walker_builder.h"
 
-namespace libbash
-{
-  void interpret(const std::string& path,
-                 std::unordered_map<std::string, std::string>& variables)
-  {
-    std::ifstream input(path.c_str());
-    if(!input)
-      throw interpreter_exception("Unable to create fstream for script: " + path);
-    parser_builder pbuilder(input);
-    walker_builder wbuilder = pbuilder.create_walker_builder();
+#include "core/interpreter.h"
+#include "libbashWalker.h"
 
-    for(auto iter = wbuilder.walker->begin(); iter != wbuilder.walker->end(); ++iter)
-      variables[iter->first]=iter->second->get_value<std::string>();
-  }
+walker_builder::walker_builder(pANTLR3_COMMON_TREE_NODE_STREAM nodes): walker(new interpreter)
+{
+  set_interpreter(walker);
+  plibbashWalker treePsr = libbashWalkerNew(nodes);
+  treePsr->start(treePsr);
+  treePsr->free(treePsr);
 }

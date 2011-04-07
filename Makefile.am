@@ -135,6 +135,10 @@ libcppbash_la_SOURCES = src/common.h \
 						src/core/interpreter.cpp \
 						src/core/interpreter.h \
 						src/core/symbols.hpp \
+						src/core/parser_builder.cpp \
+						src/core/parser_builder.h \
+						src/core/walker_builder.cpp \
+						src/core/walker_builder.h \
 						$(GENERATED_WALKER_C) \
 						$(GENERATED_WALKER_H)
 
