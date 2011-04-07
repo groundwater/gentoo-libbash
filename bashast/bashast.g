@@ -372,10 +372,6 @@ ns_str	:	ns_str_part* -> ^(STRING ns_str_part*);
 dq_str_part
 	:	BLANK|EOL|AMP|LOGICAND|LOGICOR|LESS_THAN|GREATER_THAN|PIPE|SQUOTE|SEMIC|COMMA|LPAREN|RPAREN|LLPAREN|RRPAREN|DOUBLE_SEMIC|LBRACE|RBRACE|TICK|LEQ|GEQ
 	|	str_part_with_pound;
-//Allowable parts of single quoted strings
-sq_str_part
-	:	str_part_with_pound
-	|	BLANK|EOL|AMP|LOGICAND|LOGICOR|LESS_THAN|GREATER_THAN|PIPE|QUOTE|SEMIC|COMMA|LPAREN|RPAREN|LLPAREN|RRPAREN|DOUBLE_SEMIC|LBRACE|RBRACE|DOLLAR|TICK|BOP|UOP;
 //Generic strings/filenames.
 fname	:	nqstr -> ^(STRING nqstr);
 //A string that is NOT a bash reserved word
@@ -411,7 +407,9 @@ dqstr_part
 	|	pattern_match_trigger
 	|	BANG;
 //single quoted string rule, no expansions
-sqstr	:	SQUOTE sq_str_part* SQUOTE -> ^(SINGLE_QUOTED_STRING sq_str_part*);
+sqstr_part
+	: ~SQUOTE*;
+sqstr	:	SQUOTE sqstr_part SQUOTE -> ^(SINGLE_QUOTED_STRING sqstr_part);
 //certain tokens that trigger pattern matching
 pattern_match_trigger
 	:	LSQUARE
