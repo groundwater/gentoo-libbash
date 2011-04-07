@@ -368,10 +368,6 @@ ns_str_part_no_res
 	|	name|OTHER|EQUALS|PCT|PCTPCT|MINUS|DOT|DOTDOT|COLON|BOP|UOP|TEST_EXPR|'_'|TILDE|INC|DEC|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN|OR_ASSIGN|ESC_CHAR|CARET;
 //strings with no slashes, used in certain variable expansions
 ns_str	:	ns_str_part* -> ^(STRING ns_str_part*);
-//Allowable parts of double quoted strings
-dq_str_part
-	:	BLANK|EOL|AMP|LOGICAND|LOGICOR|LESS_THAN|GREATER_THAN|PIPE|SQUOTE|SEMIC|COMMA|LPAREN|RPAREN|LLPAREN|RRPAREN|DOUBLE_SEMIC|LBRACE|RBRACE|TICK|LEQ|GEQ
-	|	str_part_with_pound;
 //Generic strings/filenames.
 fname	:	nqstr -> ^(STRING nqstr);
 //A string that is NOT a bash reserved word
@@ -398,14 +394,10 @@ nqstr	:	(bracket_pattern_match|extended_pattern_match|var_ref|command_sub|arithm
 //double quoted string rule, allows expansions
 dqstr	:	QUOTE dqstr_part* QUOTE -> ^(DOUBLE_QUOTED_STRING dqstr_part*);
 dqstr_part
-	:	bracket_pattern_match
-	|	extended_pattern_match
-	|	var_ref
-	|	command_sub
-	|	arithmetic_expansion
-	|	dq_str_part
-	|	pattern_match_trigger
-	|	BANG;
+	: var_ref
+	| command_sub
+	| arithmetic_expansion
+	| ~(DOLLAR|TICK|QUOTE);
 //single quoted string rule, no expansions
 sqstr_part
 	: ~SQUOTE*;
