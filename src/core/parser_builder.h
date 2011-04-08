@@ -46,7 +46,7 @@ class parser_builder
   libbashLexer_Ctx_struct* lxr;
   pANTLR3_COMMON_TOKEN_STREAM tstream;
   libbashParser_Ctx_struct* psr;
-  std::shared_ptr<libbashParser_start_return_struct> langAST;
+  std::unique_ptr<libbashParser_start_return_struct> langAST;
   pANTLR3_COMMON_TREE_NODE_STREAM nodes;
 
   void init_parser();
