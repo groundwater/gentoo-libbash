@@ -246,8 +246,7 @@ var_ref
 	|	DOLLAR POUND -> ^(VAR_REF POUND)
 	|	DOLLAR QMARK -> ^(VAR_REF QMARK)
 	|	DOLLAR MINUS -> ^(VAR_REF MINUS)
-	|	DOLLAR BANG -> ^(VAR_REF BANG)
-	|	DOLLAR '_' -> ^(VAR_REF '_');
+	|	DOLLAR BANG -> ^(VAR_REF BANG);
 //Variable expansions
 var_exp	:	var_name (USE_DEFAULT|USE_ALTERNATE|DISPLAY_ERROR|ASSIGN_DEFAULT)^ word
 	|	var_name COLON wspace* LPAREN? os=arithmetic RPAREN? (COLON len=arithmetic)? -> ^(OFFSET var_name $os ^($len)?)

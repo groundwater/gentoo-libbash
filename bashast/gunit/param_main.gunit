@@ -45,6 +45,8 @@ var_ref:
 "${@}" -> (VAR_REF @)
 "${3}" -> (VAR_REF 3)
 "$?" -> (VAR_REF ?)
+"$_" -> (VAR_REF _)
+"${_}" -> (VAR_REF _)
 "${PV//./_}" -> (VAR_REF (REPLACE_ALL PV (STRING .) (STRING _)))
 "${PV/#foo/bar}" -> (VAR_REF (REPLACE_FIRST PV (STRING foo) (STRING bar)))
 "${PV/%foo/bar}" -> (VAR_REF (REPLACE_LAST PV (STRING foo) (STRING bar)))
