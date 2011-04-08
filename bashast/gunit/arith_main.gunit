@@ -49,7 +49,7 @@ exponential:
 "6**2" -> (** 6 2)
 "-5**+4" -> (** (MINUS_SIGN 5) (PLUS_SIGN 4))
 
-tdm:
+times_division_modulus:
 "9" -> "9"
 "7 * 9" -> (* 7 9)
 "7 / 9" -> (/ 7 9)

@@ -466,8 +466,9 @@ negation
 	:	(BANG^BLANK!?|TILDE^BLANK!?)?unary;
 exponential
 	:	negation (BLANK!* EXP^ BLANK!* negation)* ;
-tdm	:	exponential (BLANK!*(TIMES^|SLASH^|PCT^)BLANK!* exponential)*;
-addsub	:	tdm (BLANK!* (PLUS^|MINUS^)BLANK!* tdm)*;
+times_division_modulus
+	:	exponential (BLANK!*(TIMES^|SLASH^|PCT^)BLANK!* exponential)*;
+addsub	:	times_division_modulus (BLANK!* (PLUS^|MINUS^)BLANK!* times_division_modulus)*;
 shifts	:	addsub (BLANK!* (LSHIFT^|RSHIFT^) BLANK!* addsub)*;
 compare	:	shifts (BLANK!* (LEQ^|GEQ^|LESS_THAN^|GREATER_THAN^)BLANK!* shifts)?;
 bitwiseand
