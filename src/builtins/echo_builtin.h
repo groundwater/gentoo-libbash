@@ -22,8 +22,8 @@
 /// \brief class that implements the echo builtin
 ///
 
-#ifndef ECHO_BUILTIN_H
-#define ECHO_BUILTIN_H
+#ifndef LIBBASH_BUILTINS_ECHO_BUILTIN_H_
+#define LIBBASH_BUILTINS_ECHO_BUILTIN_H_
 
 #include <cstdlib>
 #include <iterator>

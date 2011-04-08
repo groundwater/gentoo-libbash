@@ -20,8 +20,10 @@
 /// \file boolean_builtins.cpp
 /// \brief implementations for the true and false builtins
 ///
+#ifndef LIBBASH_BUILTINS_BOOLEAN_BUILTINS_H_
+#define LIBBASH_BUILTINS_BOOLEAN_BUILTINS_H_
 
-#include "../cppbash_builtin.h"
+#include "cppbash_builtin.h"
 
 struct true_builtin : public virtual cppbash_builtin
 {
@@ -34,3 +36,5 @@ struct false_builtin : public virtual cppbash_builtin
   BUILTIN_CONSTRUCTOR(false)
   virtual int exec(const std::vector<std::string>& ) { return 1; }
 };
+
+#endif

@@ -22,16 +22,17 @@
 /// \brief Base class for builtin functions in bash
 ///
 
-#ifndef CPPBASH_BUILTIN_H
-#define CPPBASH_BUILTIN_H
+#ifndef LIBBASH_CPPBASH_BUILTIN_H_
+#define LIBBASH_CPPBASH_BUILTIN_H_
 
 #include <iostream>
-#include <vector>
 #include <map>
 #include <string>
-#include <boost/scoped_ptr.hpp>
+#include <vector>
+
 #include <boost/functional/factory.hpp>
 #include <boost/function.hpp>
+#include <boost/scoped_ptr.hpp>
 
 #define STREAM_ARGS std::ostream &out, std::ostream &err, std::istream &in
 

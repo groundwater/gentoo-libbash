@@ -22,8 +22,8 @@
 /// \brief a class that helps build libbashParser from istream
 ///
 
-#ifndef PARSER_BUILDER_H
-#define PARSER_BUILDER_H
+#ifndef LIBBASH_CORE_PARSER_BUILDER_H_
+#define LIBBASH_CORE_PARSER_BUILDER_H_
 
 #include <istream>
 #include <memory>

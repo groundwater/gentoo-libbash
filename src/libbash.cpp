@@ -26,6 +26,7 @@
 
 #include <fstream>
 
+#include "core/interpreter.h"
 #include "core/parser_builder.h"
 #include "core/walker_builder.h"
 

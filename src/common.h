@@ -22,8 +22,8 @@
 /// \brief common macros and includes
 ///
 
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef LIBBASH_COMMON_H_
+#define LIBBASH_COMMON_H_
 
 #define LIBBASH_API __attribute__((visibility("default")))
 #define LIBBASH_LOCAL __attribute__((visibility("hidden")))

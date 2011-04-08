@@ -22,8 +22,8 @@
 /// \brief a class that helps build a libbashWalker
 ///
 
-#ifndef WALKER_BUILDER_H
-#define WALKER_BUILDER_H
+#ifndef LIBBASH_CORE_WALKER_BUILDER_H_
+#define LIBBASH_CORE_WALKER_BUILDER_H_
 
 #include <memory>
 

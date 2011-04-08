@@ -22,15 +22,15 @@
 /// \brief public interface for libbash
 ///
 
-#ifndef LIBBASH_H
-#define LIBBASH_H
+#ifndef LIBBASH_LIBBASH_H_
+#define LIBBASH_LIBBASH_H_
 
 #include <memory>
 #include <string>
 #include <unordered_map>
 
 #include "common.h"
-#include "core/interpreter.h"
+#include "core/interpreter_exception.h"
 
 namespace libbash
 {

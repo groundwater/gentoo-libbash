@@ -22,12 +22,12 @@
 /// \brief template implementation for symbols and symbol table
 ///
 
-#ifndef SYMBOLS_HPP_
-#define SYMBOLS_HPP_
+#ifndef LIBBASH_CORE_SYMBOLS_HPP_
+#define LIBBASH_CORE_SYMBOLS_HPP_
 
 #include <memory>
-#include <string>
 #include <sstream>
+#include <string>
 #include <unordered_map>
 #include <vector>
 

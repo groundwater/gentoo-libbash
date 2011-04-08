@@ -23,10 +23,12 @@ Templated implementation files: .hpp
 Code must be split into two types of files: header files and implementation files.  Header files may contain no implementation except functions that may be implemented in one line/command, for example accessor/mutator functions.\\
 Implementation and header names must match.  A class prototyped in the file foobar.h must be implemented in foobar.cpp or foobar.hpp.\\
 \subsection{Header files}
-Header files must contain the appropriate ifndef header guard:
+\subsubsection{The \#define guard}
+All header files should have \#define guards to prevent multiple inclusion. The format of the symbol name should be LIBBASH\_PATH\_FILE\_H\_.\\
+For example, the file foo/src/bar/baz.h in project foo should have the following guard:
 \begin{verbatim}
-#ifndef FILENAME_H
-#define FILENAME_H
+#ifndef FOO_BAR_BAZ_H_
+#define FOO_BAR_BAZ_H_
 
 /*
 code
@@ -34,6 +36,20 @@ code
 
 #endif
 \end{verbatim}
+\subsubsection{Header file dependencies}
+Don't use an \#include when a forward declaration would suffice.\\
+\subsubsection{Names and Order of Includes}
+Use standard order for readability and to avoid hidden dependencies: C library, C++ library, other libraries' .h, your project's .h.\\
+All of a project's header files should be listed as descendants of the project's source directory without use of UNIX directory shortcuts . (the current directory) or .. (the parent directory).\\
+In dir/foo.cc or dir/foo\_test.cc, whose main purpose is to implement or test the stuff in dir2/foo2.h, order your includes as follows:
+\begin{verbatim}
+1. dir2/foo2.h
+2. C system files.
+3. C++ system files.
+4. Other libraries' .h files.
+5. Your project's .h files.
+\end{verbatim}
+Use one blank line to separate each section. Within each section it is nice to order the includes alphabetically.
 \subsection{Implementation Files}
 Implementation files will NEVER be included by another file.  Files with the extension .hpp should only be included at the end of the header file of the templated class they are implementing.
 \section{Comments}

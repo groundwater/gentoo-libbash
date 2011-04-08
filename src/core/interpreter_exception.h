@@ -22,8 +22,8 @@
 /// \brief implementation for interpreter_exception
 ///
 
-#ifndef INTERPRETER_EXCEPTION_H_
-#define INTERPRETER_EXCEPTION_H_
+#ifndef LIBBASH_CORE_INTERPRETER_EXCEPTION_H_
+#define LIBBASH_CORE_INTERPRETER_EXCEPTION_H_
 
 #include <stdexcept>
 #include <string>

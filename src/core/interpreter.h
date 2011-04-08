@@ -22,19 +22,19 @@
 /// \brief implementation for bash interpreter (visitor pattern)
 ///
 
-#ifndef INTERPRETER_H_
-#define INTERPRETER_H_
+#ifndef LIBBASH_CORE_INTERPRETER_H_
+#define LIBBASH_CORE_INTERPRETER_H_
 
 #include <cmath>
 
+#include <functional>
 #include <memory>
 #include <string>
-#include <functional>
 
 #include <antlr3basetree.h>
 
-#include "libbashLexer.h"
 #include "core/symbols.hpp"
+#include "libbashLexer.h"
 
 ///
 /// \class interpreter
