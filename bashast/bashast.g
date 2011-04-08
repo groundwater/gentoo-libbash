@@ -95,9 +95,10 @@ list_level_2
 	:	list_level_1 ((BLANK!?';'!|BLANK!?'&'^|(BLANK!? EOL!)+)BLANK!? list_level_1)*;
 pipeline
 	:	var_def+
-	|	time?('!' BLANK!*)? BLANK!* command^ (BLANK!* PIPE^ BLANK!* command)*;
-time	:	TIME^ BLANK!+ timearg?;
-timearg	:	'-p' BLANK!+;
+	|	BLANK!* time? (BANG BLANK!+)? command^ (BLANK!* PIPE^ BLANK!* command)*;
+time	:	TIME^ BLANK!+ time_posix?;
+time_posix
+	:	'-p' BLANK!+;
 //The structure of a command in bash
 command
 	:	EXPORT^ var_def+
