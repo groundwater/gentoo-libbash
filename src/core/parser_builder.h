@@ -51,7 +51,7 @@ class parser_builder
 
   void init_parser();
 public:
-  parser_builder(std::istream& source);
+  explicit parser_builder(std::istream& source);
   ~parser_builder();
 
   ///

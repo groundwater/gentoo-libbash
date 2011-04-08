@@ -40,7 +40,7 @@ public:
   /// \brief the interpreter object that contains all runtime information
   std::shared_ptr<interpreter> walker;
 
-  walker_builder(pANTLR3_COMMON_TREE_NODE_STREAM nodes);
+  explicit walker_builder(pANTLR3_COMMON_TREE_NODE_STREAM nodes);
 };
 
 #endif

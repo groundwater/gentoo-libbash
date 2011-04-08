@@ -112,6 +112,11 @@ vector<string> names; //Not good
 std::vector<std::string> names; //GOOD
 \end{verbatim}
 Namespaces may be used in implementation files if they do not cause conflicts, as implementation files should never be included in another file.
+\subsection{Classes}
+Use the C++ keyword explicit for constructors with one argument.\\
+Provide a copy constructor and assignment operator only when necessary. Otherwise, disable them with "= delete" from C++0x.\\
+Use a struct only for passive objects that carry data; everything else is a class.\\
+Composition is often more appropriate than inheritance. When using inheritance, make it public.
 \section{Statements}
 \subsection{Simple statements}
 Each line should contain only one statement:
