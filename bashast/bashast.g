@@ -89,7 +89,7 @@ clist
 options{greedy=false;}
 	:	list_level_2 -> ^(LIST list_level_2);
 list_level_1
-	:	(function|pipeline) (BLANK!*('&&'^|'||'^)BLANK!* (function|pipeline))*;
+	:	(function|pipeline) (BLANK!*(LOGICAND^|LOGICOR^)BLANK!* (function|pipeline))*;
 list_level_2
 	:	list_level_1 ((BLANK!?';'!|BLANK!?'&'^|(BLANK!? EOL!)+)BLANK!? list_level_1)*;
 pipeline
