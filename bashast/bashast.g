@@ -330,13 +330,13 @@ wspace	:	BLANK+|EOL;
 semiel	:	(';'|EOL) BLANK*;
 
 //definition of word.  this is just going to grow...
-word	:	brace_expansion
-	|	command_sub
-	|	var_ref
-	|	num
-	|	fname
-	|	arithmetic_expansion
-	|	res_word_str -> ^(STRING res_word_str);
+word	:	(brace_expansion) => brace_expansion
+	|	(command_sub) => command_sub
+	|	(var_ref) => var_ref
+	|	(num) => num
+	|	(arithmetic_expansion) => arithmetic_expansion
+	|	fname;
+
 pattern	:	command_sub
 	|	fname
 	|	TIMES;
