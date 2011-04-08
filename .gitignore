@@ -40,9 +40,8 @@ libbashWalker.h
 libbashWalker.c
 libbashWalker.cpp
 libbashWalker.tokens
-coding_standard/*.pdf
-coding_standard/*.log
-coding_standard/*.aux
+*.pdf
+*.aux
 config.*
 *.run
 configure
