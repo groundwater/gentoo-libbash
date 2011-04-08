@@ -41,7 +41,7 @@ GUNIT_TESTS = bashast/gunit/arith_main.gunit \
 			  bashast/gunit/list.gunit \
 			  bashast/gunit/param_main.gunit \
 			  bashast/gunit/pipeline.gunit \
-			  bashast/gunit/proc_sub.gunit \
+			  bashast/gunit/process_substitution.gunit \
 			  bashast/gunit/redir.gunit \
 			  bashast/gunit/simp_command.gunit \
 			  bashast/gunit/simp_prog.gunit

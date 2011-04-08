@@ -18,6 +18,6 @@
 */
 gunit bashast;
 
-proc_sub:
-"<( true )" -> (PROC_SUB < (LIST (COMMAND (STRING true))))
-">(false)" -> (PROC_SUB > (LIST (COMMAND (STRING false))))
+process_substitution:
+"<( true )" -> (PROCESS_SUBSTITUTION < (LIST (COMMAND (STRING true))))
+">(false)" -> (PROCESS_SUBSTITUTION > (LIST (COMMAND (STRING false))))

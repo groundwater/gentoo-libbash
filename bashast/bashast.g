@@ -46,7 +46,7 @@ tokens{
 	PRE_DECR;
 	POST_INCR;
 	POST_DECR;
-	PROC_SUB;
+	PROCESS_SUBSTITUTION;
 	VAR_REF;
 	NEGATION;
 	LIST;
@@ -121,7 +121,7 @@ redirect:	BLANK!* here_string_op^ BLANK!* fname
 	|	BLANK!* here_doc_op^ BLANK!* fname EOL! heredoc
 	|	BLANK* redir_op BLANK* DIGIT MINUS? -> ^(REDIR redir_op DIGIT MINUS?)
 	|	BLANK* redir_op BLANK* redir_dest -> ^(REDIR redir_op redir_dest)
-	|	BLANK!* proc_sub;
+	|	BLANK!* process_substitution;
 redir_dest
 	:	fname //path to a file
 	|	file_desc_as_file; //handles file descriptors0
@@ -485,8 +485,8 @@ arithmetic_condition
 	:	cnd=logicor QMARK t=logicor COLON f=logicor -> ^(ARITHMETIC_CONDITION $cnd $t $f);
 arithmetic_assignment
 	:	(name BLANK!* (EQUALS|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN|OR_ASSIGN)^ BLANK!*)? logicor;
-//process substitution
-proc_sub:	(dir=LESS_THAN|dir=GREATER_THAN)LPAREN BLANK* clist BLANK* RPAREN -> ^(PROC_SUB $dir clist);
+process_substitution
+	:	(dir=LESS_THAN|dir=GREATER_THAN)LPAREN BLANK* clist BLANK* RPAREN -> ^(PROCESS_SUBSTITUTION $dir clist);
 //the biggie: functions
 function:	FUNCTION BLANK+ name (BLANK* parens)? wspace compound_command redirect* -> ^(FUNCTION name compound_command redirect*)
 	|	name BLANK* parens wspace compound_command redirect* -> ^(FUNCTION["function"] name compound_command redirect*);
