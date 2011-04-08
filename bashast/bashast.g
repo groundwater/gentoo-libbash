@@ -109,11 +109,12 @@ simple_command
 bash_command
 	:	fname_no_res_word (BLANK+ arg)* -> ^(COMMAND fname_no_res_word arg*);
 //An argument to a command
+//fname can also match var_ref and command_sub but that gives a noisier AST
 arg
-	:	var_ref
-	|	fname
-	|	command_sub
-	|	var_ref;
+options{backtrack=false;}
+	:	(var_ref) => var_ref
+	|	(command_sub) => command_sub
+	|	fname;
 redirect:	BLANK!* here_string_op^ BLANK!* fname
 	|	BLANK!* here_doc_op^ BLANK!* fname EOL! heredoc
 	|	BLANK* redir_op BLANK* redir_dest -> ^(REDIR redir_op redir_dest)
