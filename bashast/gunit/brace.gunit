@@ -18,14 +18,13 @@
 */
 gunit bashast;
 
-brace:
-"{a,b}"-> (BRACE (STRING a) (STRING b))
-"{a,b,c}" -> (BRACE (STRING a) (STRING b) (STRING c))
-"{a..d}" -> (BRACE (.. a d))
-"{{a,b},c,d}" -> (BRACE (BRACE (STRING a) (STRING b)) (STRING c) (STRING d))
-
 brace_expansion:
-"{a,b}" -> (BRACE_EXP (BRACE (STRING a) (STRING b)))
-"a{b,c}" -> (BRACE_EXP (STRING a) (BRACE (STRING b) (STRING c)))
-"{c..d}f" -> (BRACE_EXP (BRACE (.. c d)) (STRING f))
-"z{{a,b},c}" -> (BRACE_EXP (STRING z) (BRACE (BRACE (STRING a) (STRING b)) (STRING c)))
+"{a,b}"-> (BRACE_EXP (STRING a) (STRING b))
+"{a,b,c}" -> (BRACE_EXP (STRING a) (STRING b) (STRING c))
+"{a..d}" -> (BRACE_EXP (.. a d))
+"{{a,b},c,d}" -> (BRACE_EXP (BRACE_EXP (STRING a) (STRING b)) (STRING c) (STRING d))
+
+arg:
+"a{b,c}" -> (STRING a (BRACE_EXP (STRING b) (STRING c)))
+"{c..d}f" -> (STRING (BRACE_EXP (.. c d)) f)
+"a{a,b}b{c,d}" -> (STRING a (BRACE_EXP (STRING a) (STRING b)) b (BRACE_EXP (STRING c) (STRING d)))

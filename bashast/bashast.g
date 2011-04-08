@@ -27,7 +27,6 @@ options
 tokens{
 	ARG;
 	ARRAY;
-	BRACE;
 	BRACE_EXP;
 	COMMAND_SUB;
 	CASE_PATTERN;
@@ -111,8 +110,7 @@ bash_command
 	:	fname_no_res_word (BLANK+ arg)* -> ^(COMMAND fname_no_res_word arg*);
 //An argument to a command
 arg
-	:	brace_expansion
-	|	var_ref
+	:	var_ref
 	|	fname
 	|	command_sub
 	|	var_ref;
@@ -144,16 +142,14 @@ redir_op:	AMP LESS_THAN -> OP["&<"]
 	|	GREATER_THAN
 	|	DIGIT redir_op;
 brace_expansion
-	:	pre=fname? brace post=fname? -> ^(BRACE_EXP ($pre)? brace ($post)?);
-brace
-	:	LBRACE BLANK* brace_expansion_inside BLANK?RBRACE -> ^(BRACE brace_expansion_inside);
+	:	LBRACE BLANK* brace_expansion_inside BLANK* RBRACE -> ^(BRACE_EXP brace_expansion_inside);
 brace_expansion_inside
 	:	commasep|range;
 range	:	DIGIT DOTDOT^ DIGIT
 	|	LETTER DOTDOT^ LETTER;
 brace_expansion_part
-	:	fname
-	|	brace
+	:	brace_expansion
+	|	fname
 	|	var_ref
 	|	command_sub;
 commasep:	brace_expansion_part(COMMA! brace_expansion_part)+;
@@ -388,13 +384,14 @@ no_res_word_part
 	|	var_ref
 	|	command_sub
 	|	arithmetic_expansion
+	|	brace_expansion
 	|	dqstr
 	|	sqstr
 	|	ns_str_part_no_res
 	|	SLASH
 	|	pattern_match_trigger;
 //non-quoted string rule, allows expansions
-nqstr	:	(bracket_pattern_match|extended_pattern_match|var_ref|command_sub|arithmetic_expansion|dqstr|sqstr|(str_part str_part_with_pound*)|pattern_match_trigger|BANG)+;
+nqstr	:	(bracket_pattern_match|extended_pattern_match|var_ref|command_sub|arithmetic_expansion|brace_expansion|dqstr|sqstr|(str_part str_part_with_pound*)|pattern_match_trigger|BANG)+;
 //double quoted string rule, allows expansions
 dqstr	:	QUOTE dqstr_part* QUOTE -> ^(DOUBLE_QUOTED_STRING dqstr_part*);
 dqstr_part
