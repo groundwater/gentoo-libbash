@@ -228,7 +228,7 @@ value	:	num
 //allow the parser to create array variables
 arr_val	:
 	|	(ag+=val wspace?)+ -> ^(ARRAY $ag+);
-val	:	'['!BLANK!*var_index BLANK!?']'!EQUALS^ pos_val
+val	:	LSQUARE! BLANK!* var_index BLANK!? RSQUARE! EQUALS^ pos_val
 	|	pos_val;
 pos_val	: command_sub
 	|	var_ref
@@ -467,7 +467,7 @@ negation
 exponential
 	:	negation (BLANK!* EXP^ BLANK!* negation)* ;
 times_division_modulus
-	:	exponential (BLANK!*(TIMES^|SLASH^|PCT^)BLANK!* exponential)*;
+	:	exponential (BLANK!* (TIMES^|SLASH^|PCT^) BLANK!* exponential)*;
 addsub	:	times_division_modulus (BLANK!* (PLUS^|MINUS^)BLANK!* times_division_modulus)*;
 shifts	:	addsub (BLANK!* (LSHIFT^|RSHIFT^) BLANK!* addsub)*;
 compare	:	shifts (BLANK!* (LEQ^|GEQ^|LESS_THAN^|GREATER_THAN^)BLANK!* shifts)?;
