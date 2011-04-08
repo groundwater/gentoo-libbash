@@ -90,6 +90,7 @@ options{greedy=false;}
 	:	list_level_2 -> ^(LIST list_level_2);
 list_level_1
 	:	(function|pipeline) (BLANK!*(LOGICAND^|LOGICOR^)BLANK!* (function|pipeline))*;
+// ';' '&' and EOL have lower operator precedence than '&&' and '||' so we need level2 here
 list_level_2
 	:	list_level_1 ((BLANK!?';'!|BLANK!?'&'^|(BLANK!? EOL!)+)BLANK!? list_level_1)*;
 pipeline
