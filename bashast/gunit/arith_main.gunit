@@ -25,24 +25,26 @@ primary:
 "3" -> "3"
 
 post_inc_dec:
-"b--" -> (POST_DECR b)
-"i++" -> (POST_INCR i)
+"b--" -> (POST_DECR (VAR_REF b))
+"i++" -> (POST_INCR (VAR_REF i))
 
 pre_inc_dec:
-"++i" -> (PRE_INCR i)
-"--b" -> (PRE_DECR b)
+"++i" -> (PRE_INCR (VAR_REF i))
+"--b" -> (PRE_DECR (VAR_REF b))
 
 unary:
 "6" -> "6"
 "+9" -> (PLUS_SIGN 9)
 "-15" -> (MINUS_SIGN 15)
-"++ z" -> (PRE_INCR z)
-"f--" -> (POST_DECR f)
-
-negation:
-"8" -> "8"
+"++ z" -> (PRE_INCR (VAR_REF z))
+"f--" -> (POST_DECR (VAR_REF f))
 "~8" -> (~ 8)
 "!8" -> (! 8)
+"!!8" -> (! (! 8))
+"--8" -> (PRE_DECR 8)
+"+++${a}" -> (PLUS_SIGN (PRE_INCR (VAR_REF a)))
+"++++${a}" -> (PLUS_SIGN (PLUS_SIGN (PRE_INCR (VAR_REF a))))
+"+-++${a}" -> (PLUS_SIGN (MINUS_SIGN (PRE_INCR (VAR_REF a))))
 
 exponential:
 "8" -> "8"
@@ -120,5 +122,5 @@ arithmetics:
 
 start:
 "echo $(( 3 + 2 ))" -> (LIST (COMMAND (STRING echo) (STRING (ARITHMETIC_EXPRESSION (+ 3 2)))))
-"echo $((++i))" -> (LIST (COMMAND (STRING echo) (STRING (ARITHMETIC_EXPRESSION (PRE_INCR i)))))
+"echo $((++i))" -> (LIST (COMMAND (STRING echo) (STRING (ARITHMETIC_EXPRESSION (PRE_INCR (VAR_REF i))))))
 "echo \"The solution is: $(( 3+2 ))\""-> (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING The   solution   is :   (ARITHMETIC_EXPRESSION (+ 3 2))))))

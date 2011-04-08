@@ -98,7 +98,7 @@ pipeline
 	|	BLANK!* time? (BANG BLANK!+)? command^ (BLANK!* PIPE^ BLANK!* command)*;
 time	:	TIME^ BLANK!+ time_posix?;
 time_posix
-	:	'-p' BLANK!+;
+	:	TIME_POSIX BLANK!+;
 //The structure of a command in bash
 command
 	:	EXPORT^ var_def+
@@ -286,7 +286,7 @@ cond_primary
 keyword_cond_binary
 	:	cond_part BLANK!* binary_str_op_keyword^ BLANK!? cond_part;
 keyword_cond_unary
-	:	UOP^ BLANK!+ cond_part;
+	:	uop^ BLANK!+ cond_part;
 builtin_cond_primary
 	:	LPAREN! BLANK!* builtin_cond BLANK!* RPAREN!
 	|	builtin_cond_binary
@@ -295,7 +295,7 @@ builtin_cond_primary
 builtin_cond_binary
 	:	cond_part BLANK!* binary_string_op_builtin^ BLANK!? cond_part;
 builtin_cond_unary
-	:	UOP^ BLANK!+ cond_part;
+	:	uop^ BLANK!+ cond_part;
 keyword_cond
 	:	(negate_primary|cond_primary) (BLANK!* (LOGICOR^|LOGICAND^) BLANK!* keyword_cond)?;
 builtin_cond
@@ -305,20 +305,22 @@ negate_primary
 negate_builtin_primary
 	:	BANG BLANK+ builtin_cond_primary -> ^(NEGATION builtin_cond_primary);
 binary_str_op_keyword
-	:	BOP
+	:	bop
 	|	EQUALS EQUALS -> OP["=="]
 	|	EQUALS
 	|	BANG EQUALS -> OP["!="]
 	|	LESS_THAN
 	|	GREATER_THAN;
 binary_string_op_builtin
-	:	BOP
+	:	bop
 	|	EQUALS
 	|	BANG EQUALS -> OP["!="]
 	|	ESC_LT
 	|	ESC_GT;
+bop	:	MINUS! NAME^;
 unary_cond
-	:	UOP^ BLANK! cond_part;
+	:	uop^ BLANK! cond_part;
+uop	:	MINUS! LETTER;
 //Allowable parts of conditions
 cond_part:	brace_expansion
 	|	var_ref
@@ -363,7 +365,11 @@ ns_str_part
 //Parts of strings, no slashes, no reserved words
 ns_str_part_no_res
 	:	num
-	|	name|OTHER|EQUALS|PCT|PCTPCT|MINUS|DOT|DOTDOT|COLON|BOP|UOP|TEST_EXPR|'_'|TILDE|INC|DEC|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN|OR_ASSIGN|ESC_CHAR|CARET;
+	|	name
+	|OTHER|EQUALS|PCT|PCTPCT|MINUS|DOT|DOTDOT|COLON|TEST_EXPR|'_'
+	|TILDE|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN
+	|TIME_POSIX|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN
+	|OR_ASSIGN|ESC_CHAR|CARET;
 //strings with no slashes, used in certain variable expansions
 ns_str	:	ns_str_part* -> ^(STRING ns_str_part*);
 //Generic strings/filenames.
@@ -452,20 +458,19 @@ primary	:	num
 	|	name -> ^(VAR_REF name)
 	|	LPAREN! (arithmetics) RPAREN!;
 post_inc_dec
-	:	name BLANK?INC -> ^(POST_INCR name)
-	|	name BLANK?DEC -> ^(POST_DECR name);
+	:	primary BLANK? PLUS PLUS -> ^(POST_INCR primary)
+	|	primary BLANK? MINUS MINUS -> ^(POST_DECR primary);
 pre_inc_dec
-	:	INC BLANK?name -> ^(PRE_INCR name)
-	|	DEC BLANK?name -> ^(PRE_DECR name);
+	:	PLUS PLUS BLANK? primary -> ^(PRE_INCR primary)
+	|	MINUS MINUS BLANK? primary -> ^(PRE_DECR primary);
 unary	:	post_inc_dec
 	|	pre_inc_dec
 	|	primary
-	|	PLUS primary -> ^(PLUS_SIGN primary)
-	|	MINUS primary -> ^(MINUS_SIGN primary);
-negation
-	:	(BANG^BLANK!?|TILDE^BLANK!?)?unary;
+	|	PLUS unary -> ^(PLUS_SIGN unary)
+	|	MINUS unary -> ^(MINUS_SIGN unary)
+	|	(TILDE|BANG)^ unary;
 exponential
-	:	negation (BLANK!* EXP^ BLANK!* negation)* ;
+	:	unary (BLANK!* EXP^ BLANK!* unary)* ;
 times_division_modulus
 	:	exponential (BLANK!* (TIMES^|SLASH^|PCT^) BLANK!* exponential)*;
 addsub	:	times_division_modulus (BLANK!* (PLUS^|MINUS^)BLANK!* times_division_modulus)*;
@@ -540,8 +545,6 @@ TIMES	:	'*';
 EQUALS	:	'=';
 MINUS	:	'-';
 PLUS	:	'+';
-INC	:	'++';
-DEC	:	'--';
 EXP	:	'**';
 AMP	:	'&';
 LEQ	:	'<=';
@@ -600,8 +603,6 @@ TEST_EXPR	:	'test';
 LOGICAND
 	:	'&&';
 LOGICOR	:	'||';
-BOP	:	MINUS LETTER LETTER;
-UOP	:	MINUS LETTER;
 //Some builtins
 EXPORT	:	'export';
 //Tokens for strings
@@ -613,6 +614,9 @@ ESC_LPAREN
 	:	'\\' LPAREN;
 ESC_LT	:	'\\''<';
 ESC_GT	:	'\\''>';
+//For pipeline
+TIME_POSIX
+	:	'-p';
 //Handle ANSI C escaped characters: escaped octal, escaped hex, escaped ctrl+ chars, then all others
 ESC_CHAR:	'\\' (('0'..'7')('0'..'7')('0'..'7')?|'x'('0'..'9'|'a'..'f'|'A'..'F')('0'..'9'|'a'..'f'|'A'..'F')?|'c'.|.);
 NAME	:	(LETTER|'_')(ALPHANUM|'_')+;
