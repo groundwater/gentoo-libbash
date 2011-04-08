@@ -42,11 +42,11 @@ fname:
 "ab@(gh|i)" -> (STRING ab (MATCH_EXACTLY_ONE (STRING gh) (STRING i)))
 "ab!(gh|i)" -> (STRING ab (MATCH_NONE (STRING gh) (STRING i)))
 "\"abc\"\'\"\'\"def\"" -> (STRING (DOUBLE_QUOTED_STRING abc) (SINGLE_QUOTED_STRING ") (DOUBLE_QUOTED_STRING def))
-"my\ name\ is" -> (STRING my \  name \  is)
-"octal\007" -> (STRING octal \007)
-"hex\xaF" -> (STRING hex \xaF)
-"ctrlx\cx" -> (STRING ctrlx \cx)
-"tab\\ttab" -> "(STRING tab \\\t tab)"
+"my\ name\ is" -> (STRING my \   name \   is)
+"octal\007" -> (STRING octal \ 007)
+"hex\xaF" -> (STRING hex \ xaF)
+"ctrlx\cx" -> (STRING ctrlx \ cx)
+"tab\\ttab" -> "(STRING tab \\ \t tab)"
 "abc[def]" -> (STRING abc (MATCH_PATTERN def))
 "a[]" -> (STRING a [ ])
 "ab[d-h]" -> (STRING ab (MATCH_PATTERN d - h))

@@ -363,10 +363,11 @@ ns_str_part
 ns_str_part_no_res
 	:	num
 	|	name
+	|	esc_char
 	|OTHER|EQUALS|PCT|PCTPCT|MINUS|DOT|DOTDOT|COLON|TEST_EXPR|'_'
 	|TILDE|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN
 	|TIME_POSIX|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN
-	|OR_ASSIGN|ESC_CHAR|CARET;
+	|OR_ASSIGN|CARET;
 //strings with no slashes, used in certain variable expansions
 ns_str	:	ns_str_part* -> ^(STRING ns_str_part*);
 //Generic strings/filenames.
@@ -493,6 +494,7 @@ parens	:	LPAREN BLANK* RPAREN;
 name	:	NAME
 	|	LETTER
 	|	'_';
+esc_char:	ESC (DIGIT DIGIT? DIGIT?|LETTER ALPHANUM ALPHANUM?|.);
 
 //****************
 // TOKENS/LEXER RULES
@@ -602,17 +604,17 @@ LOGICOR	:	'||';
 EXPORT	:	'export';
 //Tokens for strings
 CONTINUE_LINE
-	:	('\\' EOL)+{$channel=HIDDEN;};
+	:	(ESC EOL)+{$channel=HIDDEN;};
 ESC_RPAREN
-	:	'\\' RPAREN;
+	:	ESC RPAREN;
 ESC_LPAREN
-	:	'\\' LPAREN;
-ESC_LT	:	'\\''<';
-ESC_GT	:	'\\''>';
+	:	ESC LPAREN;
+ESC_LT	:	ESC'<';
+ESC_GT	:	ESC'>';
 //For pipeline
 TIME_POSIX
 	:	'-p';
 //Handle ANSI C escaped characters: escaped octal, escaped hex, escaped ctrl+ chars, then all others
-ESC_CHAR:	'\\' (('0'..'7')('0'..'7')('0'..'7')?|'x'('0'..'9'|'a'..'f'|'A'..'F')('0'..'9'|'a'..'f'|'A'..'F')?|'c'.|.);
+ESC	:	'\\';
 NAME	:	(LETTER|'_')(ALPHANUM|'_')+;
 OTHER	:	.;

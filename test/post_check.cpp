@@ -36,7 +36,7 @@ static void check_file_size(const char *path, uintmax_t size_max)
 
 TEST(post_check, lexer_size)
 {
-  check_file_size("libbashLexer.c", 1024 * 1024);
+  check_file_size("libbashLexer.c", 512 * 1024);
 }
 
 TEST(post_check, parser_size)
