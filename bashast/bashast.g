@@ -114,16 +114,15 @@ arg
 	:	brace_expansion
 	|	var_ref
 	|	fname
-	|	res_word_str -> ^(STRING res_word_str)
 	|	command_sub
 	|	var_ref;
 redirect:	BLANK!* here_string_op^ BLANK!* fname
 	|	BLANK!* here_doc_op^ BLANK!* fname EOL! heredoc
-	|	BLANK* redir_op BLANK* DIGIT MINUS? -> ^(REDIR redir_op DIGIT MINUS?)
 	|	BLANK* redir_op BLANK* redir_dest -> ^(REDIR redir_op redir_dest)
 	|	BLANK!* process_substitution;
 redir_dest
-	:	fname //path to a file
+	:	DIGIT MINUS?
+	|	fname //path to a file
 	|	file_desc_as_file; //handles file descriptors0
 file_desc_as_file
 	:	AMP DIGIT -> FILE_DESCRIPTOR[$DIGIT]
