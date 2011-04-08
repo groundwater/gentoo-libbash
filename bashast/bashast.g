@@ -441,8 +441,7 @@ extended_pattern_match
 arithmetic_expansion
 	:	DOLLAR LLPAREN BLANK* arithmetic_part BLANK* RRPAREN -> ^(ARITHMETIC_EXPRESSION arithmetic_part);
 arithmetic_part
-	:	arithmetics
-	|	arithmetic;
+	:	arithmetics;
 //The comma operator for arithmetic expansions
 arithmetics
 	:	arithmetic (BLANK!* COMMA! BLANK!* arithmetic)*;

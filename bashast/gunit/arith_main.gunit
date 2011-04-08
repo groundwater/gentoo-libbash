@@ -117,8 +117,8 @@ arithmetic_condition:
 "5?7:2"->(ARITHMETIC_CONDITION 5 7 2)
 "(4-3)?0:1"->(ARITHMETIC_CONDITION (- 4 3) 0 1)
 
-arithmetics:
-"5+4, 3+2, $a*$b" -> (+ 5 4) (+ 3 2) (* (VAR_REF a) (VAR_REF b))
+arithmetic_expansion:
+"$((5+4, 3+2, $a*$b))" -> (ARITHMETIC_EXPRESSION (+ 5 4) (+ 3 2) (* (VAR_REF a) (VAR_REF b)))
 
 start:
 "echo $(( 3 + 2 ))" -> (LIST (COMMAND (STRING echo) (STRING (ARITHMETIC_EXPRESSION (+ 3 2)))))
