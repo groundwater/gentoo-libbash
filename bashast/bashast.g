@@ -105,8 +105,7 @@ command
 	|	simple_command;
 //Simple bash commands
 simple_command
-	:	var_def+ bash_command^ redirect*
-	|	bash_command^ redirect*;
+	:	(var_def BLANK!+)* bash_command^ redirect*;
 bash_command
 	:	fname_no_res_word (BLANK+ arg)* -> ^(COMMAND fname_no_res_word arg*);
 //An argument to a command
@@ -217,9 +216,9 @@ cond_comparison
 	:	cond_expr -> ^(COMPOUND_COND cond_expr);
 //Variables
 //Defining a variable
-var_def	:	BLANK* name LSQUARE BLANK? var_index BLANK* RSQUARE EQUALS value BLANK* -> ^(EQUALS ^(name  var_index) value)
-	|	BLANK!* name EQUALS^ value BLANK!*
-	|	BLANK!* LET! name EQUALS^ arithmetic BLANK!*;
+var_def	:	name LSQUARE BLANK? var_index BLANK* RSQUARE EQUALS value -> ^(EQUALS ^(name  var_index) value)
+	|	name EQUALS^ value
+	|	LET! name EQUALS^ arithmetic;
 //Possible values of a variable
 value	:	num
 	|	var_ref
