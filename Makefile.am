@@ -57,7 +57,7 @@ TESTS = $(GUNIT_TESTS) $(EBUILD_TESTS)
 check_JAVA = bashast/bashastLexer.java bashast/bashastParser.java
 AM_JAVACFLAGS = -classpath @antlr_cp@
 
-COMMON_FLAGS = $(BOOST_CPPFLAGS) -std=c++0x -I$(top_srcdir)/src/
+COMMON_FLAGS = -std=c++0x -I$(top_srcdir)/src/
 # We use -x c++ to compile all C source files as C++ because there's C++
 # code embedded in them.
 # no DEVELOPER_FLAGS to as the generated files don't pass -Werror
