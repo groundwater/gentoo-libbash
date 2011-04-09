@@ -34,6 +34,7 @@ AX_BOOST_BASE([$boost_version],[:],
 			  [AC_MSG_ERROR([Needed boost not found])])
 AX_BOOST_SYSTEM
 AX_BOOST_FILESYSTEM
+AX_BOOST_PROGRAM_OPTIONS
 AC_PATH_PROG([JAVA],[java],"no")
 if test "$JAVA" = "no"; then
 	AC_MSG_ERROR([No java executable found])

@@ -98,8 +98,9 @@ variable_printer_SOURCES = test/variable_printer.cpp
 variable_printer_LDADD = libcppbash.la
 
 ast_printer_SOURCES = test/ast_printer.cpp
-ast_printer_LDADD = libcppbash.la
+ast_printer_LDADD = libcppbash.la $(BOOST_PROGRAM_OPTIONS_LIB)
 ast_printer_LDFLAGS = -static
+ast_printer_CPPFLAGS = $(BOOST_CPPFLAGS)
 endif
 
 GENERATED_PARSER_C = libbashLexer.c libbashParser.c

@@ -22,89 +22,96 @@
 ///
 
 #include <fstream>
+#include <functional>
 #include <iostream>
-#include <memory>
 #include <sstream>
 #include <string>
+#include <vector>
+
+#include <boost/program_options.hpp>
 
 #include "core/parser_builder.h"
 #include "libbashParser.h"
 
-static void print_usage()
+namespace po = boost::program_options;
+
+static void print_ast(std::istream& input, bool silent, bool dot)
 {
-  std::cout<<
-    "Usage:\n"<<
-    "-f, --file FILE   using FILE as input script, if this option and -e are\n"
-    "                  not specified, will use standard input\n"<<
-    "-e, --expr EXPR   using EXPR as input script\n"<<
-    "-t, --tree        print tree\n"<<
-    "-d, --dot         print graphviz doc file (default)"<< std::endl;
+  parser_builder parser(input);
+
+  if(silent)
+    return;
+
+  if(dot)
+    std::cout << parser.get_dot_graph() << std::endl;
+  else
+    std::cout << parser.get_string_tree() << std::endl;
+}
+
+static void print_files(const std::vector<std::string>& files,
+                        bool print_name,
+                        std::function<void(std::istream&)> printer)
+{
+  for(auto iter = files.begin(); iter != files.end(); ++iter)
+  {
+    if(print_name)
+      std::cout << "Interpreting " << *iter << std::endl;
+
+    std::ifstream input(iter->c_str());
+    printer(input);
+  }
+}
+
+static inline void print_expression(const std::string& expr,
+                                    std::function<void(std::istream&)> printer)
+{
+  std::istringstream input(expr);
+  printer(input);
+}
+
+static inline void print_cin(std::function<void(std::istream&)> printer)
+{
+  printer(std::cin);
 }
 
 int main(int argc, char** argv)
 {
-  bool dot = true;
-  char* path = 0;
+  std::vector<std::string> files;
   std::string expr;
 
-  for(int i = 1; i < argc; ++i)
+  po::options_description desc("Allowed options");
+  desc.add_options()
+    ("help,h", "produce help message")
+    ("files,f", po::value<std::vector<std::string>>()->multitoken(),
+     "input scripts. If this option and -e are not specified, "
+     "will use standard input")
+    ("expr,e", po::value<std::string>(), "one line of script")
+    ("dot,d", "print graphviz doc file instead of tree string if -s is not specified")
+    ("name,n", "When using files as input scripts, print out file names")
+    ("silent,s", "do not print any AST")
+  ;
+
+  po::variables_map vm;
+  po::store(po::parse_command_line(argc, argv, desc), vm);
+  po::notify(vm);
+
+  if(vm.count("help"))
   {
-    if(!strcmp(argv[i], "-f") || !strcmp(argv[i], "--file"))
-    {
-      if(i + 1 == argc)
-      {
-        print_usage();
-        exit(EXIT_FAILURE);
-      }
-      path = argv[++i];
-    }
-    else if(!strcmp(argv[i], "-d") || !strcmp(argv[i], "--dot"))
-    {
-      dot = true;
-    }
-    else if(!strcmp(argv[i], "-t") || !strcmp(argv[i], "--tree"))
-    {
-      dot = false;
-    }
-    else if(!strcmp(argv[i], "-e") || !strcmp(argv[i], "--expr"))
-    {
-      if(i + 1 == argc)
-      {
-        print_usage();
-        exit(EXIT_FAILURE);
-      }
-      expr = argv[++i];
-    }
-    else
-    {
-      print_usage();
-      exit(EXIT_FAILURE);
-    }
+    std::cout << desc << std::endl;
+    return 1;
   }
 
-  std::unique_ptr<parser_builder> parser;
-  if(path)
-  {
-    std::ifstream input(path);
-    if(!input)
-    {
-      std::cerr << "Unable to create fstream for " << path << std::endl;
-      exit(EXIT_FAILURE);
-    }
-    parser.reset(new parser_builder(input));
-  }
-  else if(expr.size())
-  {
-    std::istringstream input(expr);
-    parser.reset(new parser_builder(input));
-  }
-  else
-  {
-    parser.reset(new parser_builder(std::cin));
-  }
+  auto printer = std::bind(&print_ast,
+                           std::placeholders::_1,
+                           vm.count("silent"),
+                           vm.count("dot"));
 
-  if(dot)
-    std::cout << parser->get_dot_graph() << std::endl;
+  if(vm.count("files"))
+    print_files(vm["files"].as<std::vector<std::string>>(),
+                vm.count("name"),
+                printer);
+  else if(vm.count("expr"))
+    print_expression(vm["expr"].as<std::string>(), printer);
   else
-    std::cout << parser->get_string_tree() << std::endl;
+    print_cin(printer);
 }
