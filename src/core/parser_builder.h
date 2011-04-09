@@ -28,6 +28,7 @@
 #include <istream>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <antlr3.h>
 
@@ -60,6 +61,7 @@ public:
   walker_builder create_walker_builder();
   std::string get_dot_graph();
   std::string get_string_tree();
+  std::string get_tokens(std::function<std::string(ANTLR3_INT32)> token_map);
 };
 
 #endif

@@ -77,7 +77,7 @@ AM_CPPFLAGS = -D_GLIBCXX_DEBUG
 endif
 
 if HAVE_GTEST
-TESTS += cppunittests
+TESTS += cppunittests test/ast_printer_test.sh
 check_PROGRAMS = cppunittests variable_printer ast_printer
 
 cppunittests_SOURCES =  test/run_tests.cpp \
@@ -157,6 +157,10 @@ libcppbash_la_CFLAGS = $(AM_CFLAGS) $(HIDDEN_FLAGS)
 
 EXTRA_DIST = bashast/bashast.g \
 			 bashast/libbashWalker.g \
+			 bashast/features_script/features.sh \
+			 bashast/features_script/features.sh.ast \
+			 bashast/features_script/features.sh.tokens \
+			 test/ast_printer_test.sh \
 			 $(EBUILD_TESTS) \
 			 $(EBUILD_RESULT) \
 			 $(GUNIT_TESTS) \

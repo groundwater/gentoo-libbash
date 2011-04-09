@@ -89,3 +89,54 @@ std::string parser_builder::get_string_tree()
         langAST->tree->toStringTree(langAST->tree)->chars));
 }
 
+namespace
+{
+  void print_line_counter(std::stringstream& result,
+                          pANTLR3_COMMON_TOKEN token,
+                          int& line_counter,
+                          int pos)
+  {
+    char* text = reinterpret_cast<char*>(token->getText(token)->chars);
+    for(int i = pos; text[i] == '\n'; ++i)
+      result << '\n' << line_counter++ << "\t";
+  }
+}
+
+std::string parser_builder::get_tokens(std::function<std::string(ANTLR3_INT32)> token_map)
+{
+  std::stringstream result;
+  int line_counter = 1;
+
+  // output line number for the first line
+  result << line_counter++ << "\t";
+
+  pANTLR3_VECTOR token_list = tstream->getTokens(tstream);
+  unsigned token_size = token_list->size(token_list);
+
+  for(unsigned i = 0; i != token_size; ++i)
+  {
+    pANTLR3_COMMON_TOKEN token = reinterpret_cast<pANTLR3_COMMON_TOKEN>
+      (token_list->get(token_list, i));
+    std::string tokenName = token_map(token->getType(token));
+
+    if(tokenName != "EOL" && tokenName != "COMMENT" && tokenName != "CONTINUE_LINE")
+    {
+      result << tokenName << " ";
+    }
+    // Output \n and line number before each COMMENT token for better readability
+    else if(tokenName == "COMMENT")
+    {
+      print_line_counter(result, token, line_counter, 0);
+      result << tokenName;
+    }
+    // Output \n and line number after each CONTINUE_LINE/EOL token for better readability
+    // omit the last \n and line number
+    else if(i + 1 != token_size)
+    {
+      result << tokenName;
+      print_line_counter(result, token, line_counter, tokenName == "CONTINUE_LINE"? 1 : 0);
+    }
+  }
+
+  return result.str();
+}
