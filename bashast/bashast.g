@@ -439,9 +439,7 @@ extended_pattern_match
 	|	BANG LPAREN fname (PIPE fname)* RPAREN -> ^(MATCH_NONE fname+);
 //Arithmetic expansion
 arithmetic_expansion
-	:	DOLLAR LLPAREN BLANK* arithmetic_part BLANK* RRPAREN -> ^(ARITHMETIC_EXPRESSION arithmetic_part);
-arithmetic_part
-	:	arithmetics;
+	:	DOLLAR LLPAREN BLANK* arithmetics BLANK* RRPAREN -> ^(ARITHMETIC_EXPRESSION arithmetics);
 //The comma operator for arithmetic expansions
 arithmetics
 	:	arithmetic (BLANK!* COMMA! BLANK!* arithmetic)*;
