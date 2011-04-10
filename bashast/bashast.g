@@ -83,8 +83,8 @@ tokens{
 start	:	(flcomment!)? EOL!* list^ ;
 //Because the comment token doesn't handle the first comment in a file if it's on the first line, have a parser rule for it
 flcomment
-	:	'#' ~(EOL)* EOL;
-list	:	list_level_2 BLANK* (';'|'&'|EOL)? -> ^(LIST list_level_2);
+	:	POUND ~(EOL)* EOL;
+list	:	list_level_2 BLANK* (SEMIC|AMP|EOL)? -> ^(LIST list_level_2);
 clist
 options{greedy=false;}
 	:	list_level_2 -> ^(LIST list_level_2);
@@ -92,7 +92,7 @@ list_level_1
 	:	(function|pipeline) (BLANK!*(LOGICAND^|LOGICOR^)BLANK!* (function|pipeline))*;
 // ';' '&' and EOL have lower operator precedence than '&&' and '||' so we need level2 here
 list_level_2
-	:	list_level_1 ((BLANK!?';'!|BLANK!?'&'^|(BLANK!? EOL!)+)BLANK!? list_level_1)*;
+	:	list_level_1 ((BLANK!?SEMIC!|BLANK!?AMP^|(BLANK!? EOL!)+)BLANK!? list_level_1)*;
 pipeline
 	:	var_def+
 	|	BLANK!* time? (BANG BLANK!+)? command^ (BLANK!* PIPE^ BLANK!* command)*;
@@ -328,7 +328,7 @@ cond_part:	brace_expansion
 	|	arithmetic;
 //Rules for whitespace/line endings
 wspace	:	BLANK+|EOL;
-semiel	:	(';'|EOL) BLANK*;
+semiel	:	(SEMIC|EOL) BLANK*;
 
 //definition of word.  this is just going to grow...
 word	:	(brace_expansion) => brace_expansion
