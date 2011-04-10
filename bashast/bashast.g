@@ -357,12 +357,8 @@ str_part_with_pound
 	:	str_part
 	|	POUND
 	|	POUNDPOUND;
-//Parts of strings, no slashes
-ns_str_part
-	:	ns_str_part_no_res
-	|	res_word_str;
 //Parts of strings, no slashes, no reserved words
-ns_str_part_no_res
+ns_str_part
 	:	num
 	|	name
 	|	esc_char
@@ -373,27 +369,13 @@ ns_str_part_no_res
 //strings with no slashes, used in certain variable expansions
 ns_str	:	ns_str_part* -> ^(STRING ns_str_part*);
 //Generic strings/filenames.
-fname	:	nqstr -> ^(STRING nqstr);
+fname	:	fname_part+ -> ^(STRING fname_part+);
 //A string that is NOT a bash reserved word
 fname_no_res_word
-	:	nqstr_no_res_word -> ^(STRING nqstr_no_res_word);
-//No quoted string, no reserved words
-nqstr_no_res_word
-	:	res_word_str (no_res_word_part|str_part_with_pound)+
-	|	no_res_word_part (no_res_word_part|str_part_with_pound)*;
-//parts of strings, not including reserved word parts
-no_res_word_part
-	:	bracket_pattern_match
-	|	extended_pattern_match
-	|	var_ref
-	|	command_sub
-	|	arithmetic_expansion
-	|	brace_expansion
-	|	dqstr
-	|	sqstr
-	|	ns_str_part_no_res
-	|	SLASH
-	|	pattern_match_trigger;
+	:	nqstr fname_part* -> ^(STRING nqstr fname_part*);
+fname_part
+	:	nqstr
+	|	res_word_str;
 //non-quoted string rule, allows expansions
 nqstr	:	(bracket_pattern_match|extended_pattern_match|var_ref|command_sub|arithmetic_expansion|brace_expansion|dqstr|sqstr|(str_part str_part_with_pound*)|pattern_match_trigger|BANG)+;
 //double quoted string rule, allows expansions
