@@ -215,7 +215,7 @@ cond_comparison
 //Variables
 //Defining a variable
 var_def
-	:	name LSQUARE BLANK? var_index BLANK* RSQUARE EQUALS value -> ^(EQUALS ^(name  var_index) value)
+	:	name LSQUARE BLANK? arithmetics BLANK* RSQUARE EQUALS value -> ^(EQUALS ^(name arithmetics) value)
 	|	name EQUALS^ value
 	|	LET! name EQUALS^ arithmetic;
 //Possible values of a variable
@@ -226,15 +226,12 @@ value	:	num
 //allow the parser to create array variables
 arr_val	:
 	|	(ag+=val wspace?)+ -> ^(ARRAY $ag+);
-val	:	LSQUARE! BLANK!* var_index BLANK!? RSQUARE! EQUALS^ pos_val
+val	:	LSQUARE! BLANK!* arithmetics BLANK!? RSQUARE! EQUALS^ pos_val
 	|	pos_val;
 pos_val	: command_sub
 	|	var_ref
 	|	num
 	|	fname;
-//possible indexes for the variable.  Names are used when it acts more like a map/hash than an array
-var_index	:	num
-	|	name;
 //Referencing a variable (different possible ways/special parameters)
 var_ref
 	:	DOLLAR LBRACE BLANK* var_exp BLANK* RBRACE -> ^(VAR_REF var_exp)

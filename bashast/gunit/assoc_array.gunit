@@ -19,5 +19,8 @@
 gunit bashast;
 
 var_def:
-"arr[foo]=\"asdf\"" -> (= (arr foo) (STRING (DOUBLE_QUOTED_STRING asdf)))
+"arr[foo]=\"asdf\"" -> (= (arr (VAR_REF foo)) (STRING (DOUBLE_QUOTED_STRING asdf)))
 "arr=(a b [4]=c)" -> (= arr (ARRAY (STRING a) (STRING b) (= 4 (STRING c))))
+"asdf[$idx]=${var}" -> (= (asdf (VAR_REF idx)) (VAR_REF var))
+"asdf[++i]=${var}" -> (= (asdf (PRE_INCR (VAR_REF i))) (VAR_REF var))
+"asdf[++i,j]=${var}" -> (= (asdf (PRE_INCR (VAR_REF i)) (VAR_REF j)) (VAR_REF var))
