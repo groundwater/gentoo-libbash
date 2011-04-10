@@ -327,7 +327,7 @@ cond_part:	brace_expansion
 	|	fname
 	|	arithmetic;
 //Rules for whitespace/line endings
-wspace	:	BLANK+|EOL;
+wspace	:	BLANK+|EOL+;
 semiel	:	(SEMIC|EOL) BLANK*;
 
 //definition of word.  this is just going to grow...

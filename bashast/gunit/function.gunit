@@ -31,5 +31,8 @@ function:
 "foo() { :; }" -> (function foo (CURRSHELL (LIST (COMMAND (STRING :)))))
 
 "function quit { exit; } > /dev/null" -> (function quit (CURRSHELL (LIST (COMMAND (STRING exit)))) (REDIR > (STRING / dev / null)))
+"function quit {
+    # comment
+    exit; } > /dev/null" -> (function quit (CURRSHELL (LIST (COMMAND (STRING exit)))) (REDIR > (STRING / dev / null)))
 "function help { echo hi; } 2> /dev/null" -> (function help (CURRSHELL (LIST (COMMAND (STRING echo) (STRING hi)))) (REDIR 2 > (STRING / dev / null)))
 "function help { echo 3; } 2> /dev/null > output" OK
