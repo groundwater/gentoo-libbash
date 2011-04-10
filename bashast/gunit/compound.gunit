@@ -47,6 +47,7 @@ subshell:
 )" -> (SUBSHELL (LIST (COMMAND (STRING cat) time)))
 
 case_expr:
+"case a in esac" -> (case (STRING a))
 "case `echo asdf` in
 esac" -> (case (COMMAND_SUB (COMMAND (STRING echo) (STRING asdf))))
 

@@ -41,7 +41,7 @@ TEST(post_check, lexer_size)
 
 TEST(post_check, parser_size)
 {
-  check_file_size("libbashParser.c", 4096 * 1024);
+  check_file_size("libbashParser.c", 2*1024*1024+500*1024);
 }
 
 TEST(post_check, walker_size)

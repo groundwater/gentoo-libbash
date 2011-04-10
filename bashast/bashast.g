@@ -187,21 +187,18 @@ while_expr
 until_expr
 	:	UNTIL wspace? istrue=clist semiel DO wspace dothis=clist semiel DONE -> ^(UNTIL $istrue $dothis)
 	;
+// double semicolon is optional for the last alternative
 case_expr
-	:	CASE^ BLANK!+ word wspace! IN! wspace! (case_stmt wspace!)* last_case? ESAC!;
+	:	CASE BLANK+ word wspace IN wspace case_body? ESAC -> ^(CASE word case_body?);
+case_body
+	:	case_stmt (wspace* DOUBLE_SEMIC case_stmt)* wspace* DOUBLE_SEMIC? wspace* -> case_stmt*;
 case_stmt
-options{greedy=false;}
-	:	wspace* (LPAREN BLANK*)? pattern (BLANK* PIPE BLANK? pattern)* BLANK* RPAREN wspace* clist wspace* DOUBLE_SEMIC
-		-> ^(CASE_PATTERN pattern+ clist)
-	|	wspace* (LPAREN BLANK*)? pattern (BLANK? PIPE BLANK* pattern)* BLANK* RPAREN wspace* DOUBLE_SEMIC
-		-> ^(CASE_PATTERN pattern+)
-	;
-//the last case can have a slightly different structure than the rest; this accounts for that
-last_case
-options{greedy=false;}
-	:	wspace* (LPAREN BLANK*)? pattern (BLANK* PIPE BLANK? pattern)* BLANK* RPAREN wspace* clist? (wspace* DOUBLE_SEMIC|(BLANK* EOL)+)
-		-> ^(CASE_PATTERN pattern+ clist?)
-	;
+	:	wspace* (LPAREN BLANK*)? case_pattern (BLANK* PIPE BLANK? case_pattern)* BLANK* RPAREN (wspace* clist)?
+		-> ^(CASE_PATTERN case_pattern+ clist?);
+case_pattern
+	:	command_sub
+	|	fname
+	|	TIMES;
 //A grouping of commands executed in a subshell
 subshell:	LPAREN wspace? clist (BLANK* SEMIC)? (BLANK* EOL)* BLANK* RPAREN -> ^(SUBSHELL clist);
 //A grouping of commands executed in the current shell
@@ -336,9 +333,6 @@ word	:	(brace_expansion) => brace_expansion
 	|	(arithmetic_expansion) => arithmetic_expansion
 	|	fname;
 
-pattern	:	command_sub
-	|	fname
-	|	TIMES;
 num
 options{k=1;backtrack=false;}
 	:	DIGIT|NUMBER;
