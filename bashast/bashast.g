@@ -215,7 +215,7 @@ cond_comparison
 //Variables
 //Defining a variable
 var_def
-	:	name LSQUARE BLANK? arithmetics BLANK* RSQUARE EQUALS value -> ^(EQUALS ^(name arithmetics) value)
+	:	name LSQUARE BLANK? explicit_arithmetic BLANK* RSQUARE EQUALS value -> ^(EQUALS ^(name explicit_arithmetic) value)
 	|	name EQUALS^ value
 	|	LET! name EQUALS^ arithmetic;
 //Possible values of a variable
@@ -226,7 +226,7 @@ value	:	num
 //allow the parser to create array variables
 arr_val	:
 	|	(ag+=val wspace?)+ -> ^(ARRAY $ag+);
-val	:	LSQUARE! BLANK!* arithmetics BLANK!? RSQUARE! EQUALS^ pos_val
+val	:	LSQUARE! BLANK!* explicit_arithmetic BLANK!? RSQUARE! EQUALS^ pos_val
 	|	pos_val;
 pos_val	: command_sub
 	|	var_ref
@@ -245,7 +245,7 @@ var_ref
 	|	DOLLAR BANG -> ^(VAR_REF BANG);
 //Variable expansions
 var_exp	:	var_name (USE_DEFAULT|USE_ALTERNATE|DISPLAY_ERROR|ASSIGN_DEFAULT)^ word
-	|	var_name COLON wspace* LPAREN? os=arithmetic RPAREN? (COLON len=arithmetic)? -> ^(OFFSET var_name $os ^($len)?)
+	|	var_name COLON wspace* LPAREN? os=explicit_arithmetic RPAREN? (COLON len=explicit_arithmetic)? -> ^(OFFSET var_name $os ^($len)?)
 	|	BANG^ var_name (TIMES|AT)
 	|	BANG var_name LSQUARE (op=TIMES|op=AT) RSQUARE -> ^(LIST_EXPAND var_name $op)
 	|	BANG var_name -> ^(VAR_REF var_name)
@@ -422,6 +422,9 @@ extended_pattern_match
 //Arithmetic expansion
 arithmetic_expansion
 	:	DOLLAR LLPAREN BLANK* arithmetics BLANK* RRPAREN -> ^(ARITHMETIC_EXPRESSION arithmetics);
+//explicit arithmetic in places like array indexes
+explicit_arithmetic
+	:	(DOLLAR LLPAREN BLANK*)? arithmetics (BLANK* RRPAREN)? -> arithmetics;
 //The comma operator for arithmetic expansions
 arithmetics
 	:	arithmetic (BLANK!* COMMA! BLANK!* arithmetic)*;

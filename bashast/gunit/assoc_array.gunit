@@ -24,3 +24,4 @@ var_def:
 "asdf[$idx]=${var}" -> (= (asdf (VAR_REF idx)) (VAR_REF var))
 "asdf[++i]=${var}" -> (= (asdf (PRE_INCR (VAR_REF i))) (VAR_REF var))
 "asdf[++i,j]=${var}" -> (= (asdf (PRE_INCR (VAR_REF i)) (VAR_REF j)) (VAR_REF var))
+"asdf[$((i))]=${var}" -> (= (asdf (VAR_REF i)) (VAR_REF var))
