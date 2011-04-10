@@ -223,11 +223,7 @@ value	:	num
 //allow the parser to create array variables
 arr_val	:
 	|	(ag+=val wspace?)+ -> ^(ARRAY $ag+);
-val	:	LSQUARE! BLANK!* explicit_arithmetic BLANK!? RSQUARE! EQUALS^ pos_val
-	|	pos_val;
-pos_val	: command_sub
-	|	var_ref
-	|	num
+val	:	LSQUARE! BLANK!* explicit_arithmetic BLANK!? RSQUARE! EQUALS^ fname
 	|	fname;
 //Referencing a variable (different possible ways/special parameters)
 var_ref
