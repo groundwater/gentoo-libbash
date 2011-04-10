@@ -176,11 +176,11 @@ for_expr:	FOR BLANK+ name (wspace IN BLANK+ word)? semiel DO wspace* clist semie
 	;
 sel_expr:	SELECT BLANK+ name (wspace IN BLANK+ word)? semiel DO wspace* clist semiel DONE -> ^(SELECT name (word)? clist)
 	;
-if_expr	:	IF wspace+ ag=clist BLANK* semiel THEN wspace+ iflist=clist BLANK? semiel EOL* (elif_expr)* (ELSE wspace+ else_list=clist BLANK? semiel EOL*)? FI
+if_expr	:	IF wspace+ ag=clist semiel THEN wspace+ iflist=clist semiel EOL* (elif_expr)* (ELSE wspace+ else_list=clist semiel EOL*)? FI
 		-> ^(IF $ag $iflist (elif_expr)* ^($else_list)?)
 	;
 elif_expr
-	:	ELIF BLANK+ ag=clist BLANK* semiel THEN wspace+ iflist=clist BLANK* semiel -> ^(IF["if"] $ag $iflist);
+	:	ELIF BLANK+ ag=clist semiel THEN wspace+ iflist=clist semiel -> ^(IF["if"] $ag $iflist);
 while_expr
 	:	WHILE wspace? istrue=clist semiel DO wspace dothis=clist semiel DONE -> ^(WHILE $istrue $dothis)
 	;
@@ -329,7 +329,7 @@ cond_part:	brace_expansion
 	|	arithmetic;
 //Rules for whitespace/line endings
 wspace	:	BLANK+|EOL+;
-semiel	:	(SEMIC|EOL) BLANK*;
+semiel	:	BLANK* (SEMIC|EOL) BLANK*;
 
 //definition of word.  this is just going to grow...
 word	:	(brace_expansion) => brace_expansion
