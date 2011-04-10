@@ -101,7 +101,7 @@ time_posix
 	:	TIME_POSIX BLANK!+;
 //The structure of a command in bash
 command
-	:	EXPORT^ var_def+
+	:	EXPORT^ (BLANK!+ var_def)+
 	|	compound_command
 	|	simple_command;
 //Simple bash commands
