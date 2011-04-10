@@ -94,14 +94,13 @@ list_level_1
 list_level_2
 	:	list_level_1 ((BLANK!?SEMIC!|BLANK!?AMP^|(BLANK!? EOL!)+)BLANK!? list_level_1)*;
 pipeline
-	:	var_def+
-	|	BLANK!* time? (BANG BLANK!+)? command^ (BLANK!* PIPE^ BLANK!* command)*;
+	:	BLANK!* time? (BANG BLANK!+)? command^ (BLANK!* PIPE^ BLANK!* command)*;
 time	:	TIME^ BLANK!+ time_posix?;
 time_posix
 	:	TIME_POSIX BLANK!+;
 //The structure of a command in bash
 command
-	:	EXPORT^ (BLANK!+ var_def)+
+	:	var_def (BLANK!+ var_def)*
 	|	compound_command
 	|	simple_command;
 //Simple bash commands
@@ -215,7 +214,8 @@ cond_comparison
 	:	cond_expr -> ^(COMPOUND_COND cond_expr);
 //Variables
 //Defining a variable
-var_def	:	name LSQUARE BLANK? var_index BLANK* RSQUARE EQUALS value -> ^(EQUALS ^(name  var_index) value)
+var_def
+	:	name LSQUARE BLANK? var_index BLANK* RSQUARE EQUALS value -> ^(EQUALS ^(name  var_index) value)
 	|	name EQUALS^ value
 	|	LET! name EQUALS^ arithmetic;
 //Possible values of a variable
@@ -584,8 +584,6 @@ TEST_EXPR	:	'test';
 LOGICAND
 	:	'&&';
 LOGICOR	:	'||';
-//Some builtins
-EXPORT	:	'export';
 //Tokens for strings
 CONTINUE_LINE
 	:	(ESC EOL)+{$channel=HIDDEN;};

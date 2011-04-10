@@ -20,7 +20,8 @@ gunit bashast;
 
 pipeline:
 "cat asdf" -> (COMMAND (STRING cat) (STRING asdf))
-"export VAR=bar LAA=laa" -> (export (= VAR (STRING bar)) (= LAA (STRING laa)))
+"export VAR=bar LAA=laa" -> (COMMAND (STRING export) (STRING VAR = bar) (STRING LAA = laa))
+"LOCAL1=a  LOCAL2=b export GLOBAL1=2  GLOBAL2 GLOBAL3" -> (COMMAND (STRING export) (STRING GLOBAL1 = 2) (STRING GLOBAL2) (STRING GLOBAL3) (= LOCAL1 (STRING a)) (= LOCAL2 (STRING b)))
 "time -p cat file" -> (COMMAND (STRING cat) (STRING file) (time -p))
 "time cat file | grep search" -> (| (COMMAND (STRING cat) (STRING file) time) (COMMAND (STRING grep) (STRING search)))
 "time -p cat | grep asdf | a.out" -> (| (| (COMMAND (STRING cat) (time -p)) (COMMAND (STRING grep) (STRING asdf))) (COMMAND (STRING a . out)))
