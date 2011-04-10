@@ -120,6 +120,7 @@ while_expr:
 echo \"file found\"
 done" -> (while (LIST (COMMAND (STRING echo) (STRING true))) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found)))))
 "while echo true; do echo \"file found\"; done" -> (while (LIST (COMMAND (STRING echo) (STRING true))) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found)))))
+"while(( 1>0 )); do echo ok; done" -> (while (LIST (COMPOUND_ARITH (> 1 0))) (LIST (COMMAND (STRING echo) (STRING ok))))
 "while echo true`; do echo file done" FAIL
 
 until_expr:
