@@ -214,3 +214,8 @@ massif.out: variable_printer long.sh
 
 massif: massif.out
 	ms_print --threshold=10 $<
+
+benchmark_parser: ast_printer
+	libtool --mode=execute valgrind \
+		--tool=callgrind --callgrind-out-file=/dev/null \
+		./ast_printer -s  -f /usr/portage/eclass/versionator.eclass
