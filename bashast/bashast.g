@@ -52,10 +52,10 @@ tokens{
 	LIST;
 	REPLACE_FIRST;
 	REPLACE_ALL;
+	REPLACE_AT_START;
+	REPLACE_AT_END;
 	STRING;
 	COMMAND;
-	REPLACE_FIRST;
-	REPLACE_LAST;
 	FILE_DESCRIPTOR;
 	FILE_DESCRIPTOR_MOVE;
 	REDIR;
@@ -254,8 +254,8 @@ parameter_replace_string
 	:	(SLASH fname|SLASH)? -> fname?;
 parameter_replace_operator
 	:	SLASH SLASH -> REPLACE_ALL
-	|	SLASH PCT -> REPLACE_LAST
-	|	SLASH POUND -> REPLACE_FIRST
+	|	SLASH PCT -> REPLACE_AT_END
+	|	SLASH POUND -> REPLACE_AT_START
 	|	SLASH -> REPLACE_FIRST;
 //Allowable variable names in the variable expansion
 var_name:	num|name|POUND;

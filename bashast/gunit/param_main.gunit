@@ -52,8 +52,8 @@ var_ref:
 "$_" -> (VAR_REF _)
 "${_}" -> (VAR_REF _)
 "${PV//./_}" -> (VAR_REF (REPLACE_ALL PV (STRING .) (STRING _)))
-"${PV/#foo/bar}" -> (VAR_REF (REPLACE_FIRST PV (STRING foo) (STRING bar)))
-"${PV/%foo/bar}" -> (VAR_REF (REPLACE_LAST PV (STRING foo) (STRING bar)))
+"${PV/#foo/bar}" -> (VAR_REF (REPLACE_AT_START PV (STRING foo) (STRING bar)))
+"${PV/%foo/bar}" -> (VAR_REF (REPLACE_AT_END PV (STRING foo) (STRING bar)))
 
 var_def:
 "MY_PN=${PN/asterisk-}" -> (= MY_PN (STRING (VAR_REF (REPLACE_FIRST PN (STRING asterisk -)))))
