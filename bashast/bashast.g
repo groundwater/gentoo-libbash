@@ -213,8 +213,7 @@ cond_comparison
 //Defining a variable
 var_def
 	:	name LSQUARE BLANK? explicit_arithmetic BLANK* RSQUARE EQUALS value -> ^(EQUALS ^(name explicit_arithmetic) value)
-	|	name EQUALS^ value
-	|	LET! name EQUALS^ arithmetic;
+	|	name EQUALS^ value;
 //Possible values of a variable
 value	:	fname
 	|	LPAREN! wspace!? arr_val RPAREN!;
@@ -510,7 +509,6 @@ AT	:	'@';
 DOT	:	'.';
 DOTDOT	:	'..';
 //Arith ops
-LET	:	'let';
 TIMES	:	'*';
 EQUALS	:	'=';
 MINUS	:	'-';
