@@ -367,12 +367,23 @@ ns_str	:	ns_str_part* -> ^(STRING ns_str_part*);
 fname	:	fname_part+ -> ^(STRING fname_part+);
 //A string that is NOT a bash reserved word
 fname_no_res_word
-	:	nqstr fname_part* -> ^(STRING nqstr fname_part*);
+	:	nqstr_part+ fname_part* -> ^(STRING nqstr_part+ fname_part*);
 fname_part
-	:	nqstr
+	:	nqstr_part+
 	|	res_word_str;
-//non-quoted string rule, allows expansions
-nqstr	:	(bracket_pattern_match|extended_pattern_match|var_ref|command_sub|arithmetic_expansion|brace_expansion|dqstr|sqstr|(str_part str_part_with_pound*)|pattern_match_trigger|BANG)+;
+//non-quoted string part rule, allows expansions
+nqstr_part
+	:	bracket_pattern_match
+	|	extended_pattern_match
+	|	var_ref
+	|	command_sub
+	|	arithmetic_expansion
+	|	brace_expansion
+	|	dqstr
+	|	sqstr
+	|	str_part str_part_with_pound*
+	|	pattern_match_trigger
+	|	BANG;
 //double quoted string rule, allows expansions
 dqstr	:	QUOTE dqstr_part* QUOTE -> ^(DOUBLE_QUOTED_STRING dqstr_part*);
 dqstr_part
