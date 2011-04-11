@@ -239,13 +239,12 @@ var_ref
 //Variable expansions
 var_exp	:	var_name (USE_DEFAULT|USE_ALTERNATE|DISPLAY_ERROR|ASSIGN_DEFAULT)^ word
 	|	var_name COLON wspace* os=explicit_arithmetic (COLON len=explicit_arithmetic)? -> ^(OFFSET var_name $os ^($len)?)
-	|	BANG^ var_name (TIMES|AT)
-	|	BANG var_name LSQUARE (op=TIMES|op=AT) RSQUARE -> ^(LIST_EXPAND var_name $op)
-	|	BANG var_name -> ^(VAR_REF var_name)
+	|	BANG^ var_name_for_bang (TIMES|AT)
+	|	BANG var_name_for_bang LSQUARE (op=TIMES|op=AT) RSQUARE -> ^(LIST_EXPAND var_name_for_bang $op)
+	|	BANG var_name_for_bang -> ^(VAR_REF var_name_for_bang)
 	|	var_name (POUND^|POUNDPOUND^) fname
 	|	var_name (PCT^|PCTPCT^) fname
 	|	var_name parameter_replace_operator^ ns_str parameter_replace_string
-	|	arr_var_ref
 	|	var_size_ref
 	|	var_name
 	|	TIMES
@@ -257,11 +256,15 @@ parameter_replace_operator
 	|	SLASH PCT -> REPLACE_AT_END
 	|	SLASH POUND -> REPLACE_AT_START
 	|	SLASH -> REPLACE_FIRST;
-//Allowable variable names in the variable expansion
-var_name:	num|name|POUND;
-//Referencing an array variable
-arr_var_ref
-	:	name^ LSQUARE! (DIGIT+|AT|TIMES) RSQUARE!;
+//Allowable refences to values
+//either directly or through array
+var_name:	num
+	|	name^ LSQUARE! (DIGIT+|AT|TIMES) RSQUARE!
+	|	name
+	|	POUND;
+//with bang the array syntax is used for array indexes
+var_name_for_bang
+	:	num|name|POUND;
 var_size_ref
 	:	POUND^ name (LSQUARE! array_size_index RSQUARE!)?;
 array_size_index
