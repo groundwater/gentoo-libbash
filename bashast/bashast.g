@@ -216,14 +216,13 @@ var_def
 	|	name EQUALS^ value
 	|	LET! name EQUALS^ arithmetic;
 //Possible values of a variable
-value	:	num
-	|	var_ref
-	|	fname
+value	:	fname
 	|	LPAREN! wspace!? arr_val RPAREN!;
 //allow the parser to create array variables
 arr_val	:
-	|	(ag+=val wspace?)+ -> ^(ARRAY $ag+);
-val	:	LSQUARE! BLANK!* explicit_arithmetic BLANK!? RSQUARE! EQUALS^ fname
+	|	(ag+=array_atom wspace?)+ -> ^(ARRAY $ag+);
+array_atom
+	:	LSQUARE! BLANK!* explicit_arithmetic BLANK!? RSQUARE! EQUALS^ fname
 	|	fname;
 //Referencing a variable (different possible ways/special parameters)
 var_ref
