@@ -238,25 +238,25 @@ var_ref
 	|	DOLLAR BANG -> ^(VAR_REF BANG);
 //Variable expansions
 var_exp	:	var_name (USE_DEFAULT|USE_ALTERNATE|DISPLAY_ERROR|ASSIGN_DEFAULT)^ word
-	|	var_name COLON wspace* LPAREN? os=explicit_arithmetic RPAREN? (COLON len=explicit_arithmetic)? -> ^(OFFSET var_name $os ^($len)?)
+	|	var_name COLON wspace* os=explicit_arithmetic (COLON len=explicit_arithmetic)? -> ^(OFFSET var_name $os ^($len)?)
 	|	BANG^ var_name (TIMES|AT)
 	|	BANG var_name LSQUARE (op=TIMES|op=AT) RSQUARE -> ^(LIST_EXPAND var_name $op)
 	|	BANG var_name -> ^(VAR_REF var_name)
 	|	var_name (POUND^|POUNDPOUND^) fname
 	|	var_name (PCT^|PCTPCT^) fname
-	|	var_name SLASH POUND ns_str SLASH fname -> ^(REPLACE_FIRST var_name ns_str fname)
-	| 	var_name SLASH PCT ns_str SLASH fname -> ^(REPLACE_LAST var_name ns_str fname)
-	|	var_name SLASH SLASH ns_str SLASH fname -> ^(REPLACE_ALL var_name ns_str fname)
-	|	var_name SLASH SLASH ns_str SLASH? -> ^(REPLACE_ALL var_name ns_str)
-	|	var_name SLASH ns_str SLASH fname -> ^(REPLACE_FIRST var_name ns_str fname)
-	|	var_name SLASH POUND ns_str SLASH? -> ^(REPLACE_FIRST var_name ns_str)
-	|	var_name SLASH PCT ns_str SLASH? -> ^(REPLACE_LAST var_name ns_str)
-	|	var_name SLASH ns_str SLASH? -> ^(REPLACE_FIRST var_name ns_str)
+	|	var_name parameter_replace_operator^ ns_str parameter_replace_string
 	|	arr_var_ref
 	|	var_size_ref
 	|	var_name
 	|	TIMES
 	|	AT;
+parameter_replace_string
+	:	(SLASH fname|SLASH)? -> fname?;
+parameter_replace_operator
+	:	SLASH SLASH -> REPLACE_ALL
+	|	SLASH PCT -> REPLACE_LAST
+	|	SLASH POUND -> REPLACE_FIRST
+	|	SLASH -> REPLACE_FIRST;
 //Allowable variable names in the variable expansion
 var_name:	num|name|POUND;
 //Referencing an array variable
