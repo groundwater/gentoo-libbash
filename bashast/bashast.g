@@ -268,7 +268,7 @@ var_exp	:	var_name (USE_DEFAULT|USE_ALTERNATE|DISPLAY_ERROR|ASSIGN_DEFAULT)^ wor
 	|	TIMES
 	|	AT;
 //Allowable variable names in the variable expansion
-var_name:	num|name;
+var_name:	num|name|POUND;
 //Referencing an array variable
 arr_var_ref
 	:	name^ LSQUARE! DIGIT+ RSQUARE!;
