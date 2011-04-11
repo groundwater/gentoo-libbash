@@ -44,6 +44,17 @@ TEST(interpreter, define_resolve_string)
   EXPECT_STREQ("", walker.resolve<string>("undefined").c_str());
 }
 
+TEST(interpreter, define_resolve_array)
+{
+  interpreter walker;
+  std::map<int, std::string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
+  walker.define("array", values);
+  EXPECT_STREQ("1", walker.resolve<string>("array", 0).c_str());
+  EXPECT_STREQ("2", walker.resolve<string>("array", 1).c_str());
+  EXPECT_STREQ("3", walker.resolve<string>("array", 2).c_str());
+  EXPECT_STREQ("", walker.resolve<string>("undefined",100).c_str());
+}
+
 TEST(interpreter, is_unset_or_null)
 {
   interpreter walker;
@@ -89,6 +100,22 @@ TEST(interpreter, set_string_value)
   EXPECT_THROW(walker.set_value<string>("astring_ro", "hello"),
                interpreter_exception);
   EXPECT_STREQ("hi", walker.resolve<string>("astring_ro").c_str());
+}
+
+TEST(interpreter, set_array_value)
+{
+  interpreter walker;
+  std::map<int, std::string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
+  walker.define("array", values);
+  EXPECT_STREQ("2", walker.set_value<string>("array", "2", 0).c_str());
+  EXPECT_STREQ("2", walker.resolve<string>("array", 0).c_str());
+  EXPECT_STREQ("out_of_bound", walker.set_value<string>("array", "out_of_bound", 10).c_str());
+  EXPECT_STREQ("out_of_bound", walker.resolve<string>("array",10).c_str());
+
+  walker.define("ro_array", values, true);
+  EXPECT_THROW(walker.set_value<string>("ro_array", "hello", 1),
+               interpreter_exception);
+  EXPECT_STREQ("2", walker.resolve<string>("ro_array", 1).c_str());
 }
 
 TEST(interperter, substring_expansion_exception)

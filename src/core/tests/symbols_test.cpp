@@ -65,11 +65,40 @@ TEST(symbol_test, string_variable)
   EXPECT_EQ(123, int_string.get_value<int>());
 }
 
+TEST(symbol_test, array_variable)
+{
+  map<int, string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
+
+  // readonly array
+  variable ro_array("foo", values, true);
+  EXPECT_STREQ("foo", ro_array.get_name().c_str());
+  EXPECT_STREQ("1", ro_array.get_value<string>(0).c_str());
+  EXPECT_STREQ("2", ro_array.get_value<string>(1).c_str());
+  EXPECT_STREQ("3", ro_array.get_value<string>(2).c_str());
+  EXPECT_THROW(ro_array.set_value("4", 0), interpreter_exception);
+  EXPECT_STREQ("1", ro_array.get_value<string>(0).c_str());
+
+  // out of bound
+  EXPECT_STREQ("", ro_array.get_value<string>(100).c_str());
+
+  // normal array
+  variable normal_array("foo", values);
+  normal_array.set_value("5", 4);
+  EXPECT_STREQ("1", normal_array.get_value<string>(0).c_str());
+  EXPECT_STREQ("2", normal_array.get_value<string>(1).c_str());
+  EXPECT_STREQ("3", normal_array.get_value<string>(2).c_str());
+  EXPECT_STREQ("", normal_array.get_value<string>(3).c_str());
+  EXPECT_STREQ("5", normal_array.get_value<string>(4).c_str());
+
+  // get integer value
+  EXPECT_EQ(3, normal_array.get_value<int>(2));
+}
+
 TEST(symbol_test, is_null)
 {
   variable var("foo", 10);
   EXPECT_FALSE(var.is_null());
-  var.set_value("bar", true);
+  var.set_value("bar", 0, true);
   EXPECT_TRUE(var.is_null());
   EXPECT_TRUE(variable("foo", "", false, true).is_null());
 }

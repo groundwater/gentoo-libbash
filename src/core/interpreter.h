@@ -363,15 +363,16 @@ public:
 
   /// \brief resolve any variable
   /// \param variable name
+  /// \param array index, use index=0 if it's not an array
   /// \return the value of the variable, call default constructor if
   //          it's undefined
   template <typename T>
-  T resolve(const std::string& name)
+  T resolve(const std::string& name, const unsigned index=0)
   {
     std::shared_ptr<variable> value = members.resolve(name);
     if(!value)
       return T();
-    return value->get_value<T>();
+    return value->get_value<T>(index);
   }
 
   /// \brief check whether the value of the variable is null, return true
@@ -399,15 +400,18 @@ public:
   ///        it's readonly, will define the variable if it doesn't exist
   /// \param variable name
   /// \param new value
+  /// \param array index, use index=0 if it's not an array
   /// \return the new value of the variable
   template <typename T>
-  const T& set_value(const std::string& name, const T& new_value)
+  const T& set_value(const std::string& name,
+                     const T& new_value,
+                     const unsigned index=0)
   {
     std::shared_ptr<variable> value = members.resolve(name);
     if(!value)
       define(name, new_value, false);
     else
-      value->set_value(new_value);
+      value->set_value(new_value, index);
     return new_value;
   }
 

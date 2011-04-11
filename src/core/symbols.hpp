@@ -25,6 +25,7 @@
 #ifndef LIBBASH_CORE_SYMBOLS_HPP_
 #define LIBBASH_CORE_SYMBOLS_HPP_
 
+#include <map>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -115,8 +116,10 @@ class variable
   std::string name;
 
   /// \var private::value
-  /// \brief actual value of the variable
-  boost::variant<int, std::string> value;
+  /// \brief actual value of the variable. We put string in front of int
+  ///        because we want "" as default string value; Otherwise we
+  ///        will get "0".
+  std::map<int, boost::variant<std::string, int>> value;
 
   /// \var private::readonly
   /// \brief whether the variable is readonly
@@ -136,30 +139,43 @@ public:
 
   template <typename T>
   variable(const std::string& name,
-           T v,
+           const T& v,
            bool ro=false,
            bool is_null=false)
-    : name(name), value(v), readonly(ro), null_value(is_null){}
+    : name(name), readonly(ro), null_value(is_null)
+  {
+    value[0] = v;
+  }
 
-  /// \brief retrieve actual value of the variable
+  /// \brief retrieve actual value of the variable, if index is out of bound,
+  ///        will return the default value of type T
   /// \return the value of the variable
   template<typename T>
-  T get_value() const
+  T get_value(const unsigned index=0) const
   {
     static converter<T> visitor;
-    return boost::apply_visitor(visitor, value);
+
+    auto iter = value.find(index);
+    if(iter == value.end())
+        return T{};
+
+    return boost::apply_visitor(visitor, iter->second);
   }
 
   /// \brief set the value of the variable, raise exception if it's readonly
   /// \param the new value to be set
+  /// \param array index, use index=0 if it's not an array
   /// \param whether to set the variable to null value, default is false
   template <typename T>
-  void set_value(T new_value, bool is_null=false)
+  void set_value(const T& new_value,
+                 const unsigned index=0,
+                 bool is_null=false)
   {
     if(readonly)
       throw interpreter_exception(get_name() + " is readonly variable");
+
     null_value = is_null;
-    value = new_value;
+    value[index] = new_value;
   }
 
   /// \brief check whether the value of the variable is null
@@ -169,6 +185,16 @@ public:
     return null_value;
   }
 };
+
+// specialization for arrays
+template <>
+inline variable::variable<>(const std::string& name,
+                            const std::map<int, std::string>& v,
+                            bool ro,
+                            bool is_null)
+    : name(name), value(v.begin(), v.end()), readonly(ro), null_value(is_null)
+{
+}
 
 ///
 /// class scope
