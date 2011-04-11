@@ -28,3 +28,8 @@ var_ref:
 "${asdf[3]}" -> (VAR_REF (asdf 3))
 "${asdf[4] }" -> (VAR_REF (asdf 4))
 "${asdf}" -> (VAR_REF asdf)
+"${#asdf[0]}" -> (VAR_REF (# asdf 0))
+"${asdf[@]}" -> (VAR_REF (asdf @))
+"${asdf[*]}" -> (VAR_REF (asdf *))
+"${#asdf[@]}" -> (VAR_REF (# asdf ARRAY_SIZE))
+"${#asdf[*]}" -> (VAR_REF (# asdf ARRAY_SIZE))

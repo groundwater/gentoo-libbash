@@ -27,6 +27,7 @@ options
 tokens{
 	ARG;
 	ARRAY;
+	ARRAY_SIZE;
 	BRACE_EXP;
 	COMMAND_SUB;
 	CASE_PATTERN;
@@ -241,7 +242,6 @@ var_exp	:	var_name (USE_DEFAULT|USE_ALTERNATE|DISPLAY_ERROR|ASSIGN_DEFAULT)^ wor
 	|	BANG^ var_name (TIMES|AT)
 	|	BANG var_name LSQUARE (op=TIMES|op=AT) RSQUARE -> ^(LIST_EXPAND var_name $op)
 	|	BANG var_name -> ^(VAR_REF var_name)
-	|	POUND^ var_name
 	|	var_name (POUND^|POUNDPOUND^) fname
 	|	var_name (PCT^|PCTPCT^) fname
 	|	var_name SLASH POUND ns_str SLASH fname -> ^(REPLACE_FIRST var_name ns_str fname)
@@ -253,6 +253,7 @@ var_exp	:	var_name (USE_DEFAULT|USE_ALTERNATE|DISPLAY_ERROR|ASSIGN_DEFAULT)^ wor
 	|	var_name SLASH PCT ns_str SLASH? -> ^(REPLACE_LAST var_name ns_str)
 	|	var_name SLASH ns_str SLASH? -> ^(REPLACE_FIRST var_name ns_str)
 	|	arr_var_ref
+	|	var_size_ref
 	|	var_name
 	|	TIMES
 	|	AT;
@@ -260,7 +261,12 @@ var_exp	:	var_name (USE_DEFAULT|USE_ALTERNATE|DISPLAY_ERROR|ASSIGN_DEFAULT)^ wor
 var_name:	num|name|POUND;
 //Referencing an array variable
 arr_var_ref
-	:	name^ LSQUARE! DIGIT+ RSQUARE!;
+	:	name^ LSQUARE! (DIGIT+|AT|TIMES) RSQUARE!;
+var_size_ref
+	:	POUND^ name (LSQUARE! array_size_index RSQUARE!)?;
+array_size_index
+	:	DIGIT+
+	|	(AT|TIMES) -> ARRAY_SIZE;
 //Conditional Expressions
 cond_expr
 	:	LSQUARE LSQUARE wspace keyword_cond wspace RSQUARE RSQUARE -> ^(KEYWORD_TEST keyword_cond)
