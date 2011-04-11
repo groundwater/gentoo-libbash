@@ -43,6 +43,7 @@ var_ref:
 "$@" -> (VAR_REF @)
 "$*" -> (VAR_REF *)
 "${@}" -> (VAR_REF @)
+"${!foo}" -> (VAR_REF (VAR_REF foo))
 "${3}" -> (VAR_REF 3)
 "$?" -> (VAR_REF ?)
 "$_" -> (VAR_REF _)

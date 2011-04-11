@@ -251,6 +251,7 @@ var_exp	:	var_name (USE_DEFAULT|USE_ALTERNATE|DISPLAY_ERROR|ASSIGN_DEFAULT)^ wor
 	|	var_name COLON wspace* LPAREN? os=arithmetic RPAREN? (COLON len=arithmetic)? -> ^(OFFSET var_name $os ^($len)?)
 	|	BANG^ var_name (TIMES|AT)
 	|	BANG var_name LSQUARE (op=TIMES|op=AT) RSQUARE -> ^(LIST_EXPAND var_name $op)
+	|	BANG var_name -> ^(VAR_REF var_name)
 	|	POUND^ var_name
 	|	var_name (POUND^|POUNDPOUND^) fname
 	|	var_name (PCT^|PCTPCT^) fname
