@@ -64,7 +64,7 @@ string_expr	returns[std::string libbash_value]:
 	^(STRING(
 		(DOUBLE_QUOTED_STRING) => ^(DOUBLE_QUOTED_STRING (libbash_string=double_quoted_string { $libbash_value += libbash_string; })*)
 		|(ARITHMETIC_EXPRESSION) => ^(ARITHMETIC_EXPRESSION value=arithmetics { $libbash_value = boost::lexical_cast<std::string>(value); })
-		|libbash_string=any_string { $libbash_value = libbash_string; }
+		|(libbash_string=any_string { $libbash_value += libbash_string; })+
 	));
 
 //double quoted string rule, allows expansions

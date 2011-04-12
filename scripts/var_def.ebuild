@@ -10,3 +10,4 @@ IUSE=""
 RDEPEND="dev-db/sqlite:3"
 DEPEND="${RDEPEND}
 		dev-util/pkgconfig"
+MY_PATCH=ldflags.patch
