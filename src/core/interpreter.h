@@ -492,9 +492,12 @@ public:
   /// \brief get the length of a string variable
   /// \param the name of the variable
   /// \return the length
-  int get_length(const std::string& name)
+  unsigned get_length(const std::string& name, const unsigned index=0)
   {
-    return resolve<std::string>(name).size();
+    std::shared_ptr<variable> value = members.resolve(name);
+    if(!value)
+      return 0;
+    return value->get_length(index);
   }
 
 };

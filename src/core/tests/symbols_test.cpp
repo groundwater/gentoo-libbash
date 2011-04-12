@@ -103,6 +103,20 @@ TEST(symbol_test, is_null)
   EXPECT_TRUE(variable("foo", "", false, true).is_null());
 }
 
+TEST(symbol_test, get_length)
+{
+  variable an_int("foo", 10);
+  EXPECT_EQ(2, an_int.get_length());
+
+  variable an_string("bar", "hello world");
+  EXPECT_EQ(11, an_string.get_length());
+
+  map<int, string> values = {{0, "1"}, {1, "2"}, {2, "hello"}};
+  variable array("array", values);
+  EXPECT_EQ(5, array.get_length(2));
+  EXPECT_EQ(3, array.get_array_length());
+}
+
 TEST(scope_test, define_resolve)
 {
   scope members;

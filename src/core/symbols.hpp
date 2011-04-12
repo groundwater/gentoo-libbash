@@ -178,6 +178,21 @@ public:
     value[index] = new_value;
   }
 
+  /// \brief get the length of a variable
+  /// \param the index of the variable, use 0 if it's not an array
+  /// \return the length of the variable
+  unsigned get_length(const unsigned index=0) const
+  {
+    return get_value<std::string>(index).size();
+  }
+
+  /// \brief get the length of an array variable
+  /// \return the length of the array
+  unsigned get_array_length() const
+  {
+    return value.size();
+  }
+
   /// \brief check whether the value of the variable is null
   /// \return whether the value of the variable is null
   bool is_null() const
