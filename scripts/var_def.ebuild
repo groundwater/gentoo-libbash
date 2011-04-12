@@ -12,4 +12,5 @@ DEPEND="${RDEPEND}
 		dev-util/pkgconfig"
 MY_PATCH=ldflags.patch
 PATCH=("1.patch" 2.patch)
-ARRAY=(1 2 3 [5]=4)
+ARRAY=(1 2 3 [5]=4 5)
+ARRAY_LAST=${ARRAY[6]}

@@ -45,10 +45,22 @@ start: list|EOF;
 
 list: ^(LIST var_def+);
 
-name	returns[std::string libbash_value]:
+name_base	returns[std::string libbash_value]:
 	NAME {$libbash_value = walker->get_string($NAME);}
 	|	LETTER {$libbash_value = walker->get_string($LETTER);}
 	|	'_' {$libbash_value="_";};
+
+name	returns[std::string libbash_value, unsigned index]
+@init {
+	$index = 0;
+}:
+	^(libbash_name=name_base value=arithmetics){
+		$index = value;
+		$libbash_value = libbash_name;
+	}
+	|libbash_name=name_base{
+		$libbash_value = libbash_name;
+	};
 
 num returns[std::string libbash_value]
 options{ k=1; }:
@@ -60,14 +72,14 @@ var_def
 	std::map<int, std::string> values;
 	int index = 0;
 }:
-	^(EQUALS libbash_name=name libbash_value=word){
+	^(EQUALS libbash_name=name_base libbash_value=word){
 		walker->define(libbash_name, libbash_value);
 	}
-	|^(EQUALS libbash_name=name ^(ARRAY (
-									(libbash_string=string_expr
-									|^(EQUALS value=arithmetics { index = value; } libbash_string=string_expr))
-									{ values[index++] = libbash_string; })*
-								 )){
+	|^(EQUALS libbash_name=name_base ^(ARRAY (
+										(libbash_string=string_expr
+										|^(EQUALS value=arithmetics { index = value; } libbash_string=string_expr))
+										{ values[index++] = libbash_string; })*
+									 )){
 		walker->define(libbash_name, values);
 	};
 
@@ -91,11 +103,15 @@ any_string returns[std::string libbash_value]
 	any_token=. { $libbash_value = walker->get_string(any_token); };
 
 //Allowable variable names in the variable expansion
-var_name returns[std::string libbash_value]
-@after {
-	$libbash_value = walker->get_string($var_name.start);
+var_name returns[std::string libbash_value, unsigned index]
+@init {
+	$var_name.index = 0;
 }:
-	num|name;
+	libbash_string=num { $libbash_value = libbash_string; }
+	|name {
+		$libbash_value = $name.libbash_value;
+		$index = $name.index;
+	};
 
 var_expansion returns[std::string libbash_value]:
 	^(USE_DEFAULT var_name libbash_word=word) {
@@ -127,7 +143,7 @@ word returns[std::string libbash_value]:
 
 //variable reference
 var_ref returns[std::string libbash_value]:
-	^(VAR_REF libbash_name=name) { $libbash_value = walker->resolve<std::string>(libbash_name); }
+	^(VAR_REF name) { $libbash_value = walker->resolve<std::string>($name.libbash_value, $name.index); }
 	|^(VAR_REF libbash_string=var_expansion) { $libbash_value = libbash_string; };
 
 // shell arithmetic
@@ -157,45 +173,45 @@ arithmetics returns[int value]
 	|^(ARITHMETIC_CONDITION cnd=arithmetics l=arithmetics r=arithmetics){
 		$value = walker->arithmetic_condition(cnd, l, r);
 	}
-	|^(VAR_REF libbash_name=name) {
-		$value = walker->resolve<int>(libbash_name);
+	|^(VAR_REF name) {
+		$value = walker->resolve<int>($name.libbash_value);
 	}
-	|^(PRE_INCR ^(VAR_REF libbash_name=name)){ $value = walker->pre_incr(libbash_name); }
-	|^(PRE_DECR ^(VAR_REF libbash_name=name)){ $value = walker->pre_decr(libbash_name); }
-	|^(POST_INCR ^(VAR_REF libbash_name=name)){ $value = walker->post_incr(libbash_name); }
-	|^(POST_DECR ^(VAR_REF libbash_name=name)){ $value = walker->post_decr(libbash_name); }
-	|^(EQUALS libbash_name=name l=arithmetics) {
-		$value = walker->set_value(libbash_name, l);
+	|^(PRE_INCR ^(VAR_REF name)){ $value = walker->pre_incr($name.libbash_value); }
+	|^(PRE_DECR ^(VAR_REF name)){ $value = walker->pre_decr($name.libbash_value); }
+	|^(POST_INCR ^(VAR_REF name)){ $value = walker->post_incr($name.libbash_value); }
+	|^(POST_DECR ^(VAR_REF name)){ $value = walker->post_decr($name.libbash_value); }
+	|^(EQUALS name l=arithmetics) {
+		$value = walker->set_value($name.libbash_value, l);
 	}
-	|^(MUL_ASSIGN libbash_name=name l=arithmetics) {
-		$value = walker->assign(&interpreter::multiply, libbash_name, l);
+	|^(MUL_ASSIGN name l=arithmetics) {
+		$value = walker->assign(&interpreter::multiply, $name.libbash_value, l);
 	}
-	|^(DIVIDE_ASSIGN libbash_name=name l=arithmetics) {
-		$value = walker->assign(&interpreter::divide, libbash_name, l);
+	|^(DIVIDE_ASSIGN name l=arithmetics) {
+		$value = walker->assign(&interpreter::divide, $name.libbash_value, l);
 	}
-	|^(MOD_ASSIGN libbash_name=name l=arithmetics) {
-		$value = walker->assign(&interpreter::mod, libbash_name, l);
+	|^(MOD_ASSIGN name l=arithmetics) {
+		$value = walker->assign(&interpreter::mod, $name.libbash_value, l);
 	}
-	|^(PLUS_ASSIGN libbash_name=name l=arithmetics) {
-		$value = walker->assign(&interpreter::plus, libbash_name, l);
+	|^(PLUS_ASSIGN name l=arithmetics) {
+		$value = walker->assign(&interpreter::plus, $name.libbash_value, l);
 	}
-	|^(MINUS_ASSIGN libbash_name=name l=arithmetics) {
-		$value = walker->assign(&interpreter::minus, libbash_name, l);
+	|^(MINUS_ASSIGN name l=arithmetics) {
+		$value = walker->assign(&interpreter::minus, $name.libbash_value, l);
 	}
-	|^(LSHIFT_ASSIGN libbash_name=name l=arithmetics) {
-		$value = walker->assign(&interpreter::left_shift, libbash_name, l);
+	|^(LSHIFT_ASSIGN name l=arithmetics) {
+		$value = walker->assign(&interpreter::left_shift, $name.libbash_value, l);
 	}
-	|^(RSHIFT_ASSIGN libbash_name=name l=arithmetics) {
-		$value = walker->assign(&interpreter::right_shift, libbash_name, l);
+	|^(RSHIFT_ASSIGN name l=arithmetics) {
+		$value = walker->assign(&interpreter::right_shift, $name.libbash_value, l);
 	}
-	|^(AND_ASSIGN libbash_name=name l=arithmetics) {
-		$value = walker->assign(&interpreter::bitwiseand, libbash_name, l);
+	|^(AND_ASSIGN name l=arithmetics) {
+		$value = walker->assign(&interpreter::bitwiseand, $name.libbash_value, l);
 	}
-	|^(XOR_ASSIGN libbash_name=name l=arithmetics) {
-		$value = walker->assign(&interpreter::bitwisexor, libbash_name, l);
+	|^(XOR_ASSIGN name l=arithmetics) {
+		$value = walker->assign(&interpreter::bitwisexor, $name.libbash_value, l);
 	}
-	|^(OR_ASSIGN libbash_name=name l=arithmetics) {
-		$value = walker->assign(&interpreter::bitwiseor, libbash_name, l);
+	|^(OR_ASSIGN name l=arithmetics) {
+		$value = walker->assign(&interpreter::bitwiseor, $name.libbash_value, l);
 	}
 	| NUMBER { $value = walker->parse_int($NUMBER);}
 	| DIGIT { $value = walker->parse_int($DIGIT);}

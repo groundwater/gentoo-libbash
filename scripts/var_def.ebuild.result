@@ -1,4 +1,5 @@
-ARRAY=1 2 3 4
+ARRAY=1 2 3 4 5
+ARRAY_LAST=5
 DEPEND=dev-db/sqlite:3
 		dev-util/pkgconfig
 DESCRIPTION=SunPinyin is a SLM (Statistical Language Model) based IME
