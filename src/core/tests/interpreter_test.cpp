@@ -118,6 +118,19 @@ TEST(interpreter, set_array_value)
   EXPECT_STREQ("2", walker.resolve<string>("ro_array", 1).c_str());
 }
 
+TEST(interpreter, get_array_values)
+{
+  interpreter walker;
+  std::map<int, std::string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
+  walker.define("array", values);
+
+  std::vector<int> array_values;
+  walker.resolve_array("array", array_values);
+  EXPECT_EQ(1, array_values[0]);
+  EXPECT_EQ(2, array_values[1]);
+  EXPECT_EQ(3, array_values[2]);
+}
+
 TEST(interperter, substring_expansion_exception)
 {
   interpreter walker;

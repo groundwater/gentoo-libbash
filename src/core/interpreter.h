@@ -361,11 +361,11 @@ public:
     return new_value;
   }
 
-  /// \brief resolve any variable
+  /// \brief resolve string/int variable
   /// \param variable name
   /// \param array index, use index=0 if it's not an array
   /// \return the value of the variable, call default constructor if
-  //          it's undefined
+  ///         it's undefined
   template <typename T>
   T resolve(const std::string& name, const unsigned index=0)
   {
@@ -373,6 +373,19 @@ public:
     if(!value)
       return T();
     return value->get_value<T>(index);
+  }
+
+  /// \brief resolve array variable
+  /// \param variable name
+  /// \param[out] vector that stores all array values
+  template <typename T>
+  void resolve_array(const std::string& name, std::vector<T>& values)
+  {
+    std::shared_ptr<variable> value = members.resolve(name);
+    if(!value)
+      return;
+
+    value->get_all_values(values);
   }
 
   /// \brief check whether the value of the variable is null, return true

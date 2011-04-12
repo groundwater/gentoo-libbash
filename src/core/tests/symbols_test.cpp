@@ -94,6 +94,30 @@ TEST(symbol_test, array_variable)
   EXPECT_EQ(3, normal_array.get_value<int>(2));
 }
 
+TEST(symbol_test, get_all_values)
+{
+  map<int, string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
+  variable array("foo", values);
+  vector<string> string_values;
+  array.get_all_values(string_values);
+
+  EXPECT_EQ(3, string_values.size());
+  EXPECT_STREQ("1", string_values[0].c_str());
+  EXPECT_STREQ("2", string_values[1].c_str());
+  EXPECT_STREQ("3", string_values[2].c_str());
+
+  variable a_string("foo", 10);
+  a_string.get_all_values(string_values);
+  EXPECT_EQ(1, string_values.size());
+  EXPECT_STREQ("10", string_values[0].c_str());
+
+  variable an_int("foo", 10);
+  vector<int> int_values;
+  an_int.get_all_values(int_values);
+  EXPECT_EQ(1, int_values.size());
+  EXPECT_EQ(10, int_values[0]);
+}
+
 TEST(symbol_test, is_null)
 {
   variable var("foo", 10);

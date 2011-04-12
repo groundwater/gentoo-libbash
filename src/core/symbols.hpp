@@ -162,6 +162,22 @@ public:
     return boost::apply_visitor(visitor, iter->second);
   }
 
+  /// \brief retrieve all values of the array
+  /// \param[out] vector that stores all array values, values in the arrays will
+  ///             be cleared first
+  template<typename T>
+  void get_all_values(std::vector<T>& all_values) const
+  {
+    static converter<T> visitor;
+
+    all_values.clear();
+
+    for(auto iter = value.begin(); iter != value.end(); ++iter)
+        all_values.push_back(
+                boost::apply_visitor(visitor, iter->second));
+  }
+
+
   /// \brief set the value of the variable, raise exception if it's readonly
   /// \param the new value to be set
   /// \param array index, use index=0 if it's not an array
