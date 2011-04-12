@@ -486,7 +486,7 @@ function:	FUNCTION BLANK+ name (BLANK* parens)? wspace compound_command redirect
 parens	:	LPAREN BLANK* RPAREN;
 name	:	NAME
 	|	LETTER
-	|	'_';
+	|	UNDERSCORE;
 esc_char:	ESC (DIGIT DIGIT? DIGIT?|LETTER ALPHANUM ALPHANUM?|.);
 
 //****************
@@ -606,5 +606,6 @@ TIME_POSIX
 	:	'-p';
 //Handle ANSI C escaped characters: escaped octal, escaped hex, escaped ctrl+ chars, then all others
 ESC	:	'\\';
-NAME	:	(LETTER|'_')(ALPHANUM|'_')+;
+UNDERSCORE : '_';
+NAME	:	(LETTER|UNDERSCORE)(ALPHANUM|UNDERSCORE)+;
 OTHER	:	.;

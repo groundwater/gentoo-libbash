@@ -30,11 +30,23 @@
 #include <vector>
 
 #include <boost/program_options.hpp>
+#include <boost/spirit/include/qi.hpp>
+#include <boost/fusion/include/adapt_struct.hpp>
 
 #include "core/parser_builder.h"
 #include "libbashParser.h"
 
 namespace po = boost::program_options;
+namespace qi = boost::spirit::qi;
+
+struct reversed_pair : std::pair<ANTLR3_INT32, std::string>
+{};
+
+BOOST_FUSION_ADAPT_STRUCT(
+    reversed_pair
+  , (std::string, second)
+    (ANTLR3_INT32, first)
+)
 
 static void print_ast(std::istream& input, bool silent, bool dot)
 {
@@ -55,18 +67,20 @@ static inline std::string token_mapper(std::unordered_map<ANTLR3_INT32, std::str
   return token_map[token];
 }
 
-static void build_token_map(std::unordered_map<ANTLR3_INT32, std::string>& token_map,
+static bool build_token_map(std::unordered_map<ANTLR3_INT32, std::string>& token_map,
                             const std::string& path)
 {
   std::ifstream token_file(path);
-  std::string line;
-  while(std::getline(token_file, line))
-  {
-    auto equal = line.find("=");
-    if(equal != std::string::npos)
-      token_map[boost::lexical_cast<ANTLR3_INT32>(line.substr(equal + 1, line.size()))]
-        = line.substr(0, equal);
-  }
+  token_file.unsetf(std::ios::skipws);
+
+  typedef boost::spirit::istream_iterator iterator;
+
+  iterator first(token_file);
+  iterator last;
+
+  qi::rule<iterator, reversed_pair()> line = +~qi::char_('=') >> '=' >> qi::int_parser<ANTLR3_INT32>();
+
+  return qi::parse(first, last, line % qi::eol >> qi::eol, token_map) && first == last;
 }
 
 static inline void print_token(std::istream& input,
@@ -78,11 +92,18 @@ static inline void print_token(std::istream& input,
 
   parser_builder parser(input);
   std::unordered_map<ANTLR3_INT32, std::string> token_map;
-  build_token_map(token_map, token_path);
-  std::cout << parser.get_tokens(std::bind(&token_mapper,
-                                           token_map,
-                                           std::placeholders::_1))
-  << std::endl;
+
+  if(build_token_map(token_map, token_path))
+  {
+    std::cout << parser.get_tokens(std::bind(&token_mapper,
+                                             token_map,
+                                             std::placeholders::_1))
+    << std::endl;
+  }
+  else
+  {
+    std::cerr << "Building token map failed" << std::endl;
+  }
 }
 
 static void print_files(const std::vector<std::string>& files,
