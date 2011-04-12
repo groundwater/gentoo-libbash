@@ -435,7 +435,7 @@ pre_inc_dec
 	|	MINUS MINUS BLANK? primary -> ^(PRE_DECR primary);
 unary	:	post_inc_dec
 	|	pre_inc_dec
-	|	primary
+	|	BLANK!? primary
 	|	PLUS unary -> ^(PLUS_SIGN unary)
 	|	MINUS unary -> ^(MINUS_SIGN unary)
 	|	(TILDE|BANG)^ unary;

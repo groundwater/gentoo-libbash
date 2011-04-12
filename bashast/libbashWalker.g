@@ -160,10 +160,10 @@ arithmetics returns[int value]
 	|^(VAR_REF libbash_name=name) {
 		$value = walker->resolve<int>(libbash_name);
 	}
-	|^(PRE_INCR libbash_name=name){ $value = walker->pre_incr(libbash_name); }
-	|^(PRE_DECR libbash_name=name){ $value = walker->pre_decr(libbash_name); }
-	|^(POST_INCR libbash_name=name){ $value = walker->post_incr(libbash_name); }
-	|^(POST_DECR libbash_name=name){ $value = walker->post_decr(libbash_name); }
+	|^(PRE_INCR ^(VAR_REF libbash_name=name)){ $value = walker->pre_incr(libbash_name); }
+	|^(PRE_DECR ^(VAR_REF libbash_name=name)){ $value = walker->pre_decr(libbash_name); }
+	|^(POST_INCR ^(VAR_REF libbash_name=name)){ $value = walker->post_incr(libbash_name); }
+	|^(POST_DECR ^(VAR_REF libbash_name=name)){ $value = walker->post_decr(libbash_name); }
 	|^(EQUALS libbash_name=name l=arithmetics) {
 		$value = walker->set_value(libbash_name, l);
 	}
