@@ -28,6 +28,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "common.h"
 #include "core/interpreter_exception.h"
@@ -40,7 +41,7 @@ namespace libbash
   /// \param the path of target script
   /// \param the map to store variables
   void LIBBASH_API interpret(const std::string& path,
-                             std::unordered_map<std::string, std::string>& variables);
+                             std::unordered_map<std::string, std::vector<std::string>>& variables);
 }
 
 #endif

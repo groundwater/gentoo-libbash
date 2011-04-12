@@ -33,7 +33,7 @@
 namespace libbash
 {
   void interpret(const std::string& path,
-                 std::unordered_map<std::string, std::string>& variables)
+                 std::unordered_map<std::string, std::vector<std::string>>& variables)
   {
     std::ifstream input(path.c_str());
     if(!input)
@@ -42,6 +42,6 @@ namespace libbash
     walker_builder wbuilder = pbuilder.create_walker_builder();
 
     for(auto iter = wbuilder.walker->begin(); iter != wbuilder.walker->end(); ++iter)
-      variables[iter->first]=iter->second->get_value<std::string>();
+      iter->second->get_all_values<std::string>(variables[iter->first]);
   }
 }

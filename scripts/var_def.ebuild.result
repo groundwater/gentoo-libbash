@@ -1,3 +1,4 @@
+ARRAY=1 2 3 4
 DEPEND=dev-db/sqlite:3
 		dev-util/pkgconfig
 DESCRIPTION=SunPinyin is a SLM (Statistical Language Model) based IME
@@ -7,6 +8,7 @@ IUSE=
 KEYWORDS=~amd64 ~x86
 LICENSE=LGPL-2.1 CDDL
 MY_PATCH=ldflags.patch
+PATCH=1.patch 2.patch
 RDEPEND=dev-db/sqlite:3
 SLOT=0
 SRC_URI=http://open-gram.googlecode.com/files/dict.utf8.tar.bz2

@@ -55,9 +55,20 @@ options{ k=1; }:
 	DIGIT { $libbash_value = walker->get_string($DIGIT); }
 	|NUMBER { $libbash_value = walker->get_string($NUMBER); };
 
-var_def:
+var_def
+@declarations {
+	std::map<int, std::string> values;
+	int index = 0;
+}:
 	^(EQUALS libbash_name=name libbash_value=word){
 		walker->define(libbash_name, libbash_value);
+	}
+	|^(EQUALS libbash_name=name ^(ARRAY (
+									(libbash_string=string_expr
+									|^(EQUALS value=arithmetics { index = value; } libbash_string=string_expr))
+									{ values[index++] = libbash_string; })*
+								 )){
+		walker->define(libbash_name, values);
 	};
 
 string_expr	returns[std::string libbash_value]:

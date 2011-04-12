@@ -30,7 +30,7 @@ using namespace std;
 
 TEST(libbashapi, bad_path)
 {
-  std::unordered_map<std::string, std::string> variables;
+  std::unordered_map<std::string, std::vector<std::string>> variables;
   EXPECT_THROW(libbash::interpret("not exist", variables),
                interpreter_exception);
 }

@@ -40,13 +40,13 @@ int main(int argc, char** argv)
     exit(EXIT_FAILURE);
   }
 
-  std::unordered_map<std::string, std::string> variables;
+  std::unordered_map<std::string, std::vector<std::string>> variables;
   libbash::interpret(argv[1], variables);
 
-  std::map<std::string, std::string> sorted(variables.begin(), variables.end());
+  std::map<std::string, std::vector<std::string>> sorted(variables.begin(), variables.end());
 
   using namespace boost::spirit::karma;
-  std::cout << format((string << '=' << string) % eol, sorted) << std::endl;
+  std::cout << format((string << '=' << (string % ' ')) % eol, sorted) << std::endl;
 
   return 0;
 }

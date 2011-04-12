@@ -11,3 +11,5 @@ RDEPEND="dev-db/sqlite:3"
 DEPEND="${RDEPEND}
 		dev-util/pkgconfig"
 MY_PATCH=ldflags.patch
+PATCH=("1.patch" 2.patch)
+ARRAY=(1 2 3 [5]=4)
