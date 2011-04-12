@@ -59,9 +59,16 @@ TEST(interpreter, is_unset_or_null)
 {
   interpreter walker;
   walker.define("foo", "hello");
-  EXPECT_FALSE(walker.is_unset_or_null("foo"));
+  EXPECT_FALSE(walker.is_unset_or_null("foo", 0));
   walker.define("foo", "hello", false, true);
-  EXPECT_TRUE(walker.is_unset_or_null("foo"));
+  EXPECT_TRUE(walker.is_unset_or_null("foo", 0));
+
+  std::map<int, std::string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
+  walker.define("bar", values);
+  EXPECT_FALSE(walker.is_unset_or_null("bar", 0));
+  EXPECT_FALSE(walker.is_unset_or_null("bar", 1));
+  EXPECT_FALSE(walker.is_unset_or_null("bar", 2));
+  EXPECT_TRUE(walker.is_unset_or_null("bar", 3));
 }
 
 TEST(interpreter, is_unset)
@@ -134,5 +141,5 @@ TEST(interpreter, get_array_values)
 TEST(interperter, substring_expansion_exception)
 {
   interpreter walker;
-  EXPECT_THROW(walker.do_substring_expansion("", 0, -1), interpreter_exception);
+  EXPECT_THROW(walker.do_substring_expansion("", 0, -1, 0), interpreter_exception);
 }

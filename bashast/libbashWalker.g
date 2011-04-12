@@ -116,23 +116,28 @@ var_name returns[std::string libbash_value, unsigned index]
 
 var_expansion returns[std::string libbash_value]:
 	^(USE_DEFAULT var_name libbash_word=word) {
-		libbash_value = walker->do_default_expansion($var_name.libbash_value, libbash_word);
+		libbash_value = walker->do_default_expansion($var_name.libbash_value, libbash_word, $var_name.index);
 	}
 	|^(ASSIGN_DEFAULT var_name libbash_word=word) {
-		libbash_value = walker->do_assign_expansion($var_name.libbash_value, libbash_word);
+		libbash_value = walker->do_assign_expansion($var_name.libbash_value, libbash_word, $var_name.index);
 	}
 	|^(USE_ALTERNATE var_name libbash_word=word) {
-		libbash_value = walker->do_alternate_expansion($var_name.libbash_value, libbash_word);
+		libbash_value = walker->do_alternate_expansion($var_name.libbash_value, libbash_word, $var_name.index);
 	}
 	|(^(OFFSET var_name arithmetics arithmetics)) => ^(OFFSET var_name offset=arithmetics length=arithmetics) {
-		libbash_value = walker->do_substring_expansion($var_name.libbash_value, offset, length);
+		libbash_value = walker->do_substring_expansion($var_name.libbash_value, offset, length, $var_name.index);
 	}
 	|^(OFFSET var_name offset=arithmetics) {
-		libbash_value = walker->do_substring_expansion($var_name.libbash_value, offset);
+		libbash_value = walker->do_substring_expansion($var_name.libbash_value, offset, $var_name.index);
 	}
-	|^(POUND var_name) {
-		libbash_value = boost::lexical_cast<std::string>(walker->get_length($var_name.libbash_value));
-	};
+	|^(POUND(
+		var_name {
+			libbash_value = boost::lexical_cast<std::string>(walker->get_length($var_name.libbash_value, $var_name.index));
+		}
+		|^(libbash_name=name_base ARRAY_SIZE) {
+			libbash_value = boost::lexical_cast<std::string>(walker->get_array_length(libbash_name));
+		}
+	));
 
 word returns[std::string libbash_value]:
 	|(num) => libbash_string=num { $libbash_value = libbash_string; }

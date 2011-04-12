@@ -392,11 +392,11 @@ public:
   ///        if the variable is undefined
   /// \param variable name
   /// \return whether the value of the variable is null
-  bool is_unset_or_null(const std::string& name)
+  bool is_unset_or_null(const std::string& name, const unsigned index)
   {
     std::shared_ptr<variable> value = members.resolve(name);
     if(value)
-      return value->is_null();
+      return value->is_null(index);
     else
       return true;
   }
@@ -449,9 +449,11 @@ public:
   /// \param the value of the word
   /// \return the expansion result
   const std::string do_default_expansion(const std::string& name,
-                                         const std::string& value)
+                                         const std::string& value,
+                                         const unsigned index)
   {
-    return (is_unset_or_null(name)? value : resolve<std::string>(name));
+    return (is_unset_or_null(name, index)?
+        value : resolve<std::string>(name, index));
   }
 
   /// \brief perform ${parameter:=word} expansion
@@ -459,9 +461,11 @@ public:
   /// \param the value of the word
   /// \return the expansion result
   const std::string do_assign_expansion(const std::string& name,
-                                        const std::string& value)
+                                        const std::string& value,
+                                        const unsigned index)
   {
-    return (is_unset_or_null(name)? set_value(name, value) : resolve<std::string>(name));
+    return (is_unset_or_null(name, index)?
+        set_value(name, value, index) : resolve<std::string>(name, index));
   }
 
   /// \brief perform ${parameter:+word} expansion
@@ -469,18 +473,20 @@ public:
   /// \param the value of the word
   /// \return the expansion result
   const std::string do_alternate_expansion(const std::string& name,
-                                           const std::string& value)
+                                           const std::string& value,
+                                           const unsigned index)
   {
-    return (is_unset_or_null(name)? "" : value);
+    return (is_unset_or_null(name, index)? "" : value);
   }
 
   /// \brief perform substring expansion
   /// \param the offset of the substring
   /// \return the expansion result
   const std::string do_substring_expansion(const std::string& name,
-                                           int offset)
+                                           int offset,
+                                           const unsigned index)
   {
-    std::string value = resolve<std::string>(name);
+    std::string value = resolve<std::string>(name, index);
     if(!get_real_offset(offset, value))
       return "";
     return value.substr(offset);
@@ -492,11 +498,12 @@ public:
   /// \return the expansion result
   const std::string do_substring_expansion(const std::string& name,
                                            int offset,
-                                           int length)
+                                           int length,
+                                           const unsigned index)
   {
     if(length < 0)
       throw interpreter_exception("length of substring expression should be greater or equal to zero");
-    std::string value = resolve<std::string>(name);
+    std::string value = resolve<std::string>(name, index);
     if(!get_real_offset(offset, value))
       return "";
     return value.substr(offset, length);
@@ -513,5 +520,15 @@ public:
     return value->get_length(index);
   }
 
+  /// \brief get the length of an array
+  /// \param the name of the array
+  /// \return the length of the array
+  unsigned get_array_length(const std::string& name)
+  {
+    std::shared_ptr<variable> value = members.resolve(name);
+    if(!value)
+      return 0;
+    return value->get_array_length();
+  }
 };
 #endif
