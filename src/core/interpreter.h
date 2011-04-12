@@ -321,9 +321,9 @@ public:
   /// \brief perform pre-increment
   /// \param the variable name
   /// \return the increased value
-  int pre_incr(const std::string& name)
+  int pre_incr(const std::string& name, const unsigned index)
   {
-    int value = resolve<int>(name);
+    int value = resolve<int>(name, index);
     set_value(name, ++value);
     return value;
   }
@@ -331,9 +331,9 @@ public:
   /// \brief perform pre-decrement
   /// \param the variable name
   /// \return the decreased value
-  int pre_decr(const std::string& name)
+  int pre_decr(const std::string& name, const unsigned index)
   {
-    int value = resolve<int>(name);
+    int value = resolve<int>(name, index);
     set_value(name, --value);
     return value;
   }
@@ -341,9 +341,9 @@ public:
   /// \brief perform post-increment
   /// \param the variable name
   /// \return the original value
-  int post_incr(const std::string& name)
+  int post_incr(const std::string& name, const unsigned index)
   {
-    int value = resolve<int>(name);
+    int value = resolve<int>(name, index);
     set_value(name, value + 1);
     return value;
   }
@@ -351,9 +351,9 @@ public:
   /// \brief perform post-decrement
   /// \param the variable name
   /// \return the original value
-  int post_decr(const std::string& name)
+  int post_decr(const std::string& name, const unsigned index)
   {
-    int value = resolve<int>(name);
+    int value = resolve<int>(name, index);
     set_value(name, value - 1);
     return value;
   }
@@ -363,10 +363,10 @@ public:
   /// \param the name of the variable
   /// \param the value to assign
   /// \return the new value of the variable
-  int assign(std::function<int(int,int)> f, const std::string& name, int value)
+  int assign(std::function<int(int,int)> f, const std::string& name, int value, const unsigned index)
   {
-    int new_value = f(resolve<int>(name), value);
-    set_value(name, new_value);
+    int new_value = f(resolve<int>(name, index), value);
+    set_value(name, new_value, index);
     return new_value;
   }
 
