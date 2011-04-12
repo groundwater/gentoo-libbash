@@ -259,7 +259,7 @@ parameter_replace_operator
 //Allowable refences to values
 //either directly or through array
 var_name:	num
-	|	name^ LSQUARE! (DIGIT+|AT|TIMES) RSQUARE!
+	|	name^ LSQUARE! (AT|TIMES|explicit_arithmetic) RSQUARE!
 	|	name
 	|	POUND;
 //with bang the array syntax is used for array indexes
