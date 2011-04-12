@@ -27,6 +27,7 @@ options
 tokens{
 	ARG;
 	ARRAY;
+	ARRAY_SIZE;
 	BRACE_EXP;
 	COMMAND_SUB;
 	CASE_PATTERN;
@@ -51,10 +52,10 @@ tokens{
 	LIST;
 	REPLACE_FIRST;
 	REPLACE_ALL;
+	REPLACE_AT_START;
+	REPLACE_AT_END;
 	STRING;
 	COMMAND;
-	REPLACE_FIRST;
-	REPLACE_LAST;
 	FILE_DESCRIPTOR;
 	FILE_DESCRIPTOR_MOVE;
 	REDIR;
@@ -211,19 +212,18 @@ cond_comparison
 	:	cond_expr -> ^(COMPOUND_COND cond_expr);
 //Variables
 //Defining a variable
+//It's not legal to do FOO[1]=(a b c)
 var_def
-	:	name LSQUARE BLANK? explicit_arithmetic BLANK* RSQUARE EQUALS value -> ^(EQUALS ^(name explicit_arithmetic) value)
-	|	name EQUALS^ value
-	|	LET! name EQUALS^ arithmetic;
+	:	name LSQUARE BLANK? explicit_arithmetic BLANK* RSQUARE EQUALS fname -> ^(EQUALS ^(name explicit_arithmetic) fname)
+	|	name EQUALS^ value;
 //Possible values of a variable
-value	:	num
-	|	var_ref
-	|	fname
+value	:	fname
 	|	LPAREN! wspace!? arr_val RPAREN!;
 //allow the parser to create array variables
 arr_val	:
-	|	(ag+=val wspace?)+ -> ^(ARRAY $ag+);
-val	:	LSQUARE! BLANK!* explicit_arithmetic BLANK!? RSQUARE! EQUALS^ fname
+	|	(ag+=array_atom wspace?)+ -> ^(ARRAY $ag+);
+array_atom
+	:	LSQUARE! BLANK!* explicit_arithmetic BLANK!? RSQUARE! EQUALS^ fname
 	|	fname;
 //Referencing a variable (different possible ways/special parameters)
 var_ref
@@ -238,30 +238,38 @@ var_ref
 	|	DOLLAR BANG -> ^(VAR_REF BANG);
 //Variable expansions
 var_exp	:	var_name (USE_DEFAULT|USE_ALTERNATE|DISPLAY_ERROR|ASSIGN_DEFAULT)^ word
-	|	var_name COLON wspace* LPAREN? os=explicit_arithmetic RPAREN? (COLON len=explicit_arithmetic)? -> ^(OFFSET var_name $os ^($len)?)
-	|	BANG^ var_name (TIMES|AT)
-	|	BANG var_name LSQUARE (op=TIMES|op=AT) RSQUARE -> ^(LIST_EXPAND var_name $op)
-	|	BANG var_name -> ^(VAR_REF var_name)
-	|	POUND^ var_name
+	|	var_name COLON wspace* os=explicit_arithmetic (COLON len=explicit_arithmetic)? -> ^(OFFSET var_name $os ^($len)?)
+	|	BANG^ var_name_for_bang (TIMES|AT)
+	|	BANG var_name_for_bang LSQUARE (op=TIMES|op=AT) RSQUARE -> ^(LIST_EXPAND var_name_for_bang $op)
+	|	BANG var_name_for_bang -> ^(VAR_REF var_name_for_bang)
 	|	var_name (POUND^|POUNDPOUND^) fname
 	|	var_name (PCT^|PCTPCT^) fname
-	|	var_name SLASH POUND ns_str SLASH fname -> ^(REPLACE_FIRST var_name ns_str fname)
-	| 	var_name SLASH PCT ns_str SLASH fname -> ^(REPLACE_LAST var_name ns_str fname)
-	|	var_name SLASH SLASH ns_str SLASH fname -> ^(REPLACE_ALL var_name ns_str fname)
-	|	var_name SLASH SLASH ns_str SLASH? -> ^(REPLACE_ALL var_name ns_str)
-	|	var_name SLASH ns_str SLASH fname -> ^(REPLACE_FIRST var_name ns_str fname)
-	|	var_name SLASH POUND ns_str SLASH? -> ^(REPLACE_FIRST var_name ns_str)
-	|	var_name SLASH PCT ns_str SLASH? -> ^(REPLACE_LAST var_name ns_str)
-	|	var_name SLASH ns_str SLASH? -> ^(REPLACE_FIRST var_name ns_str)
-	|	arr_var_ref
+	|	var_name parameter_replace_operator^ ns_str parameter_replace_string
+	|	var_size_ref
 	|	var_name
 	|	TIMES
 	|	AT;
-//Allowable variable names in the variable expansion
-var_name:	num|name|POUND;
-//Referencing an array variable
-arr_var_ref
-	:	name^ LSQUARE! DIGIT+ RSQUARE!;
+parameter_replace_string
+	:	(SLASH fname|SLASH)? -> fname?;
+parameter_replace_operator
+	:	SLASH SLASH -> REPLACE_ALL
+	|	SLASH PCT -> REPLACE_AT_END
+	|	SLASH POUND -> REPLACE_AT_START
+	|	SLASH -> REPLACE_FIRST;
+//Allowable refences to values
+//either directly or through array
+var_name:	num
+	|	name^ LSQUARE! (AT|TIMES|explicit_arithmetic) RSQUARE!
+	|	name
+	|	POUND;
+//with bang the array syntax is used for array indexes
+var_name_for_bang
+	:	num|name|POUND;
+var_size_ref
+	:	POUND^ name (LSQUARE! array_size_index RSQUARE!)?;
+array_size_index
+	:	DIGIT+
+	|	(AT|TIMES) -> ARRAY_SIZE;
 //Conditional Expressions
 cond_expr
 	:	LSQUARE LSQUARE wspace keyword_cond wspace RSQUARE RSQUARE -> ^(KEYWORD_TEST keyword_cond)
@@ -359,12 +367,23 @@ ns_str	:	ns_str_part* -> ^(STRING ns_str_part*);
 fname	:	fname_part+ -> ^(STRING fname_part+);
 //A string that is NOT a bash reserved word
 fname_no_res_word
-	:	nqstr fname_part* -> ^(STRING nqstr fname_part*);
+	:	nqstr_part+ fname_part* -> ^(STRING nqstr_part+ fname_part*);
 fname_part
-	:	nqstr
+	:	nqstr_part+
 	|	res_word_str;
-//non-quoted string rule, allows expansions
-nqstr	:	(bracket_pattern_match|extended_pattern_match|var_ref|command_sub|arithmetic_expansion|brace_expansion|dqstr|sqstr|(str_part str_part_with_pound*)|pattern_match_trigger|BANG)+;
+//non-quoted string part rule, allows expansions
+nqstr_part
+	:	bracket_pattern_match
+	|	extended_pattern_match
+	|	var_ref
+	|	command_sub
+	|	arithmetic_expansion
+	|	brace_expansion
+	|	dqstr
+	|	sqstr
+	|	str_part str_part_with_pound*
+	|	pattern_match_trigger
+	|	BANG;
 //double quoted string rule, allows expansions
 dqstr	:	QUOTE dqstr_part* QUOTE -> ^(DOUBLE_QUOTED_STRING dqstr_part*);
 dqstr_part
@@ -511,7 +530,6 @@ AT	:	'@';
 DOT	:	'.';
 DOTDOT	:	'..';
 //Arith ops
-LET	:	'let';
 TIMES	:	'*';
 EQUALS	:	'=';
 MINUS	:	'-';

@@ -72,7 +72,7 @@ var_def
 	std::map<int, std::string> values;
 	int index = 0;
 }:
-	^(EQUALS libbash_name=name_base libbash_value=word){
+	^(EQUALS libbash_name=name_base libbash_value=string_expr){
 		walker->define(libbash_name, libbash_value);
 	}
 	|^(EQUALS libbash_name=name_base ^(ARRAY (
@@ -87,6 +87,7 @@ string_expr	returns[std::string libbash_value]:
 	^(STRING(
 		(DOUBLE_QUOTED_STRING) => ^(DOUBLE_QUOTED_STRING (libbash_string=double_quoted_string { $libbash_value += libbash_string; })*)
 		|(ARITHMETIC_EXPRESSION) => ^(ARITHMETIC_EXPRESSION value=arithmetics { $libbash_value = boost::lexical_cast<std::string>(value); })
+		|(var_ref) => libbash_string=var_ref { $libbash_value = libbash_string; }
 		|(libbash_string=any_string { $libbash_value += libbash_string; })+
 	));
 
@@ -134,9 +135,6 @@ var_expansion returns[std::string libbash_value]:
 	};
 
 word returns[std::string libbash_value]:
-	// Avoid conflict with arithmetics (both have VAR_DEF)
-	(var_ref) => libbash_string=var_ref { $libbash_value = libbash_string; }
-	// Avoid conflict with arithmetics (both have num)
 	|(num) => libbash_string=num { $libbash_value = libbash_string; }
 	|libbash_string=string_expr { $libbash_value = libbash_string; }
 	|value=arithmetics { $libbash_value = boost::lexical_cast<std::string>(value); };
