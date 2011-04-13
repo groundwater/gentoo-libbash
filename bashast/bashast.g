@@ -442,8 +442,10 @@ arithmetic
 	:	arithmetic_condition
 	|	arithmetic_assignment;
 //The base of the arithmetic operator.  Used for order of operations
+arithmetic_var_ref:
+	var_ref -> ^(VAR_REF var_ref);
 primary	:	num
-	|	var_ref
+	|	arithmetic_var_ref
 	|	command_sub
 	|	var_name -> ^(VAR_REF var_name)
 	|	LPAREN! (arithmetics) RPAREN!;

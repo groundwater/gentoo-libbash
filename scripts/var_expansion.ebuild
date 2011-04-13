@@ -1,6 +1,6 @@
 ARRAY=(hi hello 1 2 3)
 EAPI="3"
-EAPI4="$(($EAPI+1))"
+EAPI4="$((EAPI+1))"
 FOO001="${EAPI:-hello}"
 FOO002="${EAPI3:-hello}"
 FOO003=123
