@@ -1,10 +1,14 @@
 ARRAY=1 2 3 4 5
 ARRAY2=1 2 4 5
+ARRAY3=2 3
+ARRAY4=2 3
 ARRAY_LAST=5
 DEPEND=dev-db/sqlite:3
 		dev-util/pkgconfig
 DESCRIPTION=SunPinyin is a SLM (Statistical Language Model) based IME
 EAPI=1
+EMPTY=
+EMPTY_ARRAY=
 HOMEPAGE=http://sunpinyin.googlecode.com
 IUSE=
 KEYWORDS=~amd64 ~x86

@@ -16,5 +16,12 @@ ARRAY=(1 2 3 [5]=4 5)
 ARRAY2=(1 2 3)
 ARRAY2[2]=4
 ARRAY2[3]=5
+EMPTY=
 ARRAY_LAST=${ARRAY[6]}
 PARTIAL[5]=5
+EMPTY_ARRAY=()
+ARRAY3=(1 2 3)
+ARRAY3[0]=
+ARRAY4=(1 2 3)
+# The following one is equivalent to ARRAY4[0]=
+ARRAY4=

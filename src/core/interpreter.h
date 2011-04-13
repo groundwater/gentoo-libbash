@@ -418,13 +418,14 @@ public:
   template <typename T>
   const T& set_value(const std::string& name,
                      const T& new_value,
-                     const unsigned index=0)
+                     const unsigned index=0,
+                     bool is_null=false)
   {
     std::shared_ptr<variable> value = members.resolve(name);
     if(!value)
-      define(name, new_value, false);
+      define(name, new_value, false, is_null);
     else
-      value->set_value(new_value, index);
+      value->set_value(new_value, index, is_null);
     return new_value;
   }
 
