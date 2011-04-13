@@ -41,6 +41,8 @@
 /// \brief implementation for bash interpreter
 ///
 class interpreter{
+  typedef std::unordered_map<std::string, std::shared_ptr<variable>> scope;
+
   /// \var private::members
   /// \brief global symbol table
   scope members;
@@ -369,10 +371,10 @@ public:
   template <typename T>
   T resolve(const std::string& name, const unsigned index=0)
   {
-    std::shared_ptr<variable> value = members.resolve(name);
-    if(!value)
+    auto i = members.find(name);
+    if(i == members.end())
       return T();
-    return value->get_value<T>(index);
+    return i->second->get_value<T>(index);
   }
 
   /// \brief resolve array variable
@@ -381,11 +383,11 @@ public:
   template <typename T>
   void resolve_array(const std::string& name, std::vector<T>& values)
   {
-    std::shared_ptr<variable> value = members.resolve(name);
-    if(!value)
+    auto i = members.find(name);
+    if(i == members.end())
       return;
 
-    value->get_all_values(values);
+    i->second->get_all_values(values);
   }
 
   /// \brief check whether the value of the variable is null, return true
@@ -394,11 +396,11 @@ public:
   /// \return whether the value of the variable is null
   bool is_unset_or_null(const std::string& name)
   {
-    std::shared_ptr<variable> value = members.resolve(name);
-    if(value)
-      return value->is_null();
-    else
+    auto i = members.find(name);
+    if(i == members.end())
       return true;
+    else
+      return i->second->is_null();
   }
 
   /// \brief check whether the value of the variable is unset
@@ -406,7 +408,7 @@ public:
   /// \return whether the value of the variable is unset
   bool is_unset(const std::string& name)
   {
-    return !members.resolve(name);
+    return members.find(name) == members.end();
   }
 
   /// \brief update the variable value, raise interpreter_exception if
@@ -420,11 +422,11 @@ public:
                      const T& new_value,
                      const unsigned index=0)
   {
-    std::shared_ptr<variable> value = members.resolve(name);
-    if(!value)
+    auto i = members.find(name);
+    if(i == members.end())
       define(name, new_value, false);
     else
-      value->set_value(new_value, index);
+      i->second->set_value(new_value, index);
     return new_value;
   }
 
@@ -441,7 +443,7 @@ public:
   {
     std::shared_ptr<variable> target(
         new variable(name, value, readonly, is_null));
-    members.define(target);
+    members[name] = target;
   }
 
   /// \brief perform ${parameter:−word} expansion
@@ -507,10 +509,10 @@ public:
   /// \return the length
   unsigned get_length(const std::string& name, const unsigned index=0)
   {
-    std::shared_ptr<variable> value = members.resolve(name);
-    if(!value)
+    auto i = members.find(name);
+    if(i == members.end())
       return 0;
-    return value->get_length(index);
+    return i->second->get_length(index);
   }
 
 };

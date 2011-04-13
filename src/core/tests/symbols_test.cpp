@@ -140,12 +140,3 @@ TEST(symbol_test, get_length)
   EXPECT_EQ(5, array.get_length(2));
   EXPECT_EQ(3, array.get_array_length());
 }
-
-TEST(scope_test, define_resolve)
-{
-  scope members;
-  auto an_int = shared_ptr<variable>(new variable("integer_symbol", 100));
-  members.define(an_int);
-  EXPECT_EQ(an_int, members.resolve("integer_symbol"));
-  EXPECT_FALSE(members.resolve("not exist"));
-}
