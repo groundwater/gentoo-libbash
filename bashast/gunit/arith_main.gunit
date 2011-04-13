@@ -23,6 +23,8 @@ gunit bashast;
 
 primary:
 "3" -> "3"
+"foo" -> (VAR_REF foo)
+"foo[1]" -> (VAR_REF (foo 1))
 
 post_inc_dec:
 "b--" -> (POST_DECR (VAR_REF b))
@@ -102,6 +104,7 @@ logicor:
 arithmetic_assignment:
 "13"->"13"
 "foo=5+3" -> (= foo (+ 5 3))
+"foo[5]=5+3" -> (= (foo 5) (+ 5 3))
 "var *= 5" -> (*= var 5)
 "var /= 5" -> (/= var 5)
 "var %= 5" -> (%= var 5)

@@ -445,7 +445,7 @@ arithmetic
 primary	:	num
 	|	var_ref
 	|	command_sub
-	|	name -> ^(VAR_REF name)
+	|	var_name -> ^(VAR_REF var_name)
 	|	LPAREN! (arithmetics) RPAREN!;
 post_inc_dec
 	:	primary BLANK? PLUS PLUS -> ^(POST_INCR primary)
@@ -477,8 +477,12 @@ logicor	:	logicand (BLANK!* LOGICOR^ BLANK!* logicand)*;
 
 arithmetic_condition
 	:	cnd=logicor QMARK t=logicor COLON f=logicor -> ^(ARITHMETIC_CONDITION $cnd $t $f);
+
+arithmetic_assignment_opterator
+	:	EQUALS|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN|OR_ASSIGN;
+
 arithmetic_assignment
-	:	(name BLANK!* (EQUALS|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN|OR_ASSIGN)^ BLANK!*)? logicor;
+	:	(var_name BLANK!* arithmetic_assignment_opterator^ BLANK!*)? logicor;
 process_substitution
 	:	(dir=LESS_THAN|dir=GREATER_THAN)LPAREN clist BLANK* RPAREN -> ^(PROCESS_SUBSTITUTION $dir clist);
 //the biggie: functions
