@@ -72,8 +72,8 @@ var_def
 	std::map<int, std::string> values;
 	int index = 0;
 }:
-	^(EQUALS libbash_name=name_base libbash_value=string_expr){
-		walker->define(libbash_name, libbash_value);
+	^(EQUALS name libbash_string=string_expr){
+		walker->set_value($name.libbash_value, libbash_string, $name.index);
 	}
 	|^(EQUALS libbash_name=name_base ^(ARRAY (
 										(libbash_string=string_expr
