@@ -12,16 +12,23 @@ DEPEND="${RDEPEND}
 		dev-util/pkgconfig"
 MY_PATCH=ldflags.patch
 PATCH=("1.patch" 2.patch)
-ARRAY=(1 2 3 [5]=4 5)
-ARRAY2=(1 2 3)
-ARRAY2[2]=4
-ARRAY2[3]=5
+ARRAY01=(1 2 3 [5]=4 5)
+ARRAY02=(1 2 3)
+ARRAY02[2]=4
+ARRAY02[3]=5
 EMPTY=
-ARRAY_LAST=${ARRAY[6]}
 PARTIAL[5]=5
+ARRAY_LAST=${ARRAY01[6]}
 EMPTY_ARRAY=()
-ARRAY3=(1 2 3)
-ARRAY3[0]=
-ARRAY4=(1 2 3)
-# The following one is equivalent to ARRAY4[0]=
-ARRAY4=
+ARRAY03=(1 2 3)
+ARRAY03[0]=
+ARRAY04=(1 2 3)
+# The following one is equivalent to ARRAY04[0]=
+ARRAY04=
+ARRAY05=(1 2 3 4 5)
+ARRAY06=${ARRAY05[@]}
+ARRAY07=${ARRAY05[*]}
+ARRAY08="${ARRAY05[@]}"
+ARRAY09="${ARRAY05[*]}"
+IFS=";,:"
+ARRAY10="${ARRAY05[*]}"

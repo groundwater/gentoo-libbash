@@ -109,13 +109,13 @@ string_expr	returns[std::string libbash_value]:
 	^(STRING(
 		(DOUBLE_QUOTED_STRING) => ^(DOUBLE_QUOTED_STRING (libbash_string=double_quoted_string { $libbash_value += libbash_string; })*)
 		|(ARITHMETIC_EXPRESSION) => ^(ARITHMETIC_EXPRESSION value=arithmetics { $libbash_value = boost::lexical_cast<std::string>(value); })
-		|(var_ref) => libbash_string=var_ref { $libbash_value = libbash_string; }
+		|(var_ref[false]) => libbash_string=var_ref[false] { $libbash_value = libbash_string; }
 		|(libbash_string=any_string { $libbash_value += libbash_string; })+
 	));
 
 //double quoted string rule, allows expansions
 double_quoted_string returns[std::string libbash_value]:
-	(var_ref) => libbash_string=var_ref { $libbash_value = libbash_string; }
+	(var_ref[true]) => libbash_string=var_ref[true] { $libbash_value = libbash_string; }
 	|(ARITHMETIC_EXPRESSION) => ^(ARITHMETIC_EXPRESSION value=arithmetics) { $libbash_value = boost::lexical_cast<std::string>(value); }
 	|libbash_string=any_string { $libbash_value = libbash_string; };
 
@@ -167,8 +167,15 @@ word returns[std::string libbash_value]:
 	|value=arithmetics { $libbash_value = boost::lexical_cast<std::string>(value); };
 
 //variable reference
-var_ref returns[std::string libbash_value]:
+var_ref [bool double_quoted] returns[std::string libbash_value]:
 	^(VAR_REF name) { $libbash_value = walker->resolve<std::string>($name.libbash_value, $name.index); }
+	|^(VAR_REF ^(libbash_string=name_base AT)) { walker->get_all_elements(libbash_string, $libbash_value); }
+	|^(VAR_REF ^(libbash_string=name_base TIMES)) {
+		if(double_quoted)
+			walker->get_all_elements_IFS_joined(libbash_string, $libbash_value);
+		else
+			walker->get_all_elements(libbash_string, $libbash_value);
+	}
 	|^(VAR_REF libbash_string=var_expansion) { $libbash_value = libbash_string; };
 
 // shell arithmetic

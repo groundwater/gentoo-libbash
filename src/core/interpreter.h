@@ -56,7 +56,16 @@ class interpreter{
     return !(offset < 0 || offset >= static_cast<int>(str.size()));
   }
 
+  void get_all_elements_joined(const std::string& name,
+                               const std::string& delim,
+                               std::string& result);
+
 public:
+
+  interpreter()
+  {
+    define("IFS", " \t\n");
+  }
 
   ///
   /// \brief return the number of variables
@@ -531,5 +540,9 @@ public:
       return 0;
     return value->get_array_length();
   }
+
+  void get_all_elements(const std::string&, std::string&);
+
+  void get_all_elements_IFS_joined(const std::string&, std::string&);
 };
 #endif
