@@ -484,7 +484,7 @@ arithmetic_assignment_opterator
 	:	EQUALS|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN|OR_ASSIGN;
 
 arithmetic_assignment
-	:	(var_name BLANK!* arithmetic_assignment_opterator^ BLANK!*)? logicor;
+	:	((var_name|arithmetic_var_ref) BLANK!* arithmetic_assignment_opterator^ BLANK!*)? logicor;
 process_substitution
 	:	(dir=LESS_THAN|dir=GREATER_THAN)LPAREN clist BLANK* RPAREN -> ^(PROCESS_SUBSTITUTION $dir clist);
 //the biggie: functions

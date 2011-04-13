@@ -105,6 +105,9 @@ arithmetic_assignment:
 "13"->"13"
 "foo=5+3" -> (= foo (+ 5 3))
 "foo[5]=5+3" -> (= (foo 5) (+ 5 3))
+"${foo[5]}=3" -> (= (VAR_REF (VAR_REF (foo 5))) 3)
+"${foo[5]}*=3" -> (*= (VAR_REF (VAR_REF (foo 5))) 3)
+"${foo[5]}^=3" -> (^= (VAR_REF (VAR_REF (foo 5))) 3)
 "var *= 5" -> (*= var 5)
 "var /= 5" -> (/= var 5)
 "var %= 5" -> (%= var 5)
