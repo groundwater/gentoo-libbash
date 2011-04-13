@@ -266,7 +266,8 @@ var_name:	num
 var_name_for_bang
 	:	num|name|POUND;
 var_size_ref
-	:	POUND^ name (LSQUARE! array_size_index RSQUARE!)?;
+	:	POUND name LSQUARE array_size_index RSQUARE -> ^(POUND ^(name array_size_index))
+	|	POUND^ name;
 array_size_index
 	:	DIGIT+
 	|	(AT|TIMES) -> ARRAY_SIZE;
