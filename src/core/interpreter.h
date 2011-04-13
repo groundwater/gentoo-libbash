@@ -432,7 +432,7 @@ public:
   {
     std::shared_ptr<variable> value = members.resolve(name);
     if(!value)
-      define(name, new_value, false, is_null);
+      define(name, new_value, false, is_null, index);
     else
       value->set_value(new_value, index, is_null);
     return new_value;
@@ -447,10 +447,11 @@ public:
   void define(const std::string& name,
               const T& value,
               bool readonly=false,
-              bool is_null=false)
+              bool is_null=false,
+              const unsigned index=0)
   {
     std::shared_ptr<variable> target(
-        new variable(name, value, readonly, is_null));
+        new variable(name, value, readonly, is_null, index));
     members.define(target);
   }
 

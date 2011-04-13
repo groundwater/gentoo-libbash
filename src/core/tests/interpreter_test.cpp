@@ -53,6 +53,10 @@ TEST(interpreter, define_resolve_array)
   EXPECT_STREQ("2", walker.resolve<string>("array", 1).c_str());
   EXPECT_STREQ("3", walker.resolve<string>("array", 2).c_str());
   EXPECT_STREQ("", walker.resolve<string>("undefined",100).c_str());
+
+  walker.define("partial", 10, false, false, 8);
+  EXPECT_EQ(1, walker.get_array_length("partial"));
+  EXPECT_EQ(10, walker.resolve<int>("partial", 8));
 }
 
 TEST(interpreter, is_unset_or_null)

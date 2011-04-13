@@ -137,11 +137,12 @@ public:
   variable(const std::string& name,
            const T& v,
            bool ro=false,
-           bool is_null=false)
+           bool is_null=false,
+           const unsigned index=0)
     : name(name), readonly(ro)
   {
     if(!is_null)
-        value[0] = v;
+        value[index] = v;
   }
 
   /// \brief retrieve actual value of the variable, if index is out of bound,
@@ -221,7 +222,7 @@ template <>
 inline variable::variable<>(const std::string& name,
                             const std::map<int, std::string>& v,
                             bool ro,
-                            bool)
+                            bool, unsigned)
     : name(name), value(v.begin(), v.end()), readonly(ro)
 {
 }
