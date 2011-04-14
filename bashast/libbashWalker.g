@@ -26,23 +26,30 @@ options
 }
 
 @includes{
+
 #include <memory>
 #include <string>
 
 class interpreter;
 void set_interpreter(std::shared_ptr<interpreter> w);
+
 }
+
 @postinclude{
+
 #include "core/interpreter.h"
 #include <boost/format.hpp>
+
+}
+
+@members{
+
 static std::shared_ptr<interpreter> walker;
+
 void set_interpreter(std::shared_ptr<interpreter> w)
 {
 	walker = w;
 }
-}
-
-@members{
 
 inline void set_index(const std::string& name, unsigned& index, int value)
 {
