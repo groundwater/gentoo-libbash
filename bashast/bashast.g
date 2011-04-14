@@ -214,8 +214,8 @@ cond_comparison
 //Defining a variable
 //It's not legal to do FOO[1]=(a b c)
 var_def
-	:	name LSQUARE BLANK? explicit_arithmetic BLANK* RSQUARE EQUALS fname -> ^(EQUALS ^(name explicit_arithmetic) fname)
-	|	name EQUALS^ value;
+	:	name LSQUARE BLANK? explicit_arithmetic BLANK* RSQUARE EQUALS fname? -> ^(EQUALS ^(name explicit_arithmetic) fname?)
+	|	name EQUALS^ value?;
 //Possible values of a variable
 value	:	fname
 	|	LPAREN! wspace!? arr_val RPAREN!;
@@ -266,7 +266,8 @@ var_name:	num
 var_name_for_bang
 	:	num|name|POUND;
 var_size_ref
-	:	POUND^ name (LSQUARE! array_size_index RSQUARE!)?;
+	:	POUND name LSQUARE array_size_index RSQUARE -> ^(POUND ^(name array_size_index))
+	|	POUND^ name;
 array_size_index
 	:	DIGIT+
 	|	(AT|TIMES) -> ARRAY_SIZE;
@@ -441,10 +442,12 @@ arithmetic
 	:	arithmetic_condition
 	|	arithmetic_assignment;
 //The base of the arithmetic operator.  Used for order of operations
+arithmetic_var_ref:
+	var_ref -> ^(VAR_REF var_ref);
 primary	:	num
-	|	var_ref
+	|	arithmetic_var_ref
 	|	command_sub
-	|	name -> ^(VAR_REF name)
+	|	var_name -> ^(VAR_REF var_name)
 	|	LPAREN! (arithmetics) RPAREN!;
 post_inc_dec
 	:	primary BLANK? PLUS PLUS -> ^(POST_INCR primary)
@@ -476,8 +479,12 @@ logicor	:	logicand (BLANK!* LOGICOR^ BLANK!* logicand)*;
 
 arithmetic_condition
 	:	cnd=logicor QMARK t=logicor COLON f=logicor -> ^(ARITHMETIC_CONDITION $cnd $t $f);
+
+arithmetic_assignment_opterator
+	:	EQUALS|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN|OR_ASSIGN;
+
 arithmetic_assignment
-	:	(name BLANK!* (EQUALS|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN|OR_ASSIGN)^ BLANK!*)? logicor;
+	:	((var_name|arithmetic_var_ref) BLANK!* arithmetic_assignment_opterator^ BLANK!*)? logicor;
 process_substitution
 	:	(dir=LESS_THAN|dir=GREATER_THAN)LPAREN clist BLANK* RPAREN -> ^(PROCESS_SUBSTITUTION $dir clist);
 //the biggie: functions

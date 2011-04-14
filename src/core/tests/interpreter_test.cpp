@@ -53,15 +53,26 @@ TEST(interpreter, define_resolve_array)
   EXPECT_STREQ("2", walker.resolve<string>("array", 1).c_str());
   EXPECT_STREQ("3", walker.resolve<string>("array", 2).c_str());
   EXPECT_STREQ("", walker.resolve<string>("undefined",100).c_str());
+
+  walker.define("partial", 10, false, false, 8);
+  EXPECT_EQ(1, walker.get_array_length("partial"));
+  EXPECT_EQ(10, walker.resolve<int>("partial", 8));
 }
 
 TEST(interpreter, is_unset_or_null)
 {
   interpreter walker;
   walker.define("foo", "hello");
-  EXPECT_FALSE(walker.is_unset_or_null("foo"));
+  EXPECT_FALSE(walker.is_unset_or_null("foo", 0));
   walker.define("foo", "hello", false, true);
-  EXPECT_TRUE(walker.is_unset_or_null("foo"));
+  EXPECT_TRUE(walker.is_unset_or_null("foo", 0));
+
+  std::map<int, std::string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
+  walker.define("bar", values);
+  EXPECT_FALSE(walker.is_unset_or_null("bar", 0));
+  EXPECT_FALSE(walker.is_unset_or_null("bar", 1));
+  EXPECT_FALSE(walker.is_unset_or_null("bar", 2));
+  EXPECT_TRUE(walker.is_unset_or_null("bar", 3));
 }
 
 TEST(interpreter, is_unset)
@@ -134,5 +145,5 @@ TEST(interpreter, get_array_values)
 TEST(interperter, substring_expansion_exception)
 {
   interpreter walker;
-  EXPECT_THROW(walker.do_substring_expansion("", 0, -1), interpreter_exception);
+  EXPECT_THROW(walker.do_substring_expansion("", 0, -1, 0), interpreter_exception);
 }

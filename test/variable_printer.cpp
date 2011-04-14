@@ -44,9 +44,11 @@ int main(int argc, char** argv)
   libbash::interpret(argv[1], variables);
 
   std::map<std::string, std::vector<std::string>> sorted(variables.begin(), variables.end());
+  // Currently we don't need internal variables
+  sorted.erase("IFS");
 
   using namespace boost::spirit::karma;
-  std::cout << format((string << '=' << (string % ' ')) % eol, sorted) << std::endl;
+  std::cout << format((string << '=' << -(string % ' ')) % eol, sorted) << std::endl;
 
   return 0;
 }

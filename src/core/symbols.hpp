@@ -125,10 +125,6 @@ class variable
   /// \brief whether the variable is readonly
   bool readonly;
 
-  /// \var private::null_value
-  /// \brief whether the variable is null
-  bool null_value;
-
 public:
   /// \brief retrieve variable name
   /// \return const string value of variable name
@@ -141,10 +137,12 @@ public:
   variable(const std::string& name,
            const T& v,
            bool ro=false,
-           bool is_null=false)
-    : name(name), readonly(ro), null_value(is_null)
+           bool is_null=false,
+           const unsigned index=0)
+    : name(name), readonly(ro)
   {
-    value[0] = v;
+    if(!is_null)
+        value[index] = v;
   }
 
   /// \brief retrieve actual value of the variable, if index is out of bound,
@@ -190,8 +188,10 @@ public:
     if(readonly)
       throw interpreter_exception(get_name() + " is readonly variable");
 
-    null_value = is_null;
-    value[index] = new_value;
+    if(is_null)
+        value.erase(index);
+    else
+        value[index] = new_value;
   }
 
   /// \brief get the length of a variable
@@ -211,9 +211,9 @@ public:
 
   /// \brief check whether the value of the variable is null
   /// \return whether the value of the variable is null
-  bool is_null() const
+  bool is_null(const unsigned index=0) const
   {
-    return null_value;
+    return value.find(index) == value.end();
   }
 };
 
@@ -222,8 +222,8 @@ template <>
 inline variable::variable<>(const std::string& name,
                             const std::map<int, std::string>& v,
                             bool ro,
-                            bool is_null)
-    : name(name), value(v.begin(), v.end()), readonly(ro), null_value(is_null)
+                            bool, unsigned)
+    : name(name), value(v.begin(), v.end()), readonly(ro)
 {
 }
 

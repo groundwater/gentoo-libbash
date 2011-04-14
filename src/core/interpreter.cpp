@@ -21,3 +21,39 @@
 /// \author Mu Qiao
 /// \brief implementations for bash interpreter (visitor pattern).
 ///
+
+#include "core/interpreter.h"
+
+#include <boost/algorithm/string/join.hpp>
+
+void interpreter::get_all_elements_joined(const std::string& name,
+                                          const std::string& delim,
+                                          std::string& result)
+{
+  std::vector<std::string> source;
+
+  auto i = members.find(name);
+  if(i != members.end())
+  {
+    i->second->get_all_values(source);
+    result = boost::algorithm::join(source, delim);
+  }
+  else
+  {
+    result = "";
+  }
+}
+
+void interpreter::get_all_elements(const std::string& name,
+                                   std::string& result)
+{
+  get_all_elements_joined(name, " ", result);
+}
+
+void interpreter::get_all_elements_IFS_joined(const std::string& name,
+                                              std::string& result)
+{
+  get_all_elements_joined(name,
+                          resolve<std::string>("IFS").substr(0, 1),
+                          result);
+}

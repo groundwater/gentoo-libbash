@@ -58,7 +58,16 @@ class interpreter{
     return !(offset < 0 || offset >= static_cast<int>(str.size()));
   }
 
+  void get_all_elements_joined(const std::string& name,
+                               const std::string& delim,
+                               std::string& result);
+
 public:
+
+  interpreter()
+  {
+    define("IFS", " \t\n");
+  }
 
   ///
   /// \brief return the number of variables
@@ -314,9 +323,9 @@ public:
   /// \brief perform pre-increment
   /// \param the variable name
   /// \return the increased value
-  int pre_incr(const std::string& name)
+  int pre_incr(const std::string& name, const unsigned index)
   {
-    int value = resolve<int>(name);
+    int value = resolve<int>(name, index);
     set_value(name, ++value);
     return value;
   }
@@ -324,9 +333,9 @@ public:
   /// \brief perform pre-decrement
   /// \param the variable name
   /// \return the decreased value
-  int pre_decr(const std::string& name)
+  int pre_decr(const std::string& name, const unsigned index)
   {
-    int value = resolve<int>(name);
+    int value = resolve<int>(name, index);
     set_value(name, --value);
     return value;
   }
@@ -334,9 +343,9 @@ public:
   /// \brief perform post-increment
   /// \param the variable name
   /// \return the original value
-  int post_incr(const std::string& name)
+  int post_incr(const std::string& name, const unsigned index)
   {
-    int value = resolve<int>(name);
+    int value = resolve<int>(name, index);
     set_value(name, value + 1);
     return value;
   }
@@ -344,9 +353,9 @@ public:
   /// \brief perform post-decrement
   /// \param the variable name
   /// \return the original value
-  int post_decr(const std::string& name)
+  int post_decr(const std::string& name, const unsigned index)
   {
-    int value = resolve<int>(name);
+    int value = resolve<int>(name, index);
     set_value(name, value - 1);
     return value;
   }
@@ -356,10 +365,10 @@ public:
   /// \param the name of the variable
   /// \param the value to assign
   /// \return the new value of the variable
-  int assign(std::function<int(int,int)> f, const std::string& name, int value)
+  int assign(std::function<int(int,int)> f, const std::string& name, int value, const unsigned index)
   {
-    int new_value = f(resolve<int>(name), value);
-    set_value(name, new_value);
+    int new_value = f(resolve<int>(name, index), value);
+    set_value(name, new_value, index);
     return new_value;
   }
 
@@ -394,13 +403,13 @@ public:
   ///        if the variable is undefined
   /// \param variable name
   /// \return whether the value of the variable is null
-  bool is_unset_or_null(const std::string& name)
+  bool is_unset_or_null(const std::string& name, const unsigned index)
   {
     auto i = members.find(name);
     if(i == members.end())
       return true;
     else
-      return i->second->is_null();
+      return i->second->is_null(index);
   }
 
   /// \brief check whether the value of the variable is unset
@@ -420,13 +429,14 @@ public:
   template <typename T>
   const T& set_value(const std::string& name,
                      const T& new_value,
-                     const unsigned index=0)
+                     const unsigned index=0,
+                     bool is_null=false)
   {
     auto i = members.find(name);
     if(i == members.end())
-      define(name, new_value, false);
+      define(name, new_value, false, is_null, index);
     else
-      i->second->set_value(new_value, index);
+      i->second->set_value(new_value, index, is_null);
     return new_value;
   }
 
@@ -439,10 +449,11 @@ public:
   void define(const std::string& name,
               const T& value,
               bool readonly=false,
-              bool is_null=false)
+              bool is_null=false,
+              const unsigned index=0)
   {
     std::shared_ptr<variable> target(
-        new variable(name, value, readonly, is_null));
+        new variable(name, value, readonly, is_null, index));
     members[name] = target;
   }
 
@@ -451,9 +462,11 @@ public:
   /// \param the value of the word
   /// \return the expansion result
   const std::string do_default_expansion(const std::string& name,
-                                         const std::string& value)
+                                         const std::string& value,
+                                         const unsigned index)
   {
-    return (is_unset_or_null(name)? value : resolve<std::string>(name));
+    return (is_unset_or_null(name, index)?
+        value : resolve<std::string>(name, index));
   }
 
   /// \brief perform ${parameter:=word} expansion
@@ -461,9 +474,11 @@ public:
   /// \param the value of the word
   /// \return the expansion result
   const std::string do_assign_expansion(const std::string& name,
-                                        const std::string& value)
+                                        const std::string& value,
+                                        const unsigned index)
   {
-    return (is_unset_or_null(name)? set_value(name, value) : resolve<std::string>(name));
+    return (is_unset_or_null(name, index)?
+        set_value(name, value, index) : resolve<std::string>(name, index));
   }
 
   /// \brief perform ${parameter:+word} expansion
@@ -471,18 +486,20 @@ public:
   /// \param the value of the word
   /// \return the expansion result
   const std::string do_alternate_expansion(const std::string& name,
-                                           const std::string& value)
+                                           const std::string& value,
+                                           const unsigned index)
   {
-    return (is_unset_or_null(name)? "" : value);
+    return (is_unset_or_null(name, index)? "" : value);
   }
 
   /// \brief perform substring expansion
   /// \param the offset of the substring
   /// \return the expansion result
   const std::string do_substring_expansion(const std::string& name,
-                                           int offset)
+                                           int offset,
+                                           const unsigned index)
   {
-    std::string value = resolve<std::string>(name);
+    std::string value = resolve<std::string>(name, index);
     if(!get_real_offset(offset, value))
       return "";
     return value.substr(offset);
@@ -494,11 +511,12 @@ public:
   /// \return the expansion result
   const std::string do_substring_expansion(const std::string& name,
                                            int offset,
-                                           int length)
+                                           int length,
+                                           const unsigned index)
   {
     if(length < 0)
       throw interpreter_exception("length of substring expression should be greater or equal to zero");
-    std::string value = resolve<std::string>(name);
+    std::string value = resolve<std::string>(name, index);
     if(!get_real_offset(offset, value))
       return "";
     return value.substr(offset, length);
@@ -515,5 +533,20 @@ public:
     return i->second->get_length(index);
   }
 
+  /// \brief get the length of an array
+  /// \param the name of the array
+  /// \return the length of the array
+  unsigned get_array_length(const std::string& name)
+  {
+    auto i = members.find(name);
+    if(i == members.end())
+      return 0;
+    else
+      return i->second->get_array_length();
+  }
+
+  void get_all_elements(const std::string&, std::string&);
+
+  void get_all_elements_IFS_joined(const std::string&, std::string&);
 };
 #endif

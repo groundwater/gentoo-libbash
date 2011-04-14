@@ -23,6 +23,8 @@ gunit bashast;
 
 primary:
 "3" -> "3"
+"foo" -> (VAR_REF foo)
+"foo[1]" -> (VAR_REF (foo 1))
 
 post_inc_dec:
 "b--" -> (POST_DECR (VAR_REF b))
@@ -42,9 +44,9 @@ unary:
 "!8" -> (! 8)
 "!!8" -> (! (! 8))
 "--8" -> (PRE_DECR 8)
-"+++${a}" -> (PLUS_SIGN (PRE_INCR (VAR_REF a)))
-"++++${a}" -> (PLUS_SIGN (PLUS_SIGN (PRE_INCR (VAR_REF a))))
-"+-++${a}" -> (PLUS_SIGN (MINUS_SIGN (PRE_INCR (VAR_REF a))))
+"+++${a}" -> (PLUS_SIGN (PRE_INCR (VAR_REF (VAR_REF a))))
+"++++${a}" -> (PLUS_SIGN (PLUS_SIGN (PRE_INCR (VAR_REF (VAR_REF a)))))
+"+-++${a}" -> (PLUS_SIGN (MINUS_SIGN (PRE_INCR (VAR_REF (VAR_REF a)))))
 
 exponential:
 "8" -> "8"
@@ -102,6 +104,10 @@ logicor:
 arithmetic_assignment:
 "13"->"13"
 "foo=5+3" -> (= foo (+ 5 3))
+"foo[5]=5+3" -> (= (foo 5) (+ 5 3))
+"${foo[5]}=3" -> (= (VAR_REF (VAR_REF (foo 5))) 3)
+"${foo[5]}*=3" -> (*= (VAR_REF (VAR_REF (foo 5))) 3)
+"${foo[5]}^=3" -> (^= (VAR_REF (VAR_REF (foo 5))) 3)
 "var *= 5" -> (*= var 5)
 "var /= 5" -> (/= var 5)
 "var %= 5" -> (%= var 5)
@@ -118,7 +124,7 @@ arithmetic_condition:
 "(4-3)?0:1"->(ARITHMETIC_CONDITION (- 4 3) 0 1)
 
 arithmetic_expansion:
-"$((5+4, 3+2, $a*$b))" -> (ARITHMETIC_EXPRESSION (+ 5 4) (+ 3 2) (* (VAR_REF a) (VAR_REF b)))
+"$((5+4, 3+2, a*b))" -> (ARITHMETIC_EXPRESSION (+ 5 4) (+ 3 2) (* (VAR_REF a) (VAR_REF b)))
 
 start:
 "echo $(( 3 + 2 ))" -> (LIST (COMMAND (STRING echo) (STRING (ARITHMETIC_EXPRESSION (+ 3 2)))))
