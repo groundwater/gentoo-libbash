@@ -59,3 +59,16 @@ TEST_STRING_ASSIGNMENT(str_assignment6,
                        "str=\"/ \n \r\n & && ||| || > < ' : ; , ( (( ) )) ;; { } >= <=\"",
                        "str",
                        "/ \n \r\n & && ||| || > < ' : ; , ( (( ) )) ;; { } >= <=")
+
+TEST(array_index, out_of_bound)
+{
+  std::string script = "a[-1]=\"1\"";
+  std::istringstream input(script);
+  parser_builder pbuilder(input);
+  EXPECT_THROW(pbuilder.create_walker_builder(), interpreter_exception);
+
+  std::string script2 = "a=(1 2 [-5]=1)";
+  std::istringstream input2(script2);
+  parser_builder pbuilder2(input2);
+  EXPECT_THROW(pbuilder2.create_walker_builder(), interpreter_exception);
+}

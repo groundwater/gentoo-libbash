@@ -34,11 +34,23 @@ void set_interpreter(std::shared_ptr<interpreter> w);
 }
 @postinclude{
 #include "core/interpreter.h"
+#include <boost/format.hpp>
 static std::shared_ptr<interpreter> walker;
 void set_interpreter(std::shared_ptr<interpreter> w)
 {
 	walker = w;
 }
+}
+
+@members{
+
+inline void set_index(const std::string& name, unsigned& index, int value)
+{
+	if(value < 0)
+		throw interpreter_exception((boost::format("Array index is less than 0: \%s[\%d]") \% name \% value).str());
+	index = value;
+}
+
 }
 
 start: list|EOF;
@@ -55,7 +67,7 @@ name	returns[std::string libbash_value, unsigned index]
 	$index = 0;
 }:
 	^(libbash_name=name_base value=arithmetics){
-		$index = value;
+		set_index(libbash_name, $index, value);
 		$libbash_value = libbash_name;
 	}
 	|libbash_name=name_base{
@@ -70,7 +82,7 @@ options{ k=1; }:
 var_def
 @declarations {
 	std::map<int, std::string> values;
-	int index = 0;
+	unsigned index = 0;
 	bool is_null = true;
 }:
 	^(EQUALS name (libbash_string=string_expr { is_null = false; })?){
@@ -78,7 +90,9 @@ var_def
 	}
 	|^(EQUALS libbash_name=name_base ^(ARRAY (
 										(libbash_string=string_expr
-										|^(EQUALS value=arithmetics { index = value; } libbash_string=string_expr))
+										|^(EQUALS value=arithmetics {
+												set_index(libbash_name, index, value);
+											} libbash_string=string_expr))
 										{ values[index++] = libbash_string; })*
 									 )){
 		walker->define(libbash_name, values);
