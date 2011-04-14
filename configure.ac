@@ -19,7 +19,7 @@ dnl #############################################
 
 AC_PREREQ(2.65)
 AC_CONFIG_MACRO_DIR([m4])
-AC_INIT([libbash],[0.1],[powerofazure@gmail.com])
+AC_INIT([libbash],[0.1],[https://bugs.gentoo.org/enter_bug.cgi?component=libbash&product=Gentoo%20Hosted%20Projects])
 AM_INIT_AUTOMAKE([foreign parallel-tests color-tests subdir-objects 1.11])
 AM_SILENT_RULES([yes])
 AC_PROG_CXX
