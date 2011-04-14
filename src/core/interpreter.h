@@ -52,7 +52,7 @@ class interpreter{
   /// \param[in,out] a value/result argument referring to offset
   /// \param[in] the original string
   /// \return whether the real offset is in legal range
-  bool get_real_offset(int& offset, const std::string& str)
+  bool get_real_offset(int& offset, const std::string& str) const
   {
     offset = (offset >= 0? offset : str.size() + offset);
     return !(offset < 0 || offset >= static_cast<int>(str.size()));
@@ -60,7 +60,7 @@ class interpreter{
 
   void get_all_elements_joined(const std::string& name,
                                const std::string& delim,
-                               std::string& result);
+                               std::string& result) const;
 
 public:
 
@@ -72,7 +72,7 @@ public:
   ///
   /// \brief return the number of variables
   /// \return the number of variables
-  scope::size_type size()
+  scope::size_type size() const
   {
     return members.size();
   }
@@ -378,7 +378,7 @@ public:
   /// \return the value of the variable, call default constructor if
   ///         it's undefined
   template <typename T>
-  T resolve(const std::string& name, const unsigned index=0)
+  T resolve(const std::string& name, const unsigned index=0) const
   {
     auto i = members.find(name);
     if(i == members.end())
@@ -390,7 +390,7 @@ public:
   /// \param variable name
   /// \param[out] vector that stores all array values
   template <typename T>
-  void resolve_array(const std::string& name, std::vector<T>& values)
+  void resolve_array(const std::string& name, std::vector<T>& values) const
   {
     auto i = members.find(name);
     if(i == members.end())
@@ -403,7 +403,7 @@ public:
   ///        if the variable is undefined
   /// \param variable name
   /// \return whether the value of the variable is null
-  bool is_unset_or_null(const std::string& name, const unsigned index)
+  bool is_unset_or_null(const std::string& name, const unsigned index) const
   {
     auto i = members.find(name);
     if(i == members.end())
@@ -415,7 +415,7 @@ public:
   /// \brief check whether the value of the variable is unset
   /// \param variable name
   /// \return whether the value of the variable is unset
-  bool is_unset(const std::string& name)
+  bool is_unset(const std::string& name) const
   {
     return members.find(name) == members.end();
   }
@@ -463,7 +463,7 @@ public:
   /// \return the expansion result
   const std::string do_default_expansion(const std::string& name,
                                          const std::string& value,
-                                         const unsigned index)
+                                         const unsigned index) const
   {
     return (is_unset_or_null(name, index)?
         value : resolve<std::string>(name, index));
@@ -487,7 +487,7 @@ public:
   /// \return the expansion result
   const std::string do_alternate_expansion(const std::string& name,
                                            const std::string& value,
-                                           const unsigned index)
+                                           const unsigned index) const
   {
     return (is_unset_or_null(name, index)? "" : value);
   }
@@ -497,7 +497,7 @@ public:
   /// \return the expansion result
   const std::string do_substring_expansion(const std::string& name,
                                            int offset,
-                                           const unsigned index)
+                                           const unsigned index) const
   {
     std::string value = resolve<std::string>(name, index);
     if(!get_real_offset(offset, value))
@@ -512,7 +512,7 @@ public:
   const std::string do_substring_expansion(const std::string& name,
                                            int offset,
                                            int length,
-                                           const unsigned index)
+                                           const unsigned index) const
   {
     if(length < 0)
       throw interpreter_exception("length of substring expression should be greater or equal to zero");
@@ -525,7 +525,7 @@ public:
   /// \brief get the length of a string variable
   /// \param the name of the variable
   /// \return the length
-  unsigned get_length(const std::string& name, const unsigned index=0)
+  unsigned get_length(const std::string& name, const unsigned index=0) const
   {
     auto i = members.find(name);
     if(i == members.end())
@@ -536,7 +536,7 @@ public:
   /// \brief get the length of an array
   /// \param the name of the array
   /// \return the length of the array
-  unsigned get_array_length(const std::string& name)
+  unsigned get_array_length(const std::string& name) const
   {
     auto i = members.find(name);
     if(i == members.end())
@@ -545,8 +545,8 @@ public:
       return i->second->get_array_length();
   }
 
-  void get_all_elements(const std::string&, std::string&);
+  void get_all_elements(const std::string&, std::string&) const;
 
-  void get_all_elements_IFS_joined(const std::string&, std::string&);
+  void get_all_elements_IFS_joined(const std::string&, std::string&) const;
 };
 #endif

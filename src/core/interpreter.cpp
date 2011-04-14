@@ -28,7 +28,7 @@
 
 void interpreter::get_all_elements_joined(const std::string& name,
                                           const std::string& delim,
-                                          std::string& result)
+                                          std::string& result) const
 {
   std::vector<std::string> source;
 
@@ -45,13 +45,13 @@ void interpreter::get_all_elements_joined(const std::string& name,
 }
 
 void interpreter::get_all_elements(const std::string& name,
-                                   std::string& result)
+                                   std::string& result) const
 {
   get_all_elements_joined(name, " ", result);
 }
 
 void interpreter::get_all_elements_IFS_joined(const std::string& name,
-                                              std::string& result)
+                                              std::string& result) const
 {
   get_all_elements_joined(name,
                           resolve<std::string>("IFS").substr(0, 1),
