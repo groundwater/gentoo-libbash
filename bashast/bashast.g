@@ -174,7 +174,7 @@ compound_command
 	|	arith_comparison
 	|	cond_comparison;
 //Expressions allowed inside a compound command
-for_expr:	FOR BLANK+ name (wspace IN BLANK+ word)? semiel DO wspace* clist semiel DONE -> ^(FOR name (word)? clist)
+for_expr:	FOR BLANK+ name (wspace IN (BLANK+ fname)+)? semiel DO wspace* clist semiel DONE -> ^(FOR name (fname+)? clist)
 	|	FOR BLANK* LLPAREN EOL? (BLANK* init=arithmetic BLANK*|BLANK+)? (SEMIC (BLANK? fcond=arithmetic BLANK*|BLANK+)? SEMIC|DOUBLE_SEMIC) (BLANK* mod=arithmetic)? wspace* RRPAREN semiel DO wspace clist semiel DONE
 		-> ^(FOR ^(FOR_INIT $init)? ^(FOR_COND $fcond)? ^(FOR_MOD $mod)? clist)
 	;
