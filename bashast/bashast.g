@@ -93,7 +93,11 @@ list_level_1
 	:	(function|pipeline) (BLANK!*(LOGICAND^|LOGICOR^)BLANK!* (function|pipeline))*;
 // ';' '&' and EOL have lower operator precedence than '&&' and '||' so we need level2 here
 list_level_2
-	:	list_level_1 ((BLANK!?SEMIC!|BLANK!?AMP^|(BLANK!? EOL!)+)BLANK!? list_level_1)*;
+	:	list_level_1 (BLANK!? command_separator (BLANK!? EOL!)* BLANK!? list_level_1)*;
+command_separator
+	:	SEMIC!
+	|	AMP^
+	|	EOL!;
 pipeline
 	:	BLANK!* time? (BANG BLANK!+)? command^ (BLANK!* PIPE^ BLANK!* command)*;
 time	:	TIME^ BLANK!+ time_posix?;
