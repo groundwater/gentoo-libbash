@@ -348,11 +348,6 @@ res_word_str
 str_part
 	:	ns_str_part
 	|	SLASH;
-//Any allowable part of a string, with pounds
-str_part_with_pound
-	:	str_part
-	|	POUND
-	|	POUNDPOUND;
 //Parts of strings, no slashes, no reserved words
 ns_str_part
 	:	num
@@ -361,16 +356,16 @@ ns_str_part
 	|OTHER|EQUALS|PCT|PCTPCT|MINUS|DOT|DOTDOT|COLON|TEST_EXPR
 	|TILDE|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN
 	|TIME_POSIX|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN
-	|OR_ASSIGN|CARET;
+	|OR_ASSIGN|CARET|POUND|POUNDPOUND;
 //strings with no slashes, used in certain variable expansions
 ns_str	:	ns_str_part* -> ^(STRING ns_str_part*);
 //Generic strings/filenames.
-fname	:	fname_part+ -> ^(STRING fname_part+);
+fname	:	(~POUND) => fname_part fname_part* -> ^(STRING fname_part+);
 //A string that is NOT a bash reserved word
 fname_no_res_word
-	:	nqstr_part+ fname_part* -> ^(STRING nqstr_part+ fname_part*);
+	:	(~POUND) => nqstr_part+ fname_part* -> ^(STRING nqstr_part+ fname_part*);
 fname_part
-	:	nqstr_part+
+	:	nqstr_part
 	|	res_word_str;
 //non-quoted string part rule, allows expansions
 nqstr_part
@@ -382,7 +377,7 @@ nqstr_part
 	|	brace_expansion
 	|	dqstr
 	|	sqstr
-	|	str_part str_part_with_pound*
+	|	str_part
 	|	pattern_match_trigger
 	|	BANG;
 //double quoted string rule, allows expansions
