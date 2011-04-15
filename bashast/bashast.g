@@ -101,12 +101,15 @@ time_posix
 	:	TIME_POSIX BLANK!+;
 //The structure of a command in bash
 command
-	:	var_def (BLANK!+ var_def)*
-	|	compound_command
+	:	compound_command
 	|	simple_command;
 //Simple bash commands
 simple_command
-	:	(var_def BLANK!+)* bash_command^ redirect*;
+	:	variable_definitions BLANK!+ bash_command^ redirect*
+	|	variable_definitions
+	|	bash_command^ redirect*;
+variable_definitions
+	:	var_def (BLANK!+ var_def)*;
 bash_command
 	:	fname_no_res_word (BLANK+ arg)* -> ^(COMMAND fname_no_res_word arg*);
 //An argument to a command
