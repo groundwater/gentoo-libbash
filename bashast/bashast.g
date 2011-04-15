@@ -244,11 +244,13 @@ var_exp	:	var_name (USE_DEFAULT|USE_ALTERNATE|DISPLAY_ERROR|ASSIGN_DEFAULT)^ wor
 	|	BANG var_name_for_bang -> ^(VAR_REF var_name_for_bang)
 	|	var_name (POUND^|POUNDPOUND^) fname
 	|	var_name (PCT^|PCTPCT^) fname
-	|	var_name parameter_replace_operator^ ns_str parameter_replace_string
+	|	var_name parameter_replace_operator^ parameter_pattern parameter_replace_string
 	|	var_size_ref
 	|	var_name
 	|	TIMES
 	|	AT;
+parameter_pattern
+	:	((~SLASH) => fname_part)+ -> ^(STRING fname_part+);
 parameter_replace_string
 	:	(SLASH fname|SLASH)? -> fname?;
 parameter_replace_operator
@@ -357,8 +359,6 @@ ns_str_part
 	|TILDE|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN
 	|TIME_POSIX|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN
 	|OR_ASSIGN|CARET|POUND|POUNDPOUND;
-//strings with no slashes, used in certain variable expansions
-ns_str	:	ns_str_part* -> ^(STRING ns_str_part*);
 //Generic strings/filenames.
 fname	:	(~POUND) => fname_part fname_part* -> ^(STRING fname_part+);
 //A string that is NOT a bash reserved word
