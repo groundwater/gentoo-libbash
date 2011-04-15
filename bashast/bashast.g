@@ -253,7 +253,9 @@ var_exp	:	var_name (USE_DEFAULT|USE_ALTERNATE|DISPLAY_ERROR|ASSIGN_DEFAULT)^ wor
 	|	TIMES
 	|	AT;
 parameter_pattern
-	:	((~SLASH) => fname_part)+ -> ^(STRING fname_part+);
+	:	((~SLASH) => parameter_pattern_part)+ -> ^(STRING parameter_pattern_part+);
+parameter_pattern_part
+	:	fname_part|BLANK;
 parameter_replace_string
 	:	(SLASH fname|SLASH)? -> fname?;
 parameter_replace_operator
