@@ -413,7 +413,13 @@ bracket_pattern_match
 //allowable patterns with bracket pattern matching
 pattern_match
 	:	pattern_class_match
-	|	str_part str_part_with_pound*;
+	|	pattern_string_part+;
+pattern_string_part
+	:	var_ref
+	|	command_sub
+	|	arithmetic_expansion
+	|	ns_str_part;
+
 //special class patterns to match: [:alpha:] etc
 pattern_class_match
 	:	LSQUARE COLON NAME COLON RSQUARE -> ^(CHARACTER_CLASS NAME)

@@ -48,6 +48,7 @@ fname:
 "ctrlx\cx" -> (STRING ctrlx \ cx)
 "tab\\ttab" -> "(STRING tab \\ \t tab)"
 "abc[def]" -> (STRING abc (MATCH_PATTERN def))
+"abc[d${more}]" -> (STRING abc (MATCH_PATTERN d (VAR_REF more)))
 "a[]" -> (STRING a [ ])
 "ab[d-h]" -> (STRING ab (MATCH_PATTERN d - h))
 "ab[!d-h]" -> (STRING ab (MATCH_ANY_EXCEPT d - h))
