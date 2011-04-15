@@ -249,8 +249,8 @@ var_exp	:	var_name (USE_DEFAULT|USE_ALTERNATE|DISPLAY_ERROR|ASSIGN_DEFAULT)^ wor
 	|	BANG^ var_name_for_bang (TIMES|AT)
 	|	BANG var_name_for_bang LSQUARE (op=TIMES|op=AT) RSQUARE -> ^(LIST_EXPAND var_name_for_bang $op)
 	|	BANG var_name_for_bang -> ^(VAR_REF var_name_for_bang)
-	|	var_name (POUND^|POUNDPOUND^) fname
-	|	var_name (PCT^|PCTPCT^) fname
+	|	var_name (POUND^|POUNDPOUND^) parameter_pattern
+	|	var_name (PCT^|PCTPCT^) parameter_pattern
 	|	var_name parameter_replace_operator^ parameter_pattern parameter_replace_string
 	|	var_size_ref
 	|	var_name
@@ -259,7 +259,7 @@ var_exp	:	var_name (USE_DEFAULT|USE_ALTERNATE|DISPLAY_ERROR|ASSIGN_DEFAULT)^ wor
 parameter_pattern
 	:	((~SLASH) => parameter_pattern_part)+ -> ^(STRING parameter_pattern_part+);
 parameter_pattern_part
-	:	fname_part|BLANK;
+	:	fname_part|BLANK|SEMIC;
 parameter_replace_string
 	:	(SLASH fname|SLASH)? -> fname?;
 parameter_replace_operator

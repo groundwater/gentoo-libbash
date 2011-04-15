@@ -38,6 +38,7 @@ var_ref:
 "${foo##bar}" -> (VAR_REF (## foo (STRING bar)))
 "${foo%bar}" -> (VAR_REF (% foo (STRING bar)))
 "${foo%%bar}" -> (VAR_REF (%% foo (STRING bar)))
+"${foo%; *}" -> (VAR_REF (% foo (STRING ;   *)))
 "${this/is/pattern}"->(VAR_REF (REPLACE_FIRST this (STRING is) (STRING pattern)))
 //Test positional/special parameters
 "$1" -> (VAR_REF 1)
