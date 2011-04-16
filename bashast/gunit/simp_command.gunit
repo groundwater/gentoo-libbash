@@ -28,3 +28,4 @@ simple_command:
 "[[while" -> (COMMAND (STRING [ [ while))
 "./foobär" -> (COMMAND (STRING . / foob ä r))
 "cat ~/Documents/todo.txt" -> (COMMAND (STRING cat) (STRING ~ / Documents / todo . txt))
+"dodir ${foo}/${bar}" -> (COMMAND (STRING dodir) (STRING (VAR_REF foo) / (VAR_REF bar)))
