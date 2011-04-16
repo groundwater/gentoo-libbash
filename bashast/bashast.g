@@ -111,7 +111,7 @@ command_separator
 	|	EOL!;
 pipeline
 	:	BLANK!* time? ((BANG) => (BANG BLANK!+))? command^ (BLANK!* PIPE^ BLANK!* command)*;
-time	:	TIME^ BLANK!+ time_posix?;
+time	:	TIME^ BLANK!+ ((time_posix) => time_posix)?;
 time_posix
 	:	TIME_POSIX BLANK!+;
 //The structure of a command in bash
