@@ -525,7 +525,7 @@ function:	FUNCTION BLANK+ function_name (BLANK* parens)? wspace compound_command
 //http://article.gmane.org/gmane.comp.shells.bash.bugs/16424
 //the documented set is stricter but we need to have at least what's used in Gentoo
 function_name
-	:	(MINUS|name)+;
+	:	(MINUS|DIGIT|name)+;
 parens	:	LPAREN BLANK* RPAREN;
 name	:	NAME
 	|	LETTER

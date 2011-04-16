@@ -36,4 +36,4 @@ function:
     exit; } > /dev/null" -> (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit)))) (REDIR > (STRING / dev / null)))
 "function help { echo hi; } 2> /dev/null" -> (function (STRING help) (CURRENT_SHELL (LIST (COMMAND (STRING echo) (STRING hi)))) (REDIR 2 > (STRING / dev / null)))
 "function help { echo 3; } 2> /dev/null > output" OK
-"foo-bar() { :; }" -> (function (STRING foo - bar) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
+"xorg-2_reconf_source() { :; }" -> (function (STRING xorg - 2 _reconf_source) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
