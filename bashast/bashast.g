@@ -39,8 +39,6 @@ tokens{
 	FOR_COND;
 	FOR_MOD;
 	FNAME;
-	OFFSET;
-	LIST_EXPAND;
 	OP;
 	PRE_INCR;
 	PRE_DECR;
@@ -50,10 +48,6 @@ tokens{
 	VAR_REF;
 	NEGATION;
 	LIST;
-	REPLACE_FIRST;
-	REPLACE_ALL;
-	REPLACE_AT_START;
-	REPLACE_AT_END;
 	STRING;
 	COMMAND;
 	FILE_DESCRIPTOR;
@@ -76,6 +70,17 @@ tokens{
 	COLLATING_SYMBOL;
 	SINGLE_QUOTED_STRING;
 	DOUBLE_QUOTED_STRING;
+	// parameter expansion operators
+	USE_DEFAULT;
+	USE_ALTERNATE;
+	DISPLAY_ERROR;
+	ASSIGN_DEFAULT;
+	OFFSET;
+	LIST_EXPAND;
+	REPLACE_FIRST;
+	REPLACE_ALL;
+	REPLACE_AT_START;
+	REPLACE_AT_END;
 	// Avoid ambiguity (being a sign or an operator)
 	PLUS_SIGN;
 	MINUS_SIGN;
@@ -244,7 +249,7 @@ var_ref
 	|	DOLLAR MINUS -> ^(VAR_REF MINUS)
 	|	DOLLAR BANG -> ^(VAR_REF BANG);
 //Variable expansions
-var_exp	:	var_name (USE_DEFAULT|USE_ALTERNATE|DISPLAY_ERROR|ASSIGN_DEFAULT)^ word
+var_exp	:	var_name parameter_value_operator^ word
 	|	var_name COLON wspace* os=explicit_arithmetic (COLON len=explicit_arithmetic)? -> ^(OFFSET var_name $os ^($len)?)
 	|	BANG^ var_name_for_bang (TIMES|AT)
 	|	BANG var_name_for_bang LSQUARE (op=TIMES|op=AT) RSQUARE -> ^(LIST_EXPAND var_name_for_bang $op)
@@ -256,6 +261,11 @@ var_exp	:	var_name (USE_DEFAULT|USE_ALTERNATE|DISPLAY_ERROR|ASSIGN_DEFAULT)^ wor
 	|	var_name
 	|	TIMES
 	|	AT;
+parameter_value_operator
+	:	COLON MINUS -> USE_DEFAULT
+	|	COLON EQUALS -> ASSIGN_DEFAULT
+	|	COLON QMARK -> DISPLAY_ERROR
+	|	COLON PLUS -> USE_ALTERNATE;
 parameter_pattern
 	:	((~SLASH) => parameter_pattern_part)+ -> ^(STRING parameter_pattern_part+);
 parameter_pattern_part
@@ -598,10 +608,6 @@ POUNDPOUND
 PCT	:	'%';
 PCTPCT	:	'%%';
 SLASH	:	'/';
-USE_DEFAULT	:	':-';
-ASSIGN_DEFAULT:	':=';
-DISPLAY_ERROR:	':?';
-USE_ALTERNATE:	':+';
 COLON	:	':';
 QMARK	:	'?';
 //Operators for conditional statements
