@@ -229,10 +229,10 @@ var_def
 	|	name EQUALS^ value?;
 //Possible values of a variable
 value	:	fname
-	|	LPAREN! wspace!? arr_val RPAREN!;
+	|	LPAREN! wspace!* arr_val RPAREN!;
 //allow the parser to create array variables
 arr_val	:
-	|	(ag+=array_atom wspace?)+ -> ^(ARRAY $ag+);
+	|	(ag+=array_atom wspace*)+ -> ^(ARRAY $ag+);
 array_atom
 	:	LSQUARE! BLANK!* explicit_arithmetic BLANK!? RSQUARE! EQUALS^ fname
 	|	fname;
