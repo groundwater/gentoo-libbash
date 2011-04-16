@@ -21,18 +21,19 @@ gunit bashast;
 function:
 "function quit {
 	exit
-}" -> (function quit (CURRENT_SHELL (LIST (COMMAND (STRING exit)))))
+}" -> (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit)))))
 
 "function quit{ exit; }" FAIL
 "function quit { exit }" FAIL
 "function 'foo' { exit; }" FAIL
-"function quit { exit; }" -> (function quit (CURRENT_SHELL (LIST (COMMAND (STRING exit)))))
-"function foo() { :; }" -> (function foo (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
-"foo() { :; }" -> (function foo (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
+"function quit { exit; }" -> (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit)))))
+"function foo() { :; }" -> (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
+"foo() { :; }" -> (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
 
-"function quit { exit; } > /dev/null" -> (function quit (CURRENT_SHELL (LIST (COMMAND (STRING exit)))) (REDIR > (STRING / dev / null)))
+"function quit { exit; } > /dev/null" -> (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit)))) (REDIR > (STRING / dev / null)))
 "function quit {
     # comment
-    exit; } > /dev/null" -> (function quit (CURRENT_SHELL (LIST (COMMAND (STRING exit)))) (REDIR > (STRING / dev / null)))
-"function help { echo hi; } 2> /dev/null" -> (function help (CURRENT_SHELL (LIST (COMMAND (STRING echo) (STRING hi)))) (REDIR 2 > (STRING / dev / null)))
+    exit; } > /dev/null" -> (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit)))) (REDIR > (STRING / dev / null)))
+"function help { echo hi; } 2> /dev/null" -> (function (STRING help) (CURRENT_SHELL (LIST (COMMAND (STRING echo) (STRING hi)))) (REDIR 2 > (STRING / dev / null)))
 "function help { echo 3; } 2> /dev/null > output" OK
+"foo-bar() { :; }" -> (function (STRING foo - bar) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))

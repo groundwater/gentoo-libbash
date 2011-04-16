@@ -520,8 +520,12 @@ arithmetic_assignment
 process_substitution
 	:	(dir=LESS_THAN|dir=GREATER_THAN)LPAREN clist BLANK* RPAREN -> ^(PROCESS_SUBSTITUTION $dir clist);
 //the biggie: functions
-function:	FUNCTION BLANK+ name (BLANK* parens)? wspace compound_command redirect* -> ^(FUNCTION name compound_command redirect*)
-	|	name BLANK* parens wspace compound_command redirect* -> ^(FUNCTION["function"] name compound_command redirect*);
+function:	FUNCTION BLANK+ function_name (BLANK* parens)? wspace compound_command redirect* -> ^(FUNCTION ^(STRING function_name) compound_command redirect*)
+	|	function_name BLANK* parens wspace compound_command redirect* -> ^(FUNCTION["function"] ^(STRING function_name) compound_command redirect*);
+//http://article.gmane.org/gmane.comp.shells.bash.bugs/16424
+//the documented set is stricter but we need to have at least what's used in Gentoo
+function_name
+	:	(MINUS|name)+;
 parens	:	LPAREN BLANK* RPAREN;
 name	:	NAME
 	|	LETTER
