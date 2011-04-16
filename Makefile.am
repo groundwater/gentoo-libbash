@@ -128,8 +128,7 @@ CLEANFILES = $(GENERATED_PARSER_C) \
 			 javagrammar.run \
 			 cgrammar.run \
 			 walker.run \
-			 massif.out \
-			 long.sh
+			 massif.out
 
 lib_LTLIBRARIES = libcppbash.la
 libcppbash_la_SOURCES = src/common.h \
@@ -208,14 +207,10 @@ javagrammar.run: bashast/bashast.g
 
 $(check_JAVA): javagrammar.run
 
-long.sh:
-	rm -f $@
-	for i in $$(seq 1 10000); do echo 'FOO="bar"' >> $@; done
-
-massif.out: variable_printer long.sh
+massif.out: ast_printer
 		libtool --mode=execute valgrind \
 		--tool=massif --massif-out-file=massif.out \
-		./variable_printer long.sh
+		./ast_printer -nsf /usr/portage/eclass/versionator.eclass
 
 massif: massif.out
 	ms_print --threshold=10 $<
