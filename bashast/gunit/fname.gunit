@@ -66,3 +66,4 @@ fname:
 "ab[[.backslash.]]" -> (STRING ab (MATCH_PATTERN (COLLATING_SYMBOL backslash)))
 "ab[12[:alpha:]]" -> (STRING ab (MATCH_PATTERN 12 (CHARACTER_CLASS alpha)))
 "\"'foo'\"" -> (STRING (DOUBLE_QUOTED_STRING ' foo '))
+"--preserve=timestamps,mode" -> (STRING - -p reserve = timestamps , mode)

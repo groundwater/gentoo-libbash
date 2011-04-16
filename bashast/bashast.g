@@ -160,7 +160,7 @@ range	:	DIGIT DOTDOT^ DIGIT
 	|	LETTER DOTDOT^ LETTER;
 brace_expansion_part
 	:	brace_expansion
-	|	fname
+	|	((~COMMA) => fname_part)+ -> ^(STRING fname_part+)
 	|	var_ref
 	|	command_sub;
 commasep:	brace_expansion_part(COMMA! brace_expansion_part)+;
@@ -371,6 +371,9 @@ str_part
 	:	ns_str_part
 	|	SLASH;
 //Parts of strings, no slashes, no reserved words
+//Using negation leads to code that doesn't compile with the C backend
+//Should be investigated and filed upstream
+//Problematic: ~(CASE|DO|DONE|ELIF|ELSE|ESAC|FI|FOR|FUNCTION|IF|IN|SELECT|THEN|UNTIL|WHILE|TIME)
 ns_str_part
 	:	num
 	|	name
@@ -378,7 +381,8 @@ ns_str_part
 	|OTHER|EQUALS|PCT|PCTPCT|MINUS|DOT|DOTDOT|COLON|TEST_EXPR
 	|TILDE|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN
 	|TIME_POSIX|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN
-	|OR_ASSIGN|CARET|POUND|POUNDPOUND;
+	|OR_ASSIGN|CARET|POUND|POUNDPOUND|COMMA;
+
 //Generic strings/filenames.
 fname	:	(~POUND) => fname_part fname_part* -> ^(STRING fname_part+);
 //A string that is NOT a bash reserved word
