@@ -67,3 +67,6 @@ fname:
 "ab[12[:alpha:]]" -> (STRING ab (MATCH_PATTERN 12 (CHARACTER_CLASS alpha)))
 "\"'foo'\"" -> (STRING (DOUBLE_QUOTED_STRING ' foo '))
 "--preserve=timestamps,mode" -> (STRING - -p reserve = timestamps , mode)
+
+dqstr:
+"\"\\\"\"" -> (DOUBLE_QUOTED_STRING \ ")

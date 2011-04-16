@@ -409,10 +409,11 @@ nqstr_part
 //double quoted string rule, allows expansions
 dqstr	:	DQUOTE dqstr_part* DQUOTE -> ^(DOUBLE_QUOTED_STRING dqstr_part*);
 dqstr_part
-	: var_ref
-	| command_sub
-	| arithmetic_expansion
-	| ~(DOLLAR|TICK|DQUOTE);
+	:	var_ref
+	|	command_sub
+	|	arithmetic_expansion
+	| 	ESC DQUOTE
+	|	~(DOLLAR|TICK|DQUOTE);
 //single quoted string rule, no expansions
 sqstr_part
 	: ~SQUOTE*;
