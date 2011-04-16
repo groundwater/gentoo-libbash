@@ -523,9 +523,12 @@ process_substitution
 function:	FUNCTION BLANK+ function_name (BLANK* parens)? wspace compound_command redirect* -> ^(FUNCTION ^(STRING function_name) compound_command redirect*)
 	|	function_name BLANK* parens wspace compound_command redirect* -> ^(FUNCTION["function"] ^(STRING function_name) compound_command redirect*);
 //http://article.gmane.org/gmane.comp.shells.bash.bugs/16424
-//the documented set is stricter but we need to have at least what's used in Gentoo
+//the rules from bash 3.2 general.c:
+//Make sure that WORD is a valid shell identifier, i.e.
+//does not contain a dollar sign, nor is quoted in any way.  Nor
+//does it consist of all digits.
 function_name
-	:	(MINUS|DIGIT|name)+;
+	:	(NUMBER|DIGIT)? ~(DOLLAR|SQUOTE|DQUOTE|LPAREN|RPAREN|BLANK|EOL|NUMBER|DIGIT) ~(DOLLAR|SQUOTE|DQUOTE|LPAREN|RPAREN|BLANK|EOL)*;
 parens	:	LPAREN BLANK* RPAREN;
 name	:	NAME
 	|	LETTER

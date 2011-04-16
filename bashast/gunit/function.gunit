@@ -37,3 +37,11 @@ function:
 "function help { echo hi; } 2> /dev/null" -> (function (STRING help) (CURRENT_SHELL (LIST (COMMAND (STRING echo) (STRING hi)))) (REDIR 2 > (STRING / dev / null)))
 "function help { echo 3; } 2> /dev/null > output" OK
 "xorg-2_reconf_source() { :; }" -> (function (STRING xorg - 2 _reconf_source) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
+
+function_name:
+"xemacs-packages_src_unpack" OK
+"while" OK
+"aa'bb" FAIL
+"a\"" FAIL
+"333" FAIL
+"aa$aa" FAIL
