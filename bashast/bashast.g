@@ -215,7 +215,7 @@ case_pattern
 subshell:	LPAREN wspace? clist (BLANK* SEMIC)? (BLANK* EOL)* BLANK* RPAREN -> ^(SUBSHELL clist);
 //A grouping of commands executed in the current shell
 currshell
-	:	LBRACE wspace clist semiel RBRACE -> ^(CURRSHELL clist);
+	:	LBRACE wspace clist semiel wspace* RBRACE -> ^(CURRSHELL clist);
 //comparison using arithmetic
 arith_comparison
 	:	LLPAREN wspace? arithmetic wspace? RRPAREN -> ^(COMPOUND_ARITH arithmetic);

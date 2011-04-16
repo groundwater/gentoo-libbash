@@ -36,6 +36,11 @@ currshell:
 "{ time cat; }" -> (CURRSHELL (LIST (COMMAND (STRING cat) time)))
 "{ time cat
 }" -> (CURRSHELL (LIST (COMMAND (STRING cat) time)))
+// there's a tab on the empty line
+"{
+	echo
+	
+}" -> (CURRSHELL (LIST (COMMAND (STRING echo))))
 "{time cat}" FAIL
 "{ time cat }" FAIL
 
