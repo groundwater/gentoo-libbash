@@ -29,6 +29,7 @@ tokens{
 	ARRAY;
 	ARRAY_SIZE;
 	BRACE_EXP;
+	EMPTY_BRACE_EXPANSION_ATOM;
 	COMMAND_SUB;
 	CASE_PATTERN;
 	SUBSHELL;
@@ -162,7 +163,8 @@ brace_expansion_part
 	:	brace_expansion
 	|	((~COMMA) => fname_part)+ -> ^(STRING fname_part+)
 	|	var_ref
-	|	command_sub;
+	|	command_sub
+	|	-> EMPTY_BRACE_EXPANSION_ATOM;
 commasep:	brace_expansion_part(COMMA! brace_expansion_part)+;
 command_sub
 	:	DOLLAR LPAREN BLANK* pipeline BLANK? RPAREN -> ^(COMMAND_SUB pipeline)

@@ -23,6 +23,7 @@ brace_expansion:
 "{a,b,c}" -> (BRACE_EXP (STRING a) (STRING b) (STRING c))
 "{a..d}" -> (BRACE_EXP (.. a d))
 "{{a,b},c,d}" -> (BRACE_EXP (BRACE_EXP (STRING a) (STRING b)) (STRING c) (STRING d))
+"{.txt,,}" -> (BRACE_EXP (STRING . txt) EMPTY_BRACE_EXPANSION_ATOM EMPTY_BRACE_EXPANSION_ATOM)
 
 fname:
 "a{b,c}" -> (STRING a (BRACE_EXP (STRING b) (STRING c)))
