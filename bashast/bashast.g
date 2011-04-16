@@ -407,12 +407,12 @@ nqstr_part
 	|	pattern_match_trigger
 	|	BANG;
 //double quoted string rule, allows expansions
-dqstr	:	QUOTE dqstr_part* QUOTE -> ^(DOUBLE_QUOTED_STRING dqstr_part*);
+dqstr	:	DQUOTE dqstr_part* DQUOTE -> ^(DOUBLE_QUOTED_STRING dqstr_part*);
 dqstr_part
 	: var_ref
 	| command_sub
 	| arithmetic_expansion
-	| ~(DOLLAR|TICK|QUOTE);
+	| ~(DOLLAR|TICK|DQUOTE);
 //single quoted string rule, no expansions
 sqstr_part
 	: ~SQUOTE*;
@@ -448,7 +448,7 @@ pattern_class_match
 	|	LSQUARE DOT NAME DOT RSQUARE -> ^(COLLATING_SYMBOL NAME);
 //Characters allowed in matching equivalence classes
 pattern_char
-	:	LETTER|DIGIT|OTHER|QMARK|COLON|AT|SEMIC|POUND|SLASH|BANG|TIMES|COMMA|PIPE|AMP|MINUS|PLUS|PCT|EQUALS|LSQUARE|RSQUARE|RPAREN|LPAREN|RBRACE|LBRACE|DOLLAR|TICK|DOT|LESS_THAN|GREATER_THAN|SQUOTE|QUOTE;
+	:	LETTER|DIGIT|OTHER|QMARK|COLON|AT|SEMIC|POUND|SLASH|BANG|TIMES|COMMA|PIPE|AMP|MINUS|PLUS|PCT|EQUALS|LSQUARE|RSQUARE|RPAREN|LPAREN|RBRACE|LBRACE|DOLLAR|TICK|DOT|LESS_THAN|GREATER_THAN|SQUOTE|DQUOTE;
 //extended pattern matching
 extended_pattern_match
 	:	QMARK LPAREN fname (PIPE fname)* RPAREN -> ^(MATCH_AT_MOST_ONE fname+)
@@ -596,7 +596,7 @@ SEMIC	:	';';
 DOUBLE_SEMIC
 	:	';;';
 PIPE	:	'|';
-QUOTE	:	'"';
+DQUOTE	:	'"';
 SQUOTE	:	'\'';
 COMMA	:	',';
 //Because bash isn't exactly whitespace dependent... need to explicitly handle blanks
