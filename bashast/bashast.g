@@ -253,13 +253,17 @@ var_exp	:	var_name parameter_value_operator^ word
 	|	BANG^ var_name_for_bang (TIMES|AT)
 	|	BANG var_name_for_bang LSQUARE (op=TIMES|op=AT) RSQUARE -> ^(LIST_EXPAND var_name_for_bang $op)
 	|	BANG var_name_for_bang -> ^(VAR_REF var_name_for_bang)
-	|	var_name (POUND^|POUNDPOUND^) parameter_pattern
-	|	var_name (PCT^|PCTPCT^) parameter_pattern
-	|	var_name parameter_replace_operator^ parameter_pattern parameter_replace_string
+	|	var_name parameter_delete_operator parameter_pattern_part+ -> ^(parameter_delete_operator var_name ^(STRING parameter_pattern_part+))
+	|	var_name parameter_replace_operator^ parameter_replace_pattern parameter_replace_string
 	|	var_size_ref
 	|	var_name
 	|	TIMES
 	|	AT;
+parameter_delete_operator
+	:	POUND
+	|	POUNDPOUND
+	|	PCT
+	|	PCTPCT;
 parameter_value_operator
 	:	COLON MINUS -> USE_DEFAULT_WHEN_UNSET_OR_NULL
 	|	COLON EQUALS -> ASSIGN_DEFAULT_WHEN_UNSET_OR_NULL
@@ -269,7 +273,7 @@ parameter_value_operator
 	|	EQUALS -> ASSIGN_DEFAULT_WHEN_UNSET
 	|	QMARK -> DISPLAY_ERROR_WHEN_UNSET
 	|	PLUS -> USE_ALTERNATE_WHEN_UNSET;
-parameter_pattern
+parameter_replace_pattern
 	:	((~SLASH) => parameter_pattern_part)+ -> ^(STRING parameter_pattern_part+);
 parameter_pattern_part
 	:	fname_part|BLANK|SEMIC;
