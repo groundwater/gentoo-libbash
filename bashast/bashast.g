@@ -457,11 +457,15 @@ extended_pattern_match
 	|	AT LPAREN fname (PIPE fname)* RPAREN -> ^(MATCH_EXACTLY_ONE fname+)
 	|	BANG LPAREN fname (PIPE fname)* RPAREN -> ^(MATCH_NONE fname+);
 //Arithmetic expansion
+//the square bracket from is deprecated
+//http://permalink.gmane.org/gmane.comp.shells.bash.bugs/14479
 arithmetic_expansion
-	:	DOLLAR LLPAREN BLANK* arithmetics BLANK* RRPAREN -> ^(ARITHMETIC_EXPRESSION arithmetics);
+	:	DOLLAR LLPAREN BLANK* arithmetics BLANK* RRPAREN -> ^(ARITHMETIC_EXPRESSION arithmetics)
+	|	DOLLAR LSQUARE BLANK* arithmetics BLANK* RSQUARE -> ^(ARITHMETIC_EXPRESSION arithmetics);
 //explicit arithmetic in places like array indexes
 explicit_arithmetic
-	:	(DOLLAR LLPAREN BLANK*)? arithmetics (BLANK* RRPAREN)? -> arithmetics;
+	:	(DOLLAR LLPAREN BLANK*)? arithmetics (BLANK* RRPAREN)? -> arithmetics
+	|	(DOLLAR LSQUARE BLANK*)? arithmetics (BLANK* RSQUARE)? -> arithmetics;
 //The comma operator for arithmetic expansions
 arithmetics
 	:	arithmetic (BLANK!* COMMA! BLANK!* arithmetic)*;
