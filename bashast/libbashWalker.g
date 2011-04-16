@@ -62,7 +62,9 @@ inline void set_index(const std::string& name, unsigned& index, int value)
 
 start: list|EOF;
 
-list: ^(LIST var_def+);
+list: ^(LIST variable_definitions+);
+
+variable_definitions: ^(VARIABLE_DEFINITIONS var_def+);
 
 name_base	returns[std::string libbash_value]:
 	NAME {$libbash_value = walker->get_string($NAME);}

@@ -71,6 +71,7 @@ tokens{
 	COLLATING_SYMBOL;
 	SINGLE_QUOTED_STRING;
 	DOUBLE_QUOTED_STRING;
+	VARIABLE_DEFINITIONS;
 	// parameter expansion operators
 	USE_DEFAULT_WHEN_UNSET;
 	USE_ALTERNATE_WHEN_UNSET;
@@ -120,7 +121,7 @@ command
 //Simple bash commands
 simple_command
 	:	variable_definitions BLANK!+ bash_command^ redirect*
-	|	variable_definitions
+	|	variable_definitions -> ^(VARIABLE_DEFINITIONS variable_definitions)
 	|	bash_command^ redirect*;
 variable_definitions
 	:	var_def (BLANK!+ var_def)*;
