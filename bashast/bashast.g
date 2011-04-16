@@ -33,7 +33,7 @@ tokens{
 	COMMAND_SUB;
 	CASE_PATTERN;
 	SUBSHELL;
-	CURRSHELL;
+	CURRENT_SHELL;
 	COMPOUND_ARITH;
 	COMPOUND_COND;
 	FOR_INIT;
@@ -178,7 +178,7 @@ compound_command
 	|	until_expr
 	|	case_expr
 	|	subshell
-	|	currshell
+	|	current_shell
 	|	arith_comparison
 	|	cond_comparison;
 //Expressions allowed inside a compound command
@@ -214,8 +214,8 @@ case_pattern
 //A grouping of commands executed in a subshell
 subshell:	LPAREN wspace? clist (BLANK* SEMIC)? (BLANK* EOL)* BLANK* RPAREN -> ^(SUBSHELL clist);
 //A grouping of commands executed in the current shell
-currshell
-	:	LBRACE wspace clist semiel wspace* RBRACE -> ^(CURRSHELL clist);
+current_shell
+	:	LBRACE wspace clist semiel wspace* RBRACE -> ^(CURRENT_SHELL clist);
 //comparison using arithmetic
 arith_comparison
 	:	LLPAREN wspace? arithmetic wspace? RRPAREN -> ^(COMPOUND_ARITH arithmetic);

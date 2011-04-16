@@ -32,15 +32,15 @@ arith_comparison:
 "((5+3))" -> (COMPOUND_ARITH (+ 5 3))
 "(( 5+3 ))" -> (COMPOUND_ARITH (+ 5 3))
 
-currshell:
-"{ time cat; }" -> (CURRSHELL (LIST (COMMAND (STRING cat) time)))
+current_shell:
+"{ time cat; }" -> (CURRENT_SHELL (LIST (COMMAND (STRING cat) time)))
 "{ time cat
-}" -> (CURRSHELL (LIST (COMMAND (STRING cat) time)))
+}" -> (CURRENT_SHELL (LIST (COMMAND (STRING cat) time)))
 // there's a tab on the empty line
 "{
 	echo
 	
-}" -> (CURRSHELL (LIST (COMMAND (STRING echo))))
+}" -> (CURRENT_SHELL (LIST (COMMAND (STRING echo))))
 "{time cat}" FAIL
 "{ time cat }" FAIL
 

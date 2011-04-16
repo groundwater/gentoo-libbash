@@ -35,4 +35,4 @@ hello () {
 }
 hello
 quit
-echo foo" -> (LIST (function quit (CURRSHELL (LIST (COMMAND (STRING exit))))) (function hello (CURRSHELL (LIST (COMMAND (STRING echo) (STRING Hello !))))) (COMMAND (STRING hello)) (COMMAND (STRING quit)) (COMMAND (STRING echo) (STRING foo)))
+echo foo" -> (LIST (function quit (CURRENT_SHELL (LIST (COMMAND (STRING exit))))) (function hello (CURRENT_SHELL (LIST (COMMAND (STRING echo) (STRING Hello !))))) (COMMAND (STRING hello)) (COMMAND (STRING quit)) (COMMAND (STRING echo) (STRING foo)))
