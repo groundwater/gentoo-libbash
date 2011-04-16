@@ -25,7 +25,7 @@ var_def:
 
 var_ref:
 "$asdf" -> (VAR_REF asdf)
-"${asdf[0]:-default}" -> (VAR_REF (USE_DEFAULT (asdf 0) (STRING default)))
+"${asdf[0]:-default}" -> (VAR_REF (USE_DEFAULT_WHEN_UNSET_OR_NULL (asdf 0) (STRING default)))
 "${asdf[3]}" -> (VAR_REF (asdf 3))
 "${asdf[4] }" -> (VAR_REF (asdf 4))
 "${asdf[i*2]}" -> (VAR_REF (asdf (* (VAR_REF i) 2))))

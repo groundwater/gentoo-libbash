@@ -137,13 +137,13 @@ var_name returns[std::string libbash_value, unsigned index]
 	};
 
 var_expansion returns[std::string libbash_value]:
-	^(USE_DEFAULT var_name libbash_word=word) {
+	^(USE_DEFAULT_WHEN_UNSET_OR_NULL var_name libbash_word=word) {
 		libbash_value = walker->do_default_expansion($var_name.libbash_value, libbash_word, $var_name.index);
 	}
-	|^(ASSIGN_DEFAULT var_name libbash_word=word) {
+	|^(ASSIGN_DEFAULT_WHEN_UNSET_OR_NULL var_name libbash_word=word) {
 		libbash_value = walker->do_assign_expansion($var_name.libbash_value, libbash_word, $var_name.index);
 	}
-	|^(USE_ALTERNATE var_name libbash_word=word) {
+	|^(USE_ALTERNATE_WHEN_UNSET_OR_NULL var_name libbash_word=word) {
 		libbash_value = walker->do_alternate_expansion($var_name.libbash_value, libbash_word, $var_name.index);
 	}
 	|(^(OFFSET var_name arithmetics arithmetics)) => ^(OFFSET var_name offset=arithmetics length=arithmetics) {

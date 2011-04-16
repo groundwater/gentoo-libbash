@@ -21,7 +21,8 @@ gunit bashast;
 var_ref:
 "$asdf" -> (VAR_REF asdf)
 "${asdf}" -> (VAR_REF asdf)
-"${asdf:-foo}" -> (VAR_REF (USE_DEFAULT asdf (STRING foo)))
+"${asdf:-foo}" -> (VAR_REF (USE_DEFAULT_WHEN_UNSET_OR_NULL asdf (STRING foo)))
+"${asdf='foo'}" -> (VAR_REF (ASSIGN_DEFAULT_WHEN_UNSET asdf (STRING (SINGLE_QUOTED_STRING foo))))
 "${bar:7}" -> (VAR_REF (OFFSET bar 7))
 "${bar: -10}" -> (VAR_REF (OFFSET bar (MINUS_SIGN 10)))
 "${bar:(-10 + 5)}" -> (VAR_REF (OFFSET bar (+ (MINUS_SIGN 10) 5)))
