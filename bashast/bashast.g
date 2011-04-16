@@ -110,7 +110,7 @@ command_separator
 	|	AMP^
 	|	EOL!;
 pipeline
-	:	BLANK!* time? (BANG BLANK!+)? command^ (BLANK!* PIPE^ BLANK!* command)*;
+	:	BLANK!* time? ((BANG) => (BANG BLANK!+))? command^ (BLANK!* PIPE^ BLANK!* command)*;
 time	:	TIME^ BLANK!+ time_posix?;
 time_posix
 	:	TIME_POSIX BLANK!+;
