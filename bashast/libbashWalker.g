@@ -58,11 +58,32 @@ inline void set_index(const std::string& name, unsigned& index, int value)
 	index = value;
 }
 
+// Recursively count number of nodes of curr
+static int count_nodes(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE curr)
+{
+	int child_count = adaptor->getChildCount(adaptor, curr);
+	if(child_count == 0)
+	{
+		// Leaf node
+		return 1;
+	}
+	else
+	{
+		int result = 0;
+		// Count every child
+		for(int i = 0; i != child_count; ++i)
+			result += count_nodes(adaptor, (pANTLR3_BASE_TREE)(adaptor->getChild(adaptor, curr, i)));
+		// Add itself, DOWN and UP
+		return result + 3;
+	}
+}
+
 }
 
 start: list|EOF;
 
-list: ^(LIST variable_definitions+);
+list:
+	^(LIST (function_def|logic_command_list)+);
 
 variable_definitions: ^(VARIABLE_DEFINITIONS var_def+);
 
@@ -179,6 +200,56 @@ var_ref [bool double_quoted] returns[std::string libbash_value]:
 			walker->get_all_elements(libbash_string, $libbash_value);
 	}
 	|^(VAR_REF libbash_string=var_expansion) { $libbash_value = libbash_string; };
+
+command:
+	variable_definitions
+	|simple_command;
+
+simple_command:
+	^(COMMAND libbash_string=string_expr argument* var_def*) {
+		ANTLR3_MARKER func_index;
+		if((func_index = walker->get_function_index(libbash_string)) != -1)
+		{
+			// Saving current index
+			ANTLR3_MARKER curr = INDEX();
+			// Push function index into INPUT
+			INPUT->push(INPUT, func_index);
+			// Execute function body
+			compound_command(ctx);
+			// Reset to the previous index
+			SEEK(curr);
+		}
+		else
+		{
+			throw interpreter_exception("Unimplemented command: " + libbash_string);
+		}
+	};
+
+argument:
+	var_ref[false]
+	|string_expr;
+
+logic_command_list:
+	command
+	| ^(LOGICAND command command)
+	| ^(LOGICOR command command);
+
+command_list:
+	^(LIST logic_command_list+);
+
+compound_command:
+	^(CURRENT_SHELL command_list);
+
+function_def returns[int placeholder]:
+	^(FUNCTION ^(STRING name) {
+		// Define the function with current index
+		walker->define_function($name.libbash_value, INDEX());
+		// Skip the AST for function body, minus one is needed to make the offset right.
+		// LT(1) is the function body. It should match the compound_command rule.
+		SEEK(INDEX() + count_nodes(ADAPTOR, LT(1)) - 1);
+		// After seeking ahead, we need to call CONSUME to eat all the nodes we've skipped.
+		CONSUME();
+	});
 
 // Only used in arithmetic expansion
 primary returns[std::string libbash_value, unsigned index]:

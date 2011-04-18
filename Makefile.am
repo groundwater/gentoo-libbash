@@ -49,10 +49,12 @@ GUNIT_TESTS = bashast/gunit/arith_main.gunit \
 EBUILD_LOG_COMPILER = $(srcdir)/test/script_compiler.sh
 EBUILD_TESTS = scripts/var_def.ebuild \
 			   scripts/var_expansion.ebuild \
+			   scripts/function_def.ebuild \
 			   scripts/arithmetic_assignment.ebuild \
 			   scripts/binary_arithmetic.ebuild
 EBUILD_RESULT = scripts/var_def.ebuild.result \
 				scripts/var_expansion.ebuild.result \
+				scripts/function_def.ebuild.result \
 				scripts/arithmetic_assignment.ebuild.result \
 				scripts/binary_arithmetic.ebuild.result
 

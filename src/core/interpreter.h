@@ -44,8 +44,12 @@ class interpreter{
   typedef std::unordered_map<std::string, std::shared_ptr<variable>> scope;
 
   /// \var private::members
-  /// \brief global symbol table
+  /// \brief global symbol table for variables
   scope members;
+
+  /// \var private::function_definitions
+  /// \brief global symbol table for functions
+  std::unordered_map<std::string, ANTLR3_MARKER> functions;
 
   /// \brief calculate the correct offset when offset < 0 and check whether
   ///        the real offset is in legal range
@@ -456,6 +460,27 @@ public:
         new variable(name, value, readonly, is_null, index));
     members[name] = target;
   }
+
+  /// \brief define a new function
+  /// \param the name of the function
+  /// \param the body index of the function
+  void define_function(const std::string& name,
+                       ANTLR3_MARKER body_index)
+  {
+    functions[name] = body_index;
+  }
+
+  /// \brief get the index of the function in ANTLR3_COMMON_TREE_NODE_STREAM
+  /// \param the name of the function
+  /// \return the index of the function
+  ANTLR3_MARKER get_function_index(const std::string& name) const
+  {
+    auto iter = functions.find(name);
+    if(iter == functions.end())
+      return -1;
+    return iter->second;
+  }
+
 
   /// \brief perform ${parameter:−word} expansion
   /// \param the name of the parameter
