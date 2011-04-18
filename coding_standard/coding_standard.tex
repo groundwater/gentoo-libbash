@@ -97,6 +97,13 @@ Tabs should not be used for indentation, only spaces.  Indentation width will be
 Tabs should be used for ANTLR grammar because antlrworks automatically generate tabs. \\
 Tabs should also be used for autotools related files(Makefile.am, configure.ac, etc). \\
 Use ts=4 for indentation.
+\subsection{Line length}
+We don't have strict line length limit but you shouldn't write a line that is too long to be read easily. In general, we should keep the line length under 110 characters.
+\subsubsection{More indentation rules for tree walker grammar}
+Put colon and the first alternative of a rule in the same line with no space between them.\\
+Do not use space between the alternatives and '\textbar'.\\
+Put left brace of the embedded action block and the rule in the same line with one space between them.\\
+Use one space between rule name and 'returns'.
 \subsection{Naming conventions}
 The name of a variable, function, class, or struct should be obvious from it's name.\\
 Names will use underscored names not mixed case.\\
