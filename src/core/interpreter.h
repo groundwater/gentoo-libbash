@@ -29,6 +29,7 @@
 
 #include <functional>
 #include <memory>
+#include <stack>
 #include <string>
 
 #include <antlr3basetree.h>
@@ -36,12 +37,15 @@
 #include "core/symbols.hpp"
 #include "libbashLexer.h"
 
+typedef std::unordered_map<std::string, std::shared_ptr<variable>> scope;
+struct libbashWalker_Ctx_struct;
+typedef struct libbashWalker_Ctx_struct * plibbashWalker;
+
 ///
 /// \class interpreter
 /// \brief implementation for bash interpreter
 ///
 class interpreter{
-  typedef std::unordered_map<std::string, std::shared_ptr<variable>> scope;
 
   /// \var private::members
   /// \brief global symbol table for variables
@@ -50,6 +54,11 @@ class interpreter{
   /// \var private::function_definitions
   /// \brief global symbol table for functions
   std::unordered_map<std::string, ANTLR3_MARKER> functions;
+
+  /// \var private::local_members
+  /// \brief local scope for function arguments, execution environment and
+  ///        local variables
+  std::stack<std::unique_ptr<scope>> local_members;
 
   /// \brief calculate the correct offset when offset < 0 and check whether
   ///        the real offset is in legal range
@@ -376,7 +385,8 @@ public:
     return new_value;
   }
 
-  /// \brief resolve string/int variable
+  /// \brief resolve string/int variable, local scope will be
+  ///        checked first, then global scope
   /// \param variable name
   /// \param array index, use index=0 if it's not an array
   /// \return the value of the variable, call default constructor if
@@ -384,10 +394,17 @@ public:
   template <typename T>
   T resolve(const std::string& name, const unsigned index=0) const
   {
-    auto i = members.find(name);
-    if(i == members.end())
+    if(!local_members.empty())
+    {
+      auto iter_local = local_members.top()->find(name);
+      if(iter_local != local_members.top()->end())
+        return iter_local->second->get_value<T>(index);
+    }
+
+    auto iter_global = members.find(name);
+    if(iter_global == members.end())
       return T();
-    return i->second->get_value<T>(index);
+    return iter_global->second->get_value<T>(index);
   }
 
   /// \brief resolve array variable
@@ -444,7 +461,7 @@ public:
     return new_value;
   }
 
-  /// \brief define a new variable
+  /// \brief define a new global variable
   /// \param the name of the variable
   /// \param the value of the variable
   /// \param whether it's readonly, default is false
@@ -470,17 +487,16 @@ public:
     functions[name] = body_index;
   }
 
-  /// \brief get the index of the function in ANTLR3_COMMON_TREE_NODE_STREAM
-  /// \param the name of the function
-  /// \return the index of the function
-  ANTLR3_MARKER get_function_index(const std::string& name) const
-  {
-    auto iter = functions.find(name);
-    if(iter == functions.end())
-      return -1;
-    return iter->second;
-  }
-
+  /// \brief make function call
+  /// \param function name
+  /// \param function arguments
+  /// \param walker context
+  /// \param the function that needs to be executed
+  /// \return whether the execution is successful
+  bool call(const std::string& name,
+            const std::vector<std::string>& arguments,
+            plibbashWalker ctx,
+            std::function<void(plibbashWalker)> f);
 
   /// \brief perform ${parameter:−word} expansion
   /// \param the name of the parameter
@@ -570,8 +586,19 @@ public:
       return i->second->get_array_length();
   }
 
+  /// \brief get all array elements concatenated by space
+  /// \param the name of the array
+  /// \param[out] the concatenated string
   void get_all_elements(const std::string&, std::string&) const;
 
+  /// \brief get all array elements concatenated by the first character of IFS
+  /// \param the name of the array
+  /// \param[out] the concatenated string
   void get_all_elements_IFS_joined(const std::string&, std::string&) const;
+
+  /// \brief implementation of word splitting
+  /// \param the value of the word
+  //. \param[out] the splitted result
+  void split_word(const std::string& word, std::vector<std::string>& output);
 };
 #endif

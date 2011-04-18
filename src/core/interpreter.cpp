@@ -24,7 +24,11 @@
 
 #include "core/interpreter.h"
 
+#include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/join.hpp>
+#include <boost/algorithm/string/split.hpp>
+
+#include "libbashWalker.h"
 
 void interpreter::get_all_elements_joined(const std::string& name,
                                           const std::string& delim,
@@ -56,4 +60,52 @@ void interpreter::get_all_elements_IFS_joined(const std::string& name,
   get_all_elements_joined(name,
                           resolve<std::string>("IFS").substr(0, 1),
                           result);
+}
+
+void interpreter::split_word(const std::string& word, std::vector<std::string>& output)
+{
+  const std::string& delimeter = resolve<std::string>("IFS");
+  boost::split(output, word, boost::is_any_of(delimeter), boost::token_compress_on);
+}
+
+inline void define_function_arguments(std::unique_ptr<scope>& current_stack,
+                                      const std::vector<std::string>& arguments)
+{
+  for(auto i = 0u; i != arguments.size(); ++i)
+  {
+    const std::string& name = boost::lexical_cast<std::string>(i + 1);
+    (*current_stack)[name] = std::shared_ptr<variable>(new variable(name, arguments[i]));
+  }
+}
+
+bool interpreter::call(const std::string& name,
+                       const std::vector<std::string>& arguments,
+                       plibbashWalker ctx,
+                       std::function<void(plibbashWalker)> f)
+{
+  ANTLR3_MARKER func_index;
+  auto iter = functions.find(name);
+  if(iter == functions.end())
+    return false;
+  func_index = iter->second;
+
+  // Prepare function stack and arguments
+  local_members.push(std::unique_ptr<scope>(new scope));
+  define_function_arguments(local_members.top(), arguments);
+
+  auto INPUT = ctx->pTreeParser->ctnstream;
+  auto ISTREAM = INPUT->tnstream->istream;
+  // Saving current index
+  ANTLR3_MARKER curr = ISTREAM->index(ISTREAM);
+  // Push function index into INPUT
+  INPUT->push(INPUT, func_index);
+  // Execute function body
+  f(ctx);
+  // Reset to the previous index
+  ISTREAM->seek(ISTREAM, curr);
+
+  // Clear function stack
+  local_members.pop();
+
+  return true;
 }

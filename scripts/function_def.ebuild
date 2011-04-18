@@ -8,3 +8,21 @@ src_unpack
 src_unpack
 
 MY_PV=2.0.3-r1
+
+nested_func_with_args() {
+	ARG6=$1
+	ARG7=$3
+}
+
+func_with_args() {
+	ARG1=$1
+	ARG2=$2
+	ARG3=$3
+	ARG4=$4
+	ARG5=$5
+	nested_func_with_args $4
+}
+FOO001="4		5"
+ARRAY=(1 2 3)
+func_with_args ${ARRAY[@]} $FOO001
+func_with_args 100 $ARG2 $ARG3 $ARG4

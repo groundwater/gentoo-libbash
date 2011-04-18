@@ -29,6 +29,7 @@ options
 
 	#include <memory>
 	#include <string>
+	#include <vector>
 
 	class interpreter;
 	void set_interpreter(std::shared_ptr<interpreter> w);
@@ -37,8 +38,9 @@ options
 
 @postinclude{
 
-	#include "core/interpreter.h"
 	#include <boost/format.hpp>
+
+	#include "core/interpreter.h"
 
 }
 
@@ -114,31 +116,39 @@ var_def
 	unsigned index = 0;
 	bool is_null = true;
 }
-	:^(EQUALS name (libbash_string=string_expr { is_null = false; })?) {
-		walker->set_value($name.libbash_value, libbash_string, $name.index, is_null);
+	:^(EQUALS name (string_expr { is_null = false; })?) {
+		walker->set_value($name.libbash_value, $string_expr.libbash_value, $name.index, is_null);
 	}
 	|^(EQUALS libbash_name=name_base ^(ARRAY (
-										(libbash_string=string_expr
+										(expr=string_expr
 										|^(EQUALS value=arithmetics {
 												set_index(libbash_name, index, value);
-											} libbash_string=string_expr))
-										{ values[index++] = libbash_string; })*
+											} expr=string_expr))
+										{ values[index++] = expr.libbash_value; })*
 									 )){
 		walker->define(libbash_name, values);
 	};
 
-string_expr returns[std::string libbash_value]
+string_expr returns[std::string libbash_value, bool quoted]
 	:^(STRING(
-		(DOUBLE_QUOTED_STRING) => ^(DOUBLE_QUOTED_STRING (libbash_string=double_quoted_string { $libbash_value += libbash_string; })*)
-		|(ARITHMETIC_EXPRESSION) => ^(ARITHMETIC_EXPRESSION value=arithmetics { $libbash_value = boost::lexical_cast<std::string>(value); })
-		|(var_ref[false]) => libbash_string=var_ref[false] { $libbash_value = libbash_string; }
-		|(libbash_string=any_string { $libbash_value += libbash_string; })+
+		(DOUBLE_QUOTED_STRING) =>
+			^(DOUBLE_QUOTED_STRING (libbash_string=double_quoted_string { $libbash_value += libbash_string; })*) {
+				$quoted = true;
+			}
+		|(ARITHMETIC_EXPRESSION) =>
+			^(ARITHMETIC_EXPRESSION value=arithmetics {
+				$libbash_value = boost::lexical_cast<std::string>(value); $quoted = false;
+			})
+		|(var_ref[false]) => libbash_string=var_ref[false] { $libbash_value = libbash_string; $quoted = false; }
+		|(libbash_string=any_string { $libbash_value += libbash_string; $quoted = false; })+
 	));
 
 //double quoted string rule, allows expansions
 double_quoted_string returns[std::string libbash_value]
 	:(var_ref[true]) => libbash_string=var_ref[true] { $libbash_value = libbash_string; }
-	|(ARITHMETIC_EXPRESSION) => ^(ARITHMETIC_EXPRESSION value=arithmetics) { $libbash_value = boost::lexical_cast<std::string>(value); }
+	|(ARITHMETIC_EXPRESSION) => ^(ARITHMETIC_EXPRESSION value=arithmetics) {
+		$libbash_value = boost::lexical_cast<std::string>(value);
+	}
 	|libbash_string=any_string { $libbash_value = libbash_string; };
 
 any_string returns[std::string libbash_value]
@@ -185,12 +195,17 @@ var_expansion returns[std::string libbash_value]
 
 word returns[std::string libbash_value]
 	:(num) => libbash_string=num { $libbash_value = libbash_string; }
-	|libbash_string=string_expr { $libbash_value = libbash_string; }
+	|string_expr { $libbash_value = $string_expr.libbash_value; }
 	|value=arithmetics { $libbash_value = boost::lexical_cast<std::string>(value); };
 
 //variable reference
 var_ref [bool double_quoted] returns[std::string libbash_value]
-	:^(VAR_REF name) { $libbash_value = walker->resolve<std::string>($name.libbash_value, $name.index); }
+	:^(VAR_REF name) {
+		$libbash_value = walker->resolve<std::string>($name.libbash_value, $name.index);
+	}
+	|^(VAR_REF libbash_string=num) {
+		$libbash_value = walker->resolve<std::string>(libbash_string);
+	}
 	|^(VAR_REF ^(libbash_string=name_base AT)) { walker->get_all_elements(libbash_string, $libbash_value); }
 	|^(VAR_REF ^(libbash_string=name_base TIMES)) {
 		if(double_quoted)
@@ -205,28 +220,30 @@ command
 	|simple_command;
 
 simple_command
-	:^(COMMAND libbash_string=string_expr argument* var_def*) {
-		ANTLR3_MARKER func_index;
-		if((func_index = walker->get_function_index(libbash_string)) != -1)
+@declarations {
+	std::vector<std::string> libbash_args;
+}
+	:^(COMMAND string_expr (argument[libbash_args])* var_def*) {
+		if(!walker->call($string_expr.libbash_value,
+						 libbash_args,
+						 ctx,
+						 compound_command))
+			throw interpreter_exception("Unimplemented command: " + $string_expr.libbash_value);
+	};
+
+argument[std::vector<std::string>& args]
+	: string_expr {
+		if($string_expr.quoted)
 		{
-			// Saving current index
-			ANTLR3_MARKER curr = INDEX();
-			// Push function index into INPUT
-			INPUT->push(INPUT, func_index);
-			// Execute function body
-			compound_command(ctx);
-			// Reset to the previous index
-			SEEK(curr);
+			args.push_back($string_expr.libbash_value);
 		}
 		else
 		{
-			throw interpreter_exception("Unimplemented command: " + libbash_string);
+			std::vector<std::string> arguments;
+			walker->split_word($string_expr.libbash_value, arguments);
+			args.insert(args.end(), arguments.begin(), arguments.end());
 		}
 	};
-
-argument
-	:var_ref[false]
-	|string_expr;
 
 logic_command_list
 	:command
