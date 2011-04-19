@@ -123,6 +123,9 @@ arithmetic_condition:
 "5?7:2"->(ARITHMETIC_CONDITION 5 7 2)
 "(4-3)?0:1"->(ARITHMETIC_CONDITION (- 4 3) 0 1)
 
+arithmetics:
+"~   10" -> (~ 10)
+
 arithmetic_expansion:
 "$((5+4, 3+2, a*b))" -> (ARITHMETIC_EXPRESSION (+ 5 4) (+ 3 2) (* (VAR_REF a) (VAR_REF b)))
 "$[1]" -> (ARITHMETIC_EXPRESSION 1)

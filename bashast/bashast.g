@@ -494,10 +494,10 @@ pre_inc_dec
 	|	MINUS MINUS BLANK? primary -> ^(PRE_DECR primary);
 unary	:	post_inc_dec
 	|	pre_inc_dec
-	|	BLANK!? primary
-	|	PLUS unary -> ^(PLUS_SIGN unary)
-	|	MINUS unary -> ^(MINUS_SIGN unary)
-	|	(TILDE|BANG)^ unary;
+	|	primary
+	|	PLUS BLANK* unary -> ^(PLUS_SIGN unary)
+	|	MINUS BLANK* unary -> ^(MINUS_SIGN unary)
+	|	(TILDE|BANG)^ BLANK!* unary;
 exponential
 	:	unary (BLANK!* EXP^ BLANK!* unary)* ;
 times_division_modulus
