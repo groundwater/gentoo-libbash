@@ -102,10 +102,13 @@ cppunittests_LDFLAGS = -static
 
 endif
 
-noinst_PROGRAMS = variable_printer ast_printer
+noinst_PROGRAMS = variable_printer metadata_generator ast_printer
 
 variable_printer_SOURCES = utils/variable_printer.cpp
 variable_printer_LDADD = libcppbash.la
+
+metadata_generator_SOURCES = utils/metadata_generator.cpp
+metadata_generator_LDADD = libcppbash.la
 
 ast_printer_SOURCES = utils/ast_printer.cpp
 ast_printer_LDADD = libcppbash.la $(BOOST_PROGRAM_OPTIONS_LIB)

@@ -38,6 +38,8 @@ options
 
 @postinclude{
 
+	#include <iostream>
+
 	#include <boost/format.hpp>
 
 	#include "core/interpreter.h"
@@ -228,7 +230,7 @@ simple_command
 						 libbash_args,
 						 ctx,
 						 compound_command))
-			throw interpreter_exception("Unimplemented command: " + $string_expr.libbash_value);
+			std::cerr << $string_expr.libbash_value << " is not implemented yet" << std::endl;
 	};
 
 argument[std::vector<std::string>& args]

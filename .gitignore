@@ -19,6 +19,7 @@ Makefile
 autom4te.cache
 cppunittests
 variable_printer
+metadata_generator
 ast_printer
 long.sh
 massif.out
