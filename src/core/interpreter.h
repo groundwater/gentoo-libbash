@@ -563,6 +563,20 @@ public:
     return value.substr(offset, length);
   }
 
+  /// \brief perform replacement expansion
+  /// \param the name of the varaible that needs to be expanded
+  /// \param the function object used to perform expansion
+  /// \param array index, use index=0 if it's not an array
+  /// \return the expanded value
+  std::string do_replace_expansion(const std::string& name,
+                                   std::function<void(std::string&)> replacer,
+                                   const unsigned index) const
+  {
+    std::string value = resolve<std::string>(name, index);
+    replacer(value);
+    return value;
+  }
+
   /// \brief get the length of a string variable
   /// \param the name of the variable
   /// \return the length
@@ -600,5 +614,37 @@ public:
   /// \param the value of the word
   //. \param[out] the splitted result
   void split_word(const std::string& word, std::vector<std::string>& output);
+
+  /// \brief perform expansion like ${var//foo/bar}
+  /// \param the value to be expanded
+  /// \param the pattern used to match the value
+  /// \param the replacement string
+  static void replace_all(std::string& value,
+                          const std::string& pattern,
+                          const std::string& replacement);
+
+  /// \brief perform expansion like ${var/%foo/bar}
+  /// \param the value to be expanded
+  /// \param the pattern used to match the value
+  /// \param the replacement string
+  static void replace_at_end(std::string& value,
+                             const std::string& pattern,
+                             const std::string& replacement);
+
+  /// \brief perform expansion like ${var/#foo/bar}
+  /// \param the value to be expanded
+  /// \param the pattern used to match the value
+  /// \param the replacement string
+  static void replace_at_start(std::string& value,
+                               const std::string& pattern,
+                               const std::string& replacement);
+
+  /// \brief perform expansion like ${var/foo/bar}
+  /// \param the value to be expanded
+  /// \param the pattern used to match the value
+  /// \param the replacement string
+  static void replace_first(std::string& value,
+                            const std::string& pattern,
+                            const std::string& replacement);
 };
 #endif

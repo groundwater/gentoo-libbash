@@ -194,7 +194,39 @@ var_expansion returns[std::string libbash_value]
 		|^(libbash_name=name_base ARRAY_SIZE) {
 			libbash_value = boost::lexical_cast<std::string>(walker->get_array_length(libbash_name));
 		}
-	));
+	))
+	|^(REPLACE_ALL var_name pattern=string_expr (replacement=string_expr)?) {
+		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
+													 std::bind(&interpreter::replace_all,
+															   std::placeholders::_1,
+															   pattern.libbash_value,
+															   replacement.libbash_value),
+													 $var_name.index);
+	}
+	|^(REPLACE_AT_END var_name pattern=string_expr (replacement=string_expr)?) {
+		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
+													 std::bind(&interpreter::replace_at_end,
+															   std::placeholders::_1,
+															   pattern.libbash_value,
+															   replacement.libbash_value),
+													 $var_name.index);
+	}
+	|^(REPLACE_AT_START var_name pattern=string_expr (replacement=string_expr)?) {
+		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
+													 std::bind(&interpreter::replace_at_start,
+															   std::placeholders::_1,
+															   pattern.libbash_value,
+															   replacement.libbash_value),
+													 $var_name.index);
+	}
+	|^(REPLACE_FIRST var_name pattern=string_expr (replacement=string_expr)?) {
+		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
+													 std::bind(&interpreter::replace_first,
+															   std::placeholders::_1,
+															   pattern.libbash_value,
+															   replacement.libbash_value),
+													 $var_name.index);
+	};
 
 word returns[std::string libbash_value]
 	:(num) => libbash_string=num { $libbash_value = libbash_string; }
