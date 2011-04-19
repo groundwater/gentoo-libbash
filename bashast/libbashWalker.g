@@ -226,6 +226,20 @@ var_expansion returns[std::string libbash_value]
 															   pattern.libbash_value,
 															   replacement.libbash_value),
 													 $var_name.index);
+	}
+	|^(LAZY_REMOVE_AT_START var_name pattern=string_expr) {
+		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
+													 std::bind(&interpreter::lazy_remove_at_start,
+															   std::placeholders::_1,
+															   pattern.libbash_value),
+													 $var_name.index);
+	}
+	|^(LAZY_REMOVE_AT_END var_name pattern=string_expr) {
+		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
+													 std::bind(&interpreter::lazy_remove_at_end,
+															   std::placeholders::_1,
+															   pattern.libbash_value),
+													 $var_name.index);
 	};
 
 word returns[std::string libbash_value]

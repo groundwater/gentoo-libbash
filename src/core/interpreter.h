@@ -646,5 +646,18 @@ public:
   static void replace_first(std::string& value,
                             const std::string& pattern,
                             const std::string& replacement);
+
+  /// \brief perform expansion like ${var#foo}
+  /// \param the value to be expanded
+  /// \param the pattern used to match the value
+  static void lazy_remove_at_start(std::string& value,
+                                   const std::string& pattern);
+
+  /// \brief perform expansion like ${var%foo}
+  /// \param the value to be expanded
+  /// \param the pattern used to match the value
+  static void lazy_remove_at_end(std::string& value,
+                                 const std::string& pattern);
+
 };
 #endif

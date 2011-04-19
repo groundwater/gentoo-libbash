@@ -87,6 +87,8 @@ tokens{
 	REPLACE_ALL;
 	REPLACE_AT_START;
 	REPLACE_AT_END;
+	LAZY_REMOVE_AT_START;
+	LAZY_REMOVE_AT_END;
 	// Avoid ambiguity (being a sign or an operator)
 	PLUS_SIGN;
 	MINUS_SIGN;
@@ -268,10 +270,10 @@ var_exp	:	var_name (
 	|	TIMES
 	|	AT;
 parameter_delete_operator
-	:	POUND
-	|	POUNDPOUND
-	|	PCT
-	|	PCTPCT;
+	:	POUND -> LAZY_REMOVE_AT_START
+	|	POUNDPOUND -> REPLACE_AT_START
+	|	PCT -> LAZY_REMOVE_AT_END
+	|	PCTPCT -> REPLACE_AT_END;
 parameter_value_operator
 	:	COLON MINUS -> USE_DEFAULT_WHEN_UNSET_OR_NULL
 	|	COLON EQUALS -> ASSIGN_DEFAULT_WHEN_UNSET_OR_NULL

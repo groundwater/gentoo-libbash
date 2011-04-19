@@ -145,3 +145,15 @@ void interpreter::replace_first(std::string& value,
 {
   boost::replace_first(value, pattern, replacement);
 }
+
+void interpreter::lazy_remove_at_start(std::string& value,
+                                       const std::string& pattern)
+{
+  replace_at_start(value, pattern, "");
+}
+
+void interpreter::lazy_remove_at_end(std::string& value,
+                                     const std::string& pattern)
+{
+  replace_at_end(value, pattern, "");
+}

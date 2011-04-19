@@ -33,14 +33,14 @@ var_ref:
 "${!asdf[*]}" -> (VAR_REF (LIST_EXPAND asdf *))
 "${!asdf[@]}" -> (VAR_REF (LIST_EXPAND asdf @))
 "${#foo}" -> (VAR_REF (# foo))
-"${foo#bar}" -> (VAR_REF (# foo (STRING bar)))
+"${foo#bar}" -> (VAR_REF (LAZY_REMOVE_AT_START foo (STRING bar)))
 "${fo*o#bar}" FAIL
 "${fo@o#bar}" FAIL
-"${foo##bar}" -> (VAR_REF (## foo (STRING bar)))
-"${foo%bar}" -> (VAR_REF (% foo (STRING bar)))
-"${foo%%bar}" -> (VAR_REF (%% foo (STRING bar)))
-"${foo%; *}" -> (VAR_REF (% foo (STRING ;   *)))
-"${foo%/}" -> (VAR_REF (% foo (STRING /)))
+"${foo##bar}" -> (VAR_REF (REPLACE_AT_START foo (STRING bar)))
+"${foo%bar}" -> (VAR_REF (LAZY_REMOVE_AT_END foo (STRING bar)))
+"${foo%%bar}" -> (VAR_REF (REPLACE_AT_END foo (STRING bar)))
+"${foo%; *}" -> (VAR_REF (LAZY_REMOVE_AT_END foo (STRING ;   *)))
+"${foo%/}" -> (VAR_REF (LAZY_REMOVE_AT_END foo (STRING /)))
 "${this/is/pattern}"->(VAR_REF (REPLACE_FIRST this (STRING is) (STRING pattern)))
 //Test positional/special parameters
 "$1" -> (VAR_REF 1)
