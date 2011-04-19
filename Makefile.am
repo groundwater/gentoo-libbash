@@ -84,7 +84,7 @@ endif
 
 if HAVE_GTEST
 TESTS += cppunittests test/ast_printer_test.sh test/verify_ebuilds_test.sh
-check_PROGRAMS = cppunittests variable_printer ast_printer
+check_PROGRAMS = cppunittests
 
 cppunittests_SOURCES =  test/run_tests.cpp \
 						src/core/tests/symbols_test.cpp \
@@ -100,14 +100,17 @@ cppunittests_LDADD = libcppbash.la \
 					 $(BOOST_FILESYSTEM_LIB)
 cppunittests_LDFLAGS = -static
 
-variable_printer_SOURCES = test/variable_printer.cpp
+endif
+
+noinst_PROGRAMS = variable_printer ast_printer
+
+variable_printer_SOURCES = utils/variable_printer.cpp
 variable_printer_LDADD = libcppbash.la
 
-ast_printer_SOURCES = test/ast_printer.cpp
+ast_printer_SOURCES = utils/ast_printer.cpp
 ast_printer_LDADD = libcppbash.la $(BOOST_PROGRAM_OPTIONS_LIB)
 ast_printer_LDFLAGS = -static
 ast_printer_CPPFLAGS = $(BOOST_CPPFLAGS)
-endif
 
 GENERATED_PARSER_C = libbashLexer.c libbashParser.c
 GENERATED_PARSER_H = libbashLexer.h libbashParser.h
