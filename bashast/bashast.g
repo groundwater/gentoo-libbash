@@ -235,7 +235,7 @@ value	:	fname
 arr_val	:
 	|	(ag+=array_atom wspace*)+ -> ^(ARRAY $ag+);
 array_atom
-	:	LSQUARE! BLANK!* explicit_arithmetic BLANK!? RSQUARE! EQUALS^ fname
+	:	(LSQUARE) => LSQUARE! BLANK!* explicit_arithmetic BLANK!? RSQUARE! EQUALS^ fname
 	|	fname;
 //Referencing a variable (different possible ways/special parameters)
 var_ref
