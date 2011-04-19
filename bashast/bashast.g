@@ -466,22 +466,6 @@ extended_pattern_match
 	|	PLUS LPAREN fname (PIPE fname)* RPAREN -> ^(MATCH_AT_LEAST_ONE fname+)
 	|	AT LPAREN fname (PIPE fname)* RPAREN -> ^(MATCH_EXACTLY_ONE fname+)
 	|	BANG LPAREN fname (PIPE fname)* RPAREN -> ^(MATCH_NONE fname+);
-//Arithmetic expansion
-//the square bracket from is deprecated
-//http://permalink.gmane.org/gmane.comp.shells.bash.bugs/14479
-arithmetic_expansion
-	:	DOLLAR LLPAREN BLANK* arithmetics RRPAREN -> ^(ARITHMETIC_EXPRESSION arithmetics)
-	|	DOLLAR LSQUARE BLANK* arithmetics RSQUARE -> ^(ARITHMETIC_EXPRESSION arithmetics);
-//explicit arithmetic in places like array indexes
-explicit_arithmetic
-	:	(DOLLAR LLPAREN BLANK*)? arithmetics RRPAREN? -> arithmetics
-	|	(DOLLAR LSQUARE BLANK*)? arithmetics RSQUARE? -> arithmetics;
-//The comma operator for arithmetic expansions
-arithmetics
-	:	arithmetic (COMMA! BLANK!* arithmetic)*;
-arithmetic
-	:	arithmetic_condition
-	|	arithmetic_assignment;
 //The base of the arithmetic operator.  Used for order of operations
 arithmetic_var_ref:
 	var_ref -> ^(VAR_REF var_ref);
@@ -526,6 +510,23 @@ arithmetic_assignment_opterator
 
 arithmetic_assignment
 	:	((var_name_no_digit|arithmetic_var_ref) BLANK!* arithmetic_assignment_opterator^ BLANK!*)? logicor;
+arithmetic
+	:	arithmetic_condition
+	|	arithmetic_assignment;
+//The comma operator for arithmetic expansions
+arithmetics
+	:	arithmetic (COMMA! BLANK!* arithmetic)*;
+//explicit arithmetic in places like array indexes
+explicit_arithmetic
+	:	(DOLLAR LLPAREN BLANK*)? arithmetics RRPAREN? -> arithmetics
+	|	(DOLLAR LSQUARE BLANK*)? arithmetics RSQUARE? -> arithmetics;
+//Arithmetic expansion
+//the square bracket from is deprecated
+//http://permalink.gmane.org/gmane.comp.shells.bash.bugs/14479
+arithmetic_expansion
+	:	DOLLAR LLPAREN BLANK* arithmetics RRPAREN -> ^(ARITHMETIC_EXPRESSION arithmetics)
+	|	DOLLAR LSQUARE BLANK* arithmetics RSQUARE -> ^(ARITHMETIC_EXPRESSION arithmetics);
+
 process_substitution
 	:	(dir=LESS_THAN|dir=GREATER_THAN)LPAREN clist BLANK* RPAREN -> ^(PROCESS_SUBSTITUTION $dir clist);
 //the biggie: functions
