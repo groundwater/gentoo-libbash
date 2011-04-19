@@ -18,7 +18,7 @@
 */
 gunit bashast;
 
-list:
+clist:
 "echo a{b,c,d}" -> (LIST (COMMAND (STRING echo) (STRING a (BRACE_EXP (STRING b) (STRING c) (STRING d)))))
 "((5+5))" -> (LIST (COMPOUND_ARITH (+ 5 5)))
 "(( 4 + asdf ))" -> (LIST (COMPOUND_ARITH (+ 4 (VAR_REF asdf))))

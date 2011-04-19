@@ -92,13 +92,11 @@ tokens{
 	MINUS_SIGN;
 }
 
-start	:	(flcomment!)? EOL!* list^ ;
+start	:	(flcomment)? EOL* clist BLANK* (SEMIC|AMP|EOL)? -> clist;
 //Because the comment token doesn't handle the first comment in a file if it's on the first line, have a parser rule for it
 flcomment
 	:	POUND ~(EOL)* EOL;
-list	:	list_level_2 BLANK* (SEMIC|AMP|EOL)? -> ^(LIST list_level_2);
 clist
-options{greedy=false;}
 	:	list_level_2 -> ^(LIST list_level_2);
 list_level_1
 	:	(function|pipeline) (BLANK!*(LOGICAND^|LOGICOR^)BLANK!* (function|pipeline))*;

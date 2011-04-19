@@ -18,7 +18,7 @@
 */
 gunit bashast;
 
-list:
+start:
 "make" -> (LIST (COMMAND (STRING make)))
 "make && make modules_install;" -> (LIST (&& (COMMAND (STRING make)) (COMMAND (STRING make) (STRING modules_install))))
 "make && make modules_install &" -> (LIST (&& (COMMAND (STRING make)) (COMMAND (STRING make) (STRING modules_install))))
