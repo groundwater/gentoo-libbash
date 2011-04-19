@@ -249,15 +249,24 @@ var_ref
 	|	DOLLAR MINUS -> ^(VAR_REF MINUS)
 	|	DOLLAR BANG -> ^(VAR_REF BANG);
 //Variable expansions
-var_exp	:	var_name parameter_value_operator^ word
-	|	var_name COLON wspace* os=explicit_arithmetic (COLON len=explicit_arithmetic)? -> ^(OFFSET var_name $os ^($len)?)
-	|	BANG^ var_name_for_bang (TIMES|AT)
-	|	BANG var_name_for_bang LSQUARE (op=TIMES|op=AT) RSQUARE -> ^(LIST_EXPAND var_name_for_bang $op)
-	|	BANG var_name_for_bang -> ^(VAR_REF var_name_for_bang)
-	|	var_name parameter_delete_operator parameter_pattern_part+ -> ^(parameter_delete_operator var_name ^(STRING parameter_pattern_part+))
-	|	var_name parameter_replace_operator^ parameter_replace_pattern parameter_replace_string
+var_exp	:	var_name (
+				  parameter_value_operator word
+					-> ^(parameter_value_operator var_name word)
+				| COLON wspace* os=explicit_arithmetic (COLON len=explicit_arithmetic)?
+					-> ^(OFFSET var_name $os ^($len)?)
+				| parameter_delete_operator parameter_pattern_part+
+					-> ^(parameter_delete_operator var_name ^(STRING parameter_pattern_part+))
+				| parameter_replace_operator parameter_replace_pattern parameter_replace_string
+					-> ^(parameter_replace_operator var_name parameter_replace_pattern parameter_replace_string?)
+				| -> var_name
+			 )
+	|	BANG var_name_for_bang  (
+					   TIMES -> ^(BANG var_name_for_bang TIMES)
+					 | AT -> ^(BANG var_name_for_bang AT)
+					 | LSQUARE (op=TIMES|op=AT) RSQUARE -> ^(LIST_EXPAND var_name_for_bang $op)
+					 | -> ^(VAR_REF var_name_for_bang)
+					)
 	|	var_size_ref
-	|	var_name
 	|	TIMES
 	|	AT;
 parameter_delete_operator
