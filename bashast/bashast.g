@@ -287,8 +287,12 @@ parameter_replace_operator
 	|	SLASH -> REPLACE_FIRST;
 //Allowable refences to values
 //either directly or through array
-var_name:	num
-	|	name^ LSQUARE! (AT|TIMES|explicit_arithmetic) RSQUARE!
+var_name
+	:	num
+	|	var_name_no_digit;
+//Inside arithmetic we can't allow digits
+var_name_no_digit
+	:	name^ LSQUARE! (AT|TIMES|explicit_arithmetic) RSQUARE!
 	|	name
 	|	POUND;
 //with bang the array syntax is used for array indexes
@@ -484,7 +488,7 @@ arithmetic_var_ref:
 primary	:	num
 	|	arithmetic_var_ref
 	|	command_sub
-	|	var_name -> ^(VAR_REF var_name)
+	|	var_name_no_digit -> ^(VAR_REF var_name_no_digit)
 	|	LPAREN! (arithmetics) RPAREN!;
 post_inc_dec
 	:	primary BLANK? PLUS PLUS -> ^(POST_INCR primary)
@@ -521,7 +525,7 @@ arithmetic_assignment_opterator
 	:	EQUALS|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN|OR_ASSIGN;
 
 arithmetic_assignment
-	:	((var_name|arithmetic_var_ref) BLANK!* arithmetic_assignment_opterator^ BLANK!*)? logicor;
+	:	((var_name_no_digit|arithmetic_var_ref) BLANK!* arithmetic_assignment_opterator^ BLANK!*)? logicor;
 process_substitution
 	:	(dir=LESS_THAN|dir=GREATER_THAN)LPAREN clist BLANK* RPAREN -> ^(PROCESS_SUBSTITUTION $dir clist);
 //the biggie: functions

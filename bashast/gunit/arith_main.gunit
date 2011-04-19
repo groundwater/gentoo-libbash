@@ -118,6 +118,7 @@ arithmetic_assignment:
 "var &= 5" -> (&= var 5)
 "var ^= 5" -> (^= var 5)
 "var |= 5" -> (|= var 5)
+"3=7" FAIL
 
 arithmetic_condition:
 "5?7:2"->(ARITHMETIC_CONDITION 5 7 2)
