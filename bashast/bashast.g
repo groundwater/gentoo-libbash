@@ -505,11 +505,11 @@ logicor	:	logicand (LOGICOR^ BLANK!* logicand)*;
 arithmetic_condition
 	:	cnd=logicor QMARK t=logicor COLON f=logicor -> ^(ARITHMETIC_CONDITION $cnd $t $f);
 
-arithmetic_assignment_opterator
+arithmetic_assignment_operator
 	:	EQUALS|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN|OR_ASSIGN;
 
 arithmetic_assignment
-	:	((var_name_no_digit|arithmetic_var_ref) BLANK!* arithmetic_assignment_opterator^ BLANK!*)? logicor;
+	:	((var_name_no_digit|arithmetic_var_ref) BLANK!* arithmetic_assignment_operator^ BLANK!*)? logicor;
 arithmetic
 	:	arithmetic_condition
 	|	arithmetic_assignment;
