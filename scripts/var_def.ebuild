@@ -32,3 +32,6 @@ ARRAY08="${ARRAY05[@]}"
 ARRAY09="${ARRAY05[*]}"
 IFS=";,:"
 ARRAY10="${ARRAY05[*]}"
+FOO001="networkmanager"
+FOO002="0.8.2"
+FOO003=${FOO001}-${FOO002}

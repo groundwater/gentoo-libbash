@@ -132,18 +132,19 @@ var_def
 	};
 
 string_expr returns[std::string libbash_value, bool quoted]
-	:^(STRING(
+@init {
+	$quoted = true;
+}
+	:^(STRING (
 		(DOUBLE_QUOTED_STRING) =>
-			^(DOUBLE_QUOTED_STRING (libbash_string=double_quoted_string { $libbash_value += libbash_string; })*) {
-				$quoted = true;
-			}
+			^(DOUBLE_QUOTED_STRING (libbash_string=double_quoted_string { $libbash_value += libbash_string; })*)
 		|(ARITHMETIC_EXPRESSION) =>
 			^(ARITHMETIC_EXPRESSION value=arithmetics {
-				$libbash_value = boost::lexical_cast<std::string>(value); $quoted = false;
+				$libbash_value += boost::lexical_cast<std::string>(value); $quoted = false;
 			})
-		|(var_ref[false]) => libbash_string=var_ref[false] { $libbash_value = libbash_string; $quoted = false; }
-		|(libbash_string=any_string { $libbash_value += libbash_string; $quoted = false; })+
-	));
+		|(var_ref[false]) => libbash_string=var_ref[false] { $libbash_value += libbash_string; $quoted = false; }
+		|(libbash_string=any_string { $libbash_value += libbash_string; $quoted = false; })
+	)+);
 
 //double quoted string rule, allows expansions
 double_quoted_string returns[std::string libbash_value]
