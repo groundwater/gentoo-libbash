@@ -128,7 +128,8 @@ CLEANFILES = $(GENERATED_PARSER_C) \
 			 javagrammar.run \
 			 cgrammar.run \
 			 walker.run \
-			 massif.out
+			 massif.out \
+			 callgrind.out
 
 lib_LTLIBRARIES = libcppbash.la
 libcppbash_la_SOURCES = src/common.h \
@@ -215,7 +216,10 @@ massif.out: ast_printer
 massif: massif.out
 	ms_print --threshold=10 $<
 
-benchmark_parser: ast_printer
+callgrind.out: ast_printer
 	libtool --mode=execute valgrind \
-		--tool=callgrind --callgrind-out-file=/dev/null \
+		--tool=callgrind --callgrind-out-file=callgrind.out \
 		./ast_printer -s  -f /usr/portage/eclass/versionator.eclass
+
+benchmark_parser: callgrind.out
+	callgrind_annotate callgrind.out
