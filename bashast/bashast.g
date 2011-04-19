@@ -470,15 +470,15 @@ extended_pattern_match
 //the square bracket from is deprecated
 //http://permalink.gmane.org/gmane.comp.shells.bash.bugs/14479
 arithmetic_expansion
-	:	DOLLAR LLPAREN BLANK* arithmetics BLANK* RRPAREN -> ^(ARITHMETIC_EXPRESSION arithmetics)
-	|	DOLLAR LSQUARE BLANK* arithmetics BLANK* RSQUARE -> ^(ARITHMETIC_EXPRESSION arithmetics);
+	:	DOLLAR LLPAREN BLANK* arithmetics RRPAREN -> ^(ARITHMETIC_EXPRESSION arithmetics)
+	|	DOLLAR LSQUARE BLANK* arithmetics RSQUARE -> ^(ARITHMETIC_EXPRESSION arithmetics);
 //explicit arithmetic in places like array indexes
 explicit_arithmetic
-	:	(DOLLAR LLPAREN BLANK*)? arithmetics (BLANK* RRPAREN)? -> arithmetics
-	|	(DOLLAR LSQUARE BLANK*)? arithmetics (BLANK* RSQUARE)? -> arithmetics;
+	:	(DOLLAR LLPAREN BLANK*)? arithmetics RRPAREN? -> arithmetics
+	|	(DOLLAR LSQUARE BLANK*)? arithmetics RSQUARE? -> arithmetics;
 //The comma operator for arithmetic expansions
 arithmetics
-	:	arithmetic (BLANK!* COMMA! BLANK!* arithmetic)*;
+	:	arithmetic (COMMA! BLANK!* arithmetic)*;
 arithmetic
 	:	arithmetic_condition
 	|	arithmetic_assignment;
@@ -498,25 +498,25 @@ pre_inc_dec
 	|	MINUS MINUS BLANK? primary -> ^(PRE_DECR primary);
 unary	:	post_inc_dec
 	|	pre_inc_dec
-	|	primary
+	|	primary BLANK!*
 	|	PLUS BLANK* unary -> ^(PLUS_SIGN unary)
 	|	MINUS BLANK* unary -> ^(MINUS_SIGN unary)
 	|	(TILDE|BANG)^ BLANK!* unary;
 exponential
-	:	unary (BLANK!* EXP^ BLANK!* unary)* ;
+	:	unary (EXP^ BLANK!* unary)* ;
 times_division_modulus
-	:	exponential (BLANK!* (TIMES^|SLASH^|PCT^) BLANK!* exponential)*;
-addsub	:	times_division_modulus (BLANK!* (PLUS^|MINUS^)BLANK!* times_division_modulus)*;
-shifts	:	addsub (BLANK!* (LSHIFT^|RSHIFT^) BLANK!* addsub)*;
-compare	:	shifts (BLANK!* (LEQ^|GEQ^|LESS_THAN^|GREATER_THAN^)BLANK!* shifts)?;
+	:	exponential ((TIMES^|SLASH^|PCT^) BLANK!* exponential)*;
+addsub	:	times_division_modulus ((PLUS^|MINUS^) BLANK!* times_division_modulus)*;
+shifts	:	addsub ((LSHIFT^|RSHIFT^) BLANK!* addsub)*;
+compare	:	shifts ((LEQ^|GEQ^|LESS_THAN^|GREATER_THAN^) BLANK!* shifts)?;
 bitwiseand
-	:	compare (BLANK!* AMP^ BLANK!* compare)*;
+	:	compare (AMP^ BLANK!* compare)*;
 bitwisexor
-	:	bitwiseand (BLANK!* CARET^ BLANK!* bitwiseand)*;
+	:	bitwiseand (CARET^ BLANK!* bitwiseand)*;
 bitwiseor
-	:	bitwisexor (BLANK!* PIPE^ BLANK!* bitwisexor)*;
-logicand:	bitwiseor (BLANK!* LOGICAND^ BLANK!* bitwiseor)*;
-logicor	:	logicand (BLANK!* LOGICOR^ BLANK!* logicand)*;
+	:	bitwisexor (PIPE^ BLANK!* bitwisexor)*;
+logicand:	bitwiseor (LOGICAND^ BLANK!* bitwiseor)*;
+logicor	:	logicand (LOGICOR^ BLANK!* logicand)*;
 
 arithmetic_condition
 	:	cnd=logicor QMARK t=logicor COLON f=logicor -> ^(ARITHMETIC_CONDITION $cnd $t $f);
