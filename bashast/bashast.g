@@ -166,8 +166,8 @@ brace_expansion_part
 	|	-> EMPTY_BRACE_EXPANSION_ATOM;
 commasep:	brace_expansion_part(COMMA! brace_expansion_part)+;
 command_sub
-	:	DOLLAR LPAREN pipeline BLANK? RPAREN -> ^(COMMAND_SUB pipeline)
-	|	TICK pipeline BLANK? TICK -> ^(COMMAND_SUB pipeline) ;
+	:	DOLLAR LPAREN clist BLANK? RPAREN -> ^(COMMAND_SUB clist)
+	|	TICK clist BLANK? TICK -> ^(COMMAND_SUB clist) ;
 //compound commands
 compound_command
 	:	for_expr
