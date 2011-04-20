@@ -23,6 +23,7 @@ options
 	output	= AST;
 	language	= Java;
 	ASTLabelType	= CommonTree;
+	memoize		= true;
 }
 tokens{
 	ARG;
