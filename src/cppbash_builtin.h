@@ -83,6 +83,17 @@ class cppbash_builtin
       return p->exec(args);
     }
 
+    ///
+    /// \brief check existence of the builtin
+    /// \param builtin name
+    /// \param whether it is a builtin
+    ///
+    static bool is_builtin(const std::string& builtin)
+    {
+      builtins_type& builtin_map = builtins();
+      return builtin_map.find(builtin) != builtin_map.end();
+    }
+
   protected:
     ///
     /// \var *_out_stream

@@ -43,6 +43,7 @@ options
 	#include <boost/format.hpp>
 
 	#include "core/interpreter.h"
+	#include "cppbash_builtin.h"
 
 }
 
@@ -273,11 +274,15 @@ simple_command
 	std::vector<std::string> libbash_args;
 }
 	:^(COMMAND string_expr (argument[libbash_args])* var_def*) {
-		if(!walker->call($string_expr.libbash_value,
+		if(walker->has_function($string_expr.libbash_value))
+			walker->call($string_expr.libbash_value,
 						 libbash_args,
 						 ctx,
-						 compound_command))
-			std::cerr << $string_expr.libbash_value << " is not implemented yet" << std::endl;
+						 compound_command);
+		else if(cppbash_builtin::is_builtin($string_expr.libbash_value))
+			walker->execute_builtin($string_expr.libbash_value, libbash_args);
+		else
+			std::cerr << $string_expr.libbash_value << " is not supported yet" << std::endl;
 	};
 
 argument[std::vector<std::string>& args]

@@ -81,7 +81,7 @@ inline void define_function_arguments(std::unique_ptr<scope>& current_stack,
   }
 }
 
-bool interpreter::call(const std::string& name,
+int interpreter::call(const std::string& name,
                        const std::vector<std::string>& arguments,
                        plibbashWalker ctx,
                        std::function<void(plibbashWalker)> f)
@@ -89,7 +89,7 @@ bool interpreter::call(const std::string& name,
   ANTLR3_MARKER func_index;
   auto iter = functions.find(name);
   if(iter == functions.end())
-    return false;
+    return -1;
   func_index = iter->second;
 
   // Prepare function stack and arguments
@@ -110,7 +110,7 @@ bool interpreter::call(const std::string& name,
   // Clear function stack
   local_members.pop();
 
-  return true;
+  return 0;
 }
 
 void interpreter::replace_all(std::string& value,

@@ -35,6 +35,7 @@
 #include <antlr3basetree.h>
 
 #include "core/symbols.hpp"
+#include "cppbash_builtin.h"
 #include "libbashLexer.h"
 
 typedef std::unordered_map<std::string, std::shared_ptr<variable>> scope;
@@ -60,6 +61,12 @@ class interpreter{
   ///        local variables
   std::stack<std::unique_ptr<scope>> local_members;
 
+  std::ostream* out;
+
+  std::ostream* err;
+
+  std::istream* in;
+
   /// \brief calculate the correct offset when offset < 0 and check whether
   ///        the real offset is in legal range
   /// \param[in,out] a value/result argument referring to offset
@@ -77,7 +84,7 @@ class interpreter{
 
 public:
 
-  interpreter()
+  interpreter(): out(&std::cout), err(&std::cerr), in(&std::cin)
   {
     define("IFS", " \t\n");
   }
@@ -492,11 +499,29 @@ public:
   /// \param function arguments
   /// \param walker context
   /// \param the function that needs to be executed
-  /// \return whether the execution is successful
-  bool call(const std::string& name,
-            const std::vector<std::string>& arguments,
-            plibbashWalker ctx,
-            std::function<void(plibbashWalker)> f);
+  /// \return the return value of the function
+  int call(const std::string& name,
+           const std::vector<std::string>& arguments,
+           plibbashWalker ctx,
+           std::function<void(plibbashWalker)> f);
+
+  /// \brief check if we have 'name' defined as a function
+  /// \param function name
+  /// \return whether 'name' is a function
+  bool has_function(const std::string& name)
+  {
+    return functions.find(name) != functions.end();
+  }
+
+  /// \brief execute builtin
+  /// \param builtin name
+  /// \param builtin arguments
+  /// \return the return value of the builtin
+  int execute_builtin(const std::string& name,
+                      const std::vector<std::string>& args)
+  {
+    return cppbash_builtin::exec(name, args, *out, *err, *in);
+  }
 
   /// \brief perform ${parameter:−word} expansion
   /// \param the name of the parameter
