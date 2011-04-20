@@ -39,6 +39,7 @@ options
 @postinclude{
 
 	#include <iostream>
+	#include <sstream>
 
 	#include <boost/format.hpp>
 
@@ -144,6 +145,7 @@ string_expr returns[std::string libbash_value, bool quoted]
 				$libbash_value += boost::lexical_cast<std::string>(value); $quoted = false;
 			})
 		|(var_ref[false]) => libbash_string=var_ref[false] { $libbash_value += libbash_string; $quoted = false; }
+		|libbash_string=command_substitution { $libbash_value += libbash_string; $quoted = false; }
 		|(libbash_string=any_string { $libbash_value += libbash_string; $quoted = false; })
 	)+);
 
@@ -307,6 +309,16 @@ logic_command_list
 command_list: ^(LIST logic_command_list+);
 
 compound_command: ^(CURRENT_SHELL command_list);
+
+command_substitution returns[std::string libbash_value]
+@declarations {
+	std::stringstream out;
+}
+	:^(COMMAND_SUB{ walker->set_output_stream(&out); } command_list) {
+		walker->restore_output_stream();
+		$libbash_value = out.str();
+		walker->trim_trailing_eols($libbash_value);
+	};
 
 function_def returns[int placeholder]
 	:^(FUNCTION ^(STRING name) {

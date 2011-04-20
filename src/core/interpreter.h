@@ -132,6 +132,16 @@ public:
     return members.end();
   }
 
+  void set_output_stream(std::ostream* stream)
+  {
+    out = stream;
+  }
+
+  void restore_output_stream()
+  {
+    out = &std::cout;
+  }
+
   /// \brief parse the text value of a tree to integer
   /// \param the target tree
   /// \return the parsed value
@@ -684,5 +694,8 @@ public:
   static void lazy_remove_at_end(std::string& value,
                                  const std::string& pattern);
 
+  /// \brief remove trailing EOLs from the value
+  /// \param[in, out] the target
+  static void trim_trailing_eols(std::string& value);
 };
 #endif

@@ -30,6 +30,7 @@
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/trim.hpp>
 
 #include "libbashWalker.h"
 
@@ -156,4 +157,9 @@ void interpreter::lazy_remove_at_end(std::string& value,
                                      const std::string& pattern)
 {
   replace_at_end(value, pattern, "");
+}
+
+void interpreter::trim_trailing_eols(std::string& value)
+{
+  boost::trim_right_if(value, boost::is_any_of("\n"));
 }
