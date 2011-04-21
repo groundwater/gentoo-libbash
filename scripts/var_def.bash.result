@@ -5,8 +5,8 @@ $- has not been implemented yet
 $! has not been implemented yet
 ARRAY01=1 2 3 4 5
 ARRAY02=1 2 4 5
-ARRAY03=2 3
-ARRAY04=2 3
+ARRAY03= 2 3
+ARRAY04= 2 3
 ARRAY05=1 2 3 4 5
 ARRAY06=1 2 3 4 5
 ARRAY07=1 2 3 4 5

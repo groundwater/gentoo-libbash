@@ -119,10 +119,9 @@ var_def
 @declarations {
 	std::map<int, std::string> values;
 	unsigned index = 0;
-	bool is_null = true;
 }
-	:^(EQUALS name (string_expr { is_null = false; })?) {
-		walker->set_value($name.libbash_value, $string_expr.libbash_value, $name.index, is_null);
+	:^(EQUALS name string_expr?) {
+		walker->set_value($name.libbash_value, $string_expr.libbash_value, $name.index);
 	}
 	|^(EQUALS libbash_name=name_base ^(ARRAY (
 										(expr=string_expr

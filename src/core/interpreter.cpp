@@ -178,3 +178,24 @@ void interpreter::get_all_function_names(std::vector<std::string>& function_name
 {
   boost::copy(functions | boost::adaptors::map_keys, back_inserter(function_names));
 }
+
+void interpreter::unset(const std::string& name)
+{
+  auto iter = members.find(name);
+  if(iter == members.end())
+    return;
+  else if(iter->second->is_readonly())
+    throw interpreter_exception("Can't unset readonly variable " + name);
+  else
+    members.erase(name);
+}
+
+void interpreter::unset(const std::string& name,
+                        const unsigned index)
+{
+  auto iter = members.find(name);
+  if(iter == members.end())
+    return;
+  else
+    iter->second->unset_value(index);
+}

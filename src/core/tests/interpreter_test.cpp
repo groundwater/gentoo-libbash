@@ -54,7 +54,7 @@ TEST(interpreter, define_resolve_array)
   EXPECT_STREQ("3", walker.resolve<string>("array", 2).c_str());
   EXPECT_STREQ("", walker.resolve<string>("undefined",100).c_str());
 
-  walker.define("partial", 10, false, false, 8);
+  walker.define("partial", 10, false, 8);
   EXPECT_EQ(1, walker.get_array_length("partial"));
   EXPECT_EQ(10, walker.resolve<int>("partial", 8));
 }
@@ -140,6 +140,33 @@ TEST(interpreter, get_array_values)
   EXPECT_EQ(1, array_values[0]);
   EXPECT_EQ(2, array_values[1]);
   EXPECT_EQ(3, array_values[2]);
+}
+
+TEST(interpreter, unset_values)
+{
+  interpreter walker;
+  std::map<int, std::string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
+  walker.define("array", values);
+  walker.define("ro_array", values, true);
+  walker.define("var", "123");
+  walker.define("ro_var", "123", true);
+
+  EXPECT_STREQ("2", walker.resolve<string>("array", 1).c_str());
+  walker.unset("array", 1);
+  EXPECT_STREQ("", walker.resolve<string>("array", 1).c_str());
+  walker.unset("array");
+  EXPECT_STREQ("", walker.resolve<string>("array", 0).c_str());
+  EXPECT_STREQ("", walker.resolve<string>("array", 1).c_str());
+  EXPECT_STREQ("", walker.resolve<string>("array", 2).c_str());
+
+  EXPECT_THROW(walker.unset("ro_array", 1), interpreter_exception);
+  EXPECT_THROW(walker.unset("ro_array"), interpreter_exception);
+
+  EXPECT_STREQ("123", walker.resolve<string>("var").c_str());
+  walker.unset("var");
+  EXPECT_STREQ("", walker.resolve<string>("var").c_str());
+
+  EXPECT_THROW(walker.unset("ro_var"), interpreter_exception);
 }
 
 TEST(interperter, substring_expansion_exception)

@@ -137,12 +137,10 @@ public:
   variable(const std::string& name,
            const T& v,
            bool ro=false,
-           bool is_null=false,
            const unsigned index=0)
     : name(name), readonly(ro)
   {
-    if(!is_null)
-        value[index] = v;
+    value[index] = v;
   }
 
   /// \brief retrieve actual value of the variable, if index is out of bound,
@@ -182,16 +180,22 @@ public:
   /// \param whether to set the variable to null value, default is false
   template <typename T>
   void set_value(const T& new_value,
-                 const unsigned index=0,
-                 bool is_null=false)
+                 const unsigned index=0)
   {
     if(readonly)
       throw interpreter_exception(get_name() + " is readonly variable");
 
-    if(is_null)
-        value.erase(index);
-    else
-        value[index] = new_value;
+    value[index] = new_value;
+  }
+
+  /// \brief unset the variable, only used for array variable
+  /// \param the index to be unset
+  void unset_value(const unsigned index)
+  {
+    if(readonly)
+      throw interpreter_exception(get_name() + " is readonly variable");
+
+    value.erase(index);
   }
 
   /// \brief get the length of a variable
@@ -211,9 +215,23 @@ public:
 
   /// \brief check whether the value of the variable is null
   /// \return whether the value of the variable is null
-  bool is_null(const unsigned index=0) const
+  bool is_unset(const unsigned index=0) const
   {
     return value.find(index) == value.end();
+  }
+
+  /// \brief check whether the value of the variable is unset
+  /// \return whether the value of the variable is unset
+  bool is_null(const unsigned index=0) const
+  {
+    return get_value<std::string>(index) == "";
+  }
+
+  /// \brief check whether the value of the variable is readonly
+  /// \return whether the value of the variable is readonly
+  bool is_readonly() const
+  {
+    return readonly;
   }
 };
 
@@ -222,7 +240,7 @@ template <>
 inline variable::variable<>(const std::string& name,
                             const std::map<int, std::string>& v,
                             bool ro,
-                            bool, unsigned)
+                            unsigned)
     : name(name), value(v.begin(), v.end()), readonly(ro)
 {
 }

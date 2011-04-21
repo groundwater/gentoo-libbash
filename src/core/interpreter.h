@@ -468,14 +468,13 @@ public:
   template <typename T>
   const T& set_value(const std::string& name,
                      const T& new_value,
-                     const unsigned index=0,
-                     bool is_null=false)
+                     const unsigned index=0)
   {
     auto i = members.find(name);
     if(i == members.end())
-      define(name, new_value, false, is_null, index);
+      define(name, new_value, false, index);
     else
-      i->second->set_value(new_value, index, is_null);
+      i->second->set_value(new_value, index);
     return new_value;
   }
 
@@ -494,6 +493,15 @@ public:
     return resolve<T>("?");
   }
 
+  /// \brief unset a variable
+  /// \param the name of the variable
+  void unset(const std::string& name);
+
+  /// \brief unset a array member
+  /// \param the name of the array
+  /// \param the index of the member
+  void unset(const std::string& name, const unsigned index);
+
   /// \brief define a new global variable
   /// \param the name of the variable
   /// \param the value of the variable
@@ -503,11 +511,10 @@ public:
   void define(const std::string& name,
               const T& value,
               bool readonly=false,
-              bool is_null=false,
               const unsigned index=0)
   {
     std::shared_ptr<variable> target(
-        new variable(name, value, readonly, is_null, index));
+        new variable(name, value, readonly, index));
     members[name] = target;
   }
 
