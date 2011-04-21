@@ -27,6 +27,9 @@
 #include <vector>
 
 #include <boost/spirit/include/karma.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/trim.hpp>
 
 #include "libbash.h"
 
@@ -55,6 +58,8 @@ static const std::unordered_map<std::string, std::string> phases = {
 
 int main(int argc, char** argv)
 {
+  using namespace boost::spirit::karma;
+
   if(argc != 2)
   {
     std::cerr<<"Please provide your script as an argument"<<std::endl;
@@ -69,9 +74,19 @@ int main(int argc, char** argv)
   {
     auto iter_value = variables.find(*iter_name);
     if(iter_value != variables.end())
-      std::cout << iter_value->second[0] << std::endl;
+    {
+      std::vector<std::string> formatted;
+      boost::trim_if(iter_value->second[0], boost::is_any_of(" \t\n"));
+      boost::split(formatted,
+                   iter_value->second[0],
+                   boost::is_any_of(" \t\n"),
+                   boost::token_compress_on);
+      std::cout << format(string % ' ', formatted) << std::endl;
+    }
     else
+    {
       std::cout << std::endl;
+    }
   }
 
   // Print defined phases
