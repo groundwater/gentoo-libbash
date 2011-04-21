@@ -523,6 +523,8 @@ public:
     return functions.find(name) != functions.end();
   }
 
+  void get_all_function_names(std::vector<std::string>& function_names);
+
   /// \brief execute builtin
   /// \param builtin name
   /// \param builtin arguments

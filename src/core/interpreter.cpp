@@ -31,6 +31,8 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/range/adaptor/map.hpp>
+#include <boost/range/algorithm/copy.hpp>
 
 #include "libbashWalker.h"
 
@@ -162,4 +164,9 @@ void interpreter::lazy_remove_at_end(std::string& value,
 void interpreter::trim_trailing_eols(std::string& value)
 {
   boost::trim_right_if(value, boost::is_any_of("\n"));
+}
+
+void interpreter::get_all_function_names(std::vector<std::string>& function_names)
+{
+  boost::copy(functions | boost::adaptors::map_keys, back_inserter(function_names));
 }

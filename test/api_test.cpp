@@ -31,6 +31,7 @@ using namespace std;
 TEST(libbashapi, bad_path)
 {
   std::unordered_map<std::string, std::vector<std::string>> variables;
-  EXPECT_THROW(libbash::interpret("not exist", variables),
+  std::vector<std::string> functions;
+  EXPECT_THROW(libbash::interpret("not exist", variables, functions),
                interpreter_exception);
 }

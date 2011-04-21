@@ -41,7 +41,8 @@ namespace libbash
   /// \param the path of target script
   /// \param the map to store variables
   void LIBBASH_API interpret(const std::string& path,
-                             std::unordered_map<std::string, std::vector<std::string>>& variables);
+                             std::unordered_map<std::string, std::vector<std::string>>& variables,
+                             std::vector<std::string>& functions);
 }
 
 #endif

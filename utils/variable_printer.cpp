@@ -41,7 +41,8 @@ int main(int argc, char** argv)
   }
 
   std::unordered_map<std::string, std::vector<std::string>> variables;
-  libbash::interpret(argv[1], variables);
+  std::vector<std::string> functions;
+  libbash::interpret(argv[1], variables, functions);
 
   std::map<std::string, std::vector<std::string>> sorted(variables.begin(), variables.end());
   // Currently we don't need internal variables

@@ -1,0 +1,25 @@
+dev-db/sqlite:3
+		dev-util/pkgconfig
+dev-db/sqlite:3
+0
+http://sunpinyin.googlecode.com/files/.tar.gz
+		http://open-gram.googlecode.com/files/dict.utf8.tar.bz2
+		http://open-gram.googlecode.com/files/lm_sc.t3g.arpa.tar.bz2
+
+http://sunpinyin.googlecode.com
+LGPL-2.1 CDDL
+SunPinyin is a SLM (Statistical Language Model) based IME
+~amd64 ~x86
+
+
+
+
+
+1
+
+compile install postinst unpack
+
+
+
+
+
