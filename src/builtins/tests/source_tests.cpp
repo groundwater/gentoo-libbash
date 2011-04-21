@@ -17,26 +17,31 @@
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
 ///
-/// \file cppbash_builtin.cpp
-/// \author Nathan Eloe
-/// \brief Implementation of class to inherit builtins from
+/// \file source_tests.cpp
+/// \brief series of unit tests for source built in
 ///
 
+#include <cstdlib>
+
+#include <iostream>
+#include <string>
+
+#include <gtest/gtest.h>
+
+#include "core/interpreter.h"
 #include "cppbash_builtin.h"
-#include "builtins/echo_builtin.h"
-#include "builtins/boolean_builtins.h"
-#include "builtins/source_builtin.h"
 
-cppbash_builtin::cppbash_builtin(BUILTIN_ARGS): _out_stream(&out), _err_stream(&err), _inp_stream(&in), _walker(walker)
+using namespace std;
+
+TEST(source_builtin_test, source)
 {
-}
+  std::string srcdir(getenv("srcdir"));
+  interpreter walker;
+  int status = cppbash_builtin::exec("source", {srcdir + "/scripts/source_true.sh"}, std::cout, std::cerr, std::cin, walker);
+  EXPECT_EQ(status, 0);
+  EXPECT_TRUE(walker.has_function("foo"));
+  EXPECT_STREQ("hello", walker.resolve<std::string>("FOO001").c_str());
 
-cppbash_builtin::builtins_type& cppbash_builtin::builtins() {
-  static boost::scoped_ptr<builtins_type> p(new builtins_type {
-      {"echo", boost::factory<echo_builtin*>()},
-      {"source", boost::factory<source_builtin*>()},
-      {"true", boost::factory<true_builtin*>()},
-      {"false", boost::factory<false_builtin*>()}
-  });
-  return *p;
+  status = cppbash_builtin::exec("source", {srcdir + "/scripts/source_false.sh"}, std::cout, std::cerr, std::cin, walker);
+  EXPECT_EQ(status, 1);
 }

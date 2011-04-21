@@ -17,26 +17,31 @@
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
 ///
-/// \file cppbash_builtin.cpp
-/// \author Nathan Eloe
-/// \brief Implementation of class to inherit builtins from
+/// \file source_builtin.h
+/// \author Mu Qiao
+/// \brief class that implements the source builtin
 ///
 
+#ifndef LIBBASH_BUILTINS_SOURCE_BUILTIN_H_
+#define LIBBASH_BUILTINS_SOURCE_BUILTIN_H_
+
 #include "cppbash_builtin.h"
-#include "builtins/echo_builtin.h"
-#include "builtins/boolean_builtins.h"
-#include "builtins/source_builtin.h"
 
-cppbash_builtin::cppbash_builtin(BUILTIN_ARGS): _out_stream(&out), _err_stream(&err), _inp_stream(&in), _walker(walker)
+///
+/// \class source_builtin
+/// \brief the source builtin for bash
+///
+class source_builtin: public virtual cppbash_builtin
 {
-}
+  public:
+    BUILTIN_CONSTRUCTOR(source)
 
-cppbash_builtin::builtins_type& cppbash_builtin::builtins() {
-  static boost::scoped_ptr<builtins_type> p(new builtins_type {
-      {"echo", boost::factory<echo_builtin*>()},
-      {"source", boost::factory<source_builtin*>()},
-      {"true", boost::factory<true_builtin*>()},
-      {"false", boost::factory<false_builtin*>()}
-  });
-  return *p;
-}
+    ///
+    /// \brief runs the source builtin on the supplied arguments
+    /// \param bash_args the arguments to the source builtin
+    /// \return exit status of source
+    ///
+    virtual int exec(const std::vector<std::string>& bash_args);
+};
+
+#endif

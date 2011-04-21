@@ -101,6 +101,7 @@ cppunittests_SOURCES =  test/run_tests.cpp \
 						src/core/tests/interpreter_test.cpp \
 						src/builtins/tests/echo_tests.cpp \
 						src/builtins/tests/boolean_tests.cpp \
+						src/builtins/tests/source_tests.cpp \
 						test/post_check.cpp \
 						test/api_test.cpp \
 						test/walker_test.cpp
@@ -158,6 +159,8 @@ libcppbash_la_SOURCES = src/common.h \
 						src/builtins/echo_builtin.cpp \
 						src/builtins/echo_builtin.h \
 						src/builtins/boolean_builtins.h \
+						src/builtins/source_builtin.h \
+						src/builtins/source_builtin.cpp \
 						$(GENERATED_PARSER_C) \
 						$(GENERATED_PARSER_H) \
 						src/core/interpreter_exception.h \
@@ -182,6 +185,8 @@ EXTRA_DIST = bashast/bashast.g \
 			 bashast/features_script/features.sh.tokens \
 			 test/ast_printer_test.sh \
 			 test/verify_bashs_test.sh \
+			 scripts/source_false.sh \
+			 scripts/source_true.sh \
 			 utils/meta_gen.sh \
 			 $(BASH_TESTS) \
 			 $(BASH_RESULT) \

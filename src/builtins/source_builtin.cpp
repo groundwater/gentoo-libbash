@@ -17,26 +17,34 @@
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
 ///
-/// \file cppbash_builtin.cpp
-/// \author Nathan Eloe
-/// \brief Implementation of class to inherit builtins from
+/// \file source_builtin.h
+/// \author Mu Qiao
+/// \brief class that implements the source builtin
 ///
 
-#include "cppbash_builtin.h"
-#include "builtins/echo_builtin.h"
-#include "builtins/boolean_builtins.h"
 #include "builtins/source_builtin.h"
 
-cppbash_builtin::cppbash_builtin(BUILTIN_ARGS): _out_stream(&out), _err_stream(&err), _inp_stream(&in), _walker(walker)
-{
-}
+#include <fstream>
+#include <string>
 
-cppbash_builtin::builtins_type& cppbash_builtin::builtins() {
-  static boost::scoped_ptr<builtins_type> p(new builtins_type {
-      {"echo", boost::factory<echo_builtin*>()},
-      {"source", boost::factory<source_builtin*>()},
-      {"true", boost::factory<true_builtin*>()},
-      {"false", boost::factory<false_builtin*>()}
-  });
-  return *p;
+#include "cppbash_builtin.h"
+#include "core/interpreter.h"
+#include "core/interpreter_exception.h"
+#include "core/bash_ast.h"
+
+int source_builtin::exec(const std::vector<std::string>& bash_args)
+{
+  if(bash_args.size() == 0)
+    throw interpreter_exception("should provide one argument for source builtin");
+
+  // we need fix this to pass extra arguments as positional parameters
+  const std::string& path = bash_args[0];
+  std::ifstream input(path);
+  if(!input)
+    throw interpreter_exception(path + " can't be read");
+
+  bash_ast ast(input);
+  ast.interpret_with(_walker);
+
+  return _walker.get_status();
 }
