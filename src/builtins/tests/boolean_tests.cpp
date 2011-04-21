@@ -21,19 +21,24 @@
 /// \brief series of unit tests for echo built in
 ///
 #include <iostream>
-#include "../../cppbash_builtin.h"
+
 #include <gtest/gtest.h>
+
+#include "core/interpreter.h"
+#include "cppbash_builtin.h"
 
 using namespace std;
 
 TEST(boolean_builtin_test, true)
 {
-  int result = cppbash_builtin::exec("true", {}, std::cout, std::cerr, std::cin);
+  interpreter walker;
+  int result = cppbash_builtin::exec("true", {}, std::cout, std::cerr, std::cin, walker);
   ASSERT_EQ(0, result);
 }
 
 TEST(boolean_builtin_test, false)
 {
-  int result = cppbash_builtin::exec("false", {}, std::cout, std::cerr, std::cin);
+  interpreter walker;
+  int result = cppbash_builtin::exec("false", {}, std::cout, std::cerr, std::cin, walker);
   ASSERT_EQ(1, result);
 }

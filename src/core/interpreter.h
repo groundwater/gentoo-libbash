@@ -46,7 +46,8 @@ typedef struct libbashWalker_Ctx_struct * plibbashWalker;
 /// \class interpreter
 /// \brief implementation for bash interpreter
 ///
-class interpreter{
+class interpreter
+{
 
   /// \var private::members
   /// \brief global symbol table for variables
@@ -547,7 +548,7 @@ public:
   int execute_builtin(const std::string& name,
                       const std::vector<std::string>& args)
   {
-    return cppbash_builtin::exec(name, args, *out, *err, *in);
+    return cppbash_builtin::exec(name, args, *out, *err, *in, *this);
   }
 
   /// \brief perform ${parameter:−word} expansion

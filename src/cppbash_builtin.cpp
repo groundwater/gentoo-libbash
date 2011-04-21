@@ -26,7 +26,7 @@
 #include "builtins/echo_builtin.h"
 #include "builtins/boolean_builtins.h"
 
-cppbash_builtin::cppbash_builtin(std::ostream &outstream, std::ostream &errstream, std::istream &instream): _out_stream(&outstream), _err_stream(&errstream), _inp_stream(&instream)
+cppbash_builtin::cppbash_builtin(BUILTIN_ARGS): _out_stream(&out), _err_stream(&err), _inp_stream(&in), _walker(walker)
 {
 }
 

@@ -22,17 +22,21 @@
 /// \author Nathan Eloe
 ///
 #include <iostream>
-#include "../../cppbash_builtin.h"
 #include <sstream>
 #include <vector>
+
 #include <gtest/gtest.h>
+
+#include "core/interpreter.h"
+#include "cppbash_builtin.h"
 
 using namespace std;
 
 static void test_echo(const string& expected, std::initializer_list<string> args)
 {
   stringstream test_output;
-  cppbash_builtin::exec("echo",args,test_output,cerr,cin);
+  interpreter walker;
+  cppbash_builtin::exec("echo",args,test_output,cerr,cin,walker);
   ASSERT_EQ(expected, test_output.str());
 }
 

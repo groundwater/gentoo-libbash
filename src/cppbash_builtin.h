@@ -34,8 +34,9 @@
 #include <boost/function.hpp>
 #include <boost/scoped_ptr.hpp>
 
-#define STREAM_ARGS std::ostream &out, std::ostream &err, std::istream &in
+#define BUILTIN_ARGS std::ostream &out, std::ostream &err, std::istream &in, interpreter &walker
 
+class interpreter;
 ///
 /// \class cppbash_builtin
 /// \brief a virtual class to inherit builtin functions from
@@ -49,7 +50,7 @@ class cppbash_builtin
     /// \param errstream where to send standard error.  Default: cerr
     /// \param instream where to get standard input from.  Default: stdin
     ///
-    explicit cppbash_builtin(STREAM_ARGS);
+    explicit cppbash_builtin(BUILTIN_ARGS);
     /// prevent copying
     cppbash_builtin(const cppbash_builtin& ) = delete;
     const cppbash_builtin& operator=( const cppbash_builtin& ) = delete;
@@ -77,9 +78,11 @@ class cppbash_builtin
     ///
     std::istream& input_buffer() {return *_inp_stream;}
 
-    static int exec(const std::string& builtin, const std::vector<std::string>& args, STREAM_ARGS)
+    static int exec(const std::string& builtin,
+                    const std::vector<std::string>& args,
+                    BUILTIN_ARGS)
     {
-      boost::scoped_ptr<cppbash_builtin> p(builtins()[builtin](out,err,in));
+      boost::scoped_ptr<cppbash_builtin> p(builtins()[builtin](out,err,in,walker));
       return p->exec(args);
     }
 
@@ -110,15 +113,19 @@ class cppbash_builtin
     /// \brief current standard input stream
     ///
     std::istream *_inp_stream;
+
+    interpreter& _walker;
+
     ///
     /// \var builtins
     /// \brief holds factories for creating instances of child classes
     ///
-    typedef std::map<std::string, boost::function< cppbash_builtin*(STREAM_ARGS) >> builtins_type;
+    typedef std::map<std::string, boost::function< cppbash_builtin*(BUILTIN_ARGS) >> builtins_type;
     static builtins_type& builtins();
+
 };
 
 #define BUILTIN_CONSTRUCTOR(name) \
-  name ## _builtin(STREAM_ARGS) : cppbash_builtin(out, err, in) {}
+  name ## _builtin(BUILTIN_ARGS) : cppbash_builtin(out, err, in, walker) {}
 
 #endif
