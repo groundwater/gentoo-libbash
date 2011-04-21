@@ -1,5 +1,7 @@
 EAPI="1"
 
+inherit foo
+
 DESCRIPTION="SunPinyin is a SLM (Statistical Language Model) based IME"
 HOMEPAGE="http://sunpinyin.googlecode.com"
 SRC_URI="${HOMEPAGE}/files/${P}.tar.gz

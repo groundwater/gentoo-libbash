@@ -24,6 +24,7 @@
 
 #include "cppbash_builtin.h"
 #include "builtins/echo_builtin.h"
+#include "builtins/inherit_builtin.h"
 #include "builtins/boolean_builtins.h"
 #include "builtins/source_builtin.h"
 
@@ -35,6 +36,7 @@ cppbash_builtin::builtins_type& cppbash_builtin::builtins() {
   static boost::scoped_ptr<builtins_type> p(new builtins_type {
       {"echo", boost::factory<echo_builtin*>()},
       {"source", boost::factory<source_builtin*>()},
+      {"inherit", boost::factory<inherit_builtin*>()},
       {"true", boost::factory<true_builtin*>()},
       {"false", boost::factory<false_builtin*>()}
   });

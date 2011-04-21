@@ -73,20 +73,40 @@ int main(int argc, char** argv)
   for(auto iter_name = metadata_names.begin(); iter_name != metadata_names.end(); ++iter_name)
   {
     auto iter_value = variables.find(*iter_name);
+    std::string value;
+
     if(iter_value != variables.end())
+      value = iter_value->second[0];
+
+    // Check if global is defined
+    auto iter_global = variables.find("E_" + *iter_name);
+    if(iter_global != variables.end())
     {
-      std::vector<std::string> formatted;
-      boost::trim_if(iter_value->second[0], boost::is_any_of(" \t\n"));
-      boost::split(formatted,
-                   iter_value->second[0],
+      boost::trim_if(iter_global->second[0], boost::is_any_of(" \t\n"));
+      std::vector<std::string> splitted_global;
+      boost::split(splitted_global,
+                   iter_global->second[0],
                    boost::is_any_of(" \t\n"),
                    boost::token_compress_on);
-      std::cout << format(string % ' ', formatted) << std::endl;
+
+      // Append the global value to 'value' if it doesn't cause duplication
+      for(auto iter_splitted_global = splitted_global.begin();
+          iter_splitted_global != splitted_global.end();
+          ++iter_splitted_global)
+      {
+        if(value.find(*iter_splitted_global) == std::string::npos)
+          value += " " + *iter_splitted_global;
+      }
     }
-    else
-    {
-      std::cout << std::endl;
-    }
+
+    boost::trim_if(value, boost::is_any_of(" \t\n"));
+
+    std::vector<std::string> splitted_value;
+    boost::split(splitted_value,
+                 value,
+                 boost::is_any_of(" \t\n"),
+                 boost::token_compress_on);
+    std::cout << format(string % ' ', splitted_value) << std::endl;
   }
 
   // Print defined phases
@@ -97,8 +117,6 @@ int main(int argc, char** argv)
     if(iter_phase != phases.end())
       sorted_phases.insert(iter_phase->second);
   }
-
-  using namespace boost::spirit::karma;
   std::cout << format(string % ' ', sorted_phases) << std::endl;
 
   // Print empty lines

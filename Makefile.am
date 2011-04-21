@@ -161,6 +161,8 @@ libcppbash_la_SOURCES = src/common.h \
 						src/builtins/boolean_builtins.h \
 						src/builtins/source_builtin.h \
 						src/builtins/source_builtin.cpp \
+						src/builtins/inherit_builtin.h \
+						src/builtins/inherit_builtin.cpp \
 						$(GENERATED_PARSER_C) \
 						$(GENERATED_PARSER_H) \
 						src/core/interpreter_exception.h \
@@ -188,6 +190,7 @@ EXTRA_DIST = bashast/bashast.g \
 			 scripts/source_false.sh \
 			 scripts/source_true.sh \
 			 utils/meta_gen.sh \
+			 scripts/foo.eclass \
 			 $(BASH_TESTS) \
 			 $(BASH_RESULT) \
 			 $(EBUILD_TESTS) \
