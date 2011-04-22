@@ -321,6 +321,8 @@ for_expr
 @declarations {
 	ANTLR3_MARKER commands_index;
 	std::vector<std::string> splitted_values;
+
+	ANTLR3_MARKER condition_index;
 }
 	:^(FOR libbash_string=name_base
 		// Empty value as $@ is not supported currently
@@ -341,7 +343,42 @@ for_expr
 				walker->set_value(libbash_string, *iter);
 				command_list(ctx);
 			}
-		});
+		})
+	|^(CFOR {
+		// omit the first DOWN token for for_INIT
+		SEEK(INDEX() + 1);
+
+		if(LA(1) == FOR_INIT)
+			for_initilization(ctx);
+
+		condition_index = INDEX();
+		bool has_condition = (LA(1) != FOR_COND);
+		while(has_condition || for_condition(ctx))
+		{
+			command_list(ctx);
+			if(LA(1) == FOR_MOD)
+				for_modification(ctx);
+			SEEK(condition_index);
+		}
+
+		// Get out of the loop
+		// We are standing right after for_condition, we need to skip the command_list and optional for_modification
+		seek_to_next_tree(ctx);
+		if(LA(1) == FOR_MOD)
+			seek_to_next_tree(ctx);
+
+		// omit the last UP token
+		SEEK(INDEX() + 1);
+	});
+
+for_initilization
+	:^(FOR_INIT arithmetics);
+
+for_condition returns[int libbash_value]
+	:^(FOR_COND condition=arithmetics) { libbash_value = condition; };
+
+for_modification
+	:^(FOR_MOD arithmetics);
 
 command_substitution returns[std::string libbash_value]
 @declarations {

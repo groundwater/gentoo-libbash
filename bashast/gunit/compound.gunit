@@ -89,10 +89,10 @@ done" -> (for each (STRING (COMMAND_SUB (LIST (| (COMMAND (STRING ls)) (COMMAND 
 "for i in foo$var bar; do echo $i; done" -> (for i (STRING foo (VAR_REF var)) (STRING bar) (LIST (COMMAND (STRING echo) (STRING (VAR_REF i)))))
 "for each in `ls |grep log`; do echo file done" FAIL
 
-"for ((5+3;5+3;5+3)); do echo yay; done" -> (for (FOR_INIT (+ 5 3)) (FOR_COND (+ 5 3)) (FOR_MOD (+ 5 3)) (LIST (COMMAND (STRING echo) (STRING yay))))
-"for ((5+3; ;5+3)); do echo yay; done" -> (for (FOR_INIT (+ 5 3)) (FOR_MOD (+ 5 3)) (LIST (COMMAND (STRING echo) (STRING yay))))
-"for ((;5+3 ;5+3)); do echo yay; done" -> (for (FOR_COND (+ 5 3)) (FOR_MOD (+ 5 3)) (LIST (COMMAND (STRING echo) (STRING yay))))
-"for ((5+3;;5+3)); do echo yay; done" -> (for (FOR_INIT (+ 5 3)) (FOR_MOD (+ 5 3)) (LIST (COMMAND (STRING echo) (STRING yay))))
+"for ((5+3;5+3;5+3)); do echo yay; done" -> (CFOR (FOR_INIT (+ 5 3)) (FOR_COND (+ 5 3)) (LIST (COMMAND (STRING echo) (STRING yay))) (FOR_MOD (+ 5 3)))
+"for ((5+3; ;5+3)); do echo yay; done" -> (CFOR (FOR_INIT (+ 5 3)) (LIST (COMMAND (STRING echo) (STRING yay))) (FOR_MOD (+ 5 3)))
+"for ((;5+3 ;5+3)); do echo yay; done" -> (CFOR (FOR_COND (+ 5 3)) (LIST (COMMAND (STRING echo) (STRING yay))) (FOR_MOD (+ 5 3)))
+"for ((5+3;;5+3)); do echo yay; done" -> (CFOR (FOR_INIT (+ 5 3)) (LIST (COMMAND (STRING echo) (STRING yay))) (FOR_MOD (+ 5 3)))
 
 
 sel_expr:
