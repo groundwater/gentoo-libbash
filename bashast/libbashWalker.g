@@ -272,7 +272,8 @@ var_ref [bool double_quoted] returns[std::string libbash_value]
 
 command
 	:variable_definitions
-	|simple_command;
+	|simple_command
+	|compound_command;
 
 simple_command
 @declarations {
@@ -280,28 +281,29 @@ simple_command
 }
 	:^(COMMAND string_expr (argument[libbash_args])* var_def*) {
 		if(walker->has_function($string_expr.libbash_value))
-			walker->call($string_expr.libbash_value,
-						 libbash_args,
-						 ctx,
-						 compound_command);
+		{
+			walker->set_status(walker->call($string_expr.libbash_value,
+											libbash_args,
+											ctx,
+											compound_command));
+		}
 		else if(cppbash_builtin::is_builtin($string_expr.libbash_value))
-			walker->execute_builtin($string_expr.libbash_value, libbash_args);
+		{
+			walker->set_status(walker->execute_builtin($string_expr.libbash_value, libbash_args));
+		}
 		else
+		{
 			std::cerr << $string_expr.libbash_value << " is not supported yet" << std::endl;
+			walker->set_status(1);
+		}
 	};
 
 argument[std::vector<std::string>& args]
 	: string_expr {
 		if($string_expr.quoted)
-		{
 			args.push_back($string_expr.libbash_value);
-		}
 		else
-		{
-			std::vector<std::string> arguments;
-			walker->split_word($string_expr.libbash_value, arguments);
-			args.insert(args.end(), arguments.begin(), arguments.end());
-		}
+			walker->split_word($string_expr.libbash_value, args);
 	};
 
 logic_command_list
@@ -311,7 +313,35 @@ logic_command_list
 
 command_list: ^(LIST logic_command_list+);
 
-compound_command: ^(CURRENT_SHELL command_list);
+compound_command
+	: ^(CURRENT_SHELL command_list)
+	| for_expr;
+
+for_expr
+@declarations {
+	ANTLR3_MARKER commands_index;
+	std::vector<std::string> splitted_values;
+}
+	:^(FOR libbash_string=name_base
+		// Empty value as $@ is not supported currently
+		(string_expr
+		{
+			// Word splitting happens here
+			if($string_expr.quoted)
+				splitted_values.push_back($string_expr.libbash_value);
+			else
+				walker->split_word($string_expr.libbash_value, splitted_values);
+		}
+		)+
+		{
+			commands_index = INDEX();
+			for(auto iter = splitted_values.begin(); iter != splitted_values.end(); ++iter)
+			{
+				SEEK(commands_index);
+				walker->set_value(libbash_string, *iter);
+				command_list(ctx);
+			}
+		});
 
 command_substitution returns[std::string libbash_value]
 @declarations {

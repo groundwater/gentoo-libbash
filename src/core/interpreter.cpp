@@ -75,7 +75,9 @@ void interpreter::split_word(const std::string& word, std::vector<std::string>& 
   if(trimmed == "")
     return;
 
-  boost::split(output, trimmed, boost::is_any_of(delimeter), boost::token_compress_on);
+  std::vector<std::string> splitted_values;
+  boost::split(splitted_values, trimmed, boost::is_any_of(delimeter), boost::token_compress_on);
+  output.insert(output.end(), splitted_values.begin(), splitted_values.end());
 }
 
 inline void define_function_arguments(std::unique_ptr<scope>& current_stack,

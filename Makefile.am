@@ -52,12 +52,14 @@ BASH_TESTS = scripts/var_def.bash \
 			 scripts/command_execution.bash \
 			 scripts/function_def.bash \
 			 scripts/arithmetic_assignment.bash \
+			 scripts/compound_command.bash \
 			 scripts/binary_arithmetic.bash
 BASH_RESULT = scripts/var_def.bash.result \
 			  scripts/var_expansion.bash.result \
 			  scripts/command_execution.bash.result \
 			  scripts/function_def.bash.result \
 			  scripts/arithmetic_assignment.bash.result \
+			  scripts/compound_command.bash.result \
 			  scripts/binary_arithmetic.bash.result
 
 TESTS = $(GUNIT_TESTS) $(BASH_TESTS)
