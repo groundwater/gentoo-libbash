@@ -180,6 +180,7 @@ EXTRA_DIST = bashast/bashast.g \
 			 bashast/features_script/features.sh.tokens \
 			 test/ast_printer_test.sh \
 			 test/verify_bashs_test.sh \
+			 utils/meta_gen.sh \
 			 $(BASH_TESTS) \
 			 $(BASH_RESULT) \
 			 $(EBUILD_TESTS) \
@@ -240,3 +241,6 @@ callgrind.out: ast_printer
 
 benchmark_parser: callgrind.out
 	callgrind_annotate callgrind.out
+
+generate_metadata: metadata_generator
+	srcdir=$(srcdir) utils/meta_gen.sh
