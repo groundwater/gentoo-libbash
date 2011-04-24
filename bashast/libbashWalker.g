@@ -64,24 +64,27 @@ options
 		index = value;
 	}
 
-	// Recursively count number of nodes of curr
-	static int count_nodes(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE curr)
+	// seek to LT(2) and consume
+	static void seek_to_next_tree(plibbashWalker ctx)
 	{
-		int child_count = adaptor->getChildCount(adaptor, curr);
-		if(child_count == 0)
+		// We start from LA(1)
+		int index = 1;
+		// Current depth of the tree we are traversing
+		int depth = 1;
+
+		for(index = 1; depth != 0; ++index)
 		{
-			// Leaf node
-			return 1;
+			// Go one level done if we encounter DOWN
+			if(LA(index) == DOWN)
+				++depth;
+			// Go one level up if we encounter UP. When depth==0, we finishe one node
+			else if(LA(index) == UP)
+				--depth;
 		}
-		else
-		{
-			int result = 0;
-			// Count every child
-			for(int i = 0; i != child_count; ++i)
-				result += count_nodes(adaptor, (pANTLR3_BASE_TREE)(adaptor->getChild(adaptor, curr, i)));
-			// Add itself, DOWN and UP
-			return result + 3;
-		}
+
+		// Seek to the correct offset and consume.
+		SEEK(INDEX() + index - 3);
+		CONSUME();
 	}
 
 }
@@ -324,11 +327,8 @@ function_def returns[int placeholder]
 	:^(FUNCTION ^(STRING name) {
 		// Define the function with current index
 		walker->define_function($name.libbash_value, INDEX());
-		// Skip the AST for function body, minus one is needed to make the offset right.
-		// LT(1) is the function body. It should match the compound_command rule.
-		SEEK(INDEX() + count_nodes(ADAPTOR, LT(1)) - 1);
-		// After seeking ahead, we need to call CONSUME to eat all the nodes we've skipped.
-		CONSUME();
+		// Skip the AST for function body
+		seek_to_next_tree(ctx);
 	});
 
 // Only used in arithmetic expansion
