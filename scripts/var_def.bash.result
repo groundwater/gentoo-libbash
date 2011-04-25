@@ -1,3 +1,8 @@
+$* has not been implemented yet
+$@ has not been implemented yet
+$# has not been implemented yet
+$- has not been implemented yet
+$! has not been implemented yet
 ARRAY01=1 2 3 4 5
 ARRAY02=1 2 4 5
 ARRAY03=2 3
@@ -18,6 +23,7 @@ EMPTY_ARRAY=
 FOO001=networkmanager
 FOO002=0.8.2
 FOO003=networkmanager-0.8.2
+FOO004=
 HOMEPAGE=http://sunpinyin.googlecode.com
 IUSE=
 KEYWORDS=~amd64 ~x86

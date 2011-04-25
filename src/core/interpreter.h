@@ -485,6 +485,14 @@ public:
     set_value("?", status);
   }
 
+  /// \brief get the return status of the last command
+  /// \param the value of the return status
+  template <typename T=int>
+  T get_status(void)
+  {
+    return resolve<T>("?");
+  }
+
   /// \brief define a new global variable
   /// \param the name of the variable
   /// \param the value of the variable
