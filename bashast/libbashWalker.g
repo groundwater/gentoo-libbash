@@ -86,7 +86,6 @@ options
 		SEEK(INDEX() + index - 3);
 		CONSUME();
 	}
-
 }
 
 start: list|EOF;
@@ -321,7 +320,24 @@ command_list: ^(LIST logic_command_list+);
 
 compound_command
 	: ^(CURRENT_SHELL command_list)
+	| ^(COMPOUND_COND cond_expr)
 	| for_expr;
+
+cond_expr
+	:^(BUILTIN_TEST status=builtin_condition) { walker->set_status(!status); };
+
+builtin_condition returns[bool status]
+	:^(NEGATION l=builtin_condition) { $status = !l; }
+	|s=builtin_condition_primary { $status = s; };
+
+builtin_condition_primary returns[bool status]
+	:^(NAME string_expr string_expr) { throw interpreter_exception(walker->get_string($NAME) + "(NAME) is not supported for now");}
+	|^(EQUALS l=string_expr r=string_expr) { $status = (l.libbash_value == r.libbash_value); }
+	|^(NOT_EQUALS l=string_expr r=string_expr) { $status = (l.libbash_value != r.libbash_value); }
+	|^(ESC_LT l=string_expr r=string_expr) { $status = (l.libbash_value < r.libbash_value); }
+	|^(ESC_GT l=string_expr r=string_expr) { $status = (l.libbash_value > r.libbash_value); }
+	|^(LETTER l=string_expr) { throw interpreter_exception(walker->get_string($LETTER) + "(LETTER) is not supported for now");}
+	|string_expr { $status = ($string_expr.libbash_value.size() != 0); };
 
 for_expr
 @declarations {
