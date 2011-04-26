@@ -34,3 +34,15 @@ while [ $i \< 0 ]
 do
     echo "Shouldn't print this"
 done
+
+i=0;
+until [ $i == 4 ]
+do
+    i=$(( i + 1 ))
+    echo $i
+done
+
+until [ $i \> 0 ]
+do
+    echo "Shouldn't print this"
+done

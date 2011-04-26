@@ -406,8 +406,9 @@ for_modification
 while_expr
 @declarations {
 	ANTLR3_MARKER command_index;
+	bool negate;
 }
-	:^(WHILE {
+	:^((WHILE { negate = false; } | UNTIL { negate = true; }) {
 		// omit the first DOWN token
 		SEEK(INDEX() + 1);
 
@@ -415,7 +416,7 @@ while_expr
 		while(true)
 		{
 			command_list(ctx);
-			if(walker->get_status())
+			if(walker->get_status() == (negate? 0 : 1))
 				break;
 			command_list(ctx);
 			SEEK(command_index);
