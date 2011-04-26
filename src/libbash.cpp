@@ -27,8 +27,7 @@
 #include <fstream>
 
 #include "core/interpreter.h"
-#include "core/parser_builder.h"
-#include "core/walker_builder.h"
+#include "core/bash_ast.h"
 
 namespace libbash
 {
@@ -39,11 +38,12 @@ namespace libbash
     std::ifstream input(path.c_str());
     if(!input)
       throw interpreter_exception("Unable to create fstream for script: " + path);
-    parser_builder pbuilder(input);
-    walker_builder wbuilder = pbuilder.create_walker_builder();
+    interpreter walker;
+    bash_ast ast(input);
+    ast.interpret_with(walker);
 
-    for(auto iter = wbuilder.walker->begin(); iter != wbuilder.walker->end(); ++iter)
+    for(auto iter = walker.begin(); iter != walker.end(); ++iter)
       iter->second->get_all_values<std::string>(variables[iter->first]);
-    wbuilder.walker->get_all_function_names(functions);
+    walker.get_all_function_names(functions);
   }
 }

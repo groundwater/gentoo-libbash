@@ -33,7 +33,7 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 
-#include "core/parser_builder.h"
+#include "core/bash_ast.h"
 #include "libbashParser.h"
 
 namespace po = boost::program_options;
@@ -50,15 +50,15 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 static void print_ast(std::istream& input, bool silent, bool dot)
 {
-  parser_builder parser(input);
+  bash_ast ast(input);
 
   if(silent)
     return;
 
   if(dot)
-    std::cout << parser.get_dot_graph() << std::endl;
+    std::cout << ast.get_dot_graph() << std::endl;
   else
-    std::cout << parser.get_string_tree() << std::endl;
+    std::cout << ast.get_string_tree() << std::endl;
 }
 
 static inline std::string token_mapper(std::unordered_map<ANTLR3_INT32, std::string> token_map,
@@ -90,14 +90,14 @@ static inline void print_token(std::istream& input,
   if(silent)
     return;
 
-  parser_builder parser(input);
+  bash_ast ast(input);
   std::unordered_map<ANTLR3_INT32, std::string> token_map;
 
   if(build_token_map(token_map, token_path))
   {
-    std::cout << parser.get_tokens(std::bind(&token_mapper,
-                                             token_map,
-                                             std::placeholders::_1))
+    std::cout << ast.get_tokens(std::bind(&token_mapper,
+                                          token_map,
+                                          std::placeholders::_1))
     << std::endl;
   }
   else

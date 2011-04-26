@@ -17,9 +17,9 @@
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
 ///
-/// \file parser_builder.h
+/// \file bash_ast.h
 /// \author Mu Qiao
-/// \brief a class that helps build libbashParser from istream
+/// \brief a class that helps interpret from istream
 ///
 
 #ifndef LIBBASH_CORE_PARSER_BUILDER_H_
@@ -35,12 +35,11 @@
 struct libbashLexer_Ctx_struct;
 struct libbashParser_Ctx_struct;
 struct libbashParser_start_return_struct;
-class walker_builder;
+class interpreter;
 
-/// \class parser_builder
-/// \brief a wrapper class that creates libbashParser. It also know
-///        enough information to create walker_builder object.
-class parser_builder
+/// \class bash_ast
+/// \brief a wrapper class that helps interpret from istream
+class bash_ast
 {
   pANTLR3_INPUT_STREAM input;
   std::string script;
@@ -52,13 +51,13 @@ class parser_builder
 
   void init_parser();
 public:
-  explicit parser_builder(std::istream& source);
-  ~parser_builder();
+  explicit bash_ast(std::istream& source);
+  ~bash_ast();
 
   ///
-  /// \brief factory method that creates walker_builder
-  /// \return walker_builder object
-  walker_builder create_walker_builder();
+  /// \brief interpret the script with a given interpreter
+  /// \param the interpreter object
+  void interpret_with(interpreter& walker);
   std::string get_dot_graph();
   std::string get_string_tree();
   std::string get_tokens(std::function<std::string(ANTLR3_INT32)> token_map);

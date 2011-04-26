@@ -17,21 +17,21 @@
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
 ///
-/// \file parser_builder.cpp
+/// \file bash_ast.cpp
 /// \author Mu Qiao
-/// \brief a class that helps build libbashParser from istream
+/// \brief implementation that helps interpret from istream
 ///
 
-#include "core/parser_builder.h"
+#include "core/bash_ast.h"
 
 #include <sstream>
 
 #include "core/interpreter_exception.h"
 #include "libbashLexer.h"
 #include "libbashParser.h"
-#include "walker_builder.h"
+#include "libbashWalker.h"
 
-parser_builder::parser_builder(std::istream& source)
+bash_ast::bash_ast(std::istream& source)
 {
   std::stringstream stream;
   stream << source.rdbuf();
@@ -44,7 +44,7 @@ parser_builder::parser_builder(std::istream& source)
   init_parser();
 }
 
-parser_builder::~parser_builder()
+bash_ast::~bash_ast()
 {
   nodes->free(nodes);
   psr->free(psr);
@@ -53,7 +53,7 @@ parser_builder::~parser_builder()
   input->close(input);
 }
 
-void parser_builder::init_parser()
+void bash_ast::init_parser()
 {
   lxr = libbashLexerNew(input);
   if ( lxr == NULL )
@@ -72,18 +72,21 @@ void parser_builder::init_parser()
   nodes = antlr3CommonTreeNodeStreamNewTree(langAST->tree, ANTLR3_SIZE_HINT);
 }
 
-walker_builder parser_builder::create_walker_builder()
+void bash_ast::interpret_with(interpreter& walker)
 {
-  return walker_builder(nodes);
+  set_interpreter(&walker);
+  plibbashWalker treePsr = libbashWalkerNew(nodes);
+  treePsr->start(treePsr);
+  treePsr->free(treePsr);
 }
 
-std::string parser_builder::get_dot_graph()
+std::string bash_ast::get_dot_graph()
 {
   pANTLR3_STRING graph = nodes->adaptor->makeDot(nodes->adaptor, langAST->tree);
   return std::string(reinterpret_cast<char*>(graph->chars));
 }
 
-std::string parser_builder::get_string_tree()
+std::string bash_ast::get_string_tree()
 {
   return std::string(reinterpret_cast<char*>(
         langAST->tree->toStringTree(langAST->tree)->chars));
@@ -102,7 +105,7 @@ namespace
   }
 }
 
-std::string parser_builder::get_tokens(std::function<std::string(ANTLR3_INT32)> token_map)
+std::string bash_ast::get_tokens(std::function<std::string(ANTLR3_INT32)> token_map)
 {
   std::stringstream result;
   int line_counter = 1;

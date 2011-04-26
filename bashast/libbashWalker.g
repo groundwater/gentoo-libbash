@@ -27,12 +27,11 @@ options
 
 @includes{
 
-	#include <memory>
 	#include <string>
 	#include <vector>
 
 	class interpreter;
-	void set_interpreter(std::shared_ptr<interpreter> w);
+	void set_interpreter(interpreter* w);
 
 }
 
@@ -50,9 +49,9 @@ options
 
 @members{
 
-	static std::shared_ptr<interpreter> walker;
+	static interpreter* walker = 0;
 
-	void set_interpreter(std::shared_ptr<interpreter> w)
+	void set_interpreter(interpreter* w)
 	{
 		walker = w;
 	}

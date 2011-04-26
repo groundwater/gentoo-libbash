@@ -27,17 +27,17 @@
 #include <gtest/gtest.h>
 
 #include "core/interpreter.h"
-#include "core/parser_builder.h"
-#include "core/walker_builder.h"
+#include "core/bash_ast.h"
 
 static void check_string_assignment(const char* script,
                                     const std::string& name,
                                     const char* exp_value)
 {
+  interpreter walker;
   std::istringstream input(script);
-  parser_builder pbuilder(input);
-  walker_builder wbuilder = pbuilder.create_walker_builder();
-  EXPECT_STREQ(exp_value, wbuilder.walker->resolve<std::string>(name).c_str());
+  bash_ast ast(input);
+  ast.interpret_with(walker);
+  EXPECT_STREQ(exp_value, walker.resolve<std::string>(name).c_str());
 }
 
 #define TEST_STRING_ASSIGNMENT(name, script, var_name, exp_value)\
@@ -62,13 +62,15 @@ TEST_STRING_ASSIGNMENT(str_assignment6,
 
 TEST(array_index, out_of_bound)
 {
+  interpreter walker;
+
   std::string script = "a[-1]=\"1\"";
   std::istringstream input(script);
-  parser_builder pbuilder(input);
-  EXPECT_THROW(pbuilder.create_walker_builder(), interpreter_exception);
+  bash_ast ast(input);
+  EXPECT_THROW(ast.interpret_with(walker), interpreter_exception);
 
   std::string script2 = "a=(1 2 [-5]=1)";
   std::istringstream input2(script2);
-  parser_builder pbuilder2(input2);
-  EXPECT_THROW(pbuilder2.create_walker_builder(), interpreter_exception);
+  bash_ast ast2(input2);
+  EXPECT_THROW(ast2.interpret_with(walker), interpreter_exception);
 }
