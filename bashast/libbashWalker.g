@@ -321,7 +321,8 @@ command_list: ^(LIST logic_command_list+);
 compound_command
 	: ^(CURRENT_SHELL command_list)
 	| ^(COMPOUND_COND cond_expr)
-	| for_expr;
+	| for_expr
+	| while_expr;
 
 cond_expr
 	:^(BUILTIN_TEST status=builtin_condition) { walker->set_status(!status); };
@@ -401,6 +402,30 @@ for_condition returns[int libbash_value]
 
 for_modification
 	:^(FOR_MOD arithmetics);
+
+while_expr
+@declarations {
+	ANTLR3_MARKER command_index;
+}
+	:^(WHILE {
+		// omit the first DOWN token
+		SEEK(INDEX() + 1);
+
+		command_index = INDEX();
+		while(true)
+		{
+			command_list(ctx);
+			if(walker->get_status())
+				break;
+			command_list(ctx);
+			SEEK(command_index);
+		}
+		// Skip the body and get out
+		seek_to_next_tree(ctx);
+
+		// omit the last UP token
+		SEEK(INDEX() + 1);
+	});
 
 command_substitution returns[std::string libbash_value]
 @declarations {

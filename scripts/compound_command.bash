@@ -22,3 +22,15 @@ for ((;i<0;))
 do
     echo "Shouldn't print this"
 done
+
+i=0;
+while [ $i != 4 ]
+do
+    i=$(( i + 1 ))
+    echo $i
+done
+
+while [ $i \< 0 ]
+do
+    echo "Shouldn't print this"
+done
