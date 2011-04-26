@@ -46,3 +46,39 @@ until [ $i \> 0 ]
 do
     echo "Shouldn't print this"
 done
+
+a=1
+b=2
+if [ $a == $b ]
+then
+    echo "Shouldn't print this"
+fi
+if [ $a != $b ]
+then
+    echo $a
+fi
+
+if [ $a == $b ]
+then
+    echo "Shouldn't print this"
+elif [ $a != $b ]
+then
+    echo $b
+fi
+
+if [ $a == $b ]
+then
+    echo "Shouldn't print this"
+else
+    echo $a
+fi
+
+if [ $a == $b ]
+then
+    echo "Shouldn't print this"
+elif [ $a == $b ]
+then
+    echo "Shouldn't print this"
+else
+    echo $a
+fi

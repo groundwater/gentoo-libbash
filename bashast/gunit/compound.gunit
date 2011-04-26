@@ -105,15 +105,15 @@ sel_expr:
 if_expr:
 "if echo yay2; then
 echo yay
-fi" -> (if (LIST (COMMAND (STRING echo) (STRING yay2))) (LIST (COMMAND (STRING echo) (STRING yay))))
-"if echo yay2; then echo yay ;fi" -> (if (LIST (COMMAND (STRING echo) (STRING yay2))) (LIST (COMMAND (STRING echo) (STRING yay))))
+fi" -> (IF_STATEMENT (if (LIST (COMMAND (STRING echo) (STRING yay2))) (LIST (COMMAND (STRING echo) (STRING yay)))))
+"if echo yay2; then echo yay ;fi" -> (IF_STATEMENT (if (LIST (COMMAND (STRING echo) (STRING yay2))) (LIST (COMMAND (STRING echo) (STRING yay)))))
 "if echo yay2 then echo yay; fi" FAIL
 
 "if echo yay2; then
 echo yay
 elif echo yay3; then
 echo boo
-fi" -> (if (LIST (COMMAND (STRING echo) (STRING yay2))) (LIST (COMMAND (STRING echo) (STRING yay))) (if (LIST (COMMAND (STRING echo) (STRING yay3))) (LIST (COMMAND (STRING echo) (STRING boo)))))
+fi" -> (IF_STATEMENT (if (LIST (COMMAND (STRING echo) (STRING yay2))) (LIST (COMMAND (STRING echo) (STRING yay)))) (if (LIST (COMMAND (STRING echo) (STRING yay3))) (LIST (COMMAND (STRING echo) (STRING boo)))))
 
 "if echo yay2; then
 echo yay
@@ -121,7 +121,7 @@ elif echo yay3; then
 echo boo
 elif echo yay4; then echo hurrah
 else echo darn
-fi" -> (if (LIST (COMMAND (STRING echo) (STRING yay2))) (LIST (COMMAND (STRING echo) (STRING yay))) (if (LIST (COMMAND (STRING echo) (STRING yay3))) (LIST (COMMAND (STRING echo) (STRING boo)))) (if (LIST (COMMAND (STRING echo) (STRING yay4))) (LIST (COMMAND (STRING echo) (STRING hurrah)))) (LIST (COMMAND (STRING echo) (STRING darn))))
+fi" -> (IF_STATEMENT (if (LIST (COMMAND (STRING echo) (STRING yay2))) (LIST (COMMAND (STRING echo) (STRING yay)))) (if (LIST (COMMAND (STRING echo) (STRING yay3))) (LIST (COMMAND (STRING echo) (STRING boo)))) (if (LIST (COMMAND (STRING echo) (STRING yay4))) (LIST (COMMAND (STRING echo) (STRING hurrah)))) (else (LIST (COMMAND (STRING echo) (STRING darn)))))
 
 while_expr:
 "while echo true; do

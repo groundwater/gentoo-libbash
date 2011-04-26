@@ -41,6 +41,7 @@ tokens{
 	FOR_INIT;
 	FOR_COND;
 	FOR_MOD;
+	IF_STATEMENT;
 	FNAME;
 	OP;
 	PRE_INCR;
@@ -194,7 +195,7 @@ for_expr:	FOR BLANK+ name (wspace IN (BLANK+ fname)+)? semiel DO wspace* clist s
 sel_expr:	SELECT BLANK+ name (wspace IN BLANK+ word)? semiel DO wspace* clist semiel DONE -> ^(SELECT name (word)? clist)
 	;
 if_expr	:	IF wspace+ ag=clist semiel THEN wspace+ iflist=clist semiel EOL* (elif_expr)* (ELSE wspace+ else_list=clist semiel EOL*)? FI
-		-> ^(IF $ag $iflist (elif_expr)* ^($else_list)?)
+		-> ^(IF_STATEMENT ^(IF $ag $iflist) (elif_expr)* ^(ELSE $else_list)?)
 	;
 elif_expr
 	:	ELIF BLANK+ ag=clist semiel THEN wspace+ iflist=clist semiel -> ^(IF["if"] $ag $iflist);

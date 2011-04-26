@@ -322,7 +322,8 @@ compound_command
 	: ^(CURRENT_SHELL command_list)
 	| ^(COMPOUND_COND cond_expr)
 	| for_expr
-	| while_expr;
+	| while_expr
+	| if_expr;
 
 cond_expr
 	:^(BUILTIN_TEST status=builtin_condition) { walker->set_status(!status); };
@@ -423,6 +424,65 @@ while_expr
 		}
 		// Skip the body and get out
 		seek_to_next_tree(ctx);
+
+		// omit the last UP token
+		SEEK(INDEX() + 1);
+	});
+
+if_expr
+@declarations {
+	bool matched = false;
+}
+	:^(IF_STATEMENT {
+		// omit the first DOWN token
+		SEEK(INDEX() + 1);
+
+		while(LA(1) == IF)
+		{
+			if(matched)
+				seek_to_next_tree(ctx);
+			else
+				matched = elif_expr(ctx);
+		}
+
+		if(LA(1) == ELSE)
+		{
+			if(matched == false)
+			{
+				// omit the ELSE DOWN tokens
+				SEEK(INDEX() + 2);
+
+				command_list(ctx);
+
+				// omit the last UP token
+				SEEK(INDEX() + 1);
+			}
+			else
+			{
+				seek_to_next_tree(ctx);
+			}
+		}
+
+		// omit the last UP token
+		SEEK(INDEX() + 1);
+	});
+
+elif_expr returns[bool matched]
+	:^(IF {
+		// omit the first DOWN token
+		SEEK(INDEX() + 1);
+
+		command_list(ctx);
+		if(walker->get_status() == 0)
+		{
+			$matched=true;
+			command_list(ctx);
+		}
+		else
+		{
+			$matched=false;
+			seek_to_next_tree(ctx);
+		}
 
 		// omit the last UP token
 		SEEK(INDEX() + 1);
