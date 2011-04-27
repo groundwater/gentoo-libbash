@@ -82,3 +82,31 @@ then
 else
     echo $a
 fi
+
+target=123
+case $target in
+    bcd)
+        echo "Shouldn't print this"
+        ;;
+    abc)
+        echo "Shouldn't print this"
+        ;;
+    123)
+        echo yep
+        ;;
+    123)
+        echo "Shouldn't print this"
+        ;;
+esac
+case $target in
+    bcd)
+        echo "Shouldn't print this"
+        ;;
+    abc)
+        echo "Shouldn't print this"
+        ;;
+    *)
+        echo "default"
+        ;;
+esac
+echo "case end"

@@ -323,7 +323,8 @@ compound_command
 	| ^(COMPOUND_COND cond_expr)
 	| for_expr
 	| while_expr
-	| if_expr;
+	| if_expr
+	| case_expr;
 
 cond_expr
 	:^(BUILTIN_TEST status=builtin_condition) { walker->set_status(!status); };
@@ -487,6 +488,46 @@ elif_expr returns[bool matched]
 		// omit the last UP token
 		SEEK(INDEX() + 1);
 	});
+
+case_expr
+	:^(CASE libbash_string=word (matched=case_clause[libbash_string]{
+		if(matched)
+		{
+			while(LA(1) == CASE_PATTERN)
+				seek_to_next_tree(ctx);
+		}
+	})*);
+
+case_clause[const std::string& target] returns[bool matched]
+@declarations {
+	std::vector<std::string> patterns;
+}
+	:^(CASE_PATTERN (libbash_string=case_pattern { patterns.push_back(libbash_string); })+ {
+		if(LA(1) == CASE_COMMAND)
+		{
+			// omit CASE_COMMAND
+			SEEK(INDEX() + 1);
+			matched = false;
+			for(auto iter = patterns.begin(); iter != patterns.end(); ++iter)
+			{
+				// pattern matching should happen here in future
+				if(*iter == "*" || *iter == target)
+				{
+					command_list(ctx);
+					$matched = true;
+				}
+				else
+				{
+					seek_to_next_tree(ctx);
+				}
+			}
+		}
+	});
+
+case_pattern returns[std::string libbash_value]
+	:libbash_string=command_substitution { $libbash_value = libbash_string; }
+	|string_expr { $libbash_value = $string_expr.libbash_value; }
+	|TIMES { $libbash_value = "*"; };
 
 command_substitution returns[std::string libbash_value]
 @declarations {

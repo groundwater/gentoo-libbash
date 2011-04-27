@@ -33,6 +33,7 @@ tokens{
 	EMPTY_BRACE_EXPANSION_ATOM;
 	COMMAND_SUB;
 	CASE_PATTERN;
+	CASE_COMMAND;
 	SUBSHELL;
 	CURRENT_SHELL;
 	COMPOUND_ARITH;
@@ -212,7 +213,7 @@ case_body
 	:	case_stmt (wspace* DOUBLE_SEMIC case_stmt)* wspace* DOUBLE_SEMIC? wspace* -> case_stmt*;
 case_stmt
 	:	wspace* (LPAREN BLANK*)? case_pattern (BLANK* PIPE BLANK? case_pattern)* BLANK* RPAREN (wspace* clist)?
-		-> ^(CASE_PATTERN case_pattern+ clist?);
+		-> ^(CASE_PATTERN case_pattern+ (CASE_COMMAND clist)?);
 case_pattern
 	:	command_sub
 	|	fname

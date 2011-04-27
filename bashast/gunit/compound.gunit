@@ -65,7 +65,7 @@ echo three
 ;;
 *) echo woo
 ;;
-esac" -> (case (COMMAND_SUB (LIST (COMMAND (STRING echo) (STRING asdf)))) (CASE_PATTERN (STRING gz) (LIST (COMMAND (STRING echo) (STRING yay)))) (CASE_PATTERN (STRING bzip) (LIST (COMMAND (STRING echo) (STRING three)))) (CASE_PATTERN (STRING *) (LIST (COMMAND (STRING echo) (STRING woo)))))
+esac" -> (case (COMMAND_SUB (LIST (COMMAND (STRING echo) (STRING asdf)))) (CASE_PATTERN (STRING gz) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING yay)))) (CASE_PATTERN (STRING bzip) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING three)))) (CASE_PATTERN (STRING *) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING woo)))))
 
 "case `echo asdf` in
 	gz)
@@ -75,10 +75,10 @@ esac" -> (case (COMMAND_SUB (LIST (COMMAND (STRING echo) (STRING asdf)))) (CASE_
 		echo three
 		;;
 	*) echo woo
-esac" -> (case (COMMAND_SUB (LIST (COMMAND (STRING echo) (STRING asdf)))) (CASE_PATTERN (STRING gz) (LIST (COMMAND (STRING echo) (STRING yay)))) (CASE_PATTERN (STRING bzip) (LIST (COMMAND (STRING echo) (STRING three)))) (CASE_PATTERN (STRING *) (LIST (COMMAND (STRING echo) (STRING woo)))))
+esac" -> (case (COMMAND_SUB (LIST (COMMAND (STRING echo) (STRING asdf)))) (CASE_PATTERN (STRING gz) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING yay)))) (CASE_PATTERN (STRING bzip) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING three)))) (CASE_PATTERN (STRING *) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING woo)))))
 
 "case `echo asdf` in gz|asdf) echo yay ;; bzip) echo three ;; *) echo woo esac" FAIL
-"case `echo asdf` in gz|asdf) echo yay ;; bzip) echo three ;; *) echo woo ;; esac" -> (case (COMMAND_SUB (LIST (COMMAND (STRING echo) (STRING asdf)))) (CASE_PATTERN (STRING gz) (STRING asdf) (LIST (COMMAND (STRING echo) (STRING yay)))) (CASE_PATTERN (STRING bzip) (LIST (COMMAND (STRING echo) (STRING three)))) (CASE_PATTERN (STRING *) (LIST (COMMAND (STRING echo) (STRING woo)))))
+"case `echo asdf` in gz|asdf) echo yay ;; bzip) echo three ;; *) echo woo ;; esac" -> (case (COMMAND_SUB (LIST (COMMAND (STRING echo) (STRING asdf)))) (CASE_PATTERN (STRING gz) (STRING asdf) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING yay)))) (CASE_PATTERN (STRING bzip) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING three)))) (CASE_PATTERN (STRING *) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING woo)))))
 
 for_expr:
 "for each in `ls |grep log`; do
@@ -147,20 +147,20 @@ case_expr:
 echo \"Usage: $0 start|stop\" >&2
 exit 3
 ;;
-esac" ->  (case (STRING (DOUBLE_QUOTED_STRING (VAR_REF 1))) (CASE_PATTERN (STRING *) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING Usage :   (VAR_REF 0)   start | stop)) (REDIR >& 2)) (COMMAND (STRING exit) (STRING 3)))))
+esac" ->  (case (STRING (DOUBLE_QUOTED_STRING (VAR_REF 1))) (CASE_PATTERN (STRING *) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING Usage :   (VAR_REF 0)   start | stop)) (REDIR >& 2)) (COMMAND (STRING exit) (STRING 3)))))
 
 "case $asdf in
 a)
 echo \"yay\"
 ;;
-esac" -> (case (VAR_REF asdf) (CASE_PATTERN (STRING a) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING yay))))))
+esac" -> (case (VAR_REF asdf) (CASE_PATTERN (STRING a) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING yay))))))
 "case asdf in
 asdf)
 echo \"yay\"
 ;;
-esac" -> (case (STRING asdf) (CASE_PATTERN (STRING asdf) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING yay))))))
-"case 1 in 1) echo yay ;; esac" -> (case 1 (CASE_PATTERN (STRING 1) (LIST (COMMAND (STRING echo) (STRING yay)))))
-"case /usr/bin in 1) echo yay ;; esac" -> (case (STRING / usr / bin) (CASE_PATTERN (STRING 1) (LIST (COMMAND (STRING echo) (STRING yay)))))
+esac" -> (case (STRING asdf) (CASE_PATTERN (STRING asdf) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING yay))))))
+"case 1 in 1) echo yay ;; esac" -> (case 1 (CASE_PATTERN (STRING 1) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING yay)))))
+"case /usr/bin in 1) echo yay ;; esac" -> (case (STRING / usr / bin) (CASE_PATTERN (STRING 1) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING yay)))))
 "case \"$1\" in
 stop)
 ;;
@@ -168,4 +168,4 @@ stop)
 echo \"Usage: $0 start|stop\" >&2
 exit 3
 ;;
-esac" -> (case (STRING (DOUBLE_QUOTED_STRING (VAR_REF 1))) (CASE_PATTERN (STRING stop)) (CASE_PATTERN (STRING *) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING Usage :   (VAR_REF 0)   start | stop)) (REDIR >& 2)) (COMMAND (STRING exit) (STRING 3)))))
+esac" -> (case (STRING (DOUBLE_QUOTED_STRING (VAR_REF 1))) (CASE_PATTERN (STRING stop)) (CASE_PATTERN (STRING *) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING Usage :   (VAR_REF 0)   start | stop)) (REDIR >& 2)) (COMMAND (STRING exit) (STRING 3)))))

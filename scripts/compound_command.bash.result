@@ -23,8 +23,12 @@ ghi
 2
 1
 1
+yep
+default
+case end
 a=1
 b=2
 file= foo bar 
 foo=ghi
 i=4
+target=123
