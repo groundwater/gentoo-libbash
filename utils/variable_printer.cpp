@@ -32,6 +32,11 @@
 
 #include "libbash.h"
 
+static const std::vector<std::string> special_variables
+{
+  "IFS", "?"
+};
+
 int main(int argc, char** argv)
 {
   if(argc != 2)
@@ -46,7 +51,8 @@ int main(int argc, char** argv)
 
   std::map<std::string, std::vector<std::string>> sorted(variables.begin(), variables.end());
   // Currently we don't need internal variables
-  sorted.erase("IFS");
+  for(auto iter = special_variables.begin(); iter != special_variables.end(); ++iter)
+    sorted.erase(*iter);
 
   using namespace boost::spirit::karma;
   std::cout << format((string << '=' << -(string % ' ')) % eol, sorted) << std::endl;

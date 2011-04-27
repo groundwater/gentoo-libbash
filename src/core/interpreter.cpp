@@ -71,7 +71,15 @@ void interpreter::get_all_elements_IFS_joined(const std::string& name,
 void interpreter::split_word(const std::string& word, std::vector<std::string>& output)
 {
   const std::string& delimeter = resolve<std::string>("IFS");
-  boost::split(output, word, boost::is_any_of(delimeter), boost::token_compress_on);
+  std::string trimmed(word);
+  boost::trim_if(trimmed, boost::is_any_of(delimeter));
+
+  if(trimmed == "")
+    return;
+
+  std::vector<std::string> splitted_values;
+  boost::split(splitted_values, trimmed, boost::is_any_of(delimeter), boost::token_compress_on);
+  output.insert(output.end(), splitted_values.begin(), splitted_values.end());
 }
 
 inline void define_function_arguments(std::unique_ptr<scope>& current_stack,

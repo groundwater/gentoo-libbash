@@ -33,13 +33,16 @@ tokens{
 	EMPTY_BRACE_EXPANSION_ATOM;
 	COMMAND_SUB;
 	CASE_PATTERN;
+	CASE_COMMAND;
 	SUBSHELL;
 	CURRENT_SHELL;
 	COMPOUND_ARITH;
 	COMPOUND_COND;
+	CFOR;
 	FOR_INIT;
 	FOR_COND;
 	FOR_MOD;
+	IF_STATEMENT;
 	FNAME;
 	OP;
 	PRE_INCR;
@@ -93,6 +96,8 @@ tokens{
 	// Avoid ambiguity (being a sign or an operator)
 	PLUS_SIGN;
 	MINUS_SIGN;
+	// Operators
+	NOT_EQUALS;
 }
 
 start	:	(flcomment)? EOL* clist BLANK* (SEMIC|AMP|EOL)? -> clist;
@@ -186,12 +191,12 @@ compound_command
 //Expressions allowed inside a compound command
 for_expr:	FOR BLANK+ name (wspace IN (BLANK+ fname)+)? semiel DO wspace* clist semiel DONE -> ^(FOR name (fname+)? clist)
 	|	FOR BLANK* LLPAREN EOL? (BLANK* init=arithmetic BLANK*|BLANK+)? (SEMIC (BLANK? fcond=arithmetic BLANK*|BLANK+)? SEMIC|DOUBLE_SEMIC) (BLANK* mod=arithmetic)? wspace* RRPAREN semiel DO wspace clist semiel DONE
-		-> ^(FOR ^(FOR_INIT $init)? ^(FOR_COND $fcond)? ^(FOR_MOD $mod)? clist)
+		-> ^(CFOR ^(FOR_INIT $init)? ^(FOR_COND $fcond)? clist ^(FOR_MOD $mod)?)
 	;
 sel_expr:	SELECT BLANK+ name (wspace IN BLANK+ word)? semiel DO wspace* clist semiel DONE -> ^(SELECT name (word)? clist)
 	;
 if_expr	:	IF wspace+ ag=clist semiel THEN wspace+ iflist=clist semiel EOL* (elif_expr)* (ELSE wspace+ else_list=clist semiel EOL*)? FI
-		-> ^(IF $ag $iflist (elif_expr)* ^($else_list)?)
+		-> ^(IF_STATEMENT ^(IF $ag $iflist) (elif_expr)* ^(ELSE $else_list)?)
 	;
 elif_expr
 	:	ELIF BLANK+ ag=clist semiel THEN wspace+ iflist=clist semiel -> ^(IF["if"] $ag $iflist);
@@ -208,7 +213,7 @@ case_body
 	:	case_stmt (wspace* DOUBLE_SEMIC case_stmt)* wspace* DOUBLE_SEMIC? wspace* -> case_stmt*;
 case_stmt
 	:	wspace* (LPAREN BLANK*)? case_pattern (BLANK* PIPE BLANK? case_pattern)* BLANK* RPAREN (wspace* clist)?
-		-> ^(CASE_PATTERN case_pattern+ clist?);
+		-> ^(CASE_PATTERN case_pattern+ (CASE_COMMAND clist)?);
 case_pattern
 	:	command_sub
 	|	fname
@@ -334,7 +339,7 @@ builtin_cond_primary
 	|	builtin_cond_unary
 	|	fname;
 builtin_cond_binary
-	:	cond_part BLANK!* binary_string_op_builtin^ BLANK!? cond_part;
+	:	cond_part BLANK!* binary_string_op_builtin^ BLANK!* cond_part;
 builtin_cond_unary
 	:	uop^ BLANK!+ cond_part;
 keyword_cond
@@ -354,8 +359,9 @@ binary_str_op_keyword
 	|	GREATER_THAN;
 binary_string_op_builtin
 	:	bop
+	|	EQUALS EQUALS -> EQUALS
 	|	EQUALS
-	|	BANG EQUALS -> OP["!="]
+	|	BANG EQUALS -> NOT_EQUALS
 	|	ESC_LT
 	|	ESC_GT;
 bop	:	MINUS! NAME^;
@@ -364,11 +370,7 @@ unary_cond
 uop	:	MINUS! LETTER;
 //Allowable parts of conditions
 cond_part:	brace_expansion
-	|	var_ref
-	|	res_word_str -> ^(STRING res_word_str)
-	|	num
-	|	fname
-	|	arithmetic;
+	|	fname;
 //Rules for whitespace/line endings
 wspace	:	BLANK+|EOL+;
 semiel	:	BLANK* (SEMIC|EOL) BLANK*;
@@ -651,8 +653,7 @@ COLON	:	':';
 QMARK	:	'?';
 //Operators for conditional statements
 TEST_EXPR	:	'test';
-LOGICAND
-	:	'&&';
+LOGICAND :	'&&';
 LOGICOR	:	'||';
 //Tokens for strings
 CONTINUE_LINE

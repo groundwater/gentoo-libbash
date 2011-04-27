@@ -478,6 +478,21 @@ public:
     return new_value;
   }
 
+  /// \brief set the return status of the last command
+  /// \param the value of the return status
+  void set_status(int status)
+  {
+    set_value("?", status);
+  }
+
+  /// \brief get the return status of the last command
+  /// \param the value of the return status
+  template <typename T=int>
+  T get_status(void)
+  {
+    return resolve<T>("?");
+  }
+
   /// \brief define a new global variable
   /// \param the name of the variable
   /// \param the value of the variable
@@ -649,7 +664,7 @@ public:
 
   /// \brief implementation of word splitting
   /// \param the value of the word
-  //. \param[out] the splitted result
+  //. \param[out] the splitted result will be appended to output
   void split_word(const std::string& word, std::vector<std::string>& output);
 
   /// \brief perform expansion like ${var//foo/bar}

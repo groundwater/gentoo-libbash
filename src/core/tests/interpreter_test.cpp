@@ -147,3 +147,17 @@ TEST(interperter, substring_expansion_exception)
   interpreter walker;
   EXPECT_THROW(walker.do_substring_expansion("", 0, -1, 0), interpreter_exception);
 }
+
+TEST(interpreter, word_split)
+{
+  interpreter walker;
+  std::vector<std::string> splitted_values;
+  walker.split_word(" \n\t", splitted_values);
+  EXPECT_EQ(0, splitted_values.size());
+
+  splitted_values.clear();
+  walker.split_word(" \tfoo\n bar \n", splitted_values);
+  EXPECT_EQ(2, splitted_values.size());
+  EXPECT_STREQ("foo", splitted_values[0].c_str());
+  EXPECT_STREQ("bar", splitted_values[1].c_str());
+}

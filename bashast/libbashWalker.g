@@ -64,26 +64,28 @@ options
 		index = value;
 	}
 
-	// Recursively count number of nodes of curr
-	static int count_nodes(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE curr)
+	// seek to LT(2) and consume
+	static void seek_to_next_tree(plibbashWalker ctx)
 	{
-		int child_count = adaptor->getChildCount(adaptor, curr);
-		if(child_count == 0)
-		{
-			// Leaf node
-			return 1;
-		}
-		else
-		{
-			int result = 0;
-			// Count every child
-			for(int i = 0; i != child_count; ++i)
-				result += count_nodes(adaptor, (pANTLR3_BASE_TREE)(adaptor->getChild(adaptor, curr, i)));
-			// Add itself, DOWN and UP
-			return result + 3;
-		}
-	}
+		// We start from LA(1)
+		int index = 1;
+		// Current depth of the tree we are traversing
+		int depth = 1;
 
+		for(index = 1; depth != 0; ++index)
+		{
+			// Go one level done if we encounter DOWN
+			if(LA(index) == DOWN)
+				++depth;
+			// Go one level up if we encounter UP. When depth==0, we finishe one node
+			else if(LA(index) == UP)
+				--depth;
+		}
+
+		// Seek to the correct offset and consume.
+		SEEK(INDEX() + index - 3);
+		CONSUME();
+	}
 }
 
 start: list|EOF;
@@ -265,11 +267,18 @@ var_ref [bool double_quoted] returns[std::string libbash_value]
 		else
 			walker->get_all_elements(libbash_string, $libbash_value);
 	}
+	|^(VAR_REF TIMES) { std::cerr << "$* has not been implemented yet" << std::endl; }
+	|^(VAR_REF AT) { std::cerr << "$@ has not been implemented yet" << std::endl; }
+	|^(VAR_REF POUND) { std::cerr << "$# has not been implemented yet" << std::endl; }
+	|^(VAR_REF QMARK) { $libbash_value = walker->get_status<std::string>(); }
+	|^(VAR_REF MINUS) { std::cerr << "$- has not been implemented yet" << std::endl; }
+	|^(VAR_REF BANG) { std::cerr << "$! has not been implemented yet" << std::endl; }
 	|^(VAR_REF libbash_string=var_expansion) { $libbash_value = libbash_string; };
 
 command
 	:variable_definitions
-	|simple_command;
+	|simple_command
+	|compound_command;
 
 simple_command
 @declarations {
@@ -277,28 +286,29 @@ simple_command
 }
 	:^(COMMAND string_expr (argument[libbash_args])* var_def*) {
 		if(walker->has_function($string_expr.libbash_value))
-			walker->call($string_expr.libbash_value,
-						 libbash_args,
-						 ctx,
-						 compound_command);
+		{
+			walker->set_status(walker->call($string_expr.libbash_value,
+											libbash_args,
+											ctx,
+											compound_command));
+		}
 		else if(cppbash_builtin::is_builtin($string_expr.libbash_value))
-			walker->execute_builtin($string_expr.libbash_value, libbash_args);
+		{
+			walker->set_status(walker->execute_builtin($string_expr.libbash_value, libbash_args));
+		}
 		else
+		{
 			std::cerr << $string_expr.libbash_value << " is not supported yet" << std::endl;
+			walker->set_status(1);
+		}
 	};
 
 argument[std::vector<std::string>& args]
 	: string_expr {
 		if($string_expr.quoted)
-		{
 			args.push_back($string_expr.libbash_value);
-		}
 		else
-		{
-			std::vector<std::string> arguments;
-			walker->split_word($string_expr.libbash_value, arguments);
-			args.insert(args.end(), arguments.begin(), arguments.end());
-		}
+			walker->split_word($string_expr.libbash_value, args);
 	};
 
 logic_command_list
@@ -308,7 +318,216 @@ logic_command_list
 
 command_list: ^(LIST logic_command_list+);
 
-compound_command: ^(CURRENT_SHELL command_list);
+compound_command
+	: ^(CURRENT_SHELL command_list)
+	| ^(COMPOUND_COND cond_expr)
+	| for_expr
+	| while_expr
+	| if_expr
+	| case_expr;
+
+cond_expr
+	:^(BUILTIN_TEST status=builtin_condition) { walker->set_status(!status); };
+
+builtin_condition returns[bool status]
+	:^(NEGATION l=builtin_condition) { $status = !l; }
+	|s=builtin_condition_primary { $status = s; };
+
+builtin_condition_primary returns[bool status]
+	:^(NAME string_expr string_expr) { throw interpreter_exception(walker->get_string($NAME) + "(NAME) is not supported for now");}
+	|^(EQUALS l=string_expr r=string_expr) { $status = (l.libbash_value == r.libbash_value); }
+	|^(NOT_EQUALS l=string_expr r=string_expr) { $status = (l.libbash_value != r.libbash_value); }
+	|^(ESC_LT l=string_expr r=string_expr) { $status = (l.libbash_value < r.libbash_value); }
+	|^(ESC_GT l=string_expr r=string_expr) { $status = (l.libbash_value > r.libbash_value); }
+	|^(LETTER l=string_expr) { throw interpreter_exception(walker->get_string($LETTER) + "(LETTER) is not supported for now");}
+	|string_expr { $status = ($string_expr.libbash_value.size() != 0); };
+
+for_expr
+@declarations {
+	ANTLR3_MARKER commands_index;
+	std::vector<std::string> splitted_values;
+
+	ANTLR3_MARKER condition_index;
+}
+	:^(FOR libbash_string=name_base
+		// Empty value as $@ is not supported currently
+		(string_expr
+		{
+			// Word splitting happens here
+			if($string_expr.quoted)
+				splitted_values.push_back($string_expr.libbash_value);
+			else
+				walker->split_word($string_expr.libbash_value, splitted_values);
+		}
+		)+
+		{
+			commands_index = INDEX();
+			for(auto iter = splitted_values.begin(); iter != splitted_values.end(); ++iter)
+			{
+				SEEK(commands_index);
+				walker->set_value(libbash_string, *iter);
+				command_list(ctx);
+			}
+		})
+	|^(CFOR {
+		// omit the first DOWN token for for_INIT
+		SEEK(INDEX() + 1);
+
+		if(LA(1) == FOR_INIT)
+			for_initilization(ctx);
+
+		condition_index = INDEX();
+		bool has_condition = (LA(1) != FOR_COND);
+		while(has_condition || for_condition(ctx))
+		{
+			command_list(ctx);
+			if(LA(1) == FOR_MOD)
+				for_modification(ctx);
+			SEEK(condition_index);
+		}
+
+		// Get out of the loop
+		// We are standing right after for_condition, we need to skip the command_list and optional for_modification
+		seek_to_next_tree(ctx);
+		if(LA(1) == FOR_MOD)
+			seek_to_next_tree(ctx);
+
+		// omit the last UP token
+		SEEK(INDEX() + 1);
+	});
+
+for_initilization
+	:^(FOR_INIT arithmetics);
+
+for_condition returns[int libbash_value]
+	:^(FOR_COND condition=arithmetics) { libbash_value = condition; };
+
+for_modification
+	:^(FOR_MOD arithmetics);
+
+while_expr
+@declarations {
+	ANTLR3_MARKER command_index;
+	bool negate;
+}
+	:^((WHILE { negate = false; } | UNTIL { negate = true; }) {
+		// omit the first DOWN token
+		SEEK(INDEX() + 1);
+
+		command_index = INDEX();
+		while(true)
+		{
+			command_list(ctx);
+			if(walker->get_status() == (negate? 0 : 1))
+				break;
+			command_list(ctx);
+			SEEK(command_index);
+		}
+		// Skip the body and get out
+		seek_to_next_tree(ctx);
+
+		// omit the last UP token
+		SEEK(INDEX() + 1);
+	});
+
+if_expr
+@declarations {
+	bool matched = false;
+}
+	:^(IF_STATEMENT {
+		// omit the first DOWN token
+		SEEK(INDEX() + 1);
+
+		while(LA(1) == IF)
+		{
+			if(matched)
+				seek_to_next_tree(ctx);
+			else
+				matched = elif_expr(ctx);
+		}
+
+		if(LA(1) == ELSE)
+		{
+			if(matched == false)
+			{
+				// omit the ELSE DOWN tokens
+				SEEK(INDEX() + 2);
+
+				command_list(ctx);
+
+				// omit the last UP token
+				SEEK(INDEX() + 1);
+			}
+			else
+			{
+				seek_to_next_tree(ctx);
+			}
+		}
+
+		// omit the last UP token
+		SEEK(INDEX() + 1);
+	});
+
+elif_expr returns[bool matched]
+	:^(IF {
+		// omit the first DOWN token
+		SEEK(INDEX() + 1);
+
+		command_list(ctx);
+		if(walker->get_status() == 0)
+		{
+			$matched=true;
+			command_list(ctx);
+		}
+		else
+		{
+			$matched=false;
+			seek_to_next_tree(ctx);
+		}
+
+		// omit the last UP token
+		SEEK(INDEX() + 1);
+	});
+
+case_expr
+	:^(CASE libbash_string=word (matched=case_clause[libbash_string]{
+		if(matched)
+		{
+			while(LA(1) == CASE_PATTERN)
+				seek_to_next_tree(ctx);
+		}
+	})*);
+
+case_clause[const std::string& target] returns[bool matched]
+@declarations {
+	std::vector<std::string> patterns;
+}
+	:^(CASE_PATTERN (libbash_string=case_pattern { patterns.push_back(libbash_string); })+ {
+		if(LA(1) == CASE_COMMAND)
+		{
+			// omit CASE_COMMAND
+			SEEK(INDEX() + 1);
+			matched = false;
+			for(auto iter = patterns.begin(); iter != patterns.end(); ++iter)
+			{
+				// pattern matching should happen here in future
+				if(*iter == "*" || *iter == target)
+				{
+					command_list(ctx);
+					$matched = true;
+				}
+				else
+				{
+					seek_to_next_tree(ctx);
+				}
+			}
+		}
+	});
+
+case_pattern returns[std::string libbash_value]
+	:libbash_string=command_substitution { $libbash_value = libbash_string; }
+	|string_expr { $libbash_value = $string_expr.libbash_value; }
+	|TIMES { $libbash_value = "*"; };
 
 command_substitution returns[std::string libbash_value]
 @declarations {
@@ -324,11 +543,8 @@ function_def returns[int placeholder]
 	:^(FUNCTION ^(STRING name) {
 		// Define the function with current index
 		walker->define_function($name.libbash_value, INDEX());
-		// Skip the AST for function body, minus one is needed to make the offset right.
-		// LT(1) is the function body. It should match the compound_command rule.
-		SEEK(INDEX() + count_nodes(ADAPTOR, LT(1)) - 1);
-		// After seeking ahead, we need to call CONSUME to eat all the nodes we've skipped.
-		CONSUME();
+		// Skip the AST for function body
+		seek_to_next_tree(ctx);
 	});
 
 // Only used in arithmetic expansion
