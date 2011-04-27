@@ -94,6 +94,8 @@ tokens{
 	// Avoid ambiguity (being a sign or an operator)
 	PLUS_SIGN;
 	MINUS_SIGN;
+	// Operators
+	NOT_EQUALS;
 }
 
 start	:	(flcomment)? EOL* clist BLANK* (SEMIC|AMP|EOL)? -> clist;
@@ -335,7 +337,7 @@ builtin_cond_primary
 	|	builtin_cond_unary
 	|	fname;
 builtin_cond_binary
-	:	cond_part BLANK!* binary_string_op_builtin^ BLANK!? cond_part;
+	:	cond_part BLANK!* binary_string_op_builtin^ BLANK!* cond_part;
 builtin_cond_unary
 	:	uop^ BLANK!+ cond_part;
 keyword_cond
@@ -355,8 +357,9 @@ binary_str_op_keyword
 	|	GREATER_THAN;
 binary_string_op_builtin
 	:	bop
+	|	EQUALS EQUALS -> EQUALS
 	|	EQUALS
-	|	BANG EQUALS -> OP["!="]
+	|	BANG EQUALS -> NOT_EQUALS
 	|	ESC_LT
 	|	ESC_GT;
 bop	:	MINUS! NAME^;

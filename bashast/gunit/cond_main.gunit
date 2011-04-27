@@ -25,3 +25,6 @@ cond_expr:
 "[[ \"asdf\" != \"boo\" && -a filename ]]" -> (KEYWORD_TEST (&& (!= (STRING (DOUBLE_QUOTED_STRING asdf)) (STRING (DOUBLE_QUOTED_STRING boo))) (a (STRING filename))))
 "[[ true ]]" -> (KEYWORD_TEST (STRING true))
 "[[ true && (false || three) ]]" -> (KEYWORD_TEST (&& (STRING true) (|| (STRING false) (STRING three))))
+"[ a = b ]" -> (BUILTIN_TEST (= (STRING a) (STRING b)))
+"[ a == b ]" -> (BUILTIN_TEST (= (STRING a) (STRING b)))
+"[ a != b ]" -> (BUILTIN_TEST (NOT_EQUALS (STRING a) (STRING b)))
