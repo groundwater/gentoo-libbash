@@ -365,11 +365,7 @@ unary_cond
 uop	:	MINUS! LETTER;
 //Allowable parts of conditions
 cond_part:	brace_expansion
-	|	var_ref
-	|	res_word_str -> ^(STRING res_word_str)
-	|	num
-	|	fname
-	|	arithmetic;
+	|	fname;
 //Rules for whitespace/line endings
 wspace	:	BLANK+|EOL+;
 semiel	:	BLANK* (SEMIC|EOL) BLANK*;
@@ -652,8 +648,7 @@ COLON	:	':';
 QMARK	:	'?';
 //Operators for conditional statements
 TEST_EXPR	:	'test';
-LOGICAND
-	:	'&&';
+LOGICAND :	'&&';
 LOGICOR	:	'||';
 //Tokens for strings
 CONTINUE_LINE
