@@ -63,6 +63,8 @@ TEST(symbol_test, string_variable)
   // string contains integer value
   variable int_string("string", "123");
   EXPECT_EQ(123, int_string.get_value<int>());
+  int_string.set_value("abc");
+  EXPECT_EQ(0, int_string.get_value<int>());
 }
 
 TEST(symbol_test, array_variable)
