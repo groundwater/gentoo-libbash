@@ -91,7 +91,11 @@ start: list|EOF;
 
 list: ^(LIST (function_def|logic_command_list)+);
 
-variable_definitions: ^(VARIABLE_DEFINITIONS var_def+);
+variable_definitions
+@declarations {
+	bool local = false;
+}
+	:^(VARIABLE_DEFINITIONS (LOCAL { local = true; })? var_def[local]+);
 
 name_base returns[std::string libbash_value]
 	:NAME { $libbash_value = walker->get_string($NAME); }
@@ -115,13 +119,16 @@ options{ k=1; }
 	:DIGIT { $libbash_value = walker->get_string($DIGIT); }
 	|NUMBER { $libbash_value = walker->get_string($NUMBER); };
 
-var_def
+var_def[bool local]
 @declarations {
 	std::map<int, std::string> values;
 	unsigned index = 0;
 }
 	:^(EQUALS name string_expr?) {
-		walker->set_value($name.libbash_value, $string_expr.libbash_value, $name.index);
+		if(local)
+			walker->define_local($name.libbash_value, $string_expr.libbash_value, false, $name.index);
+		else
+			walker->set_value($name.libbash_value, $string_expr.libbash_value, $name.index);
 	}
 	|^(EQUALS libbash_name=name_base ^(ARRAY (
 										(expr=string_expr
@@ -130,7 +137,10 @@ var_def
 											} expr=string_expr))
 										{ values[index++] = expr.libbash_value; })*
 									 )){
-		walker->define(libbash_name, values);
+		if(local)
+			walker->define_local(libbash_name, values);
+		else
+			walker->define(libbash_name, values);
 	};
 
 string_expr returns[std::string libbash_value, bool quoted]
@@ -282,7 +292,7 @@ simple_command
 @declarations {
 	std::vector<std::string> libbash_args;
 }
-	:^(COMMAND string_expr (argument[libbash_args])* var_def*) {
+	:^(COMMAND string_expr (argument[libbash_args])* var_def[true]*) {
 		if(walker->has_function($string_expr.libbash_value))
 		{
 			walker->set_status(walker->call($string_expr.libbash_value,

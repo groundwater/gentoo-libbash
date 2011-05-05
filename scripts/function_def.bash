@@ -26,3 +26,13 @@ FOO001="4		5"
 ARRAY=(1 2 3)
 func_with_args ${ARRAY[@]} $FOO001
 func_with_args 100 $ARG2 $ARG3 $ARG4
+
+func_nested1() {
+    echo $foo_nested ${bar_nested[0]}
+}
+func_nested2() {
+    local foo_nested=hi bar_nested=(1 2
+    3)
+    func_nested1
+}
+func_nested2

@@ -24,6 +24,8 @@
 
 #include "core/interpreter.h"
 
+#include <cctype>
+
 #include <functional>
 
 #include <boost/algorithm/string/classification.hpp>
@@ -31,6 +33,7 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/foreach.hpp>
 #include <boost/range/adaptor/map.hpp>
 #include <boost/range/algorithm/copy.hpp>
 
@@ -47,6 +50,33 @@ std::string interpreter::get_string(pANTLR3_BASE_TREE node)
   // The real type here is int64_t which is used as a pointer.
   return std::string(reinterpret_cast<const char *>(token->start),
                      token->stop - token->start + 1);
+}
+
+std::shared_ptr<variable> interpreter::resolve_variable(const std::string& name) const
+{
+  if(name.empty())
+    throw interpreter_exception("Variable name shouldn't be empty");
+  // positional parameter
+  if(isdigit(name[0]) && !local_members.empty())
+  {
+    auto iter_local = local_members.back().find(name);
+    if(iter_local != local_members.back().end())
+      return iter_local->second;
+  }
+  else
+  {
+    BOOST_REVERSE_FOREACH(auto& frame, local_members)
+    {
+      auto iter_local = frame.find(name);
+      if(iter_local != frame.end())
+        return iter_local->second;
+    }
+  }
+
+  auto iter_global = members.find(name);
+  if(iter_global == members.end())
+    return std::shared_ptr<variable>();
+  return iter_global->second;
 }
 
 bool interpreter::is_unset_or_null(const std::string& name,
@@ -155,13 +185,13 @@ void interpreter::split_word(const std::string& word, std::vector<std::string>& 
   output.insert(output.end(), splitted_values.begin(), splitted_values.end());
 }
 
-inline void define_function_arguments(std::unique_ptr<scope>& current_stack,
+inline void define_function_arguments(scope& current_stack,
                                       const std::vector<std::string>& arguments)
 {
   for(auto i = 0u; i != arguments.size(); ++i)
   {
     const std::string& name = boost::lexical_cast<std::string>(i + 1);
-    (*current_stack)[name] = std::shared_ptr<variable>(new variable(name, arguments[i]));
+    current_stack[name].reset(new variable(name, arguments[i]));
   }
 }
 
@@ -177,8 +207,8 @@ int interpreter::call(const std::string& name,
   func_index = iter->second;
 
   // Prepare function stack and arguments
-  local_members.push(std::unique_ptr<scope>(new scope));
-  define_function_arguments(local_members.top(), arguments);
+  local_members.push_back(scope());
+  define_function_arguments(local_members.back(), arguments);
 
   auto INPUT = ctx->pTreeParser->ctnstream;
   auto ISTREAM = INPUT->tnstream->istream;
@@ -192,7 +222,7 @@ int interpreter::call(const std::string& name,
   ISTREAM->seek(ISTREAM, curr);
 
   // Clear function stack
-  local_members.pop();
+  local_members.pop_back();
 
   return 0;
 }
