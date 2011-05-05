@@ -39,6 +39,11 @@ namespace libbash
     if(!input)
       throw interpreter_exception("Unable to create fstream for script: " + path);
     interpreter walker;
+
+    // Initialize bash environment
+    for(auto iter = variables.begin(); iter != variables.end(); ++iter)
+      walker.set_value(iter->first, (iter->second)[0]);
+
     bash_ast ast(input);
     ast.interpret_with(walker);
 

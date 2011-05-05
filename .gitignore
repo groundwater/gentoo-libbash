@@ -2,6 +2,7 @@
 *.swo
 *.o
 *.la
+*.a
 *.lo
 *.log
 *.class
@@ -21,6 +22,7 @@ cppunittests
 variable_printer
 metadata_generator
 ast_printer
+instruo
 long.sh
 massif.out
 libbash.g

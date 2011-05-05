@@ -29,6 +29,8 @@ AC_ARG_ENABLE([developer],
 			  [AS_HELP_STRING([--enable-developer],[enables various QA checks])])
 AM_CONDITIONAL([DEVELOPER_MODE],[test "x$enable_developer" = xyes])
 
+PKG_CHECK_MODULES([PALUDIS], [paludis])
+
 AS_IF([test "x$enable_developer" = xyes],[boost_version="1.46.1"],[boost_version="1.43.0"])
 AX_BOOST_BASE([$boost_version],[:],
 			  [AC_MSG_ERROR([Needed boost not found])])

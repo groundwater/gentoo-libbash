@@ -17,30 +17,15 @@
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
    */
 ///
-/// \file metadata_generator.cpp
+/// \file metadata.h
 /// \author Mu Qiao
-/// \brief a simple utility for generating metadata
+/// \brief a helper for printing metadata content
 ///
 #include <iostream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
-#include "libbash.h"
-#include "utils/metadata.h"
-
-int main(int argc, char** argv)
-{
-  if(argc != 2)
-  {
-    std::cerr<<"Please provide your script as an argument"<<std::endl;
-    exit(EXIT_FAILURE);
-  }
-
-  std::unordered_map<std::string, std::vector<std::string>> variables;
-  std::vector<std::string> functions;
-  libbash::interpret(argv[1], variables, functions);
-
-  write_metadata(std::cout, variables, functions);
-
-  return EXIT_SUCCESS;
-}
+void write_metadata(std::ostream& output,
+                    std::unordered_map<std::string, std::vector<std::string>>& variables,
+                    std::vector<std::string>& functions);
