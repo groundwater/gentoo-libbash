@@ -28,20 +28,51 @@
 
 #include <gtest/gtest.h>
 
+#include "builtins/builtin_exceptions.h"
 #include "core/interpreter.h"
 #include "cppbash_builtin.h"
 
 using namespace std;
 
-TEST(source_builtin_test, source)
+TEST(source_builtin_test, source_true)
 {
   std::string srcdir(getenv("srcdir"));
   interpreter walker;
-  int status = cppbash_builtin::exec("source", {srcdir + "/scripts/source_true.sh"}, std::cout, std::cerr, std::cin, walker);
+
+  int status = cppbash_builtin::exec("source",
+                                     {srcdir + "/scripts/source_true.sh"},
+                                     std::cout,
+                                     std::cerr,
+                                     std::cin,
+                                     walker);
   EXPECT_EQ(status, 0);
   EXPECT_TRUE(walker.has_function("foo"));
   EXPECT_STREQ("hello", walker.resolve<std::string>("FOO001").c_str());
+}
 
-  status = cppbash_builtin::exec("source", {srcdir + "/scripts/source_false.sh"}, std::cout, std::cerr, std::cin, walker);
+TEST(source_builtin_test, source_false)
+{
+  std::string srcdir(getenv("srcdir"));
+  interpreter walker;
+  int status = cppbash_builtin::exec("source",
+                                     {srcdir + "/scripts/source_false.sh"},
+                                     std::cout,
+                                     std::cerr,
+                                     std::cin,
+                                     walker);
   EXPECT_EQ(status, 1);
+}
+
+TEST(source_builtin_test, source_return)
+{
+  std::string srcdir(getenv("srcdir"));
+  interpreter walker;
+  int status = cppbash_builtin::exec("source",
+                                     {srcdir + "/scripts/source_return.sh"},
+                                     std::cout,
+                                     std::cerr,
+                                     std::cin,
+                                     walker);
+  EXPECT_EQ(status, 10);
+  EXPECT_TRUE(walker.is_unset_or_null("NOT_EXIST", 0));
 }

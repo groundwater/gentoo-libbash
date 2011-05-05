@@ -17,39 +17,26 @@
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
 ///
-/// \file source_builtin.h
-/// \author Mu Qiao
-/// \brief class that implements the source builtin
+/// \file return_tests.cpp
+/// \brief series of unit tests for return builtin
 ///
+#include <iostream>
 
-#include "builtins/source_builtin.h"
-
-#include <fstream>
-#include <string>
+#include <boost/lexical_cast.hpp>
+#include <gtest/gtest.h>
 
 #include "builtins/builtin_exceptions.h"
-#include "cppbash_builtin.h"
 #include "core/interpreter.h"
-#include "core/interpreter_exception.h"
-#include "core/bash_ast.h"
+#include "cppbash_builtin.h"
 
-int source_builtin::exec(const std::vector<std::string>& bash_args)
+TEST(return_builtin_test, bad_argument)
 {
-  if(bash_args.size() == 0)
-    throw interpreter_exception("should provide one argument for source builtin");
+  interpreter walker;
+  EXPECT_THROW(cppbash_builtin::exec("return", {"abc"}, std::cout, std::cerr, std::cin, walker), boost::bad_lexical_cast);
+}
 
-  // we need fix this to pass extra arguments as positional parameters
-  const std::string& path = bash_args[0];
-  std::ifstream input(path);
-  if(!input)
-    throw interpreter_exception(path + " can't be read");
-
-  bash_ast ast(input);
-  try
-  {
-    ast.interpret_with(_walker);
-  }
-  catch(return_exception& e) {}
-
-  return _walker.get_status();
+TEST(return_builtin_test, bad_location)
+{
+  interpreter walker;
+  EXPECT_THROW(cppbash_builtin::exec("return", {}, std::cout, std::cerr, std::cin, walker), return_exception);
 }

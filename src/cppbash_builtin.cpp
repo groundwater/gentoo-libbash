@@ -23,9 +23,11 @@
 ///
 
 #include "cppbash_builtin.h"
+
+#include "builtins/boolean_builtins.h"
 #include "builtins/echo_builtin.h"
 #include "builtins/inherit_builtin.h"
-#include "builtins/boolean_builtins.h"
+#include "builtins/return_builtin.h"
 #include "builtins/source_builtin.h"
 
 cppbash_builtin::cppbash_builtin(BUILTIN_ARGS): _out_stream(&out), _err_stream(&err), _inp_stream(&in), _walker(walker)
@@ -38,7 +40,8 @@ cppbash_builtin::builtins_type& cppbash_builtin::builtins() {
       {"source", boost::factory<source_builtin*>()},
       {"inherit", boost::factory<inherit_builtin*>()},
       {"true", boost::factory<true_builtin*>()},
-      {"false", boost::factory<false_builtin*>()}
+      {"false", boost::factory<false_builtin*>()},
+      {"return", boost::factory<return_builtin*>()}
   });
   return *p;
 }

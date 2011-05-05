@@ -42,6 +42,7 @@ options
 
 	#include <boost/format.hpp>
 
+	#include "builtins/builtin_exceptions.h"
 	#include "core/interpreter.h"
 	#include "cppbash_builtin.h"
 
@@ -285,10 +286,18 @@ simple_command
 	:^(COMMAND string_expr (argument[libbash_args])* var_def*) {
 		if(walker->has_function($string_expr.libbash_value))
 		{
-			walker->set_status(walker->call($string_expr.libbash_value,
-											libbash_args,
-											ctx,
-											compound_command));
+			ANTLR3_MARKER command_index = INDEX();
+			try
+			{
+				walker->set_status(walker->call($string_expr.libbash_value,
+												libbash_args,
+												ctx,
+												compound_command));
+			}
+			catch(return_exception& e)
+			{
+				SEEK(command_index);
+			}
 		}
 		else if(cppbash_builtin::is_builtin($string_expr.libbash_value))
 		{

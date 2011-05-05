@@ -17,39 +17,23 @@
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
 ///
-/// \file source_builtin.h
+/// \file return_builtin.h
 /// \author Mu Qiao
-/// \brief class that implements the source builtin
+/// \brief implementation for the return builtin
 ///
 
-#include "builtins/source_builtin.h"
-
-#include <fstream>
-#include <string>
+#include "builtins/return_builtin.h"
 
 #include "builtins/builtin_exceptions.h"
-#include "cppbash_builtin.h"
 #include "core/interpreter.h"
-#include "core/interpreter_exception.h"
-#include "core/bash_ast.h"
+#include "cppbash_builtin.h"
 
-int source_builtin::exec(const std::vector<std::string>& bash_args)
+int return_builtin::exec(const std::vector<std::string>& bash_args)
 {
-  if(bash_args.size() == 0)
-    throw interpreter_exception("should provide one argument for source builtin");
+  if(bash_args.size() > 1)
+    throw interpreter_exception("return: too many arguments");
+  else if(bash_args.size() == 1)
+    _walker.set_status(boost::lexical_cast<int>(bash_args[0]));
 
-  // we need fix this to pass extra arguments as positional parameters
-  const std::string& path = bash_args[0];
-  std::ifstream input(path);
-  if(!input)
-    throw interpreter_exception(path + " can't be read");
-
-  bash_ast ast(input);
-  try
-  {
-    ast.interpret_with(_walker);
-  }
-  catch(return_exception& e) {}
-
-  return _walker.get_status();
+  throw return_exception();
 }
