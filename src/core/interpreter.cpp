@@ -36,6 +36,79 @@
 
 #include "libbashWalker.h"
 
+std::string interpreter::get_string(pANTLR3_BASE_TREE node)
+{
+  pANTLR3_COMMON_TOKEN token = node->getToken(node);
+  // The tree walker may send null pointer here, so return an empty
+  // string if that's the case.
+  if(!token->start)
+    return "";
+  // Use reinterpret_cast here because we have to cast C code.
+  // The real type here is int64_t which is used as a pointer.
+  return std::string(reinterpret_cast<const char *>(token->start),
+                     token->stop - token->start + 1);
+}
+
+bool interpreter::is_unset_or_null(const std::string& name,
+                                   const unsigned index) const
+{
+  auto i = members.find(name);
+  if(i == members.end())
+    return true;
+  else
+    return i->second->is_null(index);
+}
+
+const std::string interpreter::do_substring_expansion(const std::string& name,
+                                                      int offset,
+                                                      const unsigned index) const
+{
+  std::string value = resolve<std::string>(name, index);
+  if(!get_real_offset(offset, value))
+    return "";
+  return value.substr(offset);
+}
+
+const std::string interpreter::do_substring_expansion(const std::string& name,
+                                                      int offset,
+                                                      int length,
+                                                      const unsigned index) const
+{
+  if(length < 0)
+    throw interpreter_exception("length of substring expression should be greater or equal to zero");
+  std::string value = resolve<std::string>(name, index);
+  if(!get_real_offset(offset, value))
+    return "";
+  return value.substr(offset, length);
+}
+
+std::string interpreter::do_replace_expansion(const std::string& name,
+                                              std::function<void(std::string&)> replacer,
+                                              const unsigned index) const
+{
+  std::string value = resolve<std::string>(name, index);
+  replacer(value);
+  return value;
+}
+
+unsigned interpreter::get_length(const std::string& name,
+                                 const unsigned index) const
+{
+  auto i = members.find(name);
+  if(i == members.end())
+    return 0;
+  return i->second->get_length(index);
+}
+
+unsigned interpreter::get_array_length(const std::string& name) const
+{
+  auto i = members.find(name);
+  if(i == members.end())
+    return 0;
+  else
+    return i->second->get_array_length();
+}
+
 void interpreter::get_all_elements_joined(const std::string& name,
                                           const std::string& delim,
                                           std::string& result) const

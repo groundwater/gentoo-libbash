@@ -155,18 +155,7 @@ public:
   ///        of the given pANTLR3_BASE_TREE node.
   /// \param the target tree node
   /// \return the value of node->text
-  static std::string get_string(pANTLR3_BASE_TREE node)
-  {
-    pANTLR3_COMMON_TOKEN token = node->getToken(node);
-    // The tree walker may send null pointer here, so return an empty
-    // string if that's the case.
-    if(!token->start)
-      return "";
-    // Use reinterpret_cast here because we have to cast C code.
-    // The real type here is int64_t which is used as a pointer.
-    return std::string(reinterpret_cast<const char *>(token->start),
-                       token->stop - token->start + 1);
-  }
+  static std::string get_string(pANTLR3_BASE_TREE node);
 
   /// \brief perform logic or
   /// \param the first operand
@@ -442,14 +431,7 @@ public:
   ///        if the variable is undefined
   /// \param variable name
   /// \return whether the value of the variable is null
-  bool is_unset_or_null(const std::string& name, const unsigned index) const
-  {
-    auto i = members.find(name);
-    if(i == members.end())
-      return true;
-    else
-      return i->second->is_null(index);
-  }
+  bool is_unset_or_null(const std::string& name, const unsigned index) const;
 
   /// \brief check whether the value of the variable is unset
   /// \param variable name
@@ -598,13 +580,7 @@ public:
   /// \return the expansion result
   const std::string do_substring_expansion(const std::string& name,
                                            int offset,
-                                           const unsigned index) const
-  {
-    std::string value = resolve<std::string>(name, index);
-    if(!get_real_offset(offset, value))
-      return "";
-    return value.substr(offset);
-  }
+                                           const unsigned index) const;
 
   /// \brief perform substring expansion
   /// \param the offset of the substring
@@ -613,15 +589,7 @@ public:
   const std::string do_substring_expansion(const std::string& name,
                                            int offset,
                                            int length,
-                                           const unsigned index) const
-  {
-    if(length < 0)
-      throw interpreter_exception("length of substring expression should be greater or equal to zero");
-    std::string value = resolve<std::string>(name, index);
-    if(!get_real_offset(offset, value))
-      return "";
-    return value.substr(offset, length);
-  }
+                                           const unsigned index) const;
 
   /// \brief perform replacement expansion
   /// \param the name of the varaible that needs to be expanded
@@ -630,35 +598,17 @@ public:
   /// \return the expanded value
   std::string do_replace_expansion(const std::string& name,
                                    std::function<void(std::string&)> replacer,
-                                   const unsigned index) const
-  {
-    std::string value = resolve<std::string>(name, index);
-    replacer(value);
-    return value;
-  }
+                                   const unsigned index) const;
 
   /// \brief get the length of a string variable
   /// \param the name of the variable
   /// \return the length
-  unsigned get_length(const std::string& name, const unsigned index=0) const
-  {
-    auto i = members.find(name);
-    if(i == members.end())
-      return 0;
-    return i->second->get_length(index);
-  }
+  unsigned get_length(const std::string& name, const unsigned index=0) const;
 
   /// \brief get the length of an array
   /// \param the name of the array
   /// \return the length of the array
-  unsigned get_array_length(const std::string& name) const
-  {
-    auto i = members.find(name);
-    if(i == members.end())
-      return 0;
-    else
-      return i->second->get_array_length();
-  }
+  unsigned get_array_length(const std::string& name) const;
 
   /// \brief get all array elements concatenated by space
   /// \param the name of the array
