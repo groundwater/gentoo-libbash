@@ -29,3 +29,4 @@ simple_command:
 "./foobär" -> (COMMAND (STRING . / foob ä r))
 "cat ~/Documents/todo.txt" -> (COMMAND (STRING cat) (STRING ~ / Documents / todo . txt))
 "dodir ${foo}/${bar}" -> (COMMAND (STRING dodir) (STRING (VAR_REF foo) / (VAR_REF bar)))
+"local a=123 b=(1 2 3)" -> (VARIABLE_DEFINITIONS local (= a (STRING 123)) (= b (ARRAY (STRING 1) (STRING 2) (STRING 3))))

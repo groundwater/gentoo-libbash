@@ -130,7 +130,7 @@ simple_command
 	|	variable_definitions -> ^(VARIABLE_DEFINITIONS variable_definitions)
 	|	bash_command^ redirect*;
 variable_definitions
-	:	var_def (BLANK!+ var_def)*;
+	:	(LOCAL BLANK!+)? var_def (BLANK!+ var_def)*;
 bash_command
 	:	fname_no_res_word (BLANK+ fname)* -> ^(COMMAND fname_no_res_word fname*);
 redirect:	BLANK!* here_string_op^ BLANK!* fname
@@ -388,7 +388,7 @@ options{k=1;backtrack=false;}
 	:	DIGIT|NUMBER;
 //A rule for filenames/strings
 res_word_str
-	:	CASE|DO|DONE|ELIF|ELSE|ESAC|FI|FOR|FUNCTION|IF|IN|SELECT|THEN|UNTIL|WHILE|TIME;
+	:	CASE|DO|DONE|ELIF|ELSE|ESAC|FI|FOR|FUNCTION|IF|IN|SELECT|THEN|UNTIL|WHILE|TIME|LOCAL;
 //Any allowable part of a string, including slashes, no pounds
 str_part
 	:	ns_str_part
@@ -653,6 +653,7 @@ COLON	:	':';
 QMARK	:	'?';
 //Operators for conditional statements
 TEST_EXPR	:	'test';
+LOCAL	:	'local';
 LOGICAND :	'&&';
 LOGICOR	:	'||';
 //Tokens for strings
