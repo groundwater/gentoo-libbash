@@ -8,3 +8,8 @@ true
 false
 FOO001=$(echo hello)
 FOO002=$(hi)
+true && echo "right"
+false && echo "wrong"
+false || echo "right"
+true || echo "wrong"
+echo "end"
