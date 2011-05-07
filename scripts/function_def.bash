@@ -42,3 +42,13 @@ func_with_return2()
 }
 func_with_return2
 RETURN_STATUS2=$?
+
+func_nested1() {
+    echo $foo_nested ${bar_nested[0]}
+}
+func_nested2() {
+    local foo_nested=hi bar_nested=(1 2
+    3)
+    func_nested1
+}
+func_nested2

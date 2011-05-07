@@ -29,7 +29,6 @@
 
 #include <functional>
 #include <memory>
-#include <stack>
 #include <string>
 
 #include <antlr3basetree.h>
@@ -60,7 +59,7 @@ class interpreter
   /// \var private::local_members
   /// \brief local scope for function arguments, execution environment and
   ///        local variables
-  std::stack<std::unique_ptr<scope>> local_members;
+  std::vector<scope> local_members;
 
   std::ostream* out;
 
@@ -82,6 +81,8 @@ class interpreter
   void get_all_elements_joined(const std::string& name,
                                const std::string& delim,
                                std::string& result) const;
+
+  std::shared_ptr<variable> resolve_variable(const std::string&) const;
 
 public:
 
@@ -401,17 +402,11 @@ public:
   template <typename T>
   T resolve(const std::string& name, const unsigned index=0) const
   {
-    if(!local_members.empty())
-    {
-      auto iter_local = local_members.top()->find(name);
-      if(iter_local != local_members.top()->end())
-        return iter_local->second->get_value<T>(index);
-    }
-
-    auto iter_global = members.find(name);
-    if(iter_global == members.end())
-      return T();
-    return iter_global->second->get_value<T>(index);
+    auto var = resolve_variable(name);
+    if(var)
+      return var->get_value<T>(index);
+    else
+      return T{};
   }
 
   /// \brief resolve array variable
@@ -495,9 +490,21 @@ public:
               bool readonly=false,
               const unsigned index=0)
   {
-    std::shared_ptr<variable> target(
-        new variable(name, value, readonly, index));
-    members[name] = target;
+    members[name].reset(new variable(name, value, readonly, index));
+  }
+
+  /// \brief define a new local variable
+  /// \param the name of the variable
+  /// \param the value of the variable
+  /// \param whether it's readonly, default is false
+  /// \param whether it's null, default is false
+  template <typename T>
+  void define_local(const std::string& name,
+                    const T& value,
+                    bool readonly=false,
+                    const unsigned index=0)
+  {
+    local_members.back()[name].reset(new variable(name, value, readonly, index));
   }
 
   /// \brief define a new function
