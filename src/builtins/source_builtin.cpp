@@ -26,6 +26,7 @@
 
 #include <fstream>
 #include <string>
+#include <unordered_map>
 
 #include "builtins/builtin_exceptions.h"
 #include "cppbash_builtin.h"
@@ -35,19 +36,27 @@
 
 int source_builtin::exec(const std::vector<std::string>& bash_args)
 {
+  static std::unordered_map<std::string, std::shared_ptr<bash_ast>> ast_cache;
+
   if(bash_args.size() == 0)
     throw interpreter_exception("should provide one argument for source builtin");
 
   // we need fix this to pass extra arguments as positional parameters
   const std::string& path = bash_args[0];
-  std::ifstream input(path);
-  if(!input)
-    throw interpreter_exception(path + " can't be read");
 
-  bash_ast ast(input);
+  auto& stored_ast = ast_cache[path];
+  if(!stored_ast)
+  {
+    std::ifstream input(path);
+    if(!input)
+      throw interpreter_exception(path + " can't be read");
+
+    stored_ast.reset(new bash_ast(input));
+  }
+  
   try
   {
-    ast.interpret_with(_walker);
+    stored_ast->interpret_with(_walker);
   }
   catch(return_exception& e) {}
 

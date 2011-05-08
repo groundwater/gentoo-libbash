@@ -73,7 +73,7 @@ public:
     }
     catch(boost::bad_lexical_cast& e)
     {
-      throw interpreter_exception("can't cast " + value + " to int");
+      std::cerr << "can't cast " << value << " to int" << std::endl;
     }
     return result;
   }

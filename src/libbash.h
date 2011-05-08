@@ -39,7 +39,8 @@ namespace libbash
   /// \brief interpret a script specifid by path, return a map filled with
   ///        variables defined in the script
   /// \param the path of target script
-  /// \param the map to store variables
+  /// \param[in, out] we use the map to initialize bash environment and store the result
+  /// \param[out] store the names of the functions defined in the script
   void LIBBASH_API interpret(const std::string& path,
                              std::unordered_map<std::string, std::vector<std::string>>& variables,
                              std::vector<std::string>& functions);

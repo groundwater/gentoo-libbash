@@ -114,13 +114,24 @@ cppunittests_LDFLAGS = -static
 
 endif
 
-noinst_PROGRAMS = variable_printer metadata_generator ast_printer
+noinst_LIBRARIES = libmetadata.a
+
+libmetadata_a_SOURCES = utils/metadata.h utils/metadata.cpp
+libmetadata_a_CPPFLAGS = $(AM_CPPFLAGS) -Iutils
+
+noinst_PROGRAMS = variable_printer metadata_generator ast_printer instruo
 
 variable_printer_SOURCES = utils/variable_printer.cpp
 variable_printer_LDADD = libcppbash.la
 
 metadata_generator_SOURCES = utils/metadata_generator.cpp
-metadata_generator_LDADD = libcppbash.la
+metadata_generator_LDADD = libcppbash.la libmetadata.a
+metadata_generator_CPPFLAGS = $(AM_CPPFLAGS) -Iutils
+
+instruo_SOURCES = utils/instruo.cpp utils/command_line.cpp utils/command_line.h
+instruo_LDADD = libcppbash.la @PALUDIS_LIBS@ libmetadata.a
+instruo_CPPFLAGS = $(AM_CPPFLAGS) @PALUDIS_CFLAGS@ -Iutils
+instruo_CXXFLAGS = $(AM_CXXFLAGS) -Wno-extra
 
 ast_printer_SOURCES = utils/ast_printer.cpp
 ast_printer_LDADD = libcppbash.la $(BOOST_PROGRAM_OPTIONS_LIB)
