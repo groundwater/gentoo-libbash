@@ -550,8 +550,8 @@ case_clause[const std::string& target] returns[bool matched]
 
 case_pattern returns[std::string libbash_value]
 	:libbash_string=command_substitution { $libbash_value = libbash_string; }
-	|string_expr { $libbash_value = $string_expr.libbash_value; }
-	|TIMES { $libbash_value = "*"; };
+	|(^(STRING MATCH_ALL)) => ^(STRING MATCH_ALL) { $libbash_value = "*"; }
+	|string_expr { $libbash_value = $string_expr.libbash_value; };
 
 command_substitution returns[std::string libbash_value]
 @declarations {

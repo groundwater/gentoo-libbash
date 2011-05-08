@@ -70,6 +70,8 @@ tokens{
 	MATCH_AT_LEAST_ONE;
 	MATCH_PATTERN;
 	MATCH_ANY_EXCEPT;
+	MATCH_ALL;
+	MATCH_ONE;
 	CHARACTER_CLASS;
 	EQUIVALENCE_CLASS;
 	COLLATING_SYMBOL;
@@ -416,8 +418,8 @@ fname_part
 	|	res_word_str;
 //non-quoted string part rule, allows expansions
 nqstr_part
-	:	bracket_pattern_match
-	|	extended_pattern_match
+	:	extended_pattern_match
+	|	bracket_pattern_match
 	|	var_ref
 	|	command_sub
 	|	arithmetic_expansion
@@ -452,7 +454,9 @@ bracket_pattern_match
 	:	LSQUARE RSQUARE (BANG|CARET) pattern_match* RSQUARE -> ^(MATCH_ANY_EXCEPT RSQUARE pattern_match*)
 	|	LSQUARE RSQUARE pattern_match* RSQUARE -> ^(MATCH_PATTERN RSQUARE pattern_match*)
 	|	LSQUARE (BANG|CARET) pattern_match+ RSQUARE -> ^(MATCH_ANY_EXCEPT pattern_match+)
-	|	LSQUARE pattern_match+ RSQUARE -> ^(MATCH_PATTERN pattern_match+);
+	|	LSQUARE pattern_match+ RSQUARE -> ^(MATCH_PATTERN pattern_match+)
+	|	TIMES -> MATCH_ALL
+	|	QMARK -> MATCH_ONE;
 //allowable patterns with bracket pattern matching
 pattern_match
 	:	pattern_class_match
