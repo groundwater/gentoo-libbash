@@ -85,13 +85,13 @@ fi
 
 target=123
 case $target in
-    bcd)
+    1.3)
         echo "Shouldn't print this"
         ;;
-    abc)
+    \d+)
         echo "Shouldn't print this"
         ;;
-    123)
+    456|1?*|789)
         echo yep
         ;;
     123)

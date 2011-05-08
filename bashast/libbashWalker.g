@@ -27,8 +27,11 @@ options
 
 @includes{
 
+	#include <memory>
 	#include <string>
 	#include <vector>
+
+	#include <boost/xpressive/xpressive.hpp>
 
 	class interpreter;
 	void set_interpreter(interpreter* w);
@@ -85,6 +88,29 @@ options
 		// Seek to the correct offset and consume.
 		SEEK(INDEX() + index - 3);
 		CONSUME();
+	}
+
+	// The method is used to append a pattern with another one. Because it's not allowed to append an empty pattern,
+	// we need the argument 'do_append' to indicate whether the pattern is empty. 'do_append' will be set to true after
+	// the first assignment.
+	inline void append(boost::xpressive::sregex& pattern, const boost::xpressive::sregex& new_pattern, bool& do_append)
+	{
+		using namespace boost::xpressive;
+		if(do_append)
+		{
+			pattern = sregex(pattern >> new_pattern);
+		}
+		else
+		{
+			pattern = new_pattern;
+			do_append = true;
+		}
+	}
+
+	bool match(const std::string& target,
+			   const boost::xpressive::sregex& pattern)
+	{
+	  return boost::xpressive::regex_match(target, pattern);
 	}
 }
 
@@ -160,6 +186,27 @@ string_expr returns[std::string libbash_value, bool quoted]
 		|(libbash_string=any_string { $libbash_value += libbash_string; $quoted = false; })
 	)+);
 
+bash_pattern[boost::xpressive::sregex& pattern]
+@declarations {
+	using namespace boost::xpressive;
+	bool do_append = false;
+}
+	:^(STRING (
+		(DOUBLE_QUOTED_STRING) =>
+			^(DOUBLE_QUOTED_STRING (libbash_string=double_quoted_string {
+				append($pattern, as_xpr(libbash_string), do_append);
+			})*)
+		|(MATCH_ALL) => MATCH_ALL {
+			append($pattern, *_, do_append);
+		}
+		|(MATCH_ONE) => MATCH_ONE {
+			append($pattern, _, do_append);
+		}
+		|(libbash_string=any_string {
+			append($pattern, as_xpr(libbash_string), do_append);
+		})
+	)+);
+
 //double quoted string rule, allows expansions
 double_quoted_string returns[std::string libbash_value]
 	:(var_ref[true]) => libbash_string=var_ref[true] { $libbash_value = libbash_string; }
@@ -209,50 +256,50 @@ var_expansion returns[std::string libbash_value]
 			libbash_value = boost::lexical_cast<std::string>(walker->get_array_length(libbash_name));
 		}
 	))
-	|^(REPLACE_ALL var_name pattern=string_expr (replacement=string_expr)?) {
+	|^(REPLACE_ALL var_name replace_pattern=string_expr (replacement=string_expr)?) {
 		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
 													 std::bind(&interpreter::replace_all,
 															   std::placeholders::_1,
-															   pattern.libbash_value,
+															   replace_pattern.libbash_value,
 															   replacement.libbash_value),
 													 $var_name.index);
 	}
-	|^(REPLACE_AT_END var_name pattern=string_expr (replacement=string_expr)?) {
+	|^(REPLACE_AT_END var_name replace_pattern=string_expr (replacement=string_expr)?) {
 		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
 													 std::bind(&interpreter::replace_at_end,
 															   std::placeholders::_1,
-															   pattern.libbash_value,
+															   replace_pattern.libbash_value,
 															   replacement.libbash_value),
 													 $var_name.index);
 	}
-	|^(REPLACE_AT_START var_name pattern=string_expr (replacement=string_expr)?) {
+	|^(REPLACE_AT_START var_name replace_pattern=string_expr (replacement=string_expr)?) {
 		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
 													 std::bind(&interpreter::replace_at_start,
 															   std::placeholders::_1,
-															   pattern.libbash_value,
+															   replace_pattern.libbash_value,
 															   replacement.libbash_value),
 													 $var_name.index);
 	}
-	|^(REPLACE_FIRST var_name pattern=string_expr (replacement=string_expr)?) {
+	|^(REPLACE_FIRST var_name replace_pattern=string_expr (replacement=string_expr)?) {
 		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
 													 std::bind(&interpreter::replace_first,
 															   std::placeholders::_1,
-															   pattern.libbash_value,
+															   replace_pattern.libbash_value,
 															   replacement.libbash_value),
 													 $var_name.index);
 	}
-	|^(LAZY_REMOVE_AT_START var_name pattern=string_expr) {
+	|^(LAZY_REMOVE_AT_START var_name replace_pattern=string_expr) {
 		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
 													 std::bind(&interpreter::lazy_remove_at_start,
 															   std::placeholders::_1,
-															   pattern.libbash_value),
+															   replace_pattern.libbash_value),
 													 $var_name.index);
 	}
-	|^(LAZY_REMOVE_AT_END var_name pattern=string_expr) {
+	|^(LAZY_REMOVE_AT_END var_name replace_pattern=string_expr) {
 		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
 													 std::bind(&interpreter::lazy_remove_at_end,
 															   std::placeholders::_1,
-															   pattern.libbash_value),
+															   replace_pattern.libbash_value),
 													 $var_name.index);
 	};
 
@@ -524,34 +571,28 @@ case_expr
 
 case_clause[const std::string& target] returns[bool matched]
 @declarations {
-	std::vector<std::string> patterns;
+	std::vector<boost::xpressive::sregex> patterns;
 }
-	:^(CASE_PATTERN (libbash_string=case_pattern { patterns.push_back(libbash_string); })+ {
+	:^(CASE_PATTERN ( { patterns.push_back(boost::xpressive::sregex()); } bash_pattern[patterns.back()])+ {
 		if(LA(1) == CASE_COMMAND)
 		{
 			// omit CASE_COMMAND
 			SEEK(INDEX() + 1);
-			matched = false;
+			$matched = false;
+
 			for(auto iter = patterns.begin(); iter != patterns.end(); ++iter)
 			{
-				// pattern matching should happen here in future
-				if(*iter == "*" || *iter == target)
+				if(match(target, *iter))
 				{
 					command_list(ctx);
 					$matched = true;
-				}
-				else
-				{
-					seek_to_next_tree(ctx);
+					break;
 				}
 			}
+			if(!$matched)
+				seek_to_next_tree(ctx);
 		}
 	});
-
-case_pattern returns[std::string libbash_value]
-	:libbash_string=command_substitution { $libbash_value = libbash_string; }
-	|(^(STRING MATCH_ALL)) => ^(STRING MATCH_ALL) { $libbash_value = "*"; }
-	|string_expr { $libbash_value = $string_expr.libbash_value; };
 
 command_substitution returns[std::string libbash_value]
 @declarations {
