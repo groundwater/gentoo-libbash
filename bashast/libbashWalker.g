@@ -306,6 +306,7 @@ var_expansion returns[std::string libbash_value]
 word returns[std::string libbash_value]
 	:(num) => libbash_string=num { $libbash_value = libbash_string; }
 	|string_expr { $libbash_value = $string_expr.libbash_value; }
+	|(VAR_REF) => libbash_string=var_ref[false] { $libbash_value = libbash_string; }
 	|value=arithmetics { $libbash_value = boost::lexical_cast<std::string>(value); };
 
 //variable reference

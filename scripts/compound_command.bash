@@ -98,6 +98,7 @@ case $target in
         echo "Shouldn't print this"
         ;;
 esac
+target=xyz
 case $target in
     bcd)
         echo "Shouldn't print this"
