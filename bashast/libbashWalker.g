@@ -204,7 +204,7 @@ string_part returns[std::string libbash_value, bool quoted]
 		$libbash_value = libbash_string;
 	});
 
-bash_pattern[boost::xpressive::sregex& pattern]
+bash_pattern[boost::xpressive::sregex& pattern, bool greedy]
 @declarations {
 	using namespace boost::xpressive;
 	bool do_append = false;
@@ -217,7 +217,10 @@ bash_pattern[boost::xpressive::sregex& pattern]
 				append($pattern, as_xpr(libbash_string), do_append);
 			})*)
 		|(MATCH_ALL) => MATCH_ALL {
-			append($pattern, *_, do_append);
+			if($greedy)
+				append($pattern, *_, do_append);
+			else
+				append($pattern, -*_, do_append);
 		}
 		|(MATCH_ONE) => MATCH_ONE {
 			append($pattern, _, do_append);
@@ -292,6 +295,11 @@ var_name returns[std::string libbash_value, unsigned index]
 	};
 
 var_expansion returns[std::string libbash_value]
+@declarations {
+	using namespace boost::xpressive;
+	sregex replace_pattern;
+	bool greedy;
+}
 	:^(USE_DEFAULT_WHEN_UNSET_OR_NULL var_name libbash_word=word) {
 		libbash_value = walker->do_default_expansion($var_name.libbash_value, libbash_word, $var_name.index);
 	}
@@ -315,50 +323,47 @@ var_expansion returns[std::string libbash_value]
 			libbash_value = boost::lexical_cast<std::string>(walker->get_array_length(libbash_name));
 		}
 	))
-	|^(REPLACE_ALL var_name replace_pattern=string_expr (replacement=string_expr)?) {
+	|^(REPLACE_ALL var_name bash_pattern[replace_pattern, true] (replacement=string_expr)?) {
 		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
 													 std::bind(&interpreter::replace_all,
 															   std::placeholders::_1,
-															   replace_pattern.libbash_value,
+															   replace_pattern,
 															   replacement.libbash_value),
 													 $var_name.index);
 	}
-	|^(REPLACE_AT_END var_name replace_pattern=string_expr (replacement=string_expr)?) {
+	|^(REPLACE_AT_END var_name bash_pattern[replace_pattern, true] (replacement=string_expr)?) {
+		replace_pattern = sregex(replace_pattern >> eos);
 		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
-													 std::bind(&interpreter::replace_at_end,
+													 std::bind(&interpreter::replace_all,
 															   std::placeholders::_1,
-															   replace_pattern.libbash_value,
+															   replace_pattern,
 															   replacement.libbash_value),
 													 $var_name.index);
 	}
-	|^(REPLACE_AT_START var_name replace_pattern=string_expr (replacement=string_expr)?) {
-		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
-													 std::bind(&interpreter::replace_at_start,
-															   std::placeholders::_1,
-															   replace_pattern.libbash_value,
-															   replacement.libbash_value),
-													 $var_name.index);
-	}
-	|^(REPLACE_FIRST var_name replace_pattern=string_expr (replacement=string_expr)?) {
-		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
-													 std::bind(&interpreter::replace_first,
-															   std::placeholders::_1,
-															   replace_pattern.libbash_value,
-															   replacement.libbash_value),
-													 $var_name.index);
-	}
-	|^(LAZY_REMOVE_AT_START var_name replace_pattern=string_expr) {
-		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
-													 std::bind(&interpreter::lazy_remove_at_start,
-															   std::placeholders::_1,
-															   replace_pattern.libbash_value),
-													 $var_name.index);
-	}
-	|^(LAZY_REMOVE_AT_END var_name replace_pattern=string_expr) {
+	|^(LAZY_REMOVE_AT_END var_name bash_pattern[replace_pattern, false] (replacement=string_expr)?) {
+		replace_pattern = sregex(bos >> (s1=*_) >> replace_pattern >> eos);
 		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
 													 std::bind(&interpreter::lazy_remove_at_end,
 															   std::placeholders::_1,
-															   replace_pattern.libbash_value),
+															   replace_pattern),
+													 $var_name.index);
+	}
+	|^((REPLACE_AT_START { greedy = true; }|LAZY_REMOVE_AT_START { greedy = false; })
+		var_name bash_pattern[replace_pattern, greedy] (replacement=string_expr)?) {
+		replace_pattern = sregex(bos >> replace_pattern);
+		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
+													 std::bind(&interpreter::replace_all,
+															   std::placeholders::_1,
+															   replace_pattern,
+															   replacement.libbash_value),
+													 $var_name.index);
+	}
+	|^(REPLACE_FIRST var_name bash_pattern[replace_pattern, true] (replacement=string_expr)?) {
+		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
+													 std::bind(&interpreter::replace_first,
+															   std::placeholders::_1,
+															   replace_pattern,
+															   replacement.libbash_value),
 													 $var_name.index);
 	};
 
@@ -633,7 +638,7 @@ case_clause[const std::string& target] returns[bool matched]
 @declarations {
 	std::vector<boost::xpressive::sregex> patterns;
 }
-	:^(CASE_PATTERN ( { patterns.push_back(boost::xpressive::sregex()); } bash_pattern[patterns.back()])+ {
+	:^(CASE_PATTERN ( { patterns.push_back(boost::xpressive::sregex()); } bash_pattern[patterns.back(), true])+ {
 		if(LA(1) == CASE_COMMAND)
 		{
 			// omit CASE_COMMAND

@@ -228,48 +228,33 @@ int interpreter::call(const std::string& name,
 }
 
 void interpreter::replace_all(std::string& value,
-                              const std::string& pattern,
+                              const boost::xpressive::sregex& pattern,
                               const std::string& replacement)
 {
-  boost::replace_all(value, pattern, replacement);
-}
-
-void interpreter::replace_at_end(std::string& value,
-                                 const std::string& pattern,
-                                 const std::string& replacement)
-{
-  if(value.size() >= pattern.size() &&
-     value.substr(value.size() - pattern.size()) == pattern)
-    value.replace(value.size() - pattern.size(),
-                  pattern.size(),
-                  replacement);
-}
-
-void interpreter::replace_at_start(std::string& value,
-                                   const std::string& pattern,
-                                   const std::string& replacement)
-{
-  if(value.substr(0, pattern.size()) == pattern)
-    value.replace(0, pattern.size(), replacement);
-}
-
-void interpreter::replace_first(std::string& value,
-                                const std::string& pattern,
-                                const std::string& replacement)
-{
-  boost::replace_first(value, pattern, replacement);
-}
-
-void interpreter::lazy_remove_at_start(std::string& value,
-                                       const std::string& pattern)
-{
-  replace_at_start(value, pattern, "");
+  value = boost::xpressive::regex_replace(value,
+                                          pattern,
+                                          replacement,
+                                          boost::xpressive::regex_constants::format_literal);
 }
 
 void interpreter::lazy_remove_at_end(std::string& value,
-                                     const std::string& pattern)
+                              const boost::xpressive::sregex& pattern)
 {
-  replace_at_end(value, pattern, "");
+  boost::xpressive::smatch what;
+  if(boost::xpressive::regex_match(value,
+                                   what,
+                                   pattern))
+    value = what[1];
+}
+
+void interpreter::replace_first(std::string& value,
+                                const boost::xpressive::sregex& pattern,
+                                const std::string& replacement)
+{
+  value = boost::xpressive::regex_replace(value,
+                                          pattern,
+                                          replacement,
+                                          boost::xpressive::regex_constants::format_literal | boost::xpressive::regex_constants::format_first_only);
 }
 
 void interpreter::trim_trailing_eols(std::string& value)
