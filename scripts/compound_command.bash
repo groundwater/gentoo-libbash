@@ -135,4 +135,29 @@ case $target in
         echo yep
         ;;
 esac
+case $target in
+    [d-z])
+        echo "Shouldn't print this"
+        ;;
+    [a-c])
+        echo yep
+        ;;
+esac
+case $target in
+    [!a-c])
+        echo "Shouldn't print this"
+        ;;
+    [!d-z])
+        echo yep
+        ;;
+esac
+target=bar
+case $target in
+    a[a-cx-z]r)
+        echo "Shouldn't print this"
+        ;;
+    b[!d-fx-z]r)
+        echo yep
+        ;;
+esac
 echo "case end"

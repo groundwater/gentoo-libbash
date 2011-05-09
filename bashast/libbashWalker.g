@@ -209,6 +209,7 @@ bash_pattern[boost::xpressive::sregex& pattern]
 	using namespace boost::xpressive;
 	bool do_append = false;
 	bool negation;
+	std::string pattern_str;
 }
 	:^(STRING (
 		(DOUBLE_QUOTED_STRING) =>
@@ -222,13 +223,38 @@ bash_pattern[boost::xpressive::sregex& pattern]
 			append($pattern, _, do_append);
 		}
 		|(MATCH_ANY_EXCEPT|MATCH_PATTERN) =>
-		^((MATCH_ANY_EXCEPT { negation = true; } | MATCH_PATTERN { negation = false;}) s=string_part) {
-			if(s.libbash_value.empty())
+		^((MATCH_ANY_EXCEPT { negation = true; } | MATCH_PATTERN { negation = false; })
+		  (s=string_part { pattern_str += s.libbash_value; })+) {
+			if(pattern_str.empty())
 				return;
 
-			auto char_set = set = as_xpr(s.libbash_value[0]);
-			for(auto iter = s.libbash_value.begin() + 1; iter != s.libbash_value.end(); ++iter)
-				char_set = (char_set | *iter);
+			// deal with the first character specially
+			int index = 0;
+			auto char_set = set = as_xpr(pattern_str[0]);
+			if( index + 1 < pattern_str.size() && pattern_str[index + 1] == '-')
+			{
+				char_set = set[range(pattern_str[index], pattern_str[index + 2])];
+				index += 3;
+			}
+			else
+			{
+				++index;
+			}
+
+			// handle all characters in the pattern
+			while(index < pattern_str.size())
+			{
+				if( index + 1 < pattern_str.size() && pattern_str[index + 1] == '-')
+				{
+					char_set |= range(pattern_str[index], pattern_str[index + 2]);
+					index += 3;
+				}
+				else
+				{
+					char_set |= pattern_str[index];
+					++index;
+				}
+			}
 
 			if(negation)
 				append($pattern, ~char_set, do_append);
