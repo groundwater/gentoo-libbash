@@ -110,4 +110,29 @@ case $target in
         echo "default"
         ;;
 esac
+target=a
+case $target in
+    [def])
+        echo "Shouldn't print this"
+        ;;
+    [abc])
+        echo yep
+        ;;
+esac
+case $target in
+    [def])
+        echo "Shouldn't print this"
+        ;;
+    [a])
+        echo yep
+        ;;
+esac
+case $target in
+    [!abc])
+        echo "Shouldn't print this"
+        ;;
+    [!def])
+        echo yep
+        ;;
+esac
 echo "case end"

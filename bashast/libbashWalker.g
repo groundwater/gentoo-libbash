@@ -175,21 +175,40 @@ string_expr returns[std::string libbash_value, bool quoted]
 	$quoted = true;
 }
 	:^(STRING (
-		(DOUBLE_QUOTED_STRING) =>
-			^(DOUBLE_QUOTED_STRING (libbash_string=double_quoted_string { $libbash_value += libbash_string; })*)
-		|(ARITHMETIC_EXPRESSION) =>
-			^(ARITHMETIC_EXPRESSION value=arithmetics {
-				$libbash_value += boost::lexical_cast<std::string>(value); $quoted = false;
-			})
-		|(var_ref[false]) => libbash_string=var_ref[false] { $libbash_value += libbash_string; $quoted = false; }
-		|libbash_string=command_substitution { $libbash_value += libbash_string; $quoted = false; }
-		|(libbash_string=any_string { $libbash_value += libbash_string; $quoted = false; })
+		string_part {
+			$libbash_value += $string_part.libbash_value;
+			$quoted = $string_part.quoted;
+		}
 	)+);
+
+string_part returns[std::string libbash_value, bool quoted]
+@init {
+	$quoted = false;
+}
+	:(DOUBLE_QUOTED_STRING) =>
+		^(DOUBLE_QUOTED_STRING (libbash_string=double_quoted_string {
+									$libbash_value += libbash_string;
+									$quoted = true;
+								})*)
+	|(ARITHMETIC_EXPRESSION) =>
+		^(ARITHMETIC_EXPRESSION value=arithmetics {
+			$libbash_value = boost::lexical_cast<std::string>(value);
+		})
+	|(var_ref[false]) => libbash_string=var_ref[false] {
+		$libbash_value = libbash_string;
+	}
+	|libbash_string=command_substitution {
+		$libbash_value = libbash_string;
+	}
+	|(libbash_string=any_string {
+		$libbash_value = libbash_string;
+	});
 
 bash_pattern[boost::xpressive::sregex& pattern]
 @declarations {
 	using namespace boost::xpressive;
 	bool do_append = false;
+	bool negation;
 }
 	:^(STRING (
 		(DOUBLE_QUOTED_STRING) =>
@@ -201,6 +220,20 @@ bash_pattern[boost::xpressive::sregex& pattern]
 		}
 		|(MATCH_ONE) => MATCH_ONE {
 			append($pattern, _, do_append);
+		}
+		|(MATCH_ANY_EXCEPT|MATCH_PATTERN) =>
+		^((MATCH_ANY_EXCEPT { negation = true; } | MATCH_PATTERN { negation = false;}) s=string_part) {
+			if(s.libbash_value.empty())
+				return;
+
+			auto char_set = set = as_xpr(s.libbash_value[0]);
+			for(auto iter = s.libbash_value.begin() + 1; iter != s.libbash_value.end(); ++iter)
+				char_set = (char_set | *iter);
+
+			if(negation)
+				append($pattern, ~char_set, do_append);
+			else
+				append($pattern, char_set, do_append);
 		}
 		|(libbash_string=any_string {
 			append($pattern, as_xpr(libbash_string), do_append);
