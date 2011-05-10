@@ -262,7 +262,7 @@ var_exp	:	var_name (
 					-> ^(OFFSET var_name $os ^($len)?)
 				| parameter_delete_operator parameter_pattern_part+
 					-> ^(parameter_delete_operator var_name ^(STRING parameter_pattern_part+))
-				| parameter_replace_operator parameter_replace_pattern parameter_replace_string
+				| parameter_replace_operator parameter_replace_pattern (SLASH parameter_replace_string?)?
 					-> ^(parameter_replace_operator var_name parameter_replace_pattern parameter_replace_string?)
 				| -> var_name
 			 )
@@ -294,7 +294,7 @@ parameter_replace_pattern
 parameter_pattern_part
 	:	fname_part|BLANK|SEMIC;
 parameter_replace_string
-	:	(SLASH fname|SLASH)? -> fname?;
+	:	parameter_pattern_part+ -> ^(STRING parameter_pattern_part+);
 parameter_replace_operator
 	:	SLASH SLASH -> REPLACE_ALL
 	|	SLASH PCT -> REPLACE_AT_END
