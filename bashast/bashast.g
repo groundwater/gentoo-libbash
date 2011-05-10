@@ -68,7 +68,7 @@ tokens{
 	EXTENDED_MATCH_NONE;
 	EXTENDED_MATCH_ANY;
 	EXTENDED_MATCH_AT_LEAST_ONE;
-	MATCH_PATTERN;
+	MATCH_ANY;
 	MATCH_ANY_EXCEPT;
 	CHARACTER_CLASS;
 	EQUIVALENCE_CLASS;
@@ -450,9 +450,9 @@ pattern_match_trigger
 //Pattern matching using brackets
 bracket_pattern_match
 	:	LSQUARE RSQUARE (BANG|CARET) pattern_match* RSQUARE -> ^(MATCH_ANY_EXCEPT RSQUARE pattern_match*)
-	|	LSQUARE RSQUARE pattern_match* RSQUARE -> ^(MATCH_PATTERN RSQUARE pattern_match*)
+	|	LSQUARE RSQUARE pattern_match* RSQUARE -> ^(MATCH_ANY RSQUARE pattern_match*)
 	|	LSQUARE (BANG|CARET) pattern_match+ RSQUARE -> ^(MATCH_ANY_EXCEPT pattern_match+)
-	|	LSQUARE pattern_match+ RSQUARE -> ^(MATCH_PATTERN pattern_match+);
+	|	LSQUARE pattern_match+ RSQUARE -> ^(MATCH_ANY pattern_match+);
 //allowable patterns with bracket pattern matching
 pattern_match
 	:	pattern_class_match
