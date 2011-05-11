@@ -228,41 +228,13 @@ bash_pattern[boost::xpressive::sregex& pattern, bool greedy]
 		|(MATCH_ANY_EXCEPT|MATCH_ANY) =>
 		^((MATCH_ANY_EXCEPT { negation = true; } | MATCH_ANY { negation = false; })
 		  (s=string_part { pattern_str += s.libbash_value; })+) {
-			if(pattern_str.empty())
-				return;
-
-			// deal with the first character specially
-			int index = 0;
-			auto char_set = set = as_xpr(pattern_str[0]);
-			if( index + 1 < pattern_str.size() && pattern_str[index + 1] == '-')
-			{
-				char_set = set[range(pattern_str[index], pattern_str[index + 2])];
-				index += 3;
-			}
-			else
-			{
-				++index;
-			}
-
-			// handle all characters in the pattern
-			while(index < pattern_str.size())
-			{
-				if( index + 1 < pattern_str.size() && pattern_str[index + 1] == '-')
-				{
-					char_set |= range(pattern_str[index], pattern_str[index + 2]);
-					index += 3;
-				}
-				else
-				{
-					char_set |= pattern_str[index];
-					++index;
-				}
-			}
 
 			if(negation)
-				append($pattern, ~char_set, do_append);
+				pattern_str = "[^" + pattern_str + "]";
 			else
-				append($pattern, char_set, do_append);
+				pattern_str = "[" + pattern_str + "]";
+
+			append($pattern, sregex::compile(pattern_str), do_append);
 		}
 		|(libbash_string=any_string {
 			append($pattern, as_xpr(libbash_string), do_append);
