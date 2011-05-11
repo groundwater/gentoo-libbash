@@ -32,6 +32,7 @@
 #include <string>
 
 #include <antlr3basetree.h>
+#include <boost/xpressive/xpressive.hpp>
 
 #include "core/symbols.hpp"
 #include "cppbash_builtin.h"
@@ -637,44 +638,22 @@ public:
   /// \param the pattern used to match the value
   /// \param the replacement string
   static void replace_all(std::string& value,
-                          const std::string& pattern,
+                          const boost::xpressive::sregex& pattern,
                           const std::string& replacement);
 
-  /// \brief perform expansion like ${var/%foo/bar}
+  /// \brief perform expansion like ${var%foo}
   /// \param the value to be expanded
   /// \param the pattern used to match the value
-  /// \param the replacement string
-  static void replace_at_end(std::string& value,
-                             const std::string& pattern,
-                             const std::string& replacement);
-
-  /// \brief perform expansion like ${var/#foo/bar}
-  /// \param the value to be expanded
-  /// \param the pattern used to match the value
-  /// \param the replacement string
-  static void replace_at_start(std::string& value,
-                               const std::string& pattern,
-                               const std::string& replacement);
+  static void lazy_remove_at_end(std::string& value,
+                                 const boost::xpressive::sregex& pattern);
 
   /// \brief perform expansion like ${var/foo/bar}
   /// \param the value to be expanded
   /// \param the pattern used to match the value
   /// \param the replacement string
   static void replace_first(std::string& value,
-                            const std::string& pattern,
+                            const boost::xpressive::sregex& pattern,
                             const std::string& replacement);
-
-  /// \brief perform expansion like ${var#foo}
-  /// \param the value to be expanded
-  /// \param the pattern used to match the value
-  static void lazy_remove_at_start(std::string& value,
-                                   const std::string& pattern);
-
-  /// \brief perform expansion like ${var%foo}
-  /// \param the value to be expanded
-  /// \param the pattern used to match the value
-  static void lazy_remove_at_end(std::string& value,
-                                 const std::string& pattern);
 
   /// \brief remove trailing EOLs from the value
   /// \param[in, out] the target

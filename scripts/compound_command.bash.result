@@ -25,10 +25,16 @@ ghi
 1
 yep
 default
+yep
+yep
+yep
+yep
+yep
+yep
 case end
 a=1
 b=2
 file= foo bar 
 foo=ghi
 i=4
-target=123
+target=bar

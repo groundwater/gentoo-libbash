@@ -27,8 +27,11 @@ options
 
 @includes{
 
+	#include <memory>
 	#include <string>
 	#include <vector>
+
+	#include <boost/xpressive/xpressive.hpp>
 
 	class interpreter;
 	void set_interpreter(interpreter* w);
@@ -85,6 +88,29 @@ options
 		// Seek to the correct offset and consume.
 		SEEK(INDEX() + index - 3);
 		CONSUME();
+	}
+
+	// The method is used to append a pattern with another one. Because it's not allowed to append an empty pattern,
+	// we need the argument 'do_append' to indicate whether the pattern is empty. 'do_append' will be set to true after
+	// the first assignment.
+	inline void append(boost::xpressive::sregex& pattern, const boost::xpressive::sregex& new_pattern, bool& do_append)
+	{
+		using namespace boost::xpressive;
+		if(do_append)
+		{
+			pattern = sregex(pattern >> new_pattern);
+		}
+		else
+		{
+			pattern = new_pattern;
+			do_append = true;
+		}
+	}
+
+	bool match(const std::string& target,
+			   const boost::xpressive::sregex& pattern)
+	{
+	  return boost::xpressive::regex_match(target, pattern);
 	}
 }
 
@@ -149,15 +175,98 @@ string_expr returns[std::string libbash_value, bool quoted]
 	$quoted = true;
 }
 	:^(STRING (
+		string_part {
+			$libbash_value += $string_part.libbash_value;
+			$quoted = $string_part.quoted;
+		}
+	)+);
+
+string_part returns[std::string libbash_value, bool quoted]
+@init {
+	$quoted = false;
+}
+	:(DOUBLE_QUOTED_STRING) =>
+		^(DOUBLE_QUOTED_STRING (libbash_string=double_quoted_string {
+									$libbash_value += libbash_string;
+									$quoted = true;
+								})*)
+	|(ARITHMETIC_EXPRESSION) =>
+		^(ARITHMETIC_EXPRESSION value=arithmetics {
+			$libbash_value = boost::lexical_cast<std::string>(value);
+		})
+	|(var_ref[false]) => libbash_string=var_ref[false] {
+		$libbash_value = libbash_string;
+	}
+	|libbash_string=command_substitution {
+		$libbash_value = libbash_string;
+	}
+	|(libbash_string=any_string {
+		$libbash_value = libbash_string;
+	});
+
+bash_pattern[boost::xpressive::sregex& pattern, bool greedy]
+@declarations {
+	using namespace boost::xpressive;
+	bool do_append = false;
+	bool negation;
+	std::string pattern_str;
+}
+	:^(STRING (
 		(DOUBLE_QUOTED_STRING) =>
-			^(DOUBLE_QUOTED_STRING (libbash_string=double_quoted_string { $libbash_value += libbash_string; })*)
-		|(ARITHMETIC_EXPRESSION) =>
-			^(ARITHMETIC_EXPRESSION value=arithmetics {
-				$libbash_value += boost::lexical_cast<std::string>(value); $quoted = false;
-			})
-		|(var_ref[false]) => libbash_string=var_ref[false] { $libbash_value += libbash_string; $quoted = false; }
-		|libbash_string=command_substitution { $libbash_value += libbash_string; $quoted = false; }
-		|(libbash_string=any_string { $libbash_value += libbash_string; $quoted = false; })
+			^(DOUBLE_QUOTED_STRING (libbash_string=double_quoted_string {
+				append($pattern, as_xpr(libbash_string), do_append);
+			})*)
+		|(MATCH_ALL) => MATCH_ALL {
+			if($greedy)
+				append($pattern, *_, do_append);
+			else
+				append($pattern, -*_, do_append);
+		}
+		|(MATCH_ONE) => MATCH_ONE {
+			append($pattern, _, do_append);
+		}
+		|(MATCH_ANY_EXCEPT|MATCH_ANY) =>
+		^((MATCH_ANY_EXCEPT { negation = true; } | MATCH_ANY { negation = false; })
+		  (s=string_part { pattern_str += s.libbash_value; })+) {
+			if(pattern_str.empty())
+				return;
+
+			// deal with the first character specially
+			int index = 0;
+			auto char_set = set = as_xpr(pattern_str[0]);
+			if( index + 1 < pattern_str.size() && pattern_str[index + 1] == '-')
+			{
+				char_set = set[range(pattern_str[index], pattern_str[index + 2])];
+				index += 3;
+			}
+			else
+			{
+				++index;
+			}
+
+			// handle all characters in the pattern
+			while(index < pattern_str.size())
+			{
+				if( index + 1 < pattern_str.size() && pattern_str[index + 1] == '-')
+				{
+					char_set |= range(pattern_str[index], pattern_str[index + 2]);
+					index += 3;
+				}
+				else
+				{
+					char_set |= pattern_str[index];
+					++index;
+				}
+			}
+
+			if(negation)
+				append($pattern, ~char_set, do_append);
+			else
+				append($pattern, char_set, do_append);
+		}
+		|(libbash_string=any_string {
+			append($pattern, as_xpr(libbash_string), do_append);
+		})
 	)+);
 
 //double quoted string rule, allows expansions
@@ -186,6 +295,11 @@ var_name returns[std::string libbash_value, unsigned index]
 	};
 
 var_expansion returns[std::string libbash_value]
+@declarations {
+	using namespace boost::xpressive;
+	sregex replace_pattern;
+	bool greedy;
+}
 	:^(USE_DEFAULT_WHEN_UNSET_OR_NULL var_name libbash_word=word) {
 		libbash_value = walker->do_default_expansion($var_name.libbash_value, libbash_word, $var_name.index);
 	}
@@ -209,56 +323,54 @@ var_expansion returns[std::string libbash_value]
 			libbash_value = boost::lexical_cast<std::string>(walker->get_array_length(libbash_name));
 		}
 	))
-	|^(REPLACE_ALL var_name pattern=string_expr (replacement=string_expr)?) {
+	|^(REPLACE_ALL var_name bash_pattern[replace_pattern, true] (replacement=string_expr)?) {
 		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
 													 std::bind(&interpreter::replace_all,
 															   std::placeholders::_1,
-															   pattern.libbash_value,
+															   replace_pattern,
 															   replacement.libbash_value),
 													 $var_name.index);
 	}
-	|^(REPLACE_AT_END var_name pattern=string_expr (replacement=string_expr)?) {
+	|^(REPLACE_AT_END var_name bash_pattern[replace_pattern, true] (replacement=string_expr)?) {
+		replace_pattern = sregex(replace_pattern >> eos);
 		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
-													 std::bind(&interpreter::replace_at_end,
+													 std::bind(&interpreter::replace_all,
 															   std::placeholders::_1,
-															   pattern.libbash_value,
+															   replace_pattern,
 															   replacement.libbash_value),
 													 $var_name.index);
 	}
-	|^(REPLACE_AT_START var_name pattern=string_expr (replacement=string_expr)?) {
-		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
-													 std::bind(&interpreter::replace_at_start,
-															   std::placeholders::_1,
-															   pattern.libbash_value,
-															   replacement.libbash_value),
-													 $var_name.index);
-	}
-	|^(REPLACE_FIRST var_name pattern=string_expr (replacement=string_expr)?) {
-		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
-													 std::bind(&interpreter::replace_first,
-															   std::placeholders::_1,
-															   pattern.libbash_value,
-															   replacement.libbash_value),
-													 $var_name.index);
-	}
-	|^(LAZY_REMOVE_AT_START var_name pattern=string_expr) {
-		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
-													 std::bind(&interpreter::lazy_remove_at_start,
-															   std::placeholders::_1,
-															   pattern.libbash_value),
-													 $var_name.index);
-	}
-	|^(LAZY_REMOVE_AT_END var_name pattern=string_expr) {
+	|^(LAZY_REMOVE_AT_END var_name bash_pattern[replace_pattern, false] (replacement=string_expr)?) {
+		replace_pattern = sregex(bos >> (s1=*_) >> replace_pattern >> eos);
 		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
 													 std::bind(&interpreter::lazy_remove_at_end,
 															   std::placeholders::_1,
-															   pattern.libbash_value),
+															   replace_pattern),
+													 $var_name.index);
+	}
+	|^((REPLACE_AT_START { greedy = true; }|LAZY_REMOVE_AT_START { greedy = false; })
+		var_name bash_pattern[replace_pattern, greedy] (replacement=string_expr)?) {
+		replace_pattern = sregex(bos >> replace_pattern);
+		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
+													 std::bind(&interpreter::replace_all,
+															   std::placeholders::_1,
+															   replace_pattern,
+															   replacement.libbash_value),
+													 $var_name.index);
+	}
+	|^(REPLACE_FIRST var_name bash_pattern[replace_pattern, true] (replacement=string_expr)?) {
+		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
+													 std::bind(&interpreter::replace_first,
+															   std::placeholders::_1,
+															   replace_pattern,
+															   replacement.libbash_value),
 													 $var_name.index);
 	};
 
 word returns[std::string libbash_value]
 	:(num) => libbash_string=num { $libbash_value = libbash_string; }
 	|string_expr { $libbash_value = $string_expr.libbash_value; }
+	|(VAR_REF) => libbash_string=var_ref[false] { $libbash_value = libbash_string; }
 	|value=arithmetics { $libbash_value = boost::lexical_cast<std::string>(value); };
 
 //variable reference
@@ -524,34 +636,28 @@ case_expr
 
 case_clause[const std::string& target] returns[bool matched]
 @declarations {
-	std::vector<std::string> patterns;
+	std::vector<boost::xpressive::sregex> patterns;
 }
-	:^(CASE_PATTERN (libbash_string=case_pattern { patterns.push_back(libbash_string); })+ {
+	:^(CASE_PATTERN ( { patterns.push_back(boost::xpressive::sregex()); } bash_pattern[patterns.back(), true])+ {
 		if(LA(1) == CASE_COMMAND)
 		{
 			// omit CASE_COMMAND
 			SEEK(INDEX() + 1);
-			matched = false;
+			$matched = false;
+
 			for(auto iter = patterns.begin(); iter != patterns.end(); ++iter)
 			{
-				// pattern matching should happen here in future
-				if(*iter == "*" || *iter == target)
+				if(match(target, *iter))
 				{
 					command_list(ctx);
 					$matched = true;
-				}
-				else
-				{
-					seek_to_next_tree(ctx);
+					break;
 				}
 			}
+			if(!$matched)
+				seek_to_next_tree(ctx);
 		}
 	});
-
-case_pattern returns[std::string libbash_value]
-	:libbash_string=command_substitution { $libbash_value = libbash_string; }
-	|string_expr { $libbash_value = $string_expr.libbash_value; }
-	|TIMES { $libbash_value = "*"; };
 
 command_substitution returns[std::string libbash_value]
 @declarations {
