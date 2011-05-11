@@ -227,7 +227,16 @@ bash_pattern[boost::xpressive::sregex& pattern, bool greedy]
 		}
 		|(MATCH_ANY_EXCEPT|MATCH_ANY) =>
 		^((MATCH_ANY_EXCEPT { negation = true; } | MATCH_ANY { negation = false; })
-		  (s=string_part { pattern_str += s.libbash_value; })+) {
+		  ((CHARACTER_CLASS) => ^(CHARACTER_CLASS n=NAME) {
+				std::string class_name = walker->get_string(n);
+				if(class_name == "word")
+					pattern_str += "A-Za-z0-9_";
+				else if(class_name == "ascii")
+					pattern_str += "\\x00-\\x7F";
+				else
+					pattern_str += "[:" + class_name + ":]";
+			}
+			|s=string_part { pattern_str += s.libbash_value; })+) {
 
 			if(negation)
 				pattern_str = "[^" + pattern_str + "]";

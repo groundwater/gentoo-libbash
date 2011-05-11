@@ -160,4 +160,22 @@ case $target in
         echo yep
         ;;
 esac
+target="a"
+case $target in
+    [[:alnum:][:alpha:][:ascii:][:blank:][:cntrl:][:digit:][:graph:][:lower:][:print:][:punct:][:space:][:upper:][:word:][:xdigit:]])
+        echo yep
+        ;;
+esac
+target="a"
+case $target in
+    [[:ascii:]])
+        echo yep
+        ;;
+esac
+target="_"
+case $target in
+    [[:word:]])
+        echo yep
+        ;;
+esac
 echo "case end"
