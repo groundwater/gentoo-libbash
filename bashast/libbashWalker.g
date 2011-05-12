@@ -208,47 +208,100 @@ bash_pattern[boost::xpressive::sregex& pattern, bool greedy]
 @declarations {
 	using namespace boost::xpressive;
 	bool do_append = false;
+	sregex pattern_list;
+}
+	:^(STRING (
+		(EXTENDED_MATCH_AT_MOST_ONE) => ^(EXTENDED_MATCH_AT_MOST_ONE composite_pattern[pattern_list, $greedy]) {
+			if($greedy)
+				append($pattern, !sregex(pattern_list), do_append);
+			else
+				append($pattern, -!sregex(pattern_list), do_append);
+		}
+		|(EXTENDED_MATCH_ANY) => ^(EXTENDED_MATCH_ANY composite_pattern[pattern_list, $greedy]) {
+			if($greedy)
+				append($pattern, *sregex(pattern_list), do_append);
+			else
+				append($pattern, -*sregex(pattern_list), do_append);
+		}
+		|(EXTENDED_MATCH_AT_LEAST_ONE) => ^(EXTENDED_MATCH_AT_LEAST_ONE composite_pattern[pattern_list, $greedy]) {
+			if($greedy)
+				append($pattern, +sregex(pattern_list), do_append);
+			else
+				append($pattern, -+sregex(pattern_list), do_append);
+		}
+		// We don't have to do anything for the following rule
+		|(EXTENDED_MATCH_EXACTLY_ONE) => ^(EXTENDED_MATCH_EXACTLY_ONE composite_pattern[pattern_list, $greedy]) {
+			append($pattern, pattern_list, do_append);
+		}
+		|(EXTENDED_MATCH_NONE) => ^(EXTENDED_MATCH_NONE composite_pattern[pattern_list, $greedy]) {
+			throw interpreter_exception("!(blah) is not supported for now");
+		}
+		|basic_pattern[$pattern, $greedy, do_append])+);
+
+composite_pattern[boost::xpressive::sregex& pattern_list, bool greedy]
+@declarations {
+	using namespace boost::xpressive;
+	bool do_append = false;
+	bool do_sub_append = false;
+	sregex sub_pattern;
+}
+	:(^(STRING
+		(basic_pattern[sub_pattern, $greedy, do_sub_append]{
+			if(do_append)
+			{
+				$pattern_list = sregex($pattern_list | sub_pattern);
+			}
+			else
+			{
+				$pattern_list = sub_pattern;
+				do_append = true;
+			}
+			do_sub_append = false;
+		})+
+	))+;
+
+basic_pattern[boost::xpressive::sregex& pattern, bool greedy, bool& do_append]
+@declarations {
+	using namespace boost::xpressive;
 	bool negation;
 	std::string pattern_str;
 }
-	:^(STRING (
-		(DOUBLE_QUOTED_STRING) =>
-			^(DOUBLE_QUOTED_STRING (libbash_string=double_quoted_string {
-				append($pattern, as_xpr(libbash_string), do_append);
-			})*)
-		|(MATCH_ALL) => MATCH_ALL {
-			if($greedy)
-				append($pattern, *_, do_append);
-			else
-				append($pattern, -*_, do_append);
-		}
-		|(MATCH_ONE) => MATCH_ONE {
-			append($pattern, _, do_append);
-		}
-		|(MATCH_ANY_EXCEPT|MATCH_ANY) =>
-		^((MATCH_ANY_EXCEPT { negation = true; } | MATCH_ANY { negation = false; })
-		  ((CHARACTER_CLASS) => ^(CHARACTER_CLASS n=NAME) {
-				std::string class_name = walker->get_string(n);
-				if(class_name == "word")
-					pattern_str += "A-Za-z0-9_";
-				else if(class_name == "ascii")
-					pattern_str += "\\x00-\\x7F";
-				else
-					pattern_str += "[:" + class_name + ":]";
-			}
-			|s=string_part { pattern_str += s.libbash_value; })+) {
-
-			if(negation)
-				pattern_str = "[^" + pattern_str + "]";
-			else
-				pattern_str = "[" + pattern_str + "]";
-
-			append($pattern, sregex::compile(pattern_str), do_append);
-		}
-		|(libbash_string=any_string {
+	:(DOUBLE_QUOTED_STRING) =>
+		^(DOUBLE_QUOTED_STRING (libbash_string=double_quoted_string {
 			append($pattern, as_xpr(libbash_string), do_append);
-		})
-	)+);
+		})*)
+	|(MATCH_ALL) => MATCH_ALL {
+		if($greedy)
+			append($pattern, *_, do_append);
+		else
+			append($pattern, -*_, do_append);
+	}
+	|(MATCH_ONE) => MATCH_ONE {
+		append($pattern, _, do_append);
+	}
+	|(MATCH_ANY_EXCEPT|MATCH_ANY) =>
+	^((MATCH_ANY_EXCEPT { negation = true; } | MATCH_ANY { negation = false; })
+	  ((CHARACTER_CLASS) => ^(CHARACTER_CLASS n=NAME) {
+			std::string class_name = walker->get_string(n);
+			if(class_name == "word")
+				pattern_str += "A-Za-z0-9_";
+			else if(class_name == "ascii")
+				pattern_str += "\\x00-\\x7F";
+			else
+				pattern_str += "[:" + class_name + ":]";
+		}
+		|s=string_part { pattern_str += s.libbash_value; })+) {
+
+		if(negation)
+			pattern_str = "[^" + pattern_str + "]";
+		else
+			pattern_str = "[" + pattern_str + "]";
+
+		append($pattern, sregex::compile(pattern_str), do_append);
+	}
+	|(libbash_string=any_string {
+		append($pattern, as_xpr(libbash_string), do_append);
+	});
 
 //double quoted string rule, allows expansions
 double_quoted_string returns[std::string libbash_value]
