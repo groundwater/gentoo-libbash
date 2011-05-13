@@ -48,12 +48,17 @@ class bash_ast
   libbashParser_Ctx_struct* psr;
   std::unique_ptr<libbashParser_start_return_struct> langAST;
   pANTLR3_COMMON_TREE_NODE_STREAM nodes;
+  int error_count;
 
   void init_parser();
 public:
   explicit bash_ast(std::istream& source);
   ~bash_ast();
 
+  int get_error_count() const
+  {
+    return error_count;
+  }
   ///
   /// \brief interpret the script with a given interpreter
   /// \param the interpreter object

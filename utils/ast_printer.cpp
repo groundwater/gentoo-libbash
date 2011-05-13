@@ -48,17 +48,19 @@ BOOST_FUSION_ADAPT_STRUCT(
     (ANTLR3_INT32, first)
 )
 
-static void print_ast(std::istream& input, bool silent, bool dot)
+static int print_ast(std::istream& input, bool silent, bool dot)
 {
   bash_ast ast(input);
 
   if(silent)
-    return;
+    return ast.get_error_count();
 
   if(dot)
     std::cout << ast.get_dot_graph() << std::endl;
   else
     std::cout << ast.get_string_tree() << std::endl;
+
+  return ast.get_error_count();
 }
 
 static inline std::string token_mapper(std::unordered_map<ANTLR3_INT32, std::string> token_map,
@@ -83,12 +85,12 @@ static bool build_token_map(std::unordered_map<ANTLR3_INT32, std::string>& token
   return qi::parse(first, last, line % qi::eol >> qi::eol, token_map) && first == last;
 }
 
-static inline void print_token(std::istream& input,
-                               const std::string& token_path,
-                               bool silent)
+static int print_token(std::istream& input,
+                       const std::string& token_path,
+                       bool silent)
 {
   if(silent)
-    return;
+    return 0;
 
   bash_ast ast(input);
   std::unordered_map<ANTLR3_INT32, std::string> token_map;
@@ -99,37 +101,42 @@ static inline void print_token(std::istream& input,
                                           token_map,
                                           std::placeholders::_1))
     << std::endl;
+    return ast.get_error_count();
   }
   else
   {
     std::cerr << "Building token map failed" << std::endl;
+    return ast.get_error_count() + 1;
   }
 }
 
-static void print_files(const std::vector<std::string>& files,
+static int print_files(const std::vector<std::string>& files,
                         bool print_name,
-                        std::function<void(std::istream&)> printer)
+                        std::function<int(std::istream&)> printer)
 {
+  int result = 0;
   for(auto iter = files.begin(); iter != files.end(); ++iter)
   {
     if(print_name)
       std::cout << "Interpreting " << *iter << std::endl;
 
     std::ifstream input(iter->c_str());
-    printer(input);
+    result += printer(input);
   }
+
+  return result;
 }
 
-static inline void print_expression(const std::string& expr,
-                                    std::function<void(std::istream&)> printer)
+static inline int print_expression(const std::string& expr,
+                                    std::function<int(std::istream&)> printer)
 {
   std::istringstream input(expr);
-  printer(input);
+  return printer(input);
 }
 
-static inline void print_cin(std::function<void(std::istream&)> printer)
+static inline int print_cin(std::function<int(std::istream&)> printer)
 {
-  printer(std::cin);
+  return printer(std::cin);
 }
 
 int main(int argc, char** argv)
@@ -158,10 +165,10 @@ int main(int argc, char** argv)
   if(vm.count("help"))
   {
     std::cout << desc << std::endl;
-    return 1;
+    return EXIT_FAILURE;
   }
 
-  std::function<void(std::istream&)> printer;
+  std::function<int(std::istream&)> printer;
   if(vm.count("token"))
     printer = std::bind(&print_token,
                         std::placeholders::_1,
@@ -173,12 +180,15 @@ int main(int argc, char** argv)
                         vm.count("silent"),
                         vm.count("dot"));
 
+  int result;
   if(vm.count("files"))
-    print_files(vm["files"].as<std::vector<std::string>>(),
-                vm.count("name"),
-                printer);
+    result = print_files(vm["files"].as<std::vector<std::string>>(),
+                         vm.count("name"),
+                         printer);
   else if(vm.count("expr"))
-    print_expression(vm["expr"].as<std::string>(), printer);
+    result = print_expression(vm["expr"].as<std::string>(), printer);
   else
-    print_cin(printer);
+    result = print_cin(printer);
+
+  return result;
 }

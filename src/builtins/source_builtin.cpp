@@ -25,6 +25,7 @@
 #include "builtins/source_builtin.h"
 
 #include <fstream>
+#include <iostream>
 #include <string>
 #include <unordered_map>
 
@@ -52,8 +53,10 @@ int source_builtin::exec(const std::vector<std::string>& bash_args)
       throw interpreter_exception(path + " can't be read");
 
     stored_ast.reset(new bash_ast(input));
+    if(stored_ast->get_error_count())
+      std::cerr << path << " could not be parsed properly" << std::endl;
   }
-  
+
   try
   {
     stored_ast->interpret_with(_walker);

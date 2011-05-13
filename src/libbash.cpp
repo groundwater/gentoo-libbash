@@ -31,10 +31,12 @@
 
 namespace libbash
 {
-  void interpret(const std::string& path,
-                 std::unordered_map<std::string, std::vector<std::string>>& variables,
-                 std::vector<std::string>& functions)
+  int interpret(const std::string& path,
+                std::unordered_map<std::string, std::vector<std::string>>& variables,
+                std::vector<std::string>& functions)
   {
+    int result;
+
     std::ifstream input(path.c_str());
     if(!input)
       throw interpreter_exception("Unable to create fstream for script: " + path);
@@ -46,9 +48,13 @@ namespace libbash
 
     bash_ast ast(input);
     ast.interpret_with(walker);
+    result = ast.get_error_count();
 
     for(auto iter = walker.begin(); iter != walker.end(); ++iter)
       iter->second->get_all_values<std::string>(variables[iter->first]);
     walker.get_all_function_names(functions);
+
+    result += walker.get_status();
+    return result;
   }
 }

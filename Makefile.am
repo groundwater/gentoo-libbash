@@ -99,6 +99,7 @@ check_PROGRAMS = cppunittests
 cppunittests_SOURCES =  test/run_tests.cpp \
 						src/core/tests/symbols_test.cpp \
 						src/core/tests/interpreter_test.cpp \
+						src/core/tests/bash_ast_test.cpp \
 						src/builtins/tests/echo_tests.cpp \
 						src/builtins/tests/boolean_tests.cpp \
 						src/builtins/tests/source_tests.cpp \
@@ -208,6 +209,7 @@ EXTRA_DIST = bashast/bashast.g \
 			 scripts/source_false.sh \
 			 scripts/source_true.sh \
 			 scripts/source_return.sh \
+			 scripts/illegal_script.sh \
 			 utils/meta_gen.sh \
 			 scripts/foo.eclass \
 			 $(BASH_TESTS) \

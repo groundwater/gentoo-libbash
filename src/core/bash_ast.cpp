@@ -27,11 +27,12 @@
 #include <sstream>
 
 #include "core/interpreter_exception.h"
+#include "core/interpreter.h"
 #include "libbashLexer.h"
 #include "libbashParser.h"
 #include "libbashWalker.h"
 
-bash_ast::bash_ast(std::istream& source)
+bash_ast::bash_ast(std::istream& source): error_count(0)
 {
   std::stringstream stream;
   stream << source.rdbuf();
@@ -41,6 +42,10 @@ bash_ast::bash_ast(std::istream& source)
       reinterpret_cast<pANTLR3_UINT8>(const_cast<char*>(script.c_str())),
       script.size(),
       NULL);
+
+  if(input == NULL)
+    throw interpreter_exception("Unable to open file " + script + " due to malloc() failure");
+
   init_parser();
 }
 
@@ -57,18 +62,31 @@ void bash_ast::init_parser()
 {
   lxr = libbashLexerNew(input);
   if ( lxr == NULL )
-    throw interpreter_exception("Unable to create the lexer due to malloc() failure");
+  {
+    std::cerr << "Unable to create the lexer due to malloc() failure" << std::endl;
+    error_count = 1;
+    return;
+  }
 
   tstream = antlr3CommonTokenStreamSourceNew(
       ANTLR3_SIZE_HINT, lxr->pLexer->rec->state->tokSource);
   if (tstream == NULL)
-    throw interpreter_exception("Out of memory trying to allocate token stream");
+  {
+    std::cerr << "Out of memory trying to allocate token stream" << std::endl;
+    error_count = 1;
+    return;
+  }
 
   psr = libbashParserNew(tstream);
   if (psr == NULL)
-    throw interpreter_exception("Out of memory trying to allocate parser");
+  {
+    std::cerr << "Out of memory trying to allocate parser" << std::endl;
+    error_count = 1;
+    return;
+  }
 
   langAST.reset(new libbashParser_start_return(psr->start(psr)));
+  error_count = psr->pParser->rec->getNumberOfSyntaxErrors(psr->pParser->rec);
   nodes = antlr3CommonTreeNodeStreamNewTree(langAST->tree, ANTLR3_SIZE_HINT);
 }
 

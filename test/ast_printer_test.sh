@@ -10,4 +10,16 @@ error+=$?
     | diff -u $srcdir/bashast/features_script/features.sh.tokens -
 error+=$?
 
+./ast_printer -f $srcdir/bashast/features_script/illegal_script.sh 2 > /dev/null
+if [[ $? == 0 ]]
+then
+    error+=1
+fi
+
+./ast_printer -e "case" 2 > /dev/null
+if [[ $? == 0 ]]
+then
+    error+=1
+fi
+
 exit $error
