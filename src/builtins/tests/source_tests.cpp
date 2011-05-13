@@ -21,8 +21,6 @@
 /// \brief series of unit tests for source built in
 ///
 
-#include <cstdlib>
-
 #include <iostream>
 #include <string>
 
@@ -31,16 +29,14 @@
 #include "builtins/builtin_exceptions.h"
 #include "core/interpreter.h"
 #include "cppbash_builtin.h"
-
-using namespace std;
+#include "test.h"
 
 TEST(source_builtin_test, source_true)
 {
-  std::string srcdir(getenv("srcdir"));
   interpreter walker;
 
   int status = cppbash_builtin::exec("source",
-                                     {srcdir + "/scripts/source_true.sh"},
+                                     {get_src_dir() + "/scripts/source_true.sh"},
                                      std::cout,
                                      std::cerr,
                                      std::cin,
@@ -52,10 +48,9 @@ TEST(source_builtin_test, source_true)
 
 TEST(source_builtin_test, source_false)
 {
-  std::string srcdir(getenv("srcdir"));
   interpreter walker;
   int status = cppbash_builtin::exec("source",
-                                     {srcdir + "/scripts/source_false.sh"},
+                                     {get_src_dir() + "/scripts/source_false.sh"},
                                      std::cout,
                                      std::cerr,
                                      std::cin,
@@ -65,10 +60,9 @@ TEST(source_builtin_test, source_false)
 
 TEST(source_builtin_test, source_return)
 {
-  std::string srcdir(getenv("srcdir"));
   interpreter walker;
   int status = cppbash_builtin::exec("source",
-                                     {srcdir + "/scripts/source_return.sh"},
+                                     {get_src_dir() + "/scripts/source_return.sh"},
                                      std::cout,
                                      std::cerr,
                                      std::cin,

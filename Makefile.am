@@ -103,6 +103,8 @@ cppunittests_SOURCES =  test/run_tests.cpp \
 						src/builtins/tests/boolean_tests.cpp \
 						src/builtins/tests/source_tests.cpp \
 						src/builtins/tests/return_tests.cpp \
+						test/test.h \
+						test/test.cpp \
 						test/post_check.cpp \
 						test/api_test.cpp \
 						test/walker_test.cpp
@@ -111,6 +113,7 @@ cppunittests_LDADD = libcppbash.la \
 					 $(BOOST_SYSTEM_LIB) \
 					 $(BOOST_FILESYSTEM_LIB)
 cppunittests_LDFLAGS = -static
+cppunittests_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_srcdir)/test/
 
 endif
 
