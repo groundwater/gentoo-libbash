@@ -40,7 +40,6 @@ bashastParser.*
 libbashLexer.*
 libbashParser.*
 libbashWalker.h
-libbashWalker.c
 libbashWalker.cpp
 libbashWalker.tokens
 *.pdf

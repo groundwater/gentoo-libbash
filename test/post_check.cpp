@@ -46,5 +46,5 @@ TEST(post_check, parser_size)
 
 TEST(post_check, walker_size)
 {
-  check_file_size("libbashWalker.c", 4096 * 1024);
+  check_file_size("libbashWalker.cpp", 4096 * 1024);
 }

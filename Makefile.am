@@ -73,12 +73,9 @@ TESTS = $(GUNIT_TESTS) $(BASH_TESTS) $(EBUILD_TESTS)
 check_JAVA = bashast/bashastLexer.java bashast/bashastParser.java
 AM_JAVACFLAGS = -source 1.4 -classpath @antlr_cp@
 
-COMMON_FLAGS = -std=c++0x -I$(top_srcdir)/src/
-# We use -x c++ to compile all C source files as C++ because there's C++
-# code embedded in them.
-# no DEVELOPER_FLAGS to as the generated files don't pass -Werror
-AM_CFLAGS = -x c++ $(COMMON_FLAGS)
-AM_CXXFLAGS = $(COMMON_FLAGS)
+AM_CXXFLAGS = -std=c++0x
+AM_CPPFLAGS = -I$(top_srcdir)/src
+
 if DEVELOPER_MODE
 # -Weffc++ seems to be giving false positives on protected non
 # virtual destructors in base classes
@@ -89,7 +86,7 @@ AM_CXXFLAGS += -Wall \
 			   -Wsign-promo \
 			   -pedantic-errors \
 			   -Werror
-AM_CPPFLAGS = -D_GLIBCXX_DEBUG
+AM_CPPFLAGS += -D_GLIBCXX_DEBUG
 endif
 
 if HAVE_GTEST
@@ -140,20 +137,22 @@ instruo_CXXFLAGS = $(AM_CXXFLAGS) -Wno-extra
 ast_printer_SOURCES = utils/ast_printer.cpp
 ast_printer_LDADD = libcppbash.la $(BOOST_PROGRAM_OPTIONS_LIB)
 ast_printer_LDFLAGS = -static
-ast_printer_CPPFLAGS = $(BOOST_CPPFLAGS)
+# boost is probably compiled without debug STL so if that is used
+# linking will fail
+ast_printer_CPPFLAGS = $(AM_CPPFLAGS) -U_GLIBCXX_DEBUG $(BOOST_CPPFLAGS)
 
 GENERATED_PARSER_C = libbashLexer.c libbashParser.c
 GENERATED_PARSER_H = libbashLexer.h libbashParser.h
-GENERATED_WALKER_C = libbashWalker.c
+GENERATED_WALKER_CPP = libbashWalker.cpp
 GENERATED_WALKER_H = libbashWalker.h
 BUILT_SOURCES = $(GENERATED_PARSER_C) \
 				$(GENERATED_PARSER_H) \
-				$(GENERATED_WALKER_C) \
+				$(GENERATED_WALKER_CPP) \
 				$(GENERATED_WALKER_H) \
 				$(check_JAVA)
 CLEANFILES = $(GENERATED_PARSER_C) \
 			 $(GENERATED_PARSER_H) \
-			 $(GENERATED_WALKER_C) \
+			 $(GENERATED_WALKER_CPP) \
 			 $(GENERATED_WALKER_H) \
 			 $(check_JAVA) \
 			 libbash.g \
@@ -189,15 +188,24 @@ libcppbash_la_SOURCES = src/common.h \
 						src/core/interpreter.h \
 						src/core/symbols.hpp \
 						src/core/bash_ast.cpp \
-						src/core/bash_ast.h \
-						$(GENERATED_WALKER_C) \
-						$(GENERATED_WALKER_H)
+						src/core/bash_ast.h
 
-HIDDEN_FLAGS = -fvisibility=hidden \
-			   -fvisibility-inlines-hidden
+# separate library because we need per file CXXFLAGS
+# as antlr generated code does not pass our strict developer
+# warning settings
+noinst_LTLIBRARIES = libwalker.la
+libwalker_la_SOURCES = $(GENERATED_WALKER_CPP) \
+					   $(GENERATED_WALKER_H)
 
-libcppbash_la_CXXFLAGS = $(AM_CXXFLAGS) $(HIDDEN_FLAGS)
-libcppbash_la_CFLAGS = $(AM_CFLAGS) $(HIDDEN_FLAGS)
+libwalker_la_CXXFLAGS = -std=c++0x \
+						-fvisibility=hidden \
+						-fvisibility-inlines-hidden
+
+libcppbash_la_CXXFLAGS = $(AM_CXXFLAGS) \
+						 -fvisibility=hidden \
+						 -fvisibility-inlines-hidden
+libcppbash_la_CFLAGS = $(AM_CFLAGS) -fvisibility=hidden
+libcppbash_la_LIBADD = libwalker.la
 
 EXTRA_DIST = bashast/bashast.g \
 			 bashast/libbashWalker.g \
@@ -242,12 +250,13 @@ walker.run: bashast/libbashWalker.g cgrammar.run
 	$(AM_V_at)touch $@.tmp
 	$(AM_V_GEN)$(ANTLR) -fo . $<
 	$(AM_V_at)sed -i -e 's/\(libbash_.*\) = NULL/\1/' libbashWalker.c
+	$(AM_V_at)mv libbashWalker.{c,cpp}
 	$(AM_V_at)mv $@.tmp $@
 
 $(GENERATED_PARSER_C): cgrammar.run
 $(GENERATED_PARSER_H): cgrammar.run
 
-$(GENERATED_WALKER_C): walker.run
+$(GENERATED_WALKER_CPP): walker.run
 $(GENERATED_WALKER_H): walker.run
 
 javagrammar.run: bashast/bashast.g
