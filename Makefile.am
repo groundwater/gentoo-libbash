@@ -220,6 +220,8 @@ EXTRA_DIST = bashast/bashast.g \
 			 scripts/illegal_script.sh \
 			 utils/meta_gen.sh \
 			 scripts/foo.eclass \
+			 test_coverage.sh \
+			 autogen.sh \
 			 $(BASH_TESTS) \
 			 $(BASH_RESULT) \
 			 $(EBUILD_TESTS) \
@@ -284,3 +286,7 @@ benchmark_parser: callgrind.out
 
 generate_metadata: metadata_generator
 	srcdir=$(srcdir) utils/meta_gen.sh
+
+test_coverage: dist
+	DIST_ARCHIVES=$(DIST_ARCHIVES) ./test_coverage.sh
+	rm $(DIST_ARCHIVES)
