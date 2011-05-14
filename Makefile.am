@@ -288,5 +288,5 @@ generate_metadata: metadata_generator
 	srcdir=$(srcdir) utils/meta_gen.sh
 
 test_coverage: dist
-	DIST_ARCHIVES=$(DIST_ARCHIVES) ./test_coverage.sh
+	MAKE=$(MAKE) DIST_ARCHIVES=$(DIST_ARCHIVES) ./test_coverage.sh
 	rm $(DIST_ARCHIVES)

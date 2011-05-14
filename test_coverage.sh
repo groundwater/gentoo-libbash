@@ -21,11 +21,11 @@ cd $srcdir
 CXXFLAGS="-g -O0 --coverage" CFLAGS="-g -O0 --coverage" ./autogen.sh --disable-shared
 
 # Generate gcov output
-make
+${MAKE}
 
 # Generate html report
 lcov --base-directory . --directory . --zerocounters -q
-make check
+${MAKE} check
 lcov --base-directory . --directory . -c -o libbash_test.info
 lcov --remove libbash_test.info "/usr*" -o libbash_test.info # remove output for external libraries
 rm -rf ../test_coverage
