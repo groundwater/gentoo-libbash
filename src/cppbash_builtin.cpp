@@ -39,6 +39,7 @@ cppbash_builtin::builtins_type& cppbash_builtin::builtins() {
       {"echo", boost::factory<echo_builtin*>()},
       {"source", boost::factory<source_builtin*>()},
       {"inherit", boost::factory<inherit_builtin*>()},
+      {":", boost::factory<true_builtin*>()},
       {"true", boost::factory<true_builtin*>()},
       {"false", boost::factory<false_builtin*>()},
       {"return", boost::factory<return_builtin*>()}

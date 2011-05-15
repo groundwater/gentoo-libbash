@@ -13,4 +13,5 @@ false && echo "wrong"
 false || echo "right"
 true || echo "wrong"
 echo "end"
+: ${DEFAULTED:="yes"}
 FOO="abc" echo "command environment"

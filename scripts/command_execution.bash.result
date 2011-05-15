@@ -4,5 +4,6 @@ right
 right
 end
 command environment
+DEFAULTED=yes
 FOO001=hello
 FOO002=Hello World
