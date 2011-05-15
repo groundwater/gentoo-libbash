@@ -3,5 +3,6 @@ hello world
 right
 right
 end
+command environment
 FOO001=hello
 FOO002=Hello World

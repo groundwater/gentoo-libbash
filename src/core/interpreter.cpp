@@ -206,8 +206,7 @@ int interpreter::call(const std::string& name,
     return -1;
   func_index = iter->second;
 
-  // Prepare function stack and arguments
-  local_members.push_back(scope());
+  // Prepare arguments
   define_function_arguments(local_members.back(), arguments);
 
   auto INPUT = ctx->pTreeParser->ctnstream;
@@ -220,9 +219,6 @@ int interpreter::call(const std::string& name,
   f(ctx);
   // Reset to the previous index
   ISTREAM->seek(ISTREAM, curr);
-
-  // Clear function stack
-  local_members.pop_back();
 
   return 0;
 }

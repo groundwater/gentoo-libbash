@@ -87,6 +87,26 @@ class interpreter
 
 public:
 
+  ///
+  /// \class local_scope
+  /// \brief RAII concept for local scope management
+  ///
+  class local_scope
+  {
+    interpreter& walker;
+
+  public:
+    local_scope(interpreter& w): walker(w)
+    {
+      walker.local_members.push_back(scope());
+    }
+
+    ~local_scope()
+    {
+      walker.local_members.pop_back();
+    }
+  };
+
   interpreter(): out(&std::cout), err(&std::cerr), in(&std::cin)
   {
     define("IFS", " \t\n");

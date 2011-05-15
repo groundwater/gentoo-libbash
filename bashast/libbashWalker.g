@@ -439,13 +439,19 @@ simple_command
 @declarations {
 	std::vector<std::string> libbash_args;
 }
-	:^(COMMAND string_expr (argument[libbash_args])* var_def[true]*) {
-		if(walker->has_function($string_expr.libbash_value))
+	:^(COMMAND string_expr (argument[libbash_args])* execute_command[$string_expr.libbash_value, libbash_args]);
+
+execute_command[const std::string& name, std::vector<std::string>& libbash_args]
+@declarations {
+	interpreter::local_scope current_scope(*walker);
+}
+	:var_def[true]* {
+		if(walker->has_function(name))
 		{
 			ANTLR3_MARKER command_index = INDEX();
 			try
 			{
-				walker->set_status(walker->call($string_expr.libbash_value,
+				walker->set_status(walker->call(name,
 												libbash_args,
 												ctx,
 												compound_command));
@@ -455,13 +461,13 @@ simple_command
 				SEEK(command_index);
 			}
 		}
-		else if(cppbash_builtin::is_builtin($string_expr.libbash_value))
+		else if(cppbash_builtin::is_builtin(name))
 		{
-			walker->set_status(walker->execute_builtin($string_expr.libbash_value, libbash_args));
+			walker->set_status(walker->execute_builtin(name, libbash_args));
 		}
 		else
 		{
-			std::cerr << $string_expr.libbash_value << " is not supported yet" << std::endl;
+			std::cerr << name << " is not supported yet" << std::endl;
 			walker->set_status(1);
 		}
 	};
