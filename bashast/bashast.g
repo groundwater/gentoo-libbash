@@ -68,6 +68,8 @@ tokens{
 	EXTENDED_MATCH_NONE;
 	EXTENDED_MATCH_ANY;
 	EXTENDED_MATCH_AT_LEAST_ONE;
+	MATCH_PATTERN;
+	NOT_MATCH_PATTERN;
 	MATCH_ANY;
 	MATCH_ANY_EXCEPT;
 	MATCH_ALL;
@@ -354,9 +356,9 @@ negate_builtin_primary
 	:	BANG BLANK+ builtin_cond_primary -> ^(NEGATION builtin_cond_primary);
 binary_str_op_keyword
 	:	bop
-	|	EQUALS EQUALS -> OP["=="]
+	|	EQUALS EQUALS -> MATCH_PATTERN
 	|	EQUALS
-	|	BANG EQUALS -> OP["!="]
+	|	BANG EQUALS -> NOT_MATCH_PATTERN
 	|	LESS_THAN
 	|	GREATER_THAN;
 binary_string_op_builtin
