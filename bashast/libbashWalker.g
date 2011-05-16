@@ -503,20 +503,44 @@ compound_command
 	| case_expr;
 
 cond_expr
-	:^(BUILTIN_TEST status=builtin_condition) { walker->set_status(!status); };
+	:^(BUILTIN_TEST status=builtin_condition) { walker->set_status(!status); }
+	|^(KEYWORD_TEST status=keyword_condition) { walker->set_status(!status); };
+
+common_condition returns[bool status]
+	// -eq, -ne, -lt, -le, -gt, or -ge for arithmetic. -nt -ot -ef for files
+	:^(NAME left_str=string_expr right_str=string_expr)
+	// -o for shell option,  -z -n for string, -abcdefghkprstuwxOGLSN for files
+	|^(LETTER string_expr)
+	// We do not trigger pattern matching for now
+	|^((EQUALS|MATCH_PATTERN) left_str=string_expr right_str=string_expr) {
+		$status = left_str.libbash_value == right_str.libbash_value;
+	}
+	// We do not trigger pattern matching for now
+	|^((NOT_EQUALS|NOT_MATCH_PATTERN) left_str=string_expr right_str=string_expr) {
+		$status = left_str.libbash_value != right_str.libbash_value;
+	}
+	|^(LESS_THAN left_str=string_expr right_str=string_expr) {
+		$status = left_str.libbash_value < right_str.libbash_value;
+	}
+	|^(GREATER_THAN left_str=string_expr right_str=string_expr) {
+		$status = left_str.libbash_value > right_str.libbash_value;
+	}
+	|string_expr { $status = (!$string_expr.libbash_value.empty()); };
+
+keyword_condition returns[bool status]
+	:^(LOGICOR l=keyword_condition r=keyword_condition) { $status= l || r; }
+	|^(LOGICAND l=keyword_condition r=keyword_condition) { $status= l && r; }
+	|^(NEGATION l=keyword_condition) { $status = !l; }
+	|s=common_condition { $status = s; };
 
 builtin_condition returns[bool status]
 	:^(NEGATION l=builtin_condition) { $status = !l; }
 	|s=builtin_condition_primary { $status = s; };
 
 builtin_condition_primary returns[bool status]
-	:^(NAME string_expr string_expr) { throw interpreter_exception(walker->get_string($NAME) + "(NAME) is not supported for now");}
-	|^(EQUALS l=string_expr r=string_expr) { $status = (l.libbash_value == r.libbash_value); }
-	|^(NOT_EQUALS l=string_expr r=string_expr) { $status = (l.libbash_value != r.libbash_value); }
-	|^(ESC_LT l=string_expr r=string_expr) { $status = (l.libbash_value < r.libbash_value); }
+	:^(ESC_LT l=string_expr r=string_expr) { $status = (l.libbash_value < r.libbash_value); }
 	|^(ESC_GT l=string_expr r=string_expr) { $status = (l.libbash_value > r.libbash_value); }
-	|^(LETTER l=string_expr) { throw interpreter_exception(walker->get_string($LETTER) + "(LETTER) is not supported for now");}
-	|string_expr { $status = ($string_expr.libbash_value.size() != 0); };
+	|s=common_condition { $status = s; };
 
 for_expr
 @declarations {

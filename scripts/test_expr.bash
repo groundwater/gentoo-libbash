@@ -24,3 +24,14 @@ echo $? # 1
 echo $? # 1
 [ abc \< bcd ]
 echo $? # 0
+[[ abc ]] && echo true1
+[[ abc < bcd ]] && echo true2
+[[ abc > bcd ]] || echo true3
+[[ abc != bcd ]] && echo true4
+[[ abc = bcd ]] || echo true5
+[[ abc == abc ]] && echo true6
+[[ ! abc = bcd ]] && echo true7
+[[ abc = bcd || abc == abc ]] && echo true8
+[[ abc = bcd && abc == abc ]] || echo true9
+# abc=bcd is treated as a simple string
+[[ abc=bcd && abc == abc ]] || echo wrong
