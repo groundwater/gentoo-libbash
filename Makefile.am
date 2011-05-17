@@ -97,6 +97,7 @@ cppunittests_SOURCES =  test/run_tests.cpp \
 						src/core/tests/symbols_test.cpp \
 						src/core/tests/interpreter_test.cpp \
 						src/core/tests/bash_ast_test.cpp \
+						src/core/tests/bash_condition_test.cpp \
 						src/builtins/tests/echo_tests.cpp \
 						src/builtins/tests/boolean_tests.cpp \
 						src/builtins/tests/source_tests.cpp \
@@ -187,6 +188,8 @@ libcppbash_la_SOURCES = src/common.h \
 						src/core/interpreter.cpp \
 						src/core/interpreter.h \
 						src/core/symbols.hpp \
+						src/core/bash_condition.h \
+						src/core/bash_condition.cpp \
 						src/core/bash_ast.cpp \
 						src/core/bash_ast.h
 

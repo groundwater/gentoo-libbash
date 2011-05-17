@@ -35,3 +35,4 @@ echo $? # 0
 [[ abc = bcd && abc == abc ]] || echo true9
 # abc=bcd is treated as a simple string
 [[ abc=bcd && abc == abc ]] || echo wrong
+[[ -a "/" ]] && echo "true10"

@@ -46,6 +46,7 @@ options
 	#include <boost/format.hpp>
 
 	#include "builtins/builtin_exceptions.h"
+	#include "core/bash_condition.h"
 	#include "core/interpreter.h"
 	#include "cppbash_builtin.h"
 
@@ -510,7 +511,10 @@ common_condition returns[bool status]
 	// -eq, -ne, -lt, -le, -gt, or -ge for arithmetic. -nt -ot -ef for files
 	:^(NAME left_str=string_expr right_str=string_expr)
 	// -o for shell option,  -z -n for string, -abcdefghkprstuwxOGLSN for files
-	|^(LETTER string_expr)
+	|^(op=LETTER string_expr) {
+		$status = internal::test_unary(*reinterpret_cast<const char *>(op->getToken(op)->start),
+		                               $string_expr.libbash_value);
+	}
 	// We do not trigger pattern matching for now
 	|^((EQUALS|MATCH_PATTERN) left_str=string_expr right_str=string_expr) {
 		$status = left_str.libbash_value == right_str.libbash_value;
