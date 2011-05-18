@@ -25,6 +25,7 @@
 #include "core/bash_ast.h"
 
 #include <sstream>
+#include <thread>
 
 #include "core/interpreter_exception.h"
 #include "core/interpreter.h"
@@ -49,9 +50,30 @@ bash_ast::bash_ast(std::istream& source): error_count(0)
   init_parser();
 }
 
+namespace
+{
+  std::mutex string_mutex;
+
+  pANTLR3_STRING locked_newRaw8(pANTLR3_STRING_FACTORY factory)
+  {
+    std::lock_guard<std::mutex> l(string_mutex);
+    pANTLR3_STRING_FACTORY pristine = antlr3StringFactoryNew();
+    pANTLR3_STRING result = pristine->newRaw(factory);
+    pristine->close(pristine);
+    return result;
+  }
+
+  void locked_destroy(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING string)
+  {
+    std::lock_guard<std::mutex> l(string_mutex);
+    pANTLR3_STRING_FACTORY pristine = antlr3StringFactoryNew();
+    pristine->destroy(factory, string);
+    pristine->close(pristine);
+  }
+}
+
 bash_ast::~bash_ast()
 {
-  nodes->free(nodes);
   psr->free(psr);
   tstream->free(tstream);
   lxr->free(lxr);
@@ -86,22 +108,29 @@ void bash_ast::init_parser()
   }
 
   langAST.reset(new libbashParser_start_return(psr->start(psr)));
+  langAST->tree->strFactory->newRaw = &locked_newRaw8;
+  langAST->tree->strFactory->destroy = &locked_destroy;
   error_count = psr->pParser->rec->getNumberOfSyntaxErrors(psr->pParser->rec);
-  nodes = antlr3CommonTreeNodeStreamNewTree(langAST->tree, ANTLR3_SIZE_HINT);
 }
 
 void bash_ast::interpret_with(interpreter& walker)
 {
   set_interpreter(&walker);
+
+  auto nodes = antlr3CommonTreeNodeStreamNewTree(langAST->tree, ANTLR3_SIZE_HINT);
   plibbashWalker treePsr = libbashWalkerNew(nodes);
   treePsr->start(treePsr);
   treePsr->free(treePsr);
+  nodes->free(nodes);
 }
 
 std::string bash_ast::get_dot_graph()
 {
+  auto nodes = antlr3CommonTreeNodeStreamNewTree(langAST->tree, ANTLR3_SIZE_HINT);
   pANTLR3_STRING graph = nodes->adaptor->makeDot(nodes->adaptor, langAST->tree);
-  return std::string(reinterpret_cast<char*>(graph->chars));
+  std::string result(reinterpret_cast<char*>(graph->chars));
+  nodes->free(nodes);
+  return result;
 }
 
 std::string bash_ast::get_string_tree()

@@ -132,7 +132,7 @@ metadata_generator_CPPFLAGS = $(AM_CPPFLAGS) -Iutils
 instruo_SOURCES = utils/instruo.cpp utils/command_line.cpp utils/command_line.h
 instruo_LDADD = libcppbash.la @PALUDIS_LIBS@ libmetadata.a
 instruo_CPPFLAGS = $(AM_CPPFLAGS) @PALUDIS_CFLAGS@ -Iutils
-instruo_CXXFLAGS = $(AM_CXXFLAGS) -Wno-extra
+instruo_CXXFLAGS = $(AM_CXXFLAGS) -Wno-extra -fopenmp
 
 ast_printer_SOURCES = utils/ast_printer.cpp
 ast_printer_LDADD = libcppbash.la $(BOOST_PROGRAM_OPTIONS_LIB)
@@ -279,7 +279,7 @@ massif: massif.out
 callgrind.out: ast_printer
 	libtool --mode=execute valgrind \
 		--tool=callgrind --callgrind-out-file=callgrind.out \
-		./ast_printer -s  -f /usr/portage/eclass/versionator.eclass
+		./instruo -D /usr/portage/ --output-dir metadata_output
 
 benchmark_parser: callgrind.out
 	callgrind_annotate callgrind.out

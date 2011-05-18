@@ -53,7 +53,7 @@ options
 
 @members{
 
-	static interpreter* walker = 0;
+	static __thread interpreter* walker = 0;
 
 	void set_interpreter(interpreter* w)
 	{

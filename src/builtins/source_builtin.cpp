@@ -28,12 +28,38 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <thread>
 
 #include "builtins/builtin_exceptions.h"
 #include "cppbash_builtin.h"
 #include "core/interpreter.h"
 #include "core/interpreter_exception.h"
 #include "core/bash_ast.h"
+
+namespace {
+  std::mutex parse_mutex;
+
+  std::shared_ptr<bash_ast>& parse(const std::string& path)
+  {
+    static std::unordered_map<std::string, std::shared_ptr<bash_ast>> ast_cache;
+
+    std::lock_guard<std::mutex> parse_lock(parse_mutex);
+
+    auto& stored_ast = ast_cache[path];
+    if(!stored_ast)
+    {
+      std::ifstream input(path);
+      if(!input)
+        throw interpreter_exception(path + " can't be read");
+
+      stored_ast.reset(new bash_ast(input));
+      if(stored_ast->get_error_count())
+        std::cerr << path << " could not be parsed properly" << std::endl;
+    }
+
+    return stored_ast;
+  }
+}
 
 int source_builtin::exec(const std::vector<std::string>& bash_args)
 {
@@ -42,24 +68,9 @@ int source_builtin::exec(const std::vector<std::string>& bash_args)
   if(bash_args.size() == 0)
     throw interpreter_exception("should provide one argument for source builtin");
 
-  // we need fix this to pass extra arguments as positional parameters
-  const std::string& path = bash_args[0];
-
-  auto& stored_ast = ast_cache[path];
-  if(!stored_ast)
-  {
-    std::ifstream input(path);
-    if(!input)
-      throw interpreter_exception(path + " can't be read");
-
-    stored_ast.reset(new bash_ast(input));
-    if(stored_ast->get_error_count())
-      std::cerr << path << " could not be parsed properly" << std::endl;
-  }
-
   try
   {
-    stored_ast->interpret_with(_walker);
+    parse(bash_args.front())->interpret_with(_walker);
   }
   catch(return_exception& e) {}
 

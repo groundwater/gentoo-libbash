@@ -47,7 +47,6 @@ class bash_ast
   pANTLR3_COMMON_TOKEN_STREAM tstream;
   libbashParser_Ctx_struct* psr;
   std::unique_ptr<libbashParser_start_return_struct> langAST;
-  pANTLR3_COMMON_TREE_NODE_STREAM nodes;
   int error_count;
 
   void init_parser();
