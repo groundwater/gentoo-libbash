@@ -466,6 +466,11 @@ execute_command[const std::string& name, std::vector<std::string>& libbash_args]
 		{
 			walker->set_status(walker->execute_builtin(name, libbash_args));
 		}
+		else if(name == "export")
+		{
+			std::cerr << "We do not support command env before the export builtin." << std::endl;
+			walker->set_status(1);
+		}
 		else
 		{
 			std::cerr << name << " is not supported yet" << std::endl;

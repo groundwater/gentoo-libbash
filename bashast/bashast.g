@@ -134,7 +134,11 @@ simple_command
 	|	variable_definitions -> ^(VARIABLE_DEFINITIONS variable_definitions)
 	|	bash_command^ redirect*;
 variable_definitions
-	:	(LOCAL BLANK!+)? var_def (BLANK!+ var_def)*;
+	:	(LOCAL BLANK!+)? var_def (BLANK!+ var_def)*
+	|	EXPORT! (BLANK!+ export_item)+;
+export_item
+	:var_def
+	|name ->;
 bash_command
 	:	fname_no_res_word (BLANK+ fname)* -> ^(COMMAND fname_no_res_word fname*);
 redirect:	BLANK!* here_string_op^ BLANK!* fname
@@ -408,7 +412,7 @@ ns_str_part
 	|OTHER|EQUALS|PCT|PCTPCT|MINUS|DOT|DOTDOT|COLON|TEST_EXPR
 	|TILDE|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN
 	|TIME_POSIX|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN
-	|OR_ASSIGN|CARET|POUND|POUNDPOUND|COMMA;
+	|OR_ASSIGN|CARET|POUND|POUNDPOUND|COMMA|EXPORT;
 
 //Generic strings/filenames.
 fname	:	(~POUND) => fname_part fname_part* -> ^(STRING fname_part+);
@@ -660,6 +664,7 @@ QMARK	:	'?';
 //Operators for conditional statements
 TEST_EXPR	:	'test';
 LOCAL	:	'local';
+EXPORT	:	'export';
 LOGICAND :	'&&';
 LOGICOR	:	'||';
 //Tokens for strings

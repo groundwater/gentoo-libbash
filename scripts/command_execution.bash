@@ -15,3 +15,5 @@ true || echo "wrong"
 echo "end"
 : ${DEFAULTED:="yes"}
 FOO="abc" echo "command environment"
+export FOO003=1 FOO004=abc FOO005=(1 2 3) FOO002
+abc=1 export foo

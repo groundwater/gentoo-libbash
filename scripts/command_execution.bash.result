@@ -4,6 +4,10 @@ right
 right
 end
 command environment
+We do not support command env before the export builtin.
 DEFAULTED=yes
 FOO001=hello
 FOO002=Hello World
+FOO003=1
+FOO004=abc
+FOO005=1 2 3
