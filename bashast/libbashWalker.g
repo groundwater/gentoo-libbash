@@ -509,7 +509,9 @@ cond_expr
 
 common_condition returns[bool status]
 	// -eq, -ne, -lt, -le, -gt, or -ge for arithmetic. -nt -ot -ef for files
-	:^(NAME left_str=string_expr right_str=string_expr)
+	:^(NAME left_str=string_expr right_str=string_expr) {
+		$status = internal::test_binary(walker->get_string($NAME), left_str.libbash_value, right_str.libbash_value);
+	}
 	// -o for shell option,  -z -n for string, -abcdefghkprstuwxOGLSN for files
 	|^(op=LETTER string_expr) {
 		$status = internal::test_unary(*reinterpret_cast<const char *>(op->getToken(op)->start),

@@ -29,6 +29,10 @@
 namespace internal
 {
   bool test_unary(char op, const std::string& target);
+
+  bool test_binary(const std::string& op,
+                   const std::string& lhs,
+                   const std::string& rhs);
 }
 
 #endif

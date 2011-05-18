@@ -63,7 +63,7 @@ namespace
                  ) << "Can't create " << positive << " for test";
         set_time(positive, 0, 0);
         EXPECT_NE(-1, creat(negative.c_str(), 0)) << "Can't create " << negative << " for test";
-        set_time(negative, 1, 0);
+        set_time(negative, 2, 1);
         EXPECT_EQ(0, symlink(positive.c_str(), test_link.c_str()));
         EXPECT_EQ(0, mkfifo(test_fifo.c_str(), 0));
       }
@@ -136,4 +136,44 @@ TEST(bash_condition, string_unary_operator)
   EXPECT_TRUE(internal::test_unary('n', "hello"));
 
   EXPECT_THROW(internal::test_unary('o', "extglob"), interpreter_exception);
+}
+
+TEST_F(file_test, binary_operator)
+{
+  EXPECT_TRUE(internal::test_binary("nt", negative, positive));
+  EXPECT_FALSE(internal::test_binary("ot", negative, positive));
+
+  EXPECT_TRUE(internal::test_binary("ot", positive, negative));
+  EXPECT_FALSE(internal::test_binary("nt", positive, negative));
+
+  EXPECT_FALSE(internal::test_binary("ot", positive, positive));
+  EXPECT_FALSE(internal::test_binary("nt", positive, positive));
+
+  EXPECT_TRUE(internal::test_binary("ef", positive, positive));
+  EXPECT_FALSE(internal::test_binary("ef", positive, negative));
+}
+
+TEST(bash_condition, arithmetic_operator)
+{
+  EXPECT_TRUE(internal::test_binary("eq", "1", "1"));
+  EXPECT_FALSE(internal::test_binary("eq", "2", "1"));
+
+  EXPECT_TRUE(internal::test_binary("ne", "2", "1"));
+  EXPECT_FALSE(internal::test_binary("ne", "1", "1"));
+
+  EXPECT_TRUE(internal::test_binary("lt", "0", "1"));
+  EXPECT_FALSE(internal::test_binary("lt", "1", "1"));
+  EXPECT_FALSE(internal::test_binary("lt", "2", "1"));
+
+  EXPECT_TRUE(internal::test_binary("le", "0", "1"));
+  EXPECT_TRUE(internal::test_binary("le", "1", "1"));
+  EXPECT_FALSE(internal::test_binary("le", "2", "1"));
+
+  EXPECT_TRUE(internal::test_binary("gt", "1", "0"));
+  EXPECT_FALSE(internal::test_binary("gt", "1", "1"));
+  EXPECT_FALSE(internal::test_binary("gt", "0", "1"));
+
+  EXPECT_TRUE(internal::test_binary("ge", "1", "1"));
+  EXPECT_TRUE(internal::test_binary("ge", "2", "1"));
+  EXPECT_FALSE(internal::test_binary("ge", "0", "1"));
 }

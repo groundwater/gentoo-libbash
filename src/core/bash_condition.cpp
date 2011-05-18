@@ -113,3 +113,72 @@ bool internal::test_unary(char op, const std::string& target)
       return test_file_stat(op, target);
   }
 }
+
+namespace
+{
+  bool file_comp(char op,
+                 const std::string& lhs,
+                 const std::string& rhs)
+  {
+    struct stat lst, rst;
+    int lstatus, rstatus;
+
+    lstatus = stat(lhs.c_str(), &lst);
+    rstatus = stat(rhs.c_str(), &rst);
+    if(op == 'e' && (lstatus < 0 || rstatus < 0))
+      return false;
+
+    switch(op)
+    {
+      case 'n':
+        /* -nt */
+        return ((lstatus > rstatus) || (lstatus == 0 && lst.st_mtime > rst.st_mtime));
+      case 'o':
+        /* -ot */
+        return ((lstatus < rstatus) || (rstatus == 0 && lst.st_mtime < rst.st_mtime));
+      case 'e':
+        /* -ef */
+        return (lst.st_dev == rst.st_dev && lst.st_ino == rst.st_ino);
+      default:
+        throw interpreter_exception(std::string("Unrecognized option for file test ") + op);
+    }
+  }
+}
+
+bool internal::test_binary(const std::string& op,
+                           const std::string& lhs,
+                           const std::string& rhs)
+{
+  if(op.size() != 2)
+    throw interpreter_exception("Unrecognized operator " + op);
+
+  try
+  {
+    if(op == "nt")
+      return file_comp('n', lhs, rhs);
+    else if(op == "ot")
+      return file_comp('o', lhs, rhs);
+    else if(op == "ef")
+      return file_comp('e', lhs, rhs);
+    // We do not support arithmetic expressions inside keyword test for now.
+    // So the operands can only be raw integers.
+    else if(op == "eq")
+      return boost::lexical_cast<int>(lhs) == boost::lexical_cast<int>(rhs);
+    else if(op == "ne")
+      return boost::lexical_cast<int>(lhs) != boost::lexical_cast<int>(rhs);
+    else if(op == "lt")
+      return boost::lexical_cast<int>(lhs) < boost::lexical_cast<int>(rhs);
+    else if(op == "le")
+      return boost::lexical_cast<int>(lhs) <= boost::lexical_cast<int>(rhs);
+    else if(op == "gt")
+      return boost::lexical_cast<int>(lhs) > boost::lexical_cast<int>(rhs);
+    else if(op == "ge")
+      return boost::lexical_cast<int>(lhs) >= boost::lexical_cast<int>(rhs);
+    else
+      throw interpreter_exception("Unrecognized operator " + op);
+  }
+  catch(boost::bad_lexical_cast& e)
+  {
+    return false;
+  }
+}

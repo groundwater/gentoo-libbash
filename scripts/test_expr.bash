@@ -36,3 +36,5 @@ echo $? # 0
 # abc=bcd is treated as a simple string
 [[ abc=bcd && abc == abc ]] || echo wrong
 [[ -a "/" ]] && echo "true10"
+[[ . -ef . ]] && echo "true11"
+[[ 2 -ge 2 ]] && echo "true12"
