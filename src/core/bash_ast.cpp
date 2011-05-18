@@ -119,7 +119,15 @@ void bash_ast::interpret_with(interpreter& walker)
 
   auto nodes = antlr3CommonTreeNodeStreamNewTree(langAST->tree, ANTLR3_SIZE_HINT);
   plibbashWalker treePsr = libbashWalkerNew(nodes);
-  treePsr->start(treePsr);
+  try
+  {
+    treePsr->start(treePsr);
+  }
+  catch(...)
+  {
+    treePsr->free(treePsr);
+    throw;
+  }
   treePsr->free(treePsr);
   nodes->free(nodes);
 }
