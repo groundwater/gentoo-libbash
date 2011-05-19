@@ -224,6 +224,7 @@ EXTRA_DIST = bashast/bashast.g \
 			 scripts/source_return.sh \
 			 scripts/illegal_script.sh \
 			 scripts/foo.eclass \
+			 utils/metadata_diff.sh \
 			 test_coverage.sh \
 			 autogen.sh \
 			 $(BASH_TESTS) \
