@@ -54,7 +54,6 @@ FOO050="$((ARRAY[8]|=10))"
 FOO051="$((ARRAY[8]^=3))"
 PARTIAL[8]=5
 FOO052="$((PARTIAL[8]*=1))"
-# The following 3 just expand to non-exist variables
 FOO053="$((${#ARRAY[@]}))"
 FOO054="$((${ARRAY[5]:-10}))"
 FOO055="$((${ARRAY:0}))"

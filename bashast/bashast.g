@@ -492,16 +492,17 @@ extended_pattern_match
 arithmetic_var_ref:
 	var_ref -> ^(VAR_REF var_ref);
 primary	:	num
-	|	arithmetic_var_ref
+	|	var_ref
 	|	command_sub
 	|	var_name_no_digit -> ^(VAR_REF var_name_no_digit)
 	|	LPAREN! (arithmetics) RPAREN!;
+pre_post_primary:	arithmetic_var_ref | primary;
 post_inc_dec
-	:	primary BLANK? PLUS PLUS -> ^(POST_INCR primary)
-	|	primary BLANK? MINUS MINUS -> ^(POST_DECR primary);
+	:	pre_post_primary BLANK? PLUS PLUS -> ^(POST_INCR pre_post_primary)
+	|	pre_post_primary BLANK? MINUS MINUS -> ^(POST_DECR pre_post_primary);
 pre_inc_dec
-	:	PLUS PLUS BLANK? primary -> ^(PRE_INCR primary)
-	|	MINUS MINUS BLANK? primary -> ^(PRE_DECR primary);
+	:	PLUS PLUS BLANK? pre_post_primary -> ^(PRE_INCR pre_post_primary)
+	|	MINUS MINUS BLANK? pre_post_primary -> ^(PRE_DECR pre_post_primary);
 unary	:	post_inc_dec
 	|	pre_inc_dec
 	|	primary BLANK!*

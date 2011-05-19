@@ -836,4 +836,5 @@ arithmetics returns[int value]
 	}
 	| NUMBER { $value = walker->parse_int($NUMBER);}
 	| DIGIT { $value = walker->parse_int($DIGIT);}
+	| ^(VAR_REF libbash_string=var_expansion) { $value = boost::lexical_cast<int>(libbash_string); }
 	;
