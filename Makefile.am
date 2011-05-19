@@ -223,7 +223,6 @@ EXTRA_DIST = bashast/bashast.g \
 			 scripts/source_true.sh \
 			 scripts/source_return.sh \
 			 scripts/illegal_script.sh \
-			 utils/meta_gen.sh \
 			 scripts/foo.eclass \
 			 test_coverage.sh \
 			 autogen.sh \
@@ -288,9 +287,6 @@ callgrind.out: ast_printer
 
 benchmark_parser: callgrind.out
 	callgrind_annotate callgrind.out
-
-generate_metadata: metadata_generator
-	srcdir=$(srcdir) utils/meta_gen.sh
 
 test_coverage: dist
 	MAKE=$(MAKE) DIST_ARCHIVES=$(DIST_ARCHIVES) ./test_coverage.sh
