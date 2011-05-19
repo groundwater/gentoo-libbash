@@ -423,7 +423,12 @@ var_ref [bool double_quoted] returns[std::string libbash_value]
 		else
 			walker->get_all_elements(libbash_string, $libbash_value);
 	}
-	|^(VAR_REF TIMES) { std::cerr << "$* has not been implemented yet" << std::endl; }
+	|^(VAR_REF TIMES) {
+		if(double_quoted)
+			walker->get_all_elements_IFS_joined("*", $libbash_value);
+		else
+			walker->get_all_elements("*", $libbash_value);
+	}
 	|^(VAR_REF AT) { std::cerr << "$@ has not been implemented yet" << std::endl; }
 	|^(VAR_REF POUND) { std::cerr << "$# has not been implemented yet" << std::endl; }
 	|^(VAR_REF QMARK) { $libbash_value = walker->get_status<std::string>(); }

@@ -34,7 +34,7 @@
 
 static const std::vector<std::string> special_variables
 {
-  "IFS", "?"
+  "IFS", "?", "*"
 };
 
 int main(int argc, char** argv)

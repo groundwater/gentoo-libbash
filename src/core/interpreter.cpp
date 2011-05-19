@@ -185,14 +185,19 @@ void interpreter::split_word(const std::string& word, std::vector<std::string>& 
   output.insert(output.end(), splitted_values.begin(), splitted_values.end());
 }
 
-inline void define_function_arguments(scope& current_stack,
-                                      const std::vector<std::string>& arguments)
+void interpreter::define_function_arguments(scope& current_stack,
+                                            const std::vector<std::string>& arguments)
 {
+  std::map<int, std::string> positional_args;
+
   for(auto i = 0u; i != arguments.size(); ++i)
   {
     const std::string& name = boost::lexical_cast<std::string>(i + 1);
     current_stack[name].reset(new variable(name, arguments[i]));
+    positional_args[i] = arguments[i];
   }
+
+  define("*", positional_args);
 }
 
 int interpreter::call(const std::string& name,

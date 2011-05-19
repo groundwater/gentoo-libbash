@@ -56,3 +56,11 @@ let() {
     echo "overloaded let"
 }
 let "1 + 2"
+func_positional_args() {
+    IFS="abc" echo "$*"
+    IFS="abc" echo $*
+    IFS=abc
+    echo "$*"
+    echo $*
+}
+func_positional_args 1 2 3

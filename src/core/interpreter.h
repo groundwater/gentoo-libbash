@@ -85,6 +85,9 @@ class interpreter
 
   std::shared_ptr<variable> resolve_variable(const std::string&) const;
 
+  void define_function_arguments(scope& current_stack,
+                                 const std::vector<std::string>& arguments);
+
 public:
 
   ///
