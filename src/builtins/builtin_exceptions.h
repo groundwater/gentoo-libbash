@@ -35,7 +35,7 @@ class return_exception: public std::runtime_error
 {
 public:
   explicit return_exception():
-    runtime_error(""){}
+    runtime_error("return exception"){}
 };
 
 #endif

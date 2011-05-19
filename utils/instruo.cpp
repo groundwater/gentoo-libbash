@@ -53,6 +53,7 @@
 #include <paludis/package_database.hh>
 #include <paludis/metadata_key.hh>
 
+#include "builtins/builtin_exceptions.h"
 #include "command_line.h"
 #include "libbash.h"
 #include "utils/metadata.h"
@@ -108,6 +109,17 @@ void worker(const std::shared_ptr<PackageIDSequence> &ids)
     {
       cerr << "Exception occurred while interpreting " << ebuild_path << ". The error message is:\n"
         << e.what() << endl;
+      continue;
+    }
+    catch(const return_exception& e)
+    {
+      cerr << "Unhandled return exception in " << ebuild_path << ". The error message is:\n"
+        << e.what() << endl;
+      continue;
+    }
+    catch (...)
+    {
+      cerr << "Unhandled exception in " << ebuild_path << endl;
       continue;
     }
 
