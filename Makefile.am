@@ -179,6 +179,8 @@ libcppbash_la_SOURCES = src/common.h \
 						src/builtins/source_builtin.cpp \
 						src/builtins/return_builtin.h \
 						src/builtins/return_builtin.cpp \
+						src/builtins/let_builtin.h \
+						src/builtins/let_builtin.cpp \
 						src/builtins/inherit_builtin.h \
 						src/builtins/inherit_builtin.cpp \
 						src/builtins/builtin_exceptions.h \

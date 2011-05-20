@@ -52,3 +52,7 @@ func_nested2() {
     func_nested1
 }
 func_nested2
+let() {
+    echo "overloaded let"
+}
+let "1 + 2"

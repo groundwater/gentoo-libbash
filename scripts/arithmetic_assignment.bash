@@ -11,4 +11,4 @@ FOO009="$((value^=5))"
 FOO010="$((value|=10))"
 FOO011=("CREATED" 2)
 FOO012="$((${FOO011[0]}=10))"
-value="$((100))"
+let "value=100"

@@ -27,6 +27,7 @@
 #include "builtins/boolean_builtins.h"
 #include "builtins/echo_builtin.h"
 #include "builtins/inherit_builtin.h"
+#include "builtins/let_builtin.h"
 #include "builtins/return_builtin.h"
 #include "builtins/source_builtin.h"
 
@@ -42,7 +43,8 @@ cppbash_builtin::builtins_type& cppbash_builtin::builtins() {
       {":", boost::factory<true_builtin*>()},
       {"true", boost::factory<true_builtin*>()},
       {"false", boost::factory<false_builtin*>()},
-      {"return", boost::factory<return_builtin*>()}
+      {"return", boost::factory<return_builtin*>()},
+      {"let", boost::factory<let_builtin*>()},
   });
   return *p;
 }
