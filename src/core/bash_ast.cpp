@@ -19,34 +19,22 @@
 ///
 /// \file bash_ast.cpp
 /// \author Mu Qiao
-/// \brief implementation that helps interpret from istream
+/// \brief a wrapper class that helps interpret from istream and string
 ///
+
+#include "core/interpreter_exception.h"
+#include "libbashLexer.h"
+#include "libbashParser.h"
 
 #include "core/bash_ast.h"
 
-#include <sstream>
-
-#include "core/interpreter_exception.h"
-#include "core/interpreter.h"
-#include "libbashLexer.h"
-#include "libbashParser.h"
-#include "libbashWalker.h"
-
-bash_ast::bash_ast(std::istream& source): error_count(0)
+bash_ast::bash_ast(const std::istream& source,
+                   std::function<pANTLR3_BASE_TREE(plibbashParser)> p): parse(p)
 {
   std::stringstream stream;
   stream << source.rdbuf();
   script = stream.str();
-
-  input = antlr3NewAsciiStringInPlaceStream(
-      reinterpret_cast<pANTLR3_UINT8>(const_cast<char*>(script.c_str())),
-      script.size(),
-      NULL);
-
-  if(input == NULL)
-    throw interpreter_exception("Unable to open file " + script + " due to malloc() failure");
-
-  init_parser();
+  init_parser(script);
 }
 
 bash_ast::~bash_ast()
@@ -58,8 +46,16 @@ bash_ast::~bash_ast()
   input->close(input);
 }
 
-void bash_ast::init_parser()
+void bash_ast::init_parser(const std::string& script)
 {
+  input = antlr3NewAsciiStringInPlaceStream(
+    reinterpret_cast<pANTLR3_UINT8>(const_cast<char*>(script.c_str())),
+    script.size(),
+    NULL);
+
+  if(input == NULL)
+    throw interpreter_exception("Unable to open file " + script + " due to malloc() failure");
+
   lexer = libbashLexerNew(input);
   if ( lexer == NULL )
   {
@@ -85,29 +81,20 @@ void bash_ast::init_parser()
     return;
   }
 
-  ast.reset(new libbashParser_start_return(parser->start(parser)));
+  ast = parse(parser);
   error_count = parser->pParser->rec->getNumberOfSyntaxErrors(parser->pParser->rec);
-  nodes = antlr3CommonTreeNodeStreamNewTree(ast->tree, ANTLR3_SIZE_HINT);
-}
-
-void bash_ast::interpret_with(interpreter& walker)
-{
-  set_interpreter(&walker);
-  plibbashWalker treeparser = libbashWalkerNew(nodes);
-  treeparser->start(treeparser);
-  treeparser->free(treeparser);
+  nodes = antlr3CommonTreeNodeStreamNewTree(ast, ANTLR3_SIZE_HINT);
 }
 
 std::string bash_ast::get_dot_graph()
 {
-  pANTLR3_STRING graph = nodes->adaptor->makeDot(nodes->adaptor, ast->tree);
+  pANTLR3_STRING graph = nodes->adaptor->makeDot(nodes->adaptor, ast);
   return std::string(reinterpret_cast<char*>(graph->chars));
 }
 
 std::string bash_ast::get_string_tree()
 {
-  return std::string(reinterpret_cast<char*>(
-        ast->tree->toStringTree(ast->tree)->chars));
+  return std::string(reinterpret_cast<char*>(ast->toStringTree(ast)->chars));
 }
 
 namespace
@@ -161,3 +148,25 @@ std::string bash_ast::get_tokens(std::function<std::string(ANTLR3_INT32)> token_
 
   return result.str();
 }
+
+void bash_ast::walker_start(plibbashWalker tree_parser)
+{
+  tree_parser->start(tree_parser);
+}
+
+int bash_ast::walker_arithmetics(plibbashWalker tree_parser)
+{
+  return tree_parser->arithmetics(tree_parser);
+}
+
+pANTLR3_BASE_TREE bash_ast::parser_start(plibbashParser parser)
+{
+  return parser->start(parser).tree;
+}
+
+pANTLR3_BASE_TREE bash_ast::parser_arithmetics(plibbashParser parser)
+{
+  return parser->arithmetics(parser).tree;
+}
+
+

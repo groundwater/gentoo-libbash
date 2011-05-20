@@ -28,6 +28,7 @@
 #include <gtest/gtest.h>
 
 #include "core/bash_ast.h"
+#include "core/interpreter.h"
 #include "test.h"
 
 TEST(bash_ast, parse_illegal_script)
@@ -46,4 +47,12 @@ TEST(bash_ast, parse_legal_script)
   std::ifstream input2(get_src_dir() + std::string("/scripts/source_false.sh"));
   bash_ast ast2(input2);
   EXPECT_EQ(0, ast2.get_error_count());
+}
+
+TEST(bash_ast, parse_arithmetics)
+{
+  std::string expr("1 + 2");
+  bash_ast ast(expr, bash_ast::parser_arithmetics);
+  interpreter walker;
+  EXPECT_EQ(3, ast.interpret_with(walker, &bash_ast::walker_arithmetics));
 }
