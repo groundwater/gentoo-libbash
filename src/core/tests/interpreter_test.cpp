@@ -136,10 +136,11 @@ TEST(interpreter, get_array_values)
   walker.define("array", values);
 
   std::vector<int> array_values;
-  walker.resolve_array("array", array_values);
+  EXPECT_TRUE(walker.resolve_array("array", array_values));
   EXPECT_EQ(1, array_values[0]);
   EXPECT_EQ(2, array_values[1]);
   EXPECT_EQ(3, array_values[2]);
+  EXPECT_FALSE(walker.resolve_array("undefined", array_values));
 }
 
 TEST(interpreter, unset_values)

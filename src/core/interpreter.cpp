@@ -143,18 +143,12 @@ void interpreter::get_all_elements_joined(const std::string& name,
                                           const std::string& delim,
                                           std::string& result) const
 {
-  std::vector<std::string> source;
+  std::vector<std::string> array;
 
-  auto i = members.find(name);
-  if(i != members.end())
-  {
-    i->second->get_all_values(source);
-    result = boost::algorithm::join(source, delim);
-  }
+  if(resolve_array(name, array))
+    result = boost::algorithm::join(array, delim);
   else
-  {
     result = "";
-  }
 }
 
 void interpreter::get_all_elements(const std::string& name,

@@ -437,13 +437,14 @@ public:
   /// \param variable name
   /// \param[out] vector that stores all array values
   template <typename T>
-  void resolve_array(const std::string& name, std::vector<T>& values) const
+  bool resolve_array(const std::string& name, std::vector<T>& values) const
   {
     auto i = members.find(name);
     if(i == members.end())
-      return;
+      return false;
 
     i->second->get_all_values(values);
+    return true;
   }
 
   /// \brief check whether the value of the variable is null, return true
