@@ -27,8 +27,10 @@ function:
 "function quit { exit }" FAIL
 "function 'foo' { exit; }" FAIL
 "function quit { exit; }" -> (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit)))))
-"function foo() { :; }" -> (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
-"foo() { :; }" -> (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
+"function foo()    { :; }" -> (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
+"function foo(){ :; }" -> (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
+"foo()   { :; }" -> (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
+"foo(){ :; }" -> (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
 
 "function quit { exit; } > /dev/null" -> (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit)))) (REDIR > (STRING / dev / null)))
 "function quit {
