@@ -73,10 +73,10 @@ class interpreter
   /// \param[in,out] a value/result argument referring to offset
   /// \param[in] the original string
   /// \return whether the real offset is in legal range
-  bool get_real_offset(int& offset, const std::string& str) const
+  bool get_real_offset(int& offset, const int size) const
   {
-    offset = (offset >= 0? offset : str.size() + offset);
-    return !(offset < 0 || offset >= static_cast<int>(str.size()));
+    offset = (offset >= 0? offset : size + offset);
+    return !(offset < 0 || offset >= size);
   }
 
   void get_all_elements_joined(const std::string& name,
@@ -88,6 +88,10 @@ class interpreter
   void define_function_arguments(scope& current_stack,
                                  const std::vector<std::string>& arguments);
 
+  std::string get_substring(const std::string& name,
+                            int offset,
+                            int length,
+                            const unsigned index) const;
 public:
 
   ///

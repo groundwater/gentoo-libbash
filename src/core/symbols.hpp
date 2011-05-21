@@ -159,14 +159,11 @@ public:
   }
 
   /// \brief retrieve all values of the array
-  /// \param[out] vector that stores all array values, values in the arrays will
-  ///             be cleared first
+  /// \param[out] vector that stores all array values
   template<typename T>
   void get_all_values(std::vector<T>& all_values) const
   {
     static converter<T> visitor;
-
-    all_values.clear();
 
     for(auto iter = value.begin(); iter != value.end(); ++iter)
         all_values.push_back(

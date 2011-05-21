@@ -327,7 +327,8 @@ var_name returns[std::string libbash_value, unsigned index]
 	|name {
 		$libbash_value = $name.libbash_value;
 		$index = $name.index;
-	};
+	}
+	|TIMES { $libbash_value = "*"; };
 
 var_expansion returns[std::string libbash_value]
 @declarations {

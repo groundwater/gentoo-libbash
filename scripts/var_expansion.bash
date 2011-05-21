@@ -82,3 +82,12 @@ FOO080=${FOO039/@([a-c]|[k-m])}
 FOO081=${FOO039//@([a-c]|[k-m])}
 target="abc123abc"
 FOO082="${target##+(ab[c])*([[:digit:]])}"
+function positional_parameter_test(){
+    FOO083=${*}
+    FOO084=${*:1}
+    FOO085=${*:1:2}
+    FOO086=${*: -1}
+    FOO087=${*: -2:5}
+    FOO088=${*:0}
+}
+positional_parameter_test 1 2 3 4 5

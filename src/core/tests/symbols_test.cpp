@@ -109,9 +109,10 @@ TEST(symbol_test, get_all_values)
   EXPECT_STREQ("3", string_values[2].c_str());
 
   variable a_string("foo", 10);
+  // Won't clear the original vector
   a_string.get_all_values(string_values);
-  EXPECT_EQ(1, string_values.size());
-  EXPECT_STREQ("10", string_values[0].c_str());
+  EXPECT_EQ(4, string_values.size());
+  EXPECT_STREQ("1", string_values[0].c_str());
 
   variable an_int("foo", 10);
   vector<int> int_values;

@@ -280,9 +280,7 @@ var_exp	:	var_name (
 					 | LSQUARE (op=TIMES|op=AT) RSQUARE -> ^(LIST_EXPAND var_name_for_bang $op)
 					 | -> ^(VAR_REF var_name_for_bang)
 					)
-	|	var_size_ref
-	|	TIMES
-	|	AT;
+	|	var_size_ref;
 parameter_delete_operator
 	:	POUND -> LAZY_REMOVE_AT_START
 	|	POUNDPOUND -> REPLACE_AT_START
@@ -312,7 +310,9 @@ parameter_replace_operator
 //either directly or through array
 var_name
 	:	num
-	|	var_name_no_digit;
+	|	var_name_no_digit
+	|	TIMES
+	|	AT;
 //Inside arithmetic we can't allow digits
 var_name_no_digit
 	:	name^ LSQUARE! (AT|TIMES|explicit_arithmetic) RSQUARE!

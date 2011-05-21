@@ -89,14 +89,49 @@ bool interpreter::is_unset_or_null(const std::string& name,
     return i->second->is_null(index);
 }
 
+// This method temporarily supports array offset expansion for $* and $@.
+// That logic will be refactored and applied to normal array variables in future.
+std::string interpreter::get_substring(const std::string& name,
+                                       int offset,
+                                       int length,
+                                       const unsigned index) const
+{
+  if(name != "*" && name != "@")
+  {
+    std::string value = resolve<std::string>(name, index);
+    if(!get_real_offset(offset, value.size()))
+      return "";
+    return value.substr(offset, length);
+  }
+  else
+  {
+    std::vector<std::string> array;
+    // ${*:1} has the same content as ${*}, ${*:0} contains current script name as the first element
+    if(offset > 0)
+      offset--;
+    else if(offset == 0)
+      // Need to replace this with the real script name
+      array.push_back("filename");
+    if(resolve_array(name, array) && get_real_offset(offset, array.size()))
+    {
+      int max_length = array.size() - offset;
+      if(length == -1 || length > max_length)
+        length = max_length;
+      return boost::algorithm::join(
+          std::vector<std::string>(array.begin() + offset,
+                                   array.begin() + offset + length),
+          resolve<std::string>("IFS").substr(0, 1));
+    }
+    else
+      return "";
+  }
+}
+
 const std::string interpreter::do_substring_expansion(const std::string& name,
                                                       int offset,
                                                       const unsigned index) const
 {
-  std::string value = resolve<std::string>(name, index);
-  if(!get_real_offset(offset, value))
-    return "";
-  return value.substr(offset);
+  return get_substring(name, offset, -1, index);
 }
 
 const std::string interpreter::do_substring_expansion(const std::string& name,
@@ -106,10 +141,8 @@ const std::string interpreter::do_substring_expansion(const std::string& name,
 {
   if(length < 0)
     throw interpreter_exception("length of substring expression should be greater or equal to zero");
-  std::string value = resolve<std::string>(name, index);
-  if(!get_real_offset(offset, value))
-    return "";
-  return value.substr(offset, length);
+
+  return get_substring(name, offset, length, index);
 }
 
 std::string interpreter::do_replace_expansion(const std::string& name,
