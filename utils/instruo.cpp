@@ -103,7 +103,7 @@ void worker(const std::shared_ptr<PackageIDSequence> &ids)
                             variables["PVR"][0] + ".ebuild");
     try
     {
-      libbash::interpret(ebuild_path, variables, functions);
+      libbash::interpret(ebuild_path, "utils/isolated-functions.sh", variables, functions);
     }
     catch(const interpreter_exception& e)
     {
