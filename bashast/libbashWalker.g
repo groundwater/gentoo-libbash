@@ -116,7 +116,7 @@ options
 
 start: list|EOF;
 
-list: ^(LIST (function_def|logic_command_list)+);
+list: ^(LIST (logic_command_list)+);
 
 variable_definitions
 @declarations {
@@ -432,6 +432,7 @@ var_ref [bool double_quoted] returns[std::string libbash_value]
 
 command
 	:variable_definitions
+	|function_definition
 	|simple_command
 	|compound_command;
 
@@ -710,7 +711,7 @@ command_substitution returns[std::string libbash_value]
 		walker->trim_trailing_eols($libbash_value);
 	};
 
-function_def returns[int placeholder]
+function_definition returns[int placeholder]
 	:^(FUNCTION ^(STRING name) {
 		// Define the function with current index
 		walker->define_function($name.libbash_value, INDEX());
