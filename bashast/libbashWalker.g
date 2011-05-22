@@ -470,7 +470,8 @@ execute_command[const std::string& name, std::vector<std::string>& libbash_args]
 			std::cerr << name << " is not supported yet" << std::endl;
 			walker->set_status(1);
 		}
-	};
+	}
+	(BANG { walker->set_status(!walker->get_status()); })?;
 
 argument[std::vector<std::string>& args]
 	: string_expr {
