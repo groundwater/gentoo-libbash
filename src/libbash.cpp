@@ -29,18 +29,14 @@
 #include "core/interpreter.h"
 #include "core/bash_ast.h"
 
-namespace libbash
+namespace internal
 {
-  int interpret(const std::string& path,
+  int interpret(interpreter& walker,
+                const std::ifstream& input,
                 std::unordered_map<std::string, std::vector<std::string>>& variables,
                 std::vector<std::string>& functions)
   {
-    int result;
-
-    std::ifstream input(path.c_str());
-    if(!input)
-      throw interpreter_exception("Unable to create fstream for script: " + path);
-    interpreter walker;
+    int result = 0;
 
     // Initialize bash environment
     for(auto iter = variables.begin(); iter != variables.end(); ++iter)
@@ -48,7 +44,7 @@ namespace libbash
 
     bash_ast ast(input);
     ast.interpret_with(walker);
-    result = ast.get_error_count();
+    result += ast.get_error_count();
 
     for(auto iter = walker.begin(); iter != walker.end(); ++iter)
       iter->second->get_all_values<std::string>(variables[iter->first]);
@@ -56,5 +52,49 @@ namespace libbash
 
     result += walker.get_status();
     return result;
+  }
+}
+
+namespace libbash
+{
+  int interpret(const std::string& target_path,
+                std::unordered_map<std::string, std::vector<std::string>>& variables,
+                std::vector<std::string>& functions)
+  {
+    std::ifstream input(target_path.c_str());
+    if(!input)
+      throw interpreter_exception("Unable to create fstream for script: " + target_path);
+
+    interpreter walker;
+
+    return internal::interpret(walker, input, variables, functions);
+  }
+
+  int interpret(const std::string& target_path,
+                const std::string& preload_path,
+                std::unordered_map<std::string, std::vector<std::string>>& variables,
+                std::vector<std::string>& functions)
+  {
+    std::ifstream input(target_path.c_str());
+    if(!input)
+      throw interpreter_exception("Unable to create fstream for script: " + target_path);
+
+    std::ifstream preload(preload_path.c_str());
+    if(!preload)
+      throw interpreter_exception("Unable to create fstream for script: " + preload_path);
+
+    interpreter walker;
+
+    // Preloading
+    bash_ast preload_ast(preload);
+    preload_ast.interpret_with(walker);
+    int result = preload_ast.get_error_count();
+    if(result)
+    {
+      std::cerr << "Error occured while preloading" << std::endl;
+      return result;
+    }
+
+    return internal::interpret(walker, input, variables, functions);
   }
 }

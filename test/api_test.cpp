@@ -33,6 +33,8 @@ TEST(libbashapi, bad_path)
   std::vector<std::string> functions;
   EXPECT_THROW(libbash::interpret("not exist", variables, functions),
                interpreter_exception);
+  EXPECT_THROW(libbash::interpret("/scripts/source_true.sh", "not exist", variables, functions),
+               interpreter_exception);
 }
 
 TEST(libbashapi, illegal_script)
@@ -55,6 +57,22 @@ TEST(libbashapi, legal_script)
   EXPECT_EQ(0, result);
 
   result = libbash::interpret(get_src_dir() + std::string("/scripts/source_false.sh"),
+                              variables,
+                              functions);
+  EXPECT_NE(0, result);
+}
+
+TEST(libbashapi, preload)
+{
+  std::unordered_map<std::string, std::vector<std::string>> variables;
+  std::vector<std::string> functions;
+  int result = libbash::interpret(get_src_dir() + std::string("/scripts/source_true.sh"),
+                                  get_src_dir() + std::string("/scripts/source_true.sh"),
+                                  variables,
+                                  functions);
+  EXPECT_EQ(0, result);
+  result = libbash::interpret(get_src_dir() + std::string("/scripts/source_true.sh"),
+                              get_src_dir() + std::string("/scripts/source_false.sh"),
                               variables,
                               functions);
   EXPECT_NE(0, result);

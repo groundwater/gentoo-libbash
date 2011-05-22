@@ -42,7 +42,20 @@ namespace libbash
   /// \param[in, out] we use the map to initialize bash environment and store the result
   /// \param[out] store the names of the functions defined in the script
   /// \return the return status of the script
-  int LIBBASH_API interpret(const std::string& path,
+  int LIBBASH_API interpret(const std::string& target_path,
+                            std::unordered_map<std::string, std::vector<std::string>>& variables,
+                            std::vector<std::string>& functions);
+
+  ///
+  /// \brief interpret a script specifid by path, return a map filled with
+  ///        variables defined in the script
+  /// \param the path of target script
+  /// \param the path of a script that you want to source before interpreting
+  /// \param[in, out] we use the map to initialize bash environment and store the result. The environment will be initialized after preloading.
+  /// \param[out] store the names of the functions defined in the script
+  /// \return the return status of the script
+  int LIBBASH_API interpret(const std::string& target_path,
+                            const std::string& preload_path,
                             std::unordered_map<std::string, std::vector<std::string>>& variables,
                             std::vector<std::string>& functions);
 }
