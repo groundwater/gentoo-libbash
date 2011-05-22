@@ -16,3 +16,4 @@ true || echo "wrong"
 echo "end"
 : ${DEFAULTED:="yes"}
 FOO="abc" echo "command environment"
+true > /dev/null

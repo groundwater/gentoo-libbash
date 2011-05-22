@@ -4,6 +4,7 @@ right
 right
 end
 command environment
+Redirection is not supported yet
 DEFAULTED=yes
 FOO001=hello
 FOO002=Hello World

@@ -446,7 +446,7 @@ execute_command[const std::string& name, std::vector<std::string>& libbash_args]
 @declarations {
 	interpreter::local_scope current_scope(*walker);
 }
-	:var_def[true]* {
+	:var_def[true]* redirect* {
 		if(walker->has_function(name))
 		{
 			ANTLR3_MARKER command_index = INDEX();
@@ -473,6 +473,22 @@ execute_command[const std::string& name, std::vector<std::string>& libbash_args]
 		}
 	}
 	(BANG { walker->set_status(!walker->get_status()); })?;
+
+redirect
+	:^(REDIR redirect_operator redirect_destination) {
+		std::cerr << "Redirection is not supported yet" << std::endl;
+	};
+
+redirect_destination
+	:DIGIT MINUS?
+	|string_expr //path to a file
+	|FILE_DESCRIPTOR
+	|FILE_DESCRIPTOR_MOVE;
+
+redirect_operator
+	:LESS_THAN
+	|GREATER_THAN
+	|DIGIT redirect_operator;
 
 argument[std::vector<std::string>& args]
 	: string_expr {
