@@ -43,10 +43,10 @@ class bash_ast
 {
   pANTLR3_INPUT_STREAM input;
   std::string script;
-  libbashLexer_Ctx_struct* lxr;
-  pANTLR3_COMMON_TOKEN_STREAM tstream;
-  libbashParser_Ctx_struct* psr;
-  std::unique_ptr<libbashParser_start_return_struct> langAST;
+  libbashLexer_Ctx_struct* lexer;
+  pANTLR3_COMMON_TOKEN_STREAM token_stream;
+  libbashParser_Ctx_struct* parser;
+  std::unique_ptr<libbashParser_start_return_struct> ast;
   pANTLR3_COMMON_TREE_NODE_STREAM nodes;
   int error_count;
 

@@ -52,62 +52,62 @@ bash_ast::bash_ast(std::istream& source): error_count(0)
 bash_ast::~bash_ast()
 {
   nodes->free(nodes);
-  psr->free(psr);
-  tstream->free(tstream);
-  lxr->free(lxr);
+  parser->free(parser);
+  token_stream->free(token_stream);
+  lexer->free(lexer);
   input->close(input);
 }
 
 void bash_ast::init_parser()
 {
-  lxr = libbashLexerNew(input);
-  if ( lxr == NULL )
+  lexer = libbashLexerNew(input);
+  if ( lexer == NULL )
   {
     std::cerr << "Unable to create the lexer due to malloc() failure" << std::endl;
     error_count = 1;
     return;
   }
 
-  tstream = antlr3CommonTokenStreamSourceNew(
-      ANTLR3_SIZE_HINT, lxr->pLexer->rec->state->tokSource);
-  if (tstream == NULL)
+  token_stream = antlr3CommonTokenStreamSourceNew(
+      ANTLR3_SIZE_HINT, lexer->pLexer->rec->state->tokSource);
+  if (token_stream == NULL)
   {
     std::cerr << "Out of memory trying to allocate token stream" << std::endl;
     error_count = 1;
     return;
   }
 
-  psr = libbashParserNew(tstream);
-  if (psr == NULL)
+  parser = libbashParserNew(token_stream);
+  if (parser == NULL)
   {
     std::cerr << "Out of memory trying to allocate parser" << std::endl;
     error_count = 1;
     return;
   }
 
-  langAST.reset(new libbashParser_start_return(psr->start(psr)));
-  error_count = psr->pParser->rec->getNumberOfSyntaxErrors(psr->pParser->rec);
-  nodes = antlr3CommonTreeNodeStreamNewTree(langAST->tree, ANTLR3_SIZE_HINT);
+  ast.reset(new libbashParser_start_return(parser->start(parser)));
+  error_count = parser->pParser->rec->getNumberOfSyntaxErrors(parser->pParser->rec);
+  nodes = antlr3CommonTreeNodeStreamNewTree(ast->tree, ANTLR3_SIZE_HINT);
 }
 
 void bash_ast::interpret_with(interpreter& walker)
 {
   set_interpreter(&walker);
-  plibbashWalker treePsr = libbashWalkerNew(nodes);
-  treePsr->start(treePsr);
-  treePsr->free(treePsr);
+  plibbashWalker treeparser = libbashWalkerNew(nodes);
+  treeparser->start(treeparser);
+  treeparser->free(treeparser);
 }
 
 std::string bash_ast::get_dot_graph()
 {
-  pANTLR3_STRING graph = nodes->adaptor->makeDot(nodes->adaptor, langAST->tree);
+  pANTLR3_STRING graph = nodes->adaptor->makeDot(nodes->adaptor, ast->tree);
   return std::string(reinterpret_cast<char*>(graph->chars));
 }
 
 std::string bash_ast::get_string_tree()
 {
   return std::string(reinterpret_cast<char*>(
-        langAST->tree->toStringTree(langAST->tree)->chars));
+        ast->tree->toStringTree(ast->tree)->chars));
 }
 
 namespace
@@ -131,7 +131,7 @@ std::string bash_ast::get_tokens(std::function<std::string(ANTLR3_INT32)> token_
   // output line number for the first line
   result << line_counter++ << "\t";
 
-  pANTLR3_VECTOR token_list = tstream->getTokens(tstream);
+  pANTLR3_VECTOR token_list = token_stream->getTokens(token_stream);
   unsigned token_size = token_list->size(token_list);
 
   for(unsigned i = 0; i != token_size; ++i)
