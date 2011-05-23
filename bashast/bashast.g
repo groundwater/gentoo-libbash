@@ -241,7 +241,8 @@ cond_comparison
 //It's not legal to do FOO[1]=(a b c)
 var_def
 	:	name LSQUARE BLANK? explicit_arithmetic BLANK* RSQUARE EQUALS fname? -> ^(EQUALS ^(name explicit_arithmetic) fname?)
-	|	name EQUALS^ value?;
+	|	name EQUALS^ value?
+	|	name PLUS_ASSIGN fname_part? -> ^(EQUALS name ^(STRING ^(VAR_REF name) fname_part?));
 //Possible values of a variable
 value	:	fname
 	|	LPAREN! wspace!* arr_val RPAREN!;

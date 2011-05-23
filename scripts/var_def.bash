@@ -41,3 +41,5 @@ FOO004=$#
 FOO004=$?
 FOO004=$-
 FOO004=$!
+FOO005=abc
+FOO005+=def

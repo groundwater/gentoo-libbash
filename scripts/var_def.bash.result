@@ -23,6 +23,7 @@ FOO001=networkmanager
 FOO002=0.8.2
 FOO003=networkmanager-0.8.2
 FOO004=
+FOO005=abcdef
 HOMEPAGE=http://sunpinyin.googlecode.com
 IUSE=
 KEYWORDS=~amd64 ~x86
