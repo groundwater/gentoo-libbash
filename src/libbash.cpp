@@ -32,7 +32,6 @@
 namespace internal
 {
   int interpret(interpreter& walker,
-                const std::ifstream& input,
                 const std::string& path,
                 std::unordered_map<std::string, std::vector<std::string>>& variables,
                 std::vector<std::string>& functions)
@@ -45,7 +44,7 @@ namespace internal
     walker.define("0", path, true);
     variables.clear();
 
-    bash_ast ast(input);
+    bash_ast ast(path);
     ast.interpret_with(walker);
     result += ast.get_error_count();
 
@@ -64,13 +63,8 @@ namespace libbash
                 std::unordered_map<std::string, std::vector<std::string>>& variables,
                 std::vector<std::string>& functions)
   {
-    std::ifstream input(target_path.c_str());
-    if(!input)
-      throw interpreter_exception("Unable to create fstream for script: " + target_path);
-
     interpreter walker;
-
-    return internal::interpret(walker, input, target_path, variables, functions);
+    return internal::interpret(walker, target_path, variables, functions);
   }
 
   int interpret(const std::string& target_path,
@@ -78,18 +72,10 @@ namespace libbash
                 std::unordered_map<std::string, std::vector<std::string>>& variables,
                 std::vector<std::string>& functions)
   {
-    std::ifstream input(target_path.c_str());
-    if(!input)
-      throw interpreter_exception("Unable to create fstream for script: " + target_path);
-
-    std::ifstream preload(preload_path.c_str());
-    if(!preload)
-      throw interpreter_exception("Unable to create fstream for script: " + preload_path);
-
     interpreter walker;
 
     // Preloading
-    bash_ast preload_ast(preload);
+    bash_ast preload_ast(preload_path);
     preload_ast.interpret_with(walker);
     int result = preload_ast.get_error_count();
     if(result)
@@ -98,6 +84,6 @@ namespace libbash
       return result;
     }
 
-    return internal::interpret(walker, input, target_path, variables, functions);
+    return internal::interpret(walker, target_path, variables, functions);
   }
 }

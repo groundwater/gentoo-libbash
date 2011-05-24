@@ -21,6 +21,7 @@
 /// \author Mu Qiao
 /// \brief a wrapper class that helps interpret from istream and string
 ///
+#include <fstream>
 
 #include "core/interpreter_exception.h"
 #include "libbashLexer.h"
@@ -33,6 +34,19 @@ bash_ast::bash_ast(const std::istream& source,
 {
   std::stringstream stream;
   stream << source.rdbuf();
+  script = stream.str();
+  init_parser(script);
+}
+
+bash_ast::bash_ast(const std::string& script_path,
+                   std::function<pANTLR3_BASE_TREE(plibbashParser)> p): parse(p)
+{
+  std::stringstream stream;
+  std::ifstream file_stream(script_path);
+  if(!file_stream)
+    throw interpreter_exception(script_path + " can't be read");
+
+  stream << file_stream.rdbuf();
   script = stream.str();
   init_parser(script);
 }

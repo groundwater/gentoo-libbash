@@ -60,11 +60,8 @@ public:
   bash_ast(const std::istream& source,
            std::function<pANTLR3_BASE_TREE(libbashParser_Ctx_struct*)> p=parser_start);
 
-  bash_ast(const std::string& script,
-           std::function<pANTLR3_BASE_TREE(libbashParser_Ctx_struct*)> p=parser_start): parse(p)
-  {
-    init_parser(script);
-  }
+  bash_ast(const std::string& script_path,
+           std::function<pANTLR3_BASE_TREE(libbashParser_Ctx_struct*)> p=parser_start);
 
   ~bash_ast();
 

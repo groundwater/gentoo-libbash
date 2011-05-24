@@ -48,11 +48,7 @@ int source_builtin::exec(const std::vector<std::string>& bash_args)
   auto& stored_ast = ast_cache[path];
   if(!stored_ast)
   {
-    std::ifstream input(path);
-    if(!input)
-      throw interpreter_exception(path + " can't be read");
-
-    stored_ast.reset(new bash_ast(input));
+    stored_ast.reset(new bash_ast(path));
     if(stored_ast->get_error_count())
       std::cerr << path << " could not be parsed properly" << std::endl;
   }

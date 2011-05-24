@@ -21,6 +21,8 @@
 /// \author Mu Qiao
 /// \brief implementation for the let builtin
 ///
+#include <sstream>
+
 #include <boost/algorithm/string/join.hpp>
 
 #include "core/bash_ast.h"
@@ -30,7 +32,7 @@
 int let_builtin::exec(const std::vector<std::string>& bash_args)
 {
   std::string expression(boost::algorithm::join(bash_args, " "));
-  bash_ast ast(expression, &bash_ast::parser_arithmetics);
+  bash_ast ast(std::stringstream(expression), &bash_ast::parser_arithmetics);
   ast.interpret_with(_walker, &bash_ast::walker_arithmetics);
 
   return ast.get_error_count();

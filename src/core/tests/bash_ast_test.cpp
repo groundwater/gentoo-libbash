@@ -23,6 +23,7 @@
 ///
 
 #include <fstream>
+#include <sstream>
 #include <string>
 
 #include <gtest/gtest.h>
@@ -33,26 +34,23 @@
 
 TEST(bash_ast, parse_illegal_script)
 {
-  std::ifstream input(get_src_dir() + std::string("/scripts/illegal_script.sh"));
-  bash_ast ast(input);
+  bash_ast ast(get_src_dir() + std::string("/scripts/illegal_script.sh"));
   EXPECT_NE(0, ast.get_error_count());
 }
 
 TEST(bash_ast, parse_legal_script)
 {
-  std::ifstream input(get_src_dir() + std::string("/scripts/source_true.sh"));
-  bash_ast ast(input);
+  bash_ast ast(get_src_dir() + std::string("/scripts/source_true.sh"));
   EXPECT_EQ(0, ast.get_error_count());
 
-  std::ifstream input2(get_src_dir() + std::string("/scripts/source_false.sh"));
-  bash_ast ast2(input2);
+  bash_ast ast2(get_src_dir() + std::string("/scripts/source_false.sh"));
   EXPECT_EQ(0, ast2.get_error_count());
 }
 
 TEST(bash_ast, parse_arithmetics)
 {
   std::string expr("1 + 2");
-  bash_ast ast(expr, bash_ast::parser_arithmetics);
+  bash_ast ast(std::stringstream(expr), bash_ast::parser_arithmetics);
   interpreter walker;
   EXPECT_EQ(3, ast.interpret_with(walker, &bash_ast::walker_arithmetics));
 }
