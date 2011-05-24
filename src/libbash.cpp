@@ -33,6 +33,7 @@ namespace internal
 {
   int interpret(interpreter& walker,
                 const std::ifstream& input,
+                const std::string& path,
                 std::unordered_map<std::string, std::vector<std::string>>& variables,
                 std::vector<std::string>& functions)
   {
@@ -40,7 +41,9 @@ namespace internal
 
     // Initialize bash environment
     for(auto iter = variables.begin(); iter != variables.end(); ++iter)
-      walker.set_value(iter->first, (iter->second)[0]);
+      walker.define(iter->first, (iter->second)[0]);
+    walker.define("0", path, true);
+    variables.clear();
 
     bash_ast ast(input);
     ast.interpret_with(walker);
@@ -67,7 +70,7 @@ namespace libbash
 
     interpreter walker;
 
-    return internal::interpret(walker, input, variables, functions);
+    return internal::interpret(walker, input, target_path, variables, functions);
   }
 
   int interpret(const std::string& target_path,
@@ -95,6 +98,6 @@ namespace libbash
       return result;
     }
 
-    return internal::interpret(walker, input, variables, functions);
+    return internal::interpret(walker, input, target_path, variables, functions);
   }
 }

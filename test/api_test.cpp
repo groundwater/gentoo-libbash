@@ -60,6 +60,9 @@ TEST(libbashapi, legal_script)
                               variables,
                               functions);
   EXPECT_NE(0, result);
+
+  EXPECT_STREQ((get_src_dir() + std::string("/scripts/source_false.sh")).c_str(),
+                variables["0"][0].c_str());
 }
 
 TEST(libbashapi, preload)

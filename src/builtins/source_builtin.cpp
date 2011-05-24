@@ -57,11 +57,15 @@ int source_builtin::exec(const std::vector<std::string>& bash_args)
       std::cerr << path << " could not be parsed properly" << std::endl;
   }
 
+  const std::string& original_path = _walker.resolve<std::string>("0");
   try
   {
+    _walker.define("0", path, true);
     stored_ast->interpret_with(_walker);
   }
   catch(return_exception& e) {}
+
+  _walker.define("0", original_path, true);
 
   return _walker.get_status();
 }

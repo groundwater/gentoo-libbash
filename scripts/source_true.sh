@@ -3,3 +3,4 @@ function foo()
 {
     :
 }
+FOO002=$0

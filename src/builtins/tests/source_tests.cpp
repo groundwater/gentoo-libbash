@@ -44,6 +44,9 @@ TEST(source_builtin_test, source_true)
   EXPECT_EQ(status, 0);
   EXPECT_TRUE(walker.has_function("foo"));
   EXPECT_STREQ("hello", walker.resolve<std::string>("FOO001").c_str());
+  EXPECT_STREQ((get_src_dir() + "/scripts/source_true.sh").c_str(),
+                walker.resolve<std::string>("FOO002").c_str());
+  EXPECT_STREQ("", walker.resolve<std::string>("0").c_str());
 }
 
 TEST(source_builtin_test, source_false)
