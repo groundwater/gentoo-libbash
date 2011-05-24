@@ -4,6 +4,7 @@ overloaded let
 1 2 3
 1a2a3
 1 2 3
+function_in_compound_statement
 ARG1=100
 ARG2=2
 ARG3=3

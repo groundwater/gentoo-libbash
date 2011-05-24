@@ -5,6 +5,7 @@ right
 end
 command environment
 We do not support command env before the export builtin.
+Redirection is not supported yet
 DEFAULTED=yes
 FOO001=hello
 FOO002=Hello World

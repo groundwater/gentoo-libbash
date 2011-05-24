@@ -10,6 +10,7 @@ FOO001=$(echo hello)
 FOO002=$(hi)
 true && echo "right"
 false && echo "wrong"
+! true && echo "wrong"
 false || echo "right"
 true || echo "wrong"
 echo "end"
@@ -17,3 +18,4 @@ echo "end"
 FOO="abc" echo "command environment"
 export FOO003=1 FOO004=abc FOO005=(1 2 3) FOO002
 abc=1 export foo
+true > /dev/null

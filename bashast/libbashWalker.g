@@ -117,7 +117,7 @@ options
 
 start: list|EOF;
 
-list: ^(LIST (function_def|logic_command_list)+);
+list: ^(LIST (logic_command_list)+);
 
 variable_definitions
 @declarations {
@@ -439,6 +439,7 @@ var_ref [bool double_quoted] returns[std::string libbash_value]
 
 command
 	:variable_definitions
+	|function_definition
 	|simple_command
 	|compound_command;
 
@@ -452,7 +453,7 @@ execute_command[const std::string& name, std::vector<std::string>& libbash_args]
 @declarations {
 	interpreter::local_scope current_scope(*walker);
 }
-	:var_def[true]* {
+	:var_def[true]* redirect* {
 		if(walker->has_function(name))
 		{
 			ANTLR3_MARKER command_index = INDEX();
@@ -482,7 +483,24 @@ execute_command[const std::string& name, std::vector<std::string>& libbash_args]
 			std::cerr << name << " is not supported yet" << std::endl;
 			walker->set_status(1);
 		}
+	}
+	(BANG { walker->set_status(!walker->get_status()); })?;
+
+redirect
+	:^(REDIR redirect_operator redirect_destination) {
+		std::cerr << "Redirection is not supported yet" << std::endl;
 	};
+
+redirect_destination
+	:DIGIT MINUS?
+	|string_expr //path to a file
+	|FILE_DESCRIPTOR
+	|FILE_DESCRIPTOR_MOVE;
+
+redirect_operator
+	:LESS_THAN
+	|GREATER_THAN
+	|DIGIT redirect_operator;
 
 argument[std::vector<std::string>& args]
 	: string_expr {
@@ -750,7 +768,7 @@ command_substitution returns[std::string libbash_value]
 		walker->trim_trailing_eols($libbash_value);
 	};
 
-function_def returns[int placeholder]
+function_definition returns[int placeholder]
 	:^(FUNCTION ^(STRING name) {
 		// Define the function with current index
 		walker->define_function($name.libbash_value, INDEX());

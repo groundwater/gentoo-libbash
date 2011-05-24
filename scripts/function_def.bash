@@ -52,6 +52,7 @@ func_nested2() {
     func_nested1
 }
 func_nested2
+
 let() {
     echo "overloaded let"
 }
@@ -64,3 +65,15 @@ func_positional_args() {
     echo $*
 }
 func_positional_args 1 2 3
+
+if true; then
+    function_in_compound_statement() {
+        echo "function_in_compound_statement"
+    }
+fi
+if false; then
+    function_in_compound_statement() {
+        echo "I should not get called"
+    }
+fi
+function_in_compound_statement
