@@ -35,7 +35,7 @@ bash_ast::bash_ast(const std::istream& source,
   std::stringstream stream;
   stream << source.rdbuf();
   script = stream.str();
-  init_parser(script);
+  init_parser(script, "unknown source");
 }
 
 bash_ast::bash_ast(const std::string& script_path,
@@ -48,7 +48,7 @@ bash_ast::bash_ast(const std::string& script_path,
 
   stream << file_stream.rdbuf();
   script = stream.str();
-  init_parser(script);
+  init_parser(script, script_path);
 }
 
 bash_ast::~bash_ast()
@@ -60,7 +60,7 @@ bash_ast::~bash_ast()
   input->close(input);
 }
 
-void bash_ast::init_parser(const std::string& script)
+void bash_ast::init_parser(const std::string& script, const std::string& script_path)
 {
   input = antlr3NewAsciiStringInPlaceStream(
     reinterpret_cast<pANTLR3_UINT8>(const_cast<char*>(script.c_str())),
@@ -69,6 +69,10 @@ void bash_ast::init_parser(const std::string& script)
 
   if(input == NULL)
     throw interpreter_exception("Unable to open file " + script + " due to malloc() failure");
+
+  input->fileName = input->strFactory->newStr(
+      input->strFactory,
+      reinterpret_cast<pANTLR3_UINT8>(const_cast<char*>(script_path.c_str())));
 
   lexer = libbashLexerNew(input);
   if ( lexer == NULL )

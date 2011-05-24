@@ -90,7 +90,7 @@ AM_CPPFLAGS += -D_GLIBCXX_DEBUG
 endif
 
 if HAVE_GTEST
-TESTS += cppunittests test/ast_printer_test.sh test/verify_bashs_test.sh
+TESTS += cppunittests test/ast_printer_test.sh test/verify_bashs_test.sh test/verify_error_output_test.sh
 check_PROGRAMS = cppunittests
 
 cppunittests_SOURCES =  test/run_tests.cpp \
@@ -219,6 +219,7 @@ EXTRA_DIST = bashast/bashast.g \
 			 bashast/features_script/features.sh.tokens \
 			 test/ast_printer_test.sh \
 			 test/verify_bashs_test.sh \
+			 test/verify_error_output_test.sh \
 			 scripts/source_false.sh \
 			 scripts/source_true.sh \
 			 scripts/source_return.sh \

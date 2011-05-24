@@ -54,7 +54,7 @@ class bash_ast
   int error_count;
   std::function<pANTLR3_BASE_TREE(libbashParser_Ctx_struct*)> parse;
 
-  void init_parser(const std::string& script);
+  void init_parser(const std::string& script, const std::string& script_path);
 
 public:
   bash_ast(const std::istream& source,
