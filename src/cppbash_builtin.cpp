@@ -30,6 +30,7 @@
 #include "builtins/inherit_builtin.h"
 #include "builtins/let_builtin.h"
 #include "builtins/return_builtin.h"
+#include "builtins/shopt_builtin.h"
 #include "builtins/source_builtin.h"
 
 cppbash_builtin::cppbash_builtin(BUILTIN_ARGS): _out_stream(&out), _err_stream(&err), _inp_stream(&in), _walker(walker)
@@ -41,6 +42,7 @@ cppbash_builtin::builtins_type& cppbash_builtin::builtins() {
       {"echo", boost::factory<echo_builtin*>()},
       {"declare", boost::factory<declare_builtin*>()},
       {"source", boost::factory<source_builtin*>()},
+      {"shopt", boost::factory<shopt_builtin*>()},
       {"inherit", boost::factory<inherit_builtin*>()},
       {":", boost::factory<true_builtin*>()},
       {"true", boost::factory<true_builtin*>()},
