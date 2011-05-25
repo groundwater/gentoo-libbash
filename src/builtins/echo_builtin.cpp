@@ -42,6 +42,12 @@ int echo_builtin::exec(const std::vector<std::string>& bash_args)
   bool enable_escapes = false;
   bool options_parsed = false;
 
+  if(bash_args.empty())
+  {
+    this->out_buffer() << std::endl;
+    return 0;
+  }
+
   for(auto i = bash_args.begin(); i != bash_args.end(); i++)
   {
     const std::string& str = *i;
