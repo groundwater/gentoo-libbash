@@ -134,8 +134,12 @@ simple_command
 	|	variable_definitions -> ^(VARIABLE_DEFINITIONS variable_definitions)
 	|	bash_command^ redirect*;
 variable_definitions
-	:	(LOCAL BLANK!+)? var_def (BLANK!+ var_def)*
+	:	var_def (BLANK!+ var_def)*
+	|	LOCAL BLANK!+ local_item (BLANK!+ local_item)*
 	|	EXPORT! (BLANK!+ export_item)+;
+local_item
+	:var_def
+	|name -> ^(EQUALS name);
 export_item
 	:var_def
 	|name ->;

@@ -475,11 +475,11 @@ public:
                      const T& new_value,
                      const unsigned index=0)
   {
-    auto i = members.find(name);
-    if(i == members.end())
-      define(name, new_value, false, index);
+    auto var = resolve_variable(name);
+    if(var)
+      var->set_value(new_value, index);
     else
-      i->second->set_value(new_value, index);
+      define(name, new_value, false, index);
     return new_value;
   }
 
