@@ -22,20 +22,28 @@
 /// \brief implementation for the shopt builtin
 ///
 
+#include "core/interpreter.h"
 #include "core/interpreter_exception.h"
 #include "cppbash_builtin.h"
 
 #include "builtins/shopt_builtin.h"
 
-namespace
+int shopt_builtin::set_opt(const std::vector<std::string>& bash_args, bool value)
 {
-  int disable_opt(const std::vector<std::string>& bash_args)
+  int result = 0;
+  for(auto iter = bash_args.begin() + 1; iter != bash_args.end(); ++iter)
   {
-    auto iter = find(bash_args.begin() + 1, bash_args.end(), "extglob");
-    if(iter != bash_args.end())
-      throw interpreter_exception("Disabling extglob is not allowed");
-    return 0;
+    try
+    {
+      _walker.set_option(*iter, value);
+    }
+    catch(interpreter_exception& e)
+    {
+      std::cerr << *iter << " is not a valid bash option" << std::endl;
+      result = 1;
+    }
   }
+  return result;
 }
 
 int shopt_builtin::exec(const std::vector<std::string>& bash_args)
@@ -54,8 +62,9 @@ int shopt_builtin::exec(const std::vector<std::string>& bash_args)
   switch(bash_args[0][1])
   {
     case 'u':
-      return disable_opt(bash_args);
+      return set_opt(bash_args, false);
     case 's':
+      return set_opt(bash_args, true);
     case 'q':
     case 'o':
       *_err_stream << "shopt " << bash_args[0] << " is not supported yet" << std::endl;

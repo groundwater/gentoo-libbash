@@ -29,5 +29,20 @@
 TEST(return_builtin_test, disable_extglob)
 {
   interpreter walker;
-  EXPECT_THROW(cppbash_builtin::exec("shopt", {"-u", "extglob"}, std::cout, std::cerr, std::cin, walker), interpreter_exception);
+  EXPECT_EQ(1, cppbash_builtin::exec("shopt", {"-u", "not exist"}, std::cout, std::cerr, std::cin, walker));
+
+  walker.set_option("autocd", true);
+  EXPECT_EQ(0, cppbash_builtin::exec("shopt", {"-u", "autocd", "cdspell"}, std::cout, std::cerr, std::cin, walker));
+  EXPECT_FALSE(walker.get_option("autocd"));
+  EXPECT_FALSE(walker.get_option("cdspell"));
+}
+
+TEST(return_builtin_test, enable_extglob)
+{
+  interpreter walker;
+  EXPECT_EQ(1, cppbash_builtin::exec("shopt", {"-s", "not exist"}, std::cout, std::cerr, std::cin, walker));
+
+  EXPECT_EQ(0, cppbash_builtin::exec("shopt", {"-s", "autocd", "cdspell"}, std::cout, std::cerr, std::cin, walker));
+  EXPECT_TRUE(walker.get_option("autocd"));
+  EXPECT_TRUE(walker.get_option("cdspell"));
 }
