@@ -101,7 +101,8 @@ std::string interpreter::get_string(pANTLR3_BASE_TREE node)
 std::shared_ptr<variable> interpreter::resolve_variable(const std::string& name) const
 {
   if(name.empty())
-    throw interpreter_exception("Variable name shouldn't be empty");
+    return std::shared_ptr<variable>();
+
   // positional parameter
   if(isdigit(name[0]) && !local_members.empty())
   {

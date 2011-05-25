@@ -34,6 +34,7 @@ TEST(interpreter, define_resolve_int)
   walker.define("aint", 4);
   EXPECT_EQ(4, walker.resolve<int>("aint"));
   EXPECT_EQ(0, walker.resolve<int>("undefined"));
+  EXPECT_EQ(0, walker.resolve<int>(""));
 }
 
 TEST(interpreter, define_resolve_string)
@@ -42,6 +43,7 @@ TEST(interpreter, define_resolve_string)
   walker.define("astring", "hello");
   EXPECT_STREQ("hello", walker.resolve<string>("astring").c_str());
   EXPECT_STREQ("", walker.resolve<string>("undefined").c_str());
+  EXPECT_STREQ("", walker.resolve<string>("").c_str());
 }
 
 TEST(interpreter, define_resolve_array)
