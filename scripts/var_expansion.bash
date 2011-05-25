@@ -1,3 +1,4 @@
+shopt -s extglob
 ARRAY=(hi hello 1 2 3)
 EAPI="3"
 EAPI4="$((EAPI+1))"

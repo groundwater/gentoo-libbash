@@ -210,21 +210,28 @@ bash_pattern[boost::xpressive::sregex& pattern, bool greedy]
 	using namespace boost::xpressive;
 	bool do_append = false;
 	sregex pattern_list;
+	auto check_extglob = [&]() {
+		if(!walker->get_option("extglob"))
+			throw interpreter_exception("Entered extended pattern matching with extglob disabled");
+	};
 }
 	:^(STRING (
 		(EXTENDED_MATCH_AT_MOST_ONE) => ^(EXTENDED_MATCH_AT_MOST_ONE composite_pattern[pattern_list, $greedy]) {
+			check_extglob();
 			if($greedy)
 				append($pattern, !sregex(pattern_list), do_append);
 			else
 				append($pattern, -!sregex(pattern_list), do_append);
 		}
 		|(EXTENDED_MATCH_ANY) => ^(EXTENDED_MATCH_ANY composite_pattern[pattern_list, $greedy]) {
+			check_extglob();
 			if($greedy)
 				append($pattern, *sregex(pattern_list), do_append);
 			else
 				append($pattern, -*sregex(pattern_list), do_append);
 		}
 		|(EXTENDED_MATCH_AT_LEAST_ONE) => ^(EXTENDED_MATCH_AT_LEAST_ONE composite_pattern[pattern_list, $greedy]) {
+			check_extglob();
 			if($greedy)
 				append($pattern, +sregex(pattern_list), do_append);
 			else
@@ -232,9 +239,11 @@ bash_pattern[boost::xpressive::sregex& pattern, bool greedy]
 		}
 		// We don't have to do anything for the following rule
 		|(EXTENDED_MATCH_EXACTLY_ONE) => ^(EXTENDED_MATCH_EXACTLY_ONE composite_pattern[pattern_list, $greedy]) {
+			check_extglob();
 			append($pattern, pattern_list, do_append);
 		}
 		|(EXTENDED_MATCH_NONE) => ^(EXTENDED_MATCH_NONE composite_pattern[pattern_list, $greedy]) {
+			check_extglob();
 			throw interpreter_exception("!(blah) is not supported for now");
 		}
 		|basic_pattern[$pattern, $greedy, do_append])+);

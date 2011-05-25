@@ -74,3 +74,20 @@ TEST(array_index, out_of_bound)
   bash_ast ast2(input2);
   EXPECT_THROW(ast2.interpret_with(walker), interpreter_exception);
 }
+
+TEST(extglob, used_when_disabled)
+{
+  interpreter walker;
+
+  std::string script = "echo ${abc/?([a-z])}";
+  std::istringstream input(script);
+  bash_ast ast(input);
+  try
+  {
+    ast.interpret_with(walker);
+  }
+  catch(interpreter_exception& e)
+  {
+    EXPECT_STREQ(e.what(), "Entered extended pattern matching with extglob disabled");
+  }
+}
