@@ -68,6 +68,8 @@ class interpreter
 
   std::istream* in;
 
+  std::unordered_map<std::string, bool> bash_options;
+
   /// \brief calculate the correct offset when offset < 0 and check whether
   ///        the real offset is in legal range
   /// \param[in,out] a value/result argument referring to offset
@@ -114,10 +116,7 @@ public:
     }
   };
 
-  interpreter(): out(&std::cout), err(&std::cerr), in(&std::cin)
-  {
-    define("IFS", " \t\n");
-  }
+  interpreter();
 
   ///
   /// \brief return the number of variables
@@ -660,6 +659,17 @@ public:
   /// \param the value of the word
   //. \param[out] the splitted result will be appended to output
   void split_word(const std::string& word, std::vector<std::string>& output);
+
+  /// \brief get the status of shell optional behavior
+  /// \param the option name
+  /// \return zero unless the name is not a valid shell option
+  bool get_option(const std::string& name) const;
+
+  /// \brief set the status of shell optional behavior
+  /// \param the option name
+  /// \param[in] true if option is enabled, false otherwise
+  /// \return zero unless the name is not a valid shell option
+  void set_option(const std::string& name, bool value);
 
   /// \brief perform expansion like ${var//foo/bar}
   /// \param the value to be expanded

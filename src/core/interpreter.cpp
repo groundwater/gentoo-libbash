@@ -39,6 +39,52 @@
 
 #include "libbashWalker.h"
 
+interpreter::interpreter(): out(&std::cout), err(&std::cerr), in(&std::cin), bash_options(
+    {
+      {"autocd", false},
+      {"cdable_vars", false},
+      {"cdspell", false},
+      {"checkhash", false},
+      {"checkjobs", false},
+      {"checkwinsize", false},
+      {"cmdhist", false},
+      {"compat31", false},
+      {"dirspell", false},
+      {"dotglob", false},
+      {"execfail", false},
+      {"expand_aliases", false},
+      {"extdebug", false},
+      {"extglob", false},
+      {"extquote", false},
+      {"failglob", false},
+      {"force_fignore", false},
+      {"globstar", false},
+      {"gnu_errfmt", false},
+      {"histappend", false},
+      {"histreedit", false},
+      {"histverify", false},
+      {"hostcomplete", false},
+      {"huponexit", false},
+      {"interactive", false},
+      {"lithist", false},
+      {"login_shell", false},
+      {"mailwarn", false},
+      {"no_empty_cmd_completion", false},
+      {"nocaseglob", false},
+      {"nocasematch", false},
+      {"nullglob", false},
+      {"progcomp", false},
+      {"promptvars", false},
+      {"restricted", false},
+      {"shift_verbose", false},
+      {"sourcepath", false},
+      {"xpg_echo", false},
+    }
+    )
+{
+  define("IFS", " \t\n");
+}
+
 std::string interpreter::get_string(pANTLR3_BASE_TREE node)
 {
   pANTLR3_COMMON_TOKEN token = node->getToken(node);
@@ -314,4 +360,22 @@ void interpreter::unset(const std::string& name,
     return;
   else
     iter->second->unset_value(index);
+}
+
+bool interpreter::get_option(const std::string& name) const
+{
+  auto iter = bash_options.find(name);
+  if(iter == bash_options.end())
+    throw interpreter_exception("Invalid bash option");
+
+  return iter->second;
+}
+
+void interpreter::set_option(const std::string& name, bool value)
+{
+  auto iter = bash_options.find(name);
+  if(iter == bash_options.end())
+    throw interpreter_exception("Invalid bash option");
+
+  iter->second = value;
 }
