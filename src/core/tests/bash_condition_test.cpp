@@ -151,6 +151,9 @@ TEST_F(file_test, binary_operator)
 
   EXPECT_TRUE(internal::test_binary("ef", positive, positive));
   EXPECT_FALSE(internal::test_binary("ef", positive, negative));
+  EXPECT_FALSE(internal::test_binary("ef", "not exist", negative));
+
+  EXPECT_THROW(internal::test_binary("efd", positive, negative), interpreter_exception);
 }
 
 TEST(bash_condition, arithmetic_operator)
@@ -176,4 +179,6 @@ TEST(bash_condition, arithmetic_operator)
   EXPECT_TRUE(internal::test_binary("ge", "1", "1"));
   EXPECT_TRUE(internal::test_binary("ge", "2", "1"));
   EXPECT_FALSE(internal::test_binary("ge", "0", "1"));
+
+  EXPECT_FALSE(internal::test_binary("ge", "blah", "1"));
 }
