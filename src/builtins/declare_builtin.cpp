@@ -21,7 +21,10 @@
 /// \author Mu Qiao
 /// \brief class that implements the declare builtin
 ///
+#include <algorithm>
 #include <iostream>
+
+#include "core/interpreter.h"
 
 #include "builtins/declare_builtin.h"
 
@@ -44,12 +47,36 @@ int declare_builtin::exec(const std::vector<std::string>& bash_args)
     return 1;
   }
 
+  int result = 0;
   switch(bash_args[0][1])
   {
+    case 'F':
+      if(bash_args[0][0] == '+')
+        return 0;
+      if(bash_args.size() > 1)
+      {
+        for(auto iter = bash_args.begin() + 1; iter != bash_args.end(); ++iter)
+        {
+          if(_walker.has_function(*iter))
+            *_out_stream << *iter << std::endl;
+          else
+            result = 1;
+        }
+      }
+      else
+      {
+        std::vector<std::string> functions;
+
+        _walker.get_all_function_names(functions);
+        sort(functions.begin(), functions.end());
+
+        for(auto iter = functions.begin(); iter != functions.end(); ++iter)
+          *_out_stream << "declare -f " << *iter << std::endl;
+      }
+      return result;
     case 'a':
     case 'A':
     case 'f':
-    case 'F':
     case 'i':
     case 'l':
     case 'r':

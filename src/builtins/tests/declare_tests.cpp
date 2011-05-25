@@ -27,6 +27,7 @@
 
 #include <gtest/gtest.h>
 
+#include "core/bash_ast.h"
 #include "core/interpreter.h"
 #include "cppbash_builtin.h"
 
@@ -40,13 +41,36 @@ static void test_declare(const string& expected, std::initializer_list<string> a
   EXPECT_EQ(expected, test_output.str());
 }
 
+TEST(declare_builtin_test, _F)
+{
+  stringstream expression("function foo() { :; }; function bar() { :; }");
+  interpreter walker;
+  bash_ast ast(expression);
+  ast.interpret_with(walker);
+
+  stringstream test_output1;
+  EXPECT_EQ(0, cppbash_builtin::exec("declare", {"-F", "foo"}, test_output1, cerr, cin, walker));
+  EXPECT_EQ("foo\n", test_output1.str());
+
+  stringstream test_output2;
+  EXPECT_EQ(1, cppbash_builtin::exec("declare", {"-F", "foo", "bar", "test"}, test_output2, cerr, cin, walker));
+  EXPECT_EQ("foo\nbar\n", test_output2.str());
+
+  stringstream test_output3;
+  EXPECT_EQ(0, cppbash_builtin::exec("declare", {"+F", "foo", "bar", "test"}, test_output3, cerr, cin, walker));
+  EXPECT_EQ("", test_output3.str());
+
+  stringstream test_output4;
+  EXPECT_EQ(0, cppbash_builtin::exec("declare", {"-F"}, test_output3, cerr, cin, walker));
+  EXPECT_EQ("declare -f bar\ndeclare -f foo\n", test_output3.str());
+}
+
 #define TEST_DECLARE(name, expected, ...) \
 	TEST(declare_builtin_test, name) { test_declare(expected, {__VA_ARGS__}); }
 
 TEST_DECLARE(_a, "declare -a is not supported yet\n", "-a", "world")
 TEST_DECLARE(_A, "declare -A is not supported yet\n", "-A", "world")
 TEST_DECLARE(_f, "declare -f is not supported yet\n", "-f", "world")
-TEST_DECLARE(_F, "declare -F is not supported yet\n", "-F", "world")
 TEST_DECLARE(_i, "declare -i is not supported yet\n", "-i", "world")
 TEST_DECLARE(_l, "declare -l is not supported yet\n", "-l", "world")
 TEST_DECLARE(_r, "declare -r is not supported yet\n", "-r", "world")
@@ -57,7 +81,6 @@ TEST_DECLARE(_p, "declare -p is not supported yet\n", "-p", "world")
 TEST_DECLARE(pa, "declare +a is not supported yet\n", "+a", "world")
 TEST_DECLARE(pA, "declare +A is not supported yet\n", "+A", "world")
 TEST_DECLARE(pf, "declare +f is not supported yet\n", "+f", "world")
-TEST_DECLARE(pF, "declare +F is not supported yet\n", "+F", "world")
 TEST_DECLARE(pi, "declare +i is not supported yet\n", "+i", "world")
 TEST_DECLARE(pl, "declare +l is not supported yet\n", "+l", "world")
 TEST_DECLARE(pr, "declare +r is not supported yet\n", "+r", "world")
