@@ -193,6 +193,7 @@ libcppbash_la_SOURCES = src/common.h \
 						$(GENERATED_PARSER_C) \
 						$(GENERATED_PARSER_H) \
 						src/core/interpreter_exception.h \
+						src/core/unset_exception.h \
 						src/core/interpreter.cpp \
 						src/core/interpreter.h \
 						src/core/symbols.hpp \

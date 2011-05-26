@@ -22,8 +22,6 @@
 /// \brief implementations for bash interpreter (visitor pattern).
 ///
 
-#include "core/interpreter.h"
-
 #include <cctype>
 
 #include <functional>
@@ -37,7 +35,10 @@
 #include <boost/range/adaptor/map.hpp>
 #include <boost/range/algorithm/copy.hpp>
 
+#include "core/unset_exception.h"
 #include "libbashWalker.h"
+
+#include "core/interpreter.h"
 
 interpreter::interpreter(): out(&std::cout), err(&std::cerr), in(&std::cin), bash_options(
     {
@@ -341,25 +342,56 @@ void interpreter::get_all_function_names(std::vector<std::string>& function_name
   boost::copy(functions | boost::adaptors::map_keys, back_inserter(function_names));
 }
 
+namespace
+{
+  void check_unset_positional(const std::string& name)
+  {
+    // Unsetting positional parameters is not allowed
+    if(isdigit(name[0]))
+      throw unset_exception("unset: not a valid identifier");
+  }
+}
+
 void interpreter::unset(const std::string& name)
 {
-  auto iter = members.find(name);
-  if(iter == members.end())
-    return;
-  else if(iter->second->is_readonly())
-    throw interpreter_exception("Can't unset readonly variable " + name);
-  else
-    members.erase(name);
+  check_unset_positional(name);
+
+  auto unsetter = [&](scope& frame) -> bool {
+    auto iter_local = frame.find(name);
+    if(iter_local != frame.end())
+    {
+      if(iter_local->second->is_readonly())
+        throw unset_exception("unset a readonly variable");
+      frame.erase(iter_local);
+      return true;
+    }
+    return false;
+  };
+
+  if(std::none_of(local_members.rbegin(), local_members.rend(), unsetter))
+    unsetter(members);
+}
+
+// We need to return false when unsetting readonly functions in future
+void interpreter::unset_function(const std::string& name)
+{
+  auto function = functions.find(name);
+  if(function != functions.end())
+    functions.erase(name);
 }
 
 void interpreter::unset(const std::string& name,
                         const unsigned index)
 {
-  auto iter = members.find(name);
-  if(iter == members.end())
-    return;
-  else
-    iter->second->unset_value(index);
+  check_unset_positional(name);
+
+  auto var = resolve_variable(name);
+  if(var)
+  {
+    if(var->is_readonly())
+      throw unset_exception("unset a readonly variable");
+    var->unset_value(index);
+  }
 }
 
 bool interpreter::get_option(const std::string& name) const

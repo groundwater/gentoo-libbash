@@ -25,6 +25,7 @@
 #include <gtest/gtest.h>
 
 #include "core/interpreter.h"
+#include "core/unset_exception.h"
 
 using namespace std;
 
@@ -143,31 +144,71 @@ TEST(interpreter, get_array_values)
   EXPECT_FALSE(walker.resolve_array("undefined", array_values));
 }
 
-TEST(interpreter, unset_values)
+TEST(interpreter, unset_arrays)
 {
   interpreter walker;
   std::map<int, std::string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
   walker.define("array", values);
   walker.define("ro_array", values, true);
-  walker.define("var", "123");
-  walker.define("ro_var", "123", true);
+  interpreter::local_scope temp_scope(walker);
+  values[0] = "local";
+  walker.define_local("array", values);
+  walker.define_local("ro_local_array", values, true);
 
+  // unset arrays
+  EXPECT_STREQ("local", walker.resolve<string>("array", 0).c_str());
+  // unset local
+  walker.unset("array", 0);
+  EXPECT_STREQ("", walker.resolve<string>("array", 0).c_str());
+  // unset local
+  walker.unset("array");
+  // resolve to global
+  EXPECT_STREQ("1", walker.resolve<string>("array", 0).c_str());
   EXPECT_STREQ("2", walker.resolve<string>("array", 1).c_str());
-  walker.unset("array", 1);
-  EXPECT_STREQ("", walker.resolve<string>("array", 1).c_str());
+  EXPECT_STREQ("3", walker.resolve<string>("array", 2).c_str());
+  // unset global
   walker.unset("array");
   EXPECT_STREQ("", walker.resolve<string>("array", 0).c_str());
   EXPECT_STREQ("", walker.resolve<string>("array", 1).c_str());
   EXPECT_STREQ("", walker.resolve<string>("array", 2).c_str());
+  walker.unset("array");
 
-  EXPECT_THROW(walker.unset("ro_array", 1), interpreter_exception);
-  EXPECT_THROW(walker.unset("ro_array"), interpreter_exception);
+  EXPECT_THROW(walker.unset("ro_array", 1), unset_exception);
+  EXPECT_THROW(walker.unset("ro_local_array", 1), unset_exception);
+  EXPECT_THROW(walker.unset("ro_array"), unset_exception);
+  EXPECT_THROW(walker.unset("ro_local_array"), unset_exception);
 
+  EXPECT_THROW(walker.unset("1", 1), interpreter_exception);
+}
+
+TEST(interpreter, unset_variables)
+{
+  interpreter walker;
+  walker.define("var", "123");
+  walker.define("ro_var", "123", true);
+  interpreter::local_scope temp_scope(walker);
+  walker.define_local("var", 456);
+  walker.define_local("ro_local_var", 456, true);
+
+  EXPECT_STREQ("456", walker.resolve<string>("var").c_str());
+  walker.unset("var");
   EXPECT_STREQ("123", walker.resolve<string>("var").c_str());
   walker.unset("var");
   EXPECT_STREQ("", walker.resolve<string>("var").c_str());
+  walker.unset("var");
 
-  EXPECT_THROW(walker.unset("ro_var"), interpreter_exception);
+  EXPECT_THROW(walker.unset("ro_var"), unset_exception);
+  EXPECT_THROW(walker.unset("ro_local_var"), unset_exception);
+  EXPECT_THROW(walker.unset("1"), interpreter_exception);
+}
+
+TEST(interpreter, unset_functions)
+{
+  interpreter walker;
+  walker.define_function("foo", 0);
+  EXPECT_TRUE(walker.has_function("foo"));
+  walker.unset_function("foo");
+  EXPECT_FALSE(walker.has_function("foo"));
 }
 
 TEST(interperter, substring_expansion_exception)

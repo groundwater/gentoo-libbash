@@ -502,6 +502,10 @@ public:
   /// \param the name of the variable
   void unset(const std::string& name);
 
+  /// \brief unset a function
+  /// \param the name of the function
+  void unset_function(const std::string& name);
+
   /// \brief unset a array member
   /// \param the name of the array
   /// \param the index of the member
