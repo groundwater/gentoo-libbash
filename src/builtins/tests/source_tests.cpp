@@ -73,3 +73,22 @@ TEST(source_builtin_test, source_return)
   EXPECT_EQ(status, 10);
   EXPECT_TRUE(walker.is_unset_or_null("NOT_EXIST", 0));
 }
+
+TEST(source_builtin_test, invalid)
+{
+  interpreter walker;
+  EXPECT_THROW(cppbash_builtin::exec("source",
+                                     {},
+                                     std::cout,
+                                     std::cerr,
+                                     std::cin,
+                                     walker),
+               interpreter_exception);
+  int status = cppbash_builtin::exec("source",
+                                     {get_src_dir() + "/scripts/illegal_script.sh"},
+                                     std::cout,
+                                     std::cerr,
+                                     std::cin,
+                                     walker);
+  EXPECT_NE(status, 0);
+}
