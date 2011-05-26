@@ -6,6 +6,13 @@ end
 command environment
 We do not support command env before the export builtin.
 Redirection is not supported yet
+FOO006=1 in unset_outer
+FOO007= in unset_outer
+FOO006= in unset_outer
+FOO006= in global
+FOO006=0 in global
+FOO006= in global
+unset_outer
 DEFAULTED=yes
 FOO001=hello
 FOO002=Hello World

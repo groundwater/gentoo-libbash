@@ -19,3 +19,27 @@ FOO="abc" echo "command environment"
 export FOO003=1 FOO004=abc FOO005=(1 2 3) FOO002
 abc=1 export foo
 true > /dev/null
+
+function unset_inner()
+{
+    local FOO006=3 
+    unset FOO006 FOO007
+}
+function unset_outer()
+{
+    local FOO006=1 FOO007=2
+    unset_inner
+    echo "FOO006=$FOO006 in unset_outer"
+    echo "FOO007=$FOO007 in unset_outer"
+    unset FOO006
+    echo "FOO006=$FOO006 in unset_outer"
+}
+unset_outer
+echo "FOO006=$FOO006 in global"
+FOO006=0
+echo "FOO006=$FOO006 in global"
+unset FOO006
+echo "FOO006=$FOO006 in global"
+declare -F unset_outer
+unset -f unset_outer
+declare -F unset_outer

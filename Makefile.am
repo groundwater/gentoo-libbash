@@ -189,6 +189,8 @@ libcppbash_la_SOURCES = src/common.h \
 						src/builtins/let_builtin.cpp \
 						src/builtins/inherit_builtin.h \
 						src/builtins/inherit_builtin.cpp \
+						src/builtins/unset_builtin.h \
+						src/builtins/unset_builtin.cpp \
 						src/builtins/builtin_exceptions.h \
 						$(GENERATED_PARSER_C) \
 						$(GENERATED_PARSER_H) \

@@ -32,6 +32,7 @@
 #include "builtins/return_builtin.h"
 #include "builtins/shopt_builtin.h"
 #include "builtins/source_builtin.h"
+#include "builtins/unset_builtin.h"
 
 cppbash_builtin::cppbash_builtin(BUILTIN_ARGS): _out_stream(&out), _err_stream(&err), _inp_stream(&in), _walker(walker)
 {
@@ -49,6 +50,7 @@ cppbash_builtin::builtins_type& cppbash_builtin::builtins() {
       {"false", boost::factory<false_builtin*>()},
       {"return", boost::factory<return_builtin*>()},
       {"let", boost::factory<let_builtin*>()},
+      {"unset", boost::factory<unset_builtin*>()},
   });
   return *p;
 }
