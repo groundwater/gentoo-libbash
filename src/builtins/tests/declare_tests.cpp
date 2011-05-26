@@ -41,6 +41,14 @@ static void test_declare(const string& expected, std::initializer_list<string> a
   EXPECT_EQ(expected, test_output.str());
 }
 
+TEST(declare_builtin_test, invalid_arguments)
+{
+  test_declare("Arguments required for declare\n", {});
+  test_declare("Multiple arguments are not supported\n", {"-ap"});
+  test_declare("Invalid option for declare builtin\n", {"_a"});
+  test_declare("Unrecognized option for declare: -L\n", {"-L"});
+}
+
 TEST(declare_builtin_test, _F)
 {
   stringstream expression("function foo() { :; }; function bar() { :; }");
