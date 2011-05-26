@@ -26,7 +26,7 @@
 #include "core/interpreter.h"
 #include "cppbash_builtin.h"
 
-TEST(return_builtin_test, disable_extglob)
+TEST(shopt_builtin_test, disable_extglob)
 {
   interpreter walker;
   EXPECT_EQ(1, cppbash_builtin::exec("shopt", {"-u", "not exist"}, std::cout, std::cerr, std::cin, walker));
@@ -37,7 +37,7 @@ TEST(return_builtin_test, disable_extglob)
   EXPECT_FALSE(walker.get_option("cdspell"));
 }
 
-TEST(return_builtin_test, enable_extglob)
+TEST(shopt_builtin_test, enable_extglob)
 {
   interpreter walker;
   EXPECT_EQ(1, cppbash_builtin::exec("shopt", {"-s", "not exist"}, std::cout, std::cerr, std::cin, walker));
