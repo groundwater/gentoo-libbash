@@ -17,46 +17,36 @@
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
 ///
-/// \file builtin_exceptions.h
+/// \file continue_builtin.h
 /// \author Mu Qiao
-/// \brief implementations for builtin exceptions
+/// \brief implementation for the continue builtin
 ///
+#include <boost/lexical_cast.hpp>
 
-#ifndef LIBBASH_BUILTINS_BUILTIN_EXCEPTIONS_H_
-#define LIBBASH_BUILTINS_BUILTIN_EXCEPTIONS_H_
-
-#include <stdexcept>
-
+#include "builtins/builtin_exceptions.h"
 #include "core/interpreter_exception.h"
 
-///
-/// \class return_exception
-/// \brief thrown when executing the return builtin
-///
-class return_exception: public std::runtime_error
-{
-public:
-  explicit return_exception():
-    runtime_error("return exception"){}
-};
+#include "builtins/continue_builtin.h"
 
-class continue_exception: public std::exception
+int continue_builtin::exec(const std::vector<std::string>& bash_args)
 {
-  int count;
-public:
-  explicit continue_exception(int c): count(c)
+  int nth = 1;
+
+  if(bash_args.size() > 1)
   {
-    if(c < 1)
-      throw interpreter_exception("continue: argument should be greater than or equal to 1");
+    throw interpreter_exception("continue: too many arguments");
   }
-
-  void rethrow_unless_correct_frame()
+  else if(bash_args.size() == 1)
   {
-    if(count != 1)
+    try
     {
-      --count;
-      throw *this;
+      nth = boost::lexical_cast<int>(bash_args[0]);
+    }
+    catch(boost::bad_lexical_cast& e)
+    {
+      throw interpreter_exception("continue: argument should be an integer");
     }
   }
-};
-#endif
+
+  throw continue_exception(nth);
+}

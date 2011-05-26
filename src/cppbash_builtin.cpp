@@ -25,6 +25,7 @@
 #include "cppbash_builtin.h"
 
 #include "builtins/boolean_builtins.h"
+#include "builtins/continue_builtin.h"
 #include "builtins/declare_builtin.h"
 #include "builtins/echo_builtin.h"
 #include "builtins/inherit_builtin.h"
@@ -40,6 +41,7 @@ cppbash_builtin::cppbash_builtin(BUILTIN_ARGS): _out_stream(&out), _err_stream(&
 
 cppbash_builtin::builtins_type& cppbash_builtin::builtins() {
   static boost::scoped_ptr<builtins_type> p(new builtins_type {
+      {"continue", boost::factory<continue_builtin*>()},
       {"echo", boost::factory<echo_builtin*>()},
       {"declare", boost::factory<declare_builtin*>()},
       {"source", boost::factory<source_builtin*>()},
