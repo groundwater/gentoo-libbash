@@ -79,4 +79,9 @@ TEST(libbashapi, preload)
                               variables,
                               functions);
   EXPECT_NE(0, result);
+  result = libbash::interpret(get_src_dir() + std::string("/scripts/source_true.sh"),
+                              get_src_dir() + std::string("/scripts/illegal_script.sh"),
+                              variables,
+                              functions);
+  EXPECT_NE(0, result);
 }

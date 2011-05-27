@@ -35,6 +35,7 @@ TEST(interpreter, define_resolve_int)
   walker.define("aint", 4);
   EXPECT_EQ(4, walker.resolve<int>("aint"));
   EXPECT_EQ(0, walker.resolve<int>("undefined"));
+  EXPECT_EQ(0, walker.resolve<int>(""));
 }
 
 TEST(interpreter, define_resolve_string)
@@ -43,6 +44,7 @@ TEST(interpreter, define_resolve_string)
   walker.define("astring", "hello");
   EXPECT_STREQ("hello", walker.resolve<string>("astring").c_str());
   EXPECT_STREQ("", walker.resolve<string>("undefined").c_str());
+  EXPECT_STREQ("", walker.resolve<string>("").c_str());
 }
 
 TEST(interpreter, define_resolve_array)
@@ -58,6 +60,8 @@ TEST(interpreter, define_resolve_array)
   walker.define("partial", 10, false, 8);
   EXPECT_EQ(1, walker.get_array_length("partial"));
   EXPECT_EQ(10, walker.resolve<int>("partial", 8));
+
+  EXPECT_EQ(0, walker.get_array_length("not exist"));
 }
 
 TEST(interpreter, is_unset_or_null)
@@ -211,9 +215,10 @@ TEST(interpreter, unset_functions)
   EXPECT_FALSE(walker.has_function("foo"));
 }
 
-TEST(interperter, substring_expansion_exception)
+TEST(interperter, substring_expansion)
 {
   interpreter walker;
+  EXPECT_STREQ("", walker.do_substring_expansion("@", 0, 1, 2).c_str());
   EXPECT_THROW(walker.do_substring_expansion("", 0, -1, 0), interpreter_exception);
 }
 
@@ -241,4 +246,12 @@ TEST(interpreter, bash_option)
   EXPECT_FALSE(walker.get_option("extglob"));
   walker.set_option("extglob", true);
   EXPECT_TRUE(walker.get_option("extglob"));
+}
+
+TEST(interpreter, call_function)
+{
+  interpreter walker;
+  std::vector<std::string> arguments;
+
+  EXPECT_EQ(-1, walker.call("not exist", arguments, 0, 0));
 }

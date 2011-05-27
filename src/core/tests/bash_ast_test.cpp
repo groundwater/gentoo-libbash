@@ -54,3 +54,8 @@ TEST(bash_ast, parse_arithmetics)
   interpreter walker;
   EXPECT_EQ(3, ast.interpret_with(walker, &bash_ast::walker_arithmetics));
 }
+
+TEST(bash_ast, illegal_path)
+{
+  EXPECT_THROW(bash_ast("not_exist"), interpreter_exception);
+}

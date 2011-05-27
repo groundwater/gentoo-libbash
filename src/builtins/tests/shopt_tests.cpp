@@ -26,7 +26,7 @@
 #include "core/interpreter.h"
 #include "cppbash_builtin.h"
 
-TEST(return_builtin_test, disable_extglob)
+TEST(shopt_builtin_test, disable_extglob)
 {
   interpreter walker;
   EXPECT_EQ(1, cppbash_builtin::exec("shopt", {"-u", "not exist"}, std::cout, std::cerr, std::cin, walker));
@@ -37,7 +37,7 @@ TEST(return_builtin_test, disable_extglob)
   EXPECT_FALSE(walker.get_option("cdspell"));
 }
 
-TEST(return_builtin_test, enable_extglob)
+TEST(shopt_builtin_test, enable_extglob)
 {
   interpreter walker;
   EXPECT_EQ(1, cppbash_builtin::exec("shopt", {"-s", "not exist"}, std::cout, std::cerr, std::cin, walker));
@@ -45,4 +45,20 @@ TEST(return_builtin_test, enable_extglob)
   EXPECT_EQ(0, cppbash_builtin::exec("shopt", {"-s", "autocd", "cdspell"}, std::cout, std::cerr, std::cin, walker));
   EXPECT_TRUE(walker.get_option("autocd"));
   EXPECT_TRUE(walker.get_option("cdspell"));
+}
+
+static void test_shopt_builtin(const std::string& expected, const std::vector<std::string>& args, int status)
+{
+  std::stringstream output;
+  interpreter walker;
+  EXPECT_EQ(status, cppbash_builtin::exec("shopt", args, std::cout, output, std::cin, walker));
+  EXPECT_STREQ(expected.c_str(), output.str().c_str());
+}
+
+TEST(shopt_builtin_test, invalid_argument)
+{
+  test_shopt_builtin("Arguments required for shopt\n", {}, 1);
+  test_shopt_builtin("Multiple arguments are not supported\n", {"-so"}, 1);
+  test_shopt_builtin("shopt -q is not supported yet\n", {"-q"}, 1);
+  test_shopt_builtin("Unrecognized option for shopt: -d\n", {"-d"}, 1);
 }
