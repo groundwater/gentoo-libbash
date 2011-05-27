@@ -703,7 +703,16 @@ while_expr
 			command_list(ctx);
 			if(walker->get_status() == (negate? 0 : 1))
 				break;
-			command_list(ctx);
+			try
+			{
+				command_list(ctx);
+			}
+			catch(continue_exception& e)
+			{
+				e.rethrow_unless_correct_frame();
+				SEEK(condition_index);
+				continue;
+			}
 			SEEK(condition_index);
 		}
 		// Skip the body and get out

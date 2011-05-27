@@ -54,6 +54,32 @@ do
     echo "Shouldn't print this"
 done
 
+i=0
+while [ $i != 4 ]
+do
+    i=$(( i + 1 ))
+    if [[ $i == 1 ]]; then
+        continue
+    fi
+    echo $i
+done
+
+i=0
+j=1
+while [ $i != 4 ]
+do
+    i=$(( i + 1 ))
+    
+    while [ $j == 1 ]
+    do
+        if [[ $i == 1 ]]; then
+            continue 2
+        fi
+        echo $i
+        let ++j
+    done
+done
+
 i=0;
 until [ $i == 4 ]
 do
@@ -64,6 +90,32 @@ done
 until [ $i \> 0 ]
 do
     echo "Shouldn't print this"
+done
+
+i=0
+until [ $i == 4 ]
+do
+    i=$(( i + 1 ))
+    if [[ $i == 1 ]]; then
+        continue
+    fi
+    echo $i
+done
+
+i=0
+j=1
+until [ $i == 4 ]
+do
+    i=$(( i + 1 ))
+    
+    while [ $j == 1 ]
+    do
+        if [[ $i == 1 ]]; then
+            continue 2
+        fi
+        echo $i
+        let ++j
+    done
 done
 
 a=1
