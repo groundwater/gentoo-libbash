@@ -11,6 +11,11 @@ ghi
 8
 9
 10
+bar
+2 foo
+2 bar
+3 foo
+3 bar
 1
 2
 3
@@ -37,7 +42,8 @@ yep
 case end
 a=1
 b=2
-file= foo bar 
+file=bar
 foo=ghi
 i=4
+outer=3
 target=_

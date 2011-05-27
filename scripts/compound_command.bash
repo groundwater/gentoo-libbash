@@ -23,6 +23,25 @@ do
     echo "Shouldn't print this"
 done
 
+for file in foo bar
+do
+    if [[ $file == "foo" ]]; then
+        continue
+    fi
+    echo $file
+done
+
+for outer in 1 2 3
+do
+    for file in foo bar
+    do
+        if [[ $file == "foo" && $outer == 1 ]]; then
+            continue 2
+        fi
+        echo "$outer $file"
+    done
+done
+
 i=0;
 while [ $i != 4 ]
 do

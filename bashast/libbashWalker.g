@@ -71,12 +71,13 @@ options
 	// seek to LT(2) and consume
 	static void seek_to_next_tree(plibbashWalker ctx)
 	{
-		// We start from LA(1)
-		int index = 1;
 		// Current depth of the tree we are traversing
 		int depth = 1;
 
-		for(index = 1; depth != 0; ++index)
+		// The beginning should always be ROOT DOWN ANY_TOKEN
+		// So we start from LA(4)
+		int index = 4;
+		for(; depth != 0; ++index)
 		{
 			// Go one level done if we encounter DOWN
 			if(LA(index) == DOWN)
@@ -87,7 +88,7 @@ options
 		}
 
 		// Seek to the correct offset and consume.
-		SEEK(INDEX() + index - 3);
+		SEEK(INDEX() + index - 2);
 		CONSUME();
 	}
 
@@ -614,7 +615,15 @@ for_expr
 			{
 				SEEK(commands_index);
 				walker->set_value(libbash_string, *iter);
-				command_list(ctx);
+				try
+				{
+					command_list(ctx);
+				}
+				catch(continue_exception& e)
+				{
+					e.rethrow_unless_correct_frame();
+					continue;
+				}
 			}
 		})
 	|^(CFOR {
@@ -625,11 +634,37 @@ for_expr
 			for_initilization(ctx);
 
 		condition_index = INDEX();
-		bool has_condition = (LA(1) != FOR_COND);
-		while(has_condition || for_condition(ctx))
+		bool has_condition = (LA(1) == FOR_COND);
+
+		if(has_condition)
+			seek_to_next_tree(ctx);
+		// before the body
+		seek_to_next_tree(ctx);
+		bool has_modification = (LA(1) == FOR_MOD);
+		ANTLR3_MARKER modification_index = INDEX();
+
+		SEEK(condition_index);
+
+		while(!has_condition || for_condition(ctx))
 		{
-			command_list(ctx);
-			if(LA(1) == FOR_MOD)
+			try
+			{
+				command_list(ctx);
+			}
+			catch(continue_exception& e)
+			{
+				e.rethrow_unless_correct_frame();
+
+				if(has_modification)
+				{
+					SEEK(modification_index);
+					for_modification(ctx);
+				}
+
+				SEEK(condition_index);
+				continue;
+			}
+			if(has_modification)
 				for_modification(ctx);
 			SEEK(condition_index);
 		}
