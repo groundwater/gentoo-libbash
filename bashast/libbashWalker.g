@@ -690,21 +690,21 @@ for_modification
 
 while_expr
 @declarations {
-	ANTLR3_MARKER command_index;
+	ANTLR3_MARKER condition_index;
 	bool negate;
 }
 	:^((WHILE { negate = false; } | UNTIL { negate = true; }) {
 		// omit the first DOWN token
 		SEEK(INDEX() + 1);
 
-		command_index = INDEX();
+		condition_index = INDEX();
 		while(true)
 		{
 			command_list(ctx);
 			if(walker->get_status() == (negate? 0 : 1))
 				break;
 			command_list(ctx);
-			SEEK(command_index);
+			SEEK(condition_index);
 		}
 		// Skip the body and get out
 		seek_to_next_tree(ctx);
