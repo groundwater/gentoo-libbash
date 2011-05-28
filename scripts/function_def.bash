@@ -27,20 +27,20 @@ ARRAY=(1 2 3)
 func_with_args ${ARRAY[@]} $FOO001
 func_with_args 100 $ARG2 $ARG3 $ARG4
 
-func_with_return()
+func-with-return()
 {
     return 1
     NOT_EXIST=1
 }
-func_with_return
+func-with-return
 RETURN_STATUS=$?
-func_with_return2()
+func_with-return2()
 {
     true
     return
     NOT_EXIST=1
 }
-func_with_return2
+func_with-return2
 RETURN_STATUS2=$?
 
 func_nested1() {

@@ -826,9 +826,13 @@ command_substitution returns[std::string libbash_value]
 	};
 
 function_definition returns[int placeholder]
-	:^(FUNCTION ^(STRING name) {
+@declarations {
+	std::string function_name;
+}
+	// We've already validated the function name in parser grammar so here we just use any_string to match the name.
+	:^(FUNCTION ^(STRING (libbash_string=any_string { function_name += libbash_string; })+) {
 		// Define the function with current index
-		walker->define_function($name.libbash_value, INDEX());
+		walker->define_function(function_name, INDEX());
 		// Skip the AST for function body
 		seek_to_next_tree(ctx);
 	});
