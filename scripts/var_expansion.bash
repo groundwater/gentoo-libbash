@@ -92,3 +92,7 @@ function positional_parameter_test(){
     FOO088=${*:0}
 }
 positional_parameter_test 1 2 3 4 5
+target="abc*abc"
+echo ${target/*}
+echo ${target/'*'}
+echo ${target/"*"}

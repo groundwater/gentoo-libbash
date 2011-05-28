@@ -43,3 +43,4 @@ echo "FOO006=$FOO006 in global"
 declare -F unset_outer
 unset -f unset_outer
 declare -F unset_outer
+echo '$FOO006 "abc" $(( 1 + 2 )) $(echo hi) ...'

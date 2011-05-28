@@ -191,6 +191,11 @@ string_part returns[std::string libbash_value, bool quoted]
 									$libbash_value += libbash_string;
 									$quoted = true;
 								})*)
+	|(SINGLE_QUOTED_STRING) =>
+		^(SINGLE_QUOTED_STRING (libbash_string=any_string {
+									$libbash_value += libbash_string;
+									$quoted = true;
+								})*)
 	|(ARITHMETIC_EXPRESSION) =>
 		^(ARITHMETIC_EXPRESSION value=arithmetics {
 			$libbash_value = boost::lexical_cast<std::string>(value);
@@ -276,11 +281,7 @@ basic_pattern[boost::xpressive::sregex& pattern, bool greedy, bool& do_append]
 	bool negation;
 	std::string pattern_str;
 }
-	:(DOUBLE_QUOTED_STRING) =>
-		^(DOUBLE_QUOTED_STRING (libbash_string=double_quoted_string {
-			append($pattern, as_xpr(libbash_string), do_append);
-		})*)
-	|(MATCH_ALL) => MATCH_ALL {
+	:(MATCH_ALL) => MATCH_ALL {
 		if($greedy)
 			append($pattern, *_, do_append);
 		else
@@ -309,9 +310,9 @@ basic_pattern[boost::xpressive::sregex& pattern, bool greedy, bool& do_append]
 
 		append($pattern, sregex::compile(pattern_str), do_append);
 	}
-	|(libbash_string=any_string {
-		append($pattern, as_xpr(libbash_string), do_append);
-	});
+	|string_part {
+		append($pattern, as_xpr($string_part.libbash_value), do_append);
+	};
 
 //double quoted string rule, allows expansions
 double_quoted_string returns[std::string libbash_value]

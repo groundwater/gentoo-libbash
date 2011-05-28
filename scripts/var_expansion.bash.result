@@ -1,3 +1,6 @@
+
+abcabc
+abcabc
 ARRAY=hi hello 1 2 3
 ARRAY2=hello
 EAPI=3
@@ -89,4 +92,4 @@ FOO085=1 2
 FOO086=5
 FOO087=4 5
 FOO088=filename 1 2 3 4 5
-target=abc123abc
+target=abc*abc
