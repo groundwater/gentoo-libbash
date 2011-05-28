@@ -44,3 +44,5 @@ declare -F unset_outer
 unset -f unset_outer
 declare -F unset_outer
 echo '$FOO006 "abc" $(( 1 + 2 )) $(echo hi) ...'
+echo "abc $(echo def) ghi"
+FOO008="abc $(echo def) ghi"
