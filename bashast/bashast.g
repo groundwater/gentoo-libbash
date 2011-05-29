@@ -104,7 +104,7 @@ tokens{
 	NOT_EQUALS;
 }
 
-start	:	(flcomment)? EOL* clist BLANK* (SEMIC|AMP|EOL)? -> clist;
+start	:	(flcomment)? EOL* clist BLANK* (SEMIC|AMP|EOL)? EOF -> clist;
 //Because the comment token doesn't handle the first comment in a file if it's on the first line, have a parser rule for it
 flcomment
 	:	POUND ~(EOL)* EOL;

@@ -116,7 +116,7 @@ options
 	}
 }
 
-start: list|EOF;
+start: list EOF;
 
 list: ^(LIST (logic_command_list)+);
 
