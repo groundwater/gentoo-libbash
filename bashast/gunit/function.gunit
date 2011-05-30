@@ -40,6 +40,8 @@ function:
 "function help { echo 3; } 2> /dev/null > output" OK
 "xorg-2_reconf_source() { :; }" -> (function (STRING xorg - 2 _reconf_source) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
 
+"function out() { function inner() { :; }; }" -> (function (STRING out) (CURRENT_SHELL (LIST (function (STRING inner) (CURRENT_SHELL (LIST (COMMAND (STRING :))))))))
+
 function_name:
 "xemacs-packages_src_unpack" OK
 "while" OK
