@@ -134,4 +134,5 @@ arithmetic_expansion:
 start:
 "echo $(( 3 + 2 ))" -> (LIST (COMMAND (STRING echo) (STRING (ARITHMETIC_EXPRESSION (+ 3 2)))))
 "echo $((++i))" -> (LIST (COMMAND (STRING echo) (STRING (ARITHMETIC_EXPRESSION (PRE_INCR (VAR_REF i))))))
+"echo $(( ++i ))" -> (LIST (COMMAND (STRING echo) (STRING (ARITHMETIC_EXPRESSION (PRE_INCR (VAR_REF i))))))
 "echo \"The solution is: $(( 3+2 ))\""-> (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING The   solution   is :   (ARITHMETIC_EXPRESSION (+ 3 2))))))

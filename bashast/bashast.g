@@ -554,8 +554,8 @@ explicit_arithmetic
 //the square bracket from is deprecated
 //http://permalink.gmane.org/gmane.comp.shells.bash.bugs/14479
 arithmetic_expansion
-	:	DOLLAR LLPAREN BLANK* arithmetics RRPAREN -> ^(ARITHMETIC_EXPRESSION arithmetics)
-	|	DOLLAR LSQUARE BLANK* arithmetics RSQUARE -> ^(ARITHMETIC_EXPRESSION arithmetics);
+	:	DOLLAR LLPAREN BLANK* arithmetics BLANK* RRPAREN -> ^(ARITHMETIC_EXPRESSION arithmetics)
+	|	DOLLAR LSQUARE BLANK* arithmetics BLANK* RSQUARE -> ^(ARITHMETIC_EXPRESSION arithmetics);
 
 process_substitution
 	:	(dir=LESS_THAN|dir=GREATER_THAN)LPAREN clist BLANK* RPAREN -> ^(PROCESS_SUBSTITUTION $dir clist);
