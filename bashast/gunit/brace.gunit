@@ -20,6 +20,7 @@ gunit bashast;
 
 brace_expansion:
 "{a,b}"-> (BRACE_EXP (STRING a) (STRING b))
+"{$a/$b,b}"-> (BRACE_EXP (STRING (VAR_REF a) / (VAR_REF b)) (STRING b))
 "{a,b,c}" -> (BRACE_EXP (STRING a) (STRING b) (STRING c))
 "{a..d}" -> (BRACE_EXP (.. a d))
 "{{a,b},c,d}" -> (BRACE_EXP (BRACE_EXP (STRING a) (STRING b)) (STRING c) (STRING d))
