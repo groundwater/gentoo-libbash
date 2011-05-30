@@ -109,7 +109,8 @@ fi" -> (IF_STATEMENT (if (LIST (COMMAND (STRING echo) (STRING yay2))) (LIST (COM
 "if echo yay2; then echo yay ;fi" -> (IF_STATEMENT (if (LIST (COMMAND (STRING echo) (STRING yay2))) (LIST (COMMAND (STRING echo) (STRING yay)))))
 "if echo yay2 then echo yay; fi" FAIL
 
-"if echo yay2; then
+"if echo yay2;
+then
 echo yay
 elif echo yay3; then
 echo boo

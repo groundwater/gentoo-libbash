@@ -387,7 +387,7 @@ cond_part:	brace_expansion
 	|	fname;
 //Rules for whitespace/line endings
 wspace	:	BLANK+|EOL+;
-semiel	:	BLANK* (SEMIC|EOL) BLANK*;
+semiel	:	BLANK* (SEMIC EOL?|EOL) BLANK*;
 
 //definition of word.  this is just going to grow...
 word	:	(brace_expansion) => brace_expansion
