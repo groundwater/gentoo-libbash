@@ -231,10 +231,10 @@ case_pattern
 	|	fname
 	|	TIMES;
 //A grouping of commands executed in a subshell
-subshell:	LPAREN wspace? clist (BLANK* SEMIC)? (BLANK* EOL)* BLANK* RPAREN -> ^(SUBSHELL clist);
+subshell:	LPAREN wspace? clist (BLANK* SEMIC)? (BLANK* EOL)* BLANK* RPAREN redirect* -> ^(SUBSHELL clist redirect*);
 //A grouping of commands executed in the current shell
 current_shell
-	:	LBRACE wspace clist semiel wspace* RBRACE -> ^(CURRENT_SHELL clist);
+	:	LBRACE wspace clist semiel wspace* RBRACE redirect* -> ^(CURRENT_SHELL clist redirect*);
 //comparison using arithmetic
 arith_comparison
 	:	LLPAREN wspace? arithmetic wspace? RRPAREN -> ^(COMPOUND_ARITH arithmetic);
@@ -560,8 +560,8 @@ arithmetic_expansion
 process_substitution
 	:	(dir=LESS_THAN|dir=GREATER_THAN)LPAREN clist BLANK* RPAREN -> ^(PROCESS_SUBSTITUTION $dir clist);
 //the biggie: functions
-function:	FUNCTION BLANK+ function_name ((BLANK* parens wspace*)|wspace) compound_command redirect* -> ^(FUNCTION ^(STRING function_name) compound_command redirect*)
-	|	function_name BLANK* parens wspace* compound_command redirect* -> ^(FUNCTION["function"] ^(STRING function_name) compound_command redirect*);
+function:	FUNCTION BLANK+ function_name ((BLANK* parens wspace*)|wspace) compound_command -> ^(FUNCTION ^(STRING function_name) compound_command)
+	|	function_name BLANK* parens wspace* compound_command -> ^(FUNCTION["function"] ^(STRING function_name) compound_command);
 //http://article.gmane.org/gmane.comp.shells.bash.bugs/16424
 //the rules from bash 3.2 general.c:
 //Make sure that WORD is a valid shell identifier, i.e.

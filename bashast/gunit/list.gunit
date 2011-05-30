@@ -41,3 +41,5 @@ echo \"a b\"" -> (LIST (VARIABLE_DEFINITIONS (= a (STRING asdf))) (VARIABLE_DEFI
 "FOO='bar' ;" -> (LIST (VARIABLE_DEFINITIONS (= FOO (STRING (SINGLE_QUOTED_STRING bar)))))
 "true;
 true" -> (LIST (COMMAND (STRING true)) (COMMAND (STRING true)))
+"(echo hi > /dev/null) >> 1" -> (LIST (SUBSHELL (LIST (COMMAND (STRING echo) (STRING hi) (REDIR > (STRING / dev / null)))) (REDIR >> 1)))
+"{ echo hi > /dev/null; } >> 1" -> (LIST (CURRENT_SHELL (LIST (COMMAND (STRING echo) (STRING hi) (REDIR > (STRING / dev / null)))) (REDIR >> 1)))
