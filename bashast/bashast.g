@@ -266,6 +266,7 @@ var_ref
 	|	DOLLAR POUND -> ^(VAR_REF POUND)
 	|	DOLLAR QMARK -> ^(VAR_REF QMARK)
 	|	DOLLAR MINUS -> ^(VAR_REF MINUS)
+	|	DOLLAR DOLLAR -> ^(VAR_REF DOLLAR)
 	|	DOLLAR BANG -> ^(VAR_REF BANG);
 //Variable expansions
 var_exp	:	var_name (
@@ -317,6 +318,7 @@ var_name
 	:	num
 	|	var_name_no_digit
 	|	TIMES
+	|	DOLLAR
 	|	AT;
 //Inside arithmetic we can't allow digits
 var_name_no_digit
