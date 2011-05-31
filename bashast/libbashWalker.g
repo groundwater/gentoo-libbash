@@ -124,7 +124,7 @@ variable_definitions
 @declarations {
 	bool local = false;
 }
-	:^(VARIABLE_DEFINITIONS (LOCAL { local = true; })? var_def[local]+);
+	:^(VARIABLE_DEFINITIONS (LOCAL { local = true; })? var_def[local]*);
 
 name_base returns[std::string libbash_value]
 	:NAME { $libbash_value = walker->get_string($NAME); }

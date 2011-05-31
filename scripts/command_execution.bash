@@ -17,6 +17,7 @@ echo "end"
 : ${DEFAULTED:="yes"}
 FOO="abc" echo "command environment"
 export FOO003=1 FOO004=abc FOO005=(1 2 3) FOO002
+export foo
 abc=1 export foo
 true > /dev/null
 
