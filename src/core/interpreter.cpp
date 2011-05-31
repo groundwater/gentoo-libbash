@@ -24,6 +24,7 @@
 #include <cctype>
 
 #include <functional>
+#include <limits>
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/join.hpp>
@@ -94,8 +95,9 @@ std::string interpreter::get_string(pANTLR3_BASE_TREE node)
     return "";
   // Use reinterpret_cast here because we have to cast C code.
   // The real type here is int64_t which is used as a pointer.
+  // token->stop - token->start + 1 should be bigger than 0.
   return std::string(reinterpret_cast<const char *>(token->start),
-                     token->stop - token->start + 1);
+                     boost::numeric_cast<unsigned>(token->stop - token->start + 1));
 }
 
 std::shared_ptr<variable> interpreter::resolve_variable(const std::string& name) const
@@ -139,16 +141,17 @@ bool interpreter::is_unset_or_null(const std::string& name,
 // This method temporarily supports array offset expansion for $* and $@.
 // That logic will be refactored and applied to normal array variables in future.
 std::string interpreter::get_substring(const std::string& name,
-                                       int offset,
-                                       int length,
+                                       long long offset,
+                                       unsigned length,
                                        const unsigned index) const
 {
   if(name != "*" && name != "@")
   {
     std::string value = resolve<std::string>(name, index);
-    if(!get_real_offset(offset, value.size()))
+    if(!get_real_offset(offset, boost::numeric_cast<unsigned>(value.size())))
       return "";
-    return value.substr(offset, length);
+    // After get_real_offset, we know offset can be cast to unsigned.
+    return value.substr(boost::numeric_cast<std::string::size_type>(offset), length);
   }
   else
   {
@@ -159,15 +162,18 @@ std::string interpreter::get_substring(const std::string& name,
     else if(offset == 0)
       // Need to replace this with the real script name
       array.push_back("filename");
-    if(resolve_array(name, array) && get_real_offset(offset, array.size()))
+    // We do not support arrays that have size bigger than numeric_limits<unsigned>::max()
+    if(resolve_array(name, array) && get_real_offset(offset, boost::numeric_cast<unsigned>(array.size())))
     {
-      int max_length = array.size() - offset;
-      if(length == -1 || length > max_length)
+      // We do not support arrays that have size bigger than numeric_limits<unsigned>::max()
+      // After get_real_offset, we know offset can be cast to unsigned.
+      unsigned max_length = boost::numeric_cast<unsigned>(array.size()) - boost::numeric_cast<unsigned>(offset);
+      if(length > max_length)
         length = max_length;
-      return boost::algorithm::join(
-          std::vector<std::string>(array.begin() + offset,
-                                   array.begin() + offset + length),
-          resolve<std::string>("IFS").substr(0, 1));
+
+      auto start = array.begin() + boost::numeric_cast<std::vector<std::string>::difference_type>(offset);
+      auto end = array.begin() + boost::numeric_cast<std::vector<std::string>::difference_type>(offset + length);
+      return boost::algorithm::join(std::vector<std::string>(start, end), resolve<std::string>("IFS").substr(0, 1));
     }
     else
       return "";
@@ -175,21 +181,21 @@ std::string interpreter::get_substring(const std::string& name,
 }
 
 const std::string interpreter::do_substring_expansion(const std::string& name,
-                                                      int offset,
+                                                      long long offset,
                                                       const unsigned index) const
 {
-  return get_substring(name, offset, -1, index);
+  return get_substring(name, offset, std::numeric_limits<unsigned>::max(), index);
 }
 
 const std::string interpreter::do_substring_expansion(const std::string& name,
-                                                      int offset,
+                                                      long long offset,
                                                       int length,
                                                       const unsigned index) const
 {
   if(length < 0)
     throw interpreter_exception("length of substring expression should be greater or equal to zero");
 
-  return get_substring(name, offset, length, index);
+  return get_substring(name, offset, boost::numeric_cast<unsigned>(length), index);
 }
 
 std::string interpreter::do_replace_expansion(const std::string& name,
@@ -201,7 +207,7 @@ std::string interpreter::do_replace_expansion(const std::string& name,
   return value;
 }
 
-unsigned interpreter::get_length(const std::string& name,
+std::string::size_type interpreter::get_length(const std::string& name,
                                  const unsigned index) const
 {
   auto i = members.find(name);
@@ -210,7 +216,7 @@ unsigned interpreter::get_length(const std::string& name,
   return i->second->get_length(index);
 }
 
-unsigned interpreter::get_array_length(const std::string& name) const
+variable::size_type interpreter::get_array_length(const std::string& name) const
 {
   auto i = members.find(name);
   if(i == members.end())
@@ -262,7 +268,7 @@ void interpreter::split_word(const std::string& word, std::vector<std::string>& 
 void interpreter::define_function_arguments(scope& current_stack,
                                             const std::vector<std::string>& arguments)
 {
-  std::map<int, std::string> positional_args;
+  std::map<unsigned, std::string> positional_args;
 
   for(auto i = 0u; i != arguments.size(); ++i)
   {
@@ -293,7 +299,8 @@ int interpreter::call(const std::string& name,
   // Saving current index
   ANTLR3_MARKER curr = ISTREAM->index(ISTREAM);
   // Push function index into INPUT
-  INPUT->push(INPUT, func_index);
+  // The actual type of ANTLR3_MARKER is ANTLR3_INT32
+  INPUT->push(INPUT, boost::numeric_cast<ANTLR3_INT32>(func_index));
   // Execute function body
   f(ctx);
   // Reset to the previous index
@@ -410,4 +417,12 @@ void interpreter::set_option(const std::string& name, bool value)
     throw interpreter_exception("Invalid bash option");
 
   iter->second = value;
+}
+
+int interpreter::exp(int left, int right)
+{
+  int init = 1;
+  while(right--)
+    init *= left;
+  return init;
 }

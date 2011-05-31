@@ -150,7 +150,7 @@ options{ k=1; }
 
 var_def[bool local]
 @declarations {
-	std::map<int, std::string> values;
+	std::map<unsigned, std::string> values;
 	unsigned index = 0;
 }
 	:^(EQUALS name string_expr?) {

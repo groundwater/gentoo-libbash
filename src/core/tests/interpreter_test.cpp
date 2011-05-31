@@ -49,7 +49,7 @@ TEST(interpreter, define_resolve_string)
 TEST(interpreter, define_resolve_array)
 {
   interpreter walker;
-  std::map<int, std::string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
+  std::map<unsigned, std::string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
   walker.define("array", values);
   EXPECT_STREQ("1", walker.resolve<string>("array", 0).c_str());
   EXPECT_STREQ("2", walker.resolve<string>("array", 1).c_str());
@@ -71,7 +71,7 @@ TEST(interpreter, is_unset_or_null)
   walker.define("foo", "hello", false, true);
   EXPECT_TRUE(walker.is_unset_or_null("foo", 0));
 
-  std::map<int, std::string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
+  std::map<unsigned, std::string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
   walker.define("bar", values);
   EXPECT_FALSE(walker.is_unset_or_null("bar", 0));
   EXPECT_FALSE(walker.is_unset_or_null("bar", 1));
@@ -120,7 +120,7 @@ TEST(interpreter, set_string_value)
 TEST(interpreter, set_array_value)
 {
   interpreter walker;
-  std::map<int, std::string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
+  std::map<unsigned, std::string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
   walker.define("array", values);
   EXPECT_STREQ("2", walker.set_value<string>("array", "2", 0).c_str());
   EXPECT_STREQ("2", walker.resolve<string>("array", 0).c_str());
@@ -136,7 +136,7 @@ TEST(interpreter, set_array_value)
 TEST(interpreter, get_array_values)
 {
   interpreter walker;
-  std::map<int, std::string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
+  std::map<unsigned, std::string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
   walker.define("array", values);
 
   std::vector<int> array_values;
@@ -150,7 +150,7 @@ TEST(interpreter, get_array_values)
 TEST(interpreter, unset_arrays)
 {
   interpreter walker;
-  std::map<int, std::string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
+  std::map<unsigned, std::string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
   walker.define("array", values);
   walker.define("ro_array", values, true);
   interpreter::local_scope temp_scope(walker);

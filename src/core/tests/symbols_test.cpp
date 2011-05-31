@@ -68,7 +68,7 @@ TEST(symbol_test, string_variable)
 
 TEST(symbol_test, array_variable)
 {
-  map<int, string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
+  map<unsigned, string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
 
   // readonly array
   variable ro_array("foo", values, true);
@@ -97,7 +97,7 @@ TEST(symbol_test, array_variable)
 
 TEST(symbol_test, get_all_values)
 {
-  map<int, string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
+  map<unsigned, string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
   variable array("foo", values);
   vector<string> string_values;
   array.get_all_values(string_values);
@@ -131,7 +131,7 @@ TEST(symbol_test, is_null)
 
 TEST(symbol_test, is_unset)
 {
-  map<int, string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
+  map<unsigned, string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
   variable array("foo", values);
   array.unset_value(1);
   EXPECT_TRUE(array.is_unset(1));
@@ -145,7 +145,7 @@ TEST(symbol_test, get_length)
   variable an_string("bar", "hello world");
   EXPECT_EQ(11, an_string.get_length());
 
-  map<int, string> values = {{0, "1"}, {1, "2"}, {2, "hello"}};
+  map<unsigned, string> values = {{0, "1"}, {1, "2"}, {2, "hello"}};
   variable array("array", values);
   EXPECT_EQ(5, array.get_length(2));
   EXPECT_EQ(3, array.get_array_length());

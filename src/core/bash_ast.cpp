@@ -22,6 +22,8 @@
 ///
 #include <fstream>
 
+#include <boost/numeric/conversion/cast.hpp>
+
 #include "core/interpreter_exception.h"
 #include "libbashLexer.h"
 #include "libbashParser.h"
@@ -63,7 +65,8 @@ void bash_ast::init_parser(const std::string& script, const std::string& script_
 {
   input = antlr3NewAsciiStringInPlaceStream(
     reinterpret_cast<pANTLR3_UINT8>(const_cast<char*>(script.c_str())),
-    script.size(),
+    // We do not support strings longer than the max value of ANTLR3_UNIT32
+    boost::numeric_cast<ANTLR3_UINT32>(script.size()),
     NULL);
 
   if(input == NULL)
@@ -127,7 +130,7 @@ namespace
   }
 }
 
-std::string bash_ast::get_tokens(std::function<std::string(ANTLR3_INT32)> token_map)
+std::string bash_ast::get_tokens(std::function<std::string(ANTLR3_UINT32)> token_map)
 {
   std::stringstream result;
   int line_counter = 1;
@@ -138,7 +141,7 @@ std::string bash_ast::get_tokens(std::function<std::string(ANTLR3_INT32)> token_
   pANTLR3_VECTOR token_list = token_stream->getTokens(token_stream);
   unsigned token_size = token_list->size(token_list);
 
-  for(unsigned i = 0; i != token_size; ++i)
+  for(unsigned i = 0u; i != token_size; ++i)
   {
     pANTLR3_COMMON_TOKEN token = reinterpret_cast<pANTLR3_COMMON_TOKEN>
       (token_list->get(token_list, i));

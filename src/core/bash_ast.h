@@ -51,7 +51,7 @@ class bash_ast: public boost::noncopyable
   libbashParser_Ctx_struct* parser;
   pANTLR3_BASE_TREE ast;
   pANTLR3_COMMON_TREE_NODE_STREAM nodes;
-  int error_count;
+  unsigned error_count;
   std::function<pANTLR3_BASE_TREE(libbashParser_Ctx_struct*)> parse;
 
   void init_parser(const std::string& script, const std::string& script_path);
@@ -65,7 +65,7 @@ public:
 
   ~bash_ast();
 
-  int get_error_count() const
+  unsigned get_error_count() const
   {
     return error_count;
   }
@@ -102,7 +102,7 @@ public:
 
   std::string get_string_tree();
 
-  std::string get_tokens(std::function<std::string(ANTLR3_INT32)>);
+  std::string get_tokens(std::function<std::string(ANTLR3_UINT32)>);
 };
 
 #endif

@@ -223,6 +223,11 @@ libwalker_la_CXXFLAGS = -std=c++0x \
 libcppbash_la_CXXFLAGS = $(AM_CXXFLAGS) \
 						 -fvisibility=hidden \
 						 -fvisibility-inlines-hidden
+if DEVELOPER_MODE
+# Paludis cannot get compiled with these flags.
+# So we only turn them on for our library.
+libcppbash_la_CXXFLAGS += -Wconversion -Wsign-conversion
+endif
 libcppbash_la_CFLAGS = $(AM_CFLAGS) -fvisibility=hidden
 libcppbash_la_LIBADD = libwalker.la
 

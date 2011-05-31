@@ -25,6 +25,8 @@
 
 #include <fstream>
 
+#include <boost/numeric/conversion/cast.hpp>
+
 #include "core/interpreter.h"
 #include "core/bash_ast.h"
 
@@ -45,7 +47,7 @@ namespace internal
 
     bash_ast ast(path);
     ast.interpret_with(walker);
-    result += ast.get_error_count();
+    result += boost::numeric_cast<int>(ast.get_error_count());
 
     for(auto iter = walker.begin(); iter != walker.end(); ++iter)
       iter->second->get_all_values<std::string>(variables[iter->first]);
@@ -76,7 +78,7 @@ namespace libbash
     // Preloading
     bash_ast preload_ast(preload_path);
     preload_ast.interpret_with(walker);
-    int result = preload_ast.get_error_count();
+    int result = boost::numeric_cast<int>(preload_ast.get_error_count());
     if(result)
     {
       std::cerr << "Error occured while preloading" << std::endl;

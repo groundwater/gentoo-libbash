@@ -33,6 +33,7 @@
 #include <antlr3basetree.h>
 #include <boost/utility.hpp>
 #include <boost/xpressive/xpressive.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
 #include "core/symbols.hpp"
 #include "cppbash_builtin.h"
@@ -75,7 +76,7 @@ class interpreter: public boost::noncopyable
   /// \param[in,out] a value/result argument referring to offset
   /// \param[in] the original string
   /// \return whether the real offset is in legal range
-  bool get_real_offset(int& offset, const int size) const
+  bool get_real_offset(long long& offset, const unsigned size) const
   {
     offset = (offset >= 0? offset : size + offset);
     return !(offset < 0 || offset >= size);
@@ -91,8 +92,8 @@ class interpreter: public boost::noncopyable
                                  const std::vector<std::string>& arguments);
 
   std::string get_substring(const std::string& name,
-                            int offset,
-                            int length,
+                            long long offset,
+                            unsigned length,
                             const unsigned index) const;
 public:
 
@@ -334,10 +335,7 @@ public:
   /// \param the first operand
   /// \param the second operand
   /// \return the calculated result
-  static int exp(int left, int right)
-  {
-    return pow(left, right);
-  }
+  static int exp(int left, int right);
 
   /// \brief perform logic negation
   /// \param the first operand
@@ -618,7 +616,7 @@ public:
   /// \param the offset of the substring
   /// \return the expansion result
   const std::string do_substring_expansion(const std::string& name,
-                                           int offset,
+                                           long long offset,
                                            const unsigned index) const;
 
   /// \brief perform substring expansion
@@ -626,7 +624,7 @@ public:
   /// \param the length of the substring
   /// \return the expansion result
   const std::string do_substring_expansion(const std::string& name,
-                                           int offset,
+                                           long long offset,
                                            int length,
                                            const unsigned index) const;
 
@@ -642,12 +640,12 @@ public:
   /// \brief get the length of a string variable
   /// \param the name of the variable
   /// \return the length
-  unsigned get_length(const std::string& name, const unsigned index=0) const;
+  std::string::size_type get_length(const std::string& name, const unsigned index=0) const;
 
   /// \brief get the length of an array
   /// \param the name of the array
   /// \return the length of the array
-  unsigned get_array_length(const std::string& name) const;
+  variable::size_type get_array_length(const std::string& name) const;
 
   /// \brief get all array elements concatenated by space
   /// \param the name of the array

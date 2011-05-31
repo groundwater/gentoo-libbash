@@ -118,13 +118,15 @@ class variable
   /// \brief actual value of the variable. We put string in front of int
   ///        because we want "" as default string value; Otherwise we
   ///        will get "0".
-  std::map<int, boost::variant<std::string, int>> value;
+  std::map<unsigned, boost::variant<std::string, int>> value;
 
   /// \var private::readonly
   /// \brief whether the variable is readonly
   bool readonly;
 
 public:
+  typedef std::map<unsigned, boost::variant<std::string, int>>::size_type size_type;
+
   /// \brief retrieve variable name
   /// \return const string value of variable name
   const std::string& get_name() const
@@ -197,14 +199,14 @@ public:
   /// \brief get the length of a variable
   /// \param the index of the variable, use 0 if it's not an array
   /// \return the length of the variable
-  unsigned get_length(const unsigned index=0) const
+  std::string::size_type get_length(const unsigned index=0) const
   {
     return get_value<std::string>(index).size();
   }
 
   /// \brief get the length of an array variable
   /// \return the length of the array
-  unsigned get_array_length() const
+  size_type get_array_length() const
   {
     return value.size();
   }
@@ -234,7 +236,7 @@ public:
 // specialization for arrays
 template <>
 inline variable::variable<>(const std::string& name,
-                            const std::map<int, std::string>& v,
+                            const std::map<unsigned, std::string>& v,
                             bool ro,
                             unsigned)
     : name(name), value(v.begin(), v.end()), readonly(ro)
