@@ -93,6 +93,11 @@ void write_metadata(std::ostream& output,
                  value,
                  boost::is_any_of(" \t\n"),
                  boost::token_compress_on);
+
+    // INHERITED eclasses should be sorted
+    if(*iter_name == "INHERITED")
+      sort(splitted_value.begin(), splitted_value.end());
+
     using namespace boost::spirit::karma;
     output << format(string % ' ', splitted_value) << std::endl;
   }
