@@ -551,6 +551,9 @@ cond_expr
 	|^(KEYWORD_TEST status=keyword_condition) { walker->set_status(!status); };
 
 common_condition returns[bool status]
+@declarations {
+	boost::xpressive::sregex pattern;
+}
 	// -eq, -ne, -lt, -le, -gt, or -ge for arithmetic. -nt -ot -ef for files
 	:^(NAME left_str=string_expr right_str=string_expr) {
 		$status = internal::test_binary(walker->get_string($NAME), left_str.libbash_value, right_str.libbash_value);
@@ -560,13 +563,19 @@ common_condition returns[bool status]
 		$status = internal::test_unary(*reinterpret_cast<const char *>(op->getToken(op)->start),
 		                               $string_expr.libbash_value);
 	}
-	// We do not trigger pattern matching for now
-	|^((EQUALS|MATCH_PATTERN) left_str=string_expr right_str=string_expr) {
+	|^(EQUALS left_str=string_expr right_str=string_expr) {
 		$status = left_str.libbash_value == right_str.libbash_value;
 	}
-	// We do not trigger pattern matching for now
-	|^((NOT_EQUALS|NOT_MATCH_PATTERN) left_str=string_expr right_str=string_expr) {
+	// Greedy is meaningless as we need to match the whole string
+	|^(MATCH_PATTERN left_str=string_expr bash_pattern[pattern, false]) {
+		$status = match(left_str.libbash_value, pattern);
+	}
+	|^(NOT_EQUALS left_str=string_expr right_str=string_expr) {
 		$status = left_str.libbash_value != right_str.libbash_value;
+	}
+	// Greedy is meaningless as we need to match the whole string
+	|^(NOT_MATCH_PATTERN left_str=string_expr bash_pattern[pattern, false]) {
+		$status = !match(left_str.libbash_value, pattern);
 	}
 	|^(LESS_THAN left_str=string_expr right_str=string_expr) {
 		$status = left_str.libbash_value < right_str.libbash_value;
