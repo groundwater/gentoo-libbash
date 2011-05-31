@@ -237,6 +237,7 @@ EXTRA_DIST = bashast/bashast.g \
 			 scripts/source_return.sh \
 			 scripts/illegal_script.sh \
 			 scripts/foo.eclass \
+			 scripts/bar.eclass \
 			 utils/metadata_diff.sh \
 			 utils/isolated-functions.sh \
 			 test_coverage.sh \

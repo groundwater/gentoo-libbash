@@ -7,7 +7,7 @@ http://sunpinyin.googlecode.com
 LGPL-2.1 CDDL
 SunPinyin is a SLM (Statistical Language Model) based IME
 ~amd64 ~x86
-foo
+bar foo
 abc def
 abc
 foo/bar

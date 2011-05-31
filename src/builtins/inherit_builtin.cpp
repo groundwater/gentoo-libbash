@@ -33,7 +33,7 @@
 inline void inherit_builtin::append_global(const std::string& name)
 {
     if(!_walker.is_unset_or_null(name, 0))
-      _walker.set_value("E_" + name, _walker.resolve<std::string>("E_"+name) + _walker.resolve<std::string>(name));
+      _walker.set_value("E_" + name, _walker.resolve<std::string>("E_" + name) + " " + _walker.resolve<std::string>(name));
 }
 
 inline void inherit_builtin::restore_global(const std::string& name, const std::string& value)

@@ -1,6 +1,6 @@
 EAPI="1"
 
-inherit foo
+inherit foo bar
 
 DESCRIPTION="SunPinyin is a SLM (Statistical Language Model) based IME"
 HOMEPAGE="http://sunpinyin.googlecode.com"
