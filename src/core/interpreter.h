@@ -574,9 +574,17 @@ public:
   /// \param builtin arguments
   /// \return the return value of the builtin
   int execute_builtin(const std::string& name,
-                      const std::vector<std::string>& args)
+                      const std::vector<std::string>& args,
+                      std::ostream* output=0,
+                      std::ostream* error=0,
+                      std::istream* input=0)
   {
-    return cppbash_builtin::exec(name, args, *out, *err, *in, *this);
+    return cppbash_builtin::exec(name,
+                                 args,
+                                 output == 0 ? *out : *output,
+                                 error == 0 ? *err : *error,
+                                 input == 0 ? *in : *input,
+                                 *this);
   }
 
   /// \brief perform ${parameter:−word} expansion
