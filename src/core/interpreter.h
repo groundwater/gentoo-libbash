@@ -675,6 +675,11 @@ public:
   /// \return zero unless the name is not a valid shell option
   void set_option(const std::string& name, bool value);
 
+  /// \brief evaluate arithmetic expression and return the result
+  /// \param the arithmetic expression
+  /// \return the evaluated result
+  int eval_arithmetic(const std::string& expression);
+
   /// \brief perform expansion like ${var//foo/bar}
   /// \param the value to be expanded
   /// \param the pattern used to match the value

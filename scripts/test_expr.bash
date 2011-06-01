@@ -44,3 +44,7 @@ echo $? # 0
 [[ "abc def xyz" != *"defg"* ]] && echo "true14"
 shopt -s extglob
 [[ "123" == *([[:digit:]]) ]] && echo "true15"
+i=2
+[[ i++ -gt 2 ]] && echo wrong
+[[ i++ -gt 2 ]] && echo true16
+unset i

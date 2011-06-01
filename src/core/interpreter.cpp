@@ -35,6 +35,7 @@
 #include <boost/range/adaptor/map.hpp>
 #include <boost/range/algorithm/copy.hpp>
 
+#include "core/bash_ast.h"
 #include "core/unset_exception.h"
 #include "libbashWalker.h"
 
@@ -411,4 +412,10 @@ void interpreter::set_option(const std::string& name, bool value)
     throw interpreter_exception("Invalid bash option");
 
   iter->second = value;
+}
+
+int interpreter::eval_arithmetic(const std::string& expression)
+{
+  bash_ast ast(std::stringstream(expression), &bash_ast::parser_arithmetics);
+  return ast.interpret_with(*this, &bash_ast::walker_arithmetics);
 }

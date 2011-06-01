@@ -27,6 +27,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "core/bash_ast.h"
+#include "core/interpreter.h"
 #include "core/interpreter_exception.h"
 
 #include "core/bash_condition.h"
@@ -147,7 +149,8 @@ namespace
 
 bool internal::test_binary(const std::string& op,
                            const std::string& lhs,
-                           const std::string& rhs)
+                           const std::string& rhs,
+                           interpreter& walker)
 {
   if(op.size() != 2)
     throw interpreter_exception("Unrecognized operator " + op);
@@ -163,17 +166,17 @@ bool internal::test_binary(const std::string& op,
     // We do not support arithmetic expressions inside keyword test for now.
     // So the operands can only be raw integers.
     else if(op == "eq")
-      return boost::lexical_cast<int>(lhs) == boost::lexical_cast<int>(rhs);
+      return walker.eval_arithmetic(lhs) == walker.eval_arithmetic(rhs);
     else if(op == "ne")
-      return boost::lexical_cast<int>(lhs) != boost::lexical_cast<int>(rhs);
+      return walker.eval_arithmetic(lhs) != walker.eval_arithmetic(rhs);
     else if(op == "lt")
-      return boost::lexical_cast<int>(lhs) < boost::lexical_cast<int>(rhs);
+      return walker.eval_arithmetic(lhs) < walker.eval_arithmetic(rhs);
     else if(op == "le")
-      return boost::lexical_cast<int>(lhs) <= boost::lexical_cast<int>(rhs);
+      return walker.eval_arithmetic(lhs) <= walker.eval_arithmetic(rhs);
     else if(op == "gt")
-      return boost::lexical_cast<int>(lhs) > boost::lexical_cast<int>(rhs);
+      return walker.eval_arithmetic(lhs) > walker.eval_arithmetic(rhs);
     else if(op == "ge")
-      return boost::lexical_cast<int>(lhs) >= boost::lexical_cast<int>(rhs);
+      return walker.eval_arithmetic(lhs) >= walker.eval_arithmetic(rhs);
     else
       throw interpreter_exception("Unrecognized operator " + op);
   }
