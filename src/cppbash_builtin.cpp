@@ -28,6 +28,7 @@
 #include "builtins/continue_builtin.h"
 #include "builtins/declare_builtin.h"
 #include "builtins/echo_builtin.h"
+#include "builtins/eval_builtin.h"
 #include "builtins/inherit_builtin.h"
 #include "builtins/let_builtin.h"
 #include "builtins/return_builtin.h"
@@ -43,6 +44,7 @@ cppbash_builtin::builtins_type& cppbash_builtin::builtins() {
   static boost::scoped_ptr<builtins_type> p(new builtins_type {
       {"continue", boost::factory<continue_builtin*>()},
       {"echo", boost::factory<echo_builtin*>()},
+      {"eval", boost::factory<eval_builtin*>()},
       {"declare", boost::factory<declare_builtin*>()},
       {"source", boost::factory<source_builtin*>()},
       {"shopt", boost::factory<shopt_builtin*>()},

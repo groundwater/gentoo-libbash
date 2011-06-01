@@ -15,6 +15,7 @@ FOO006= in global
 unset_outer
 $FOO006 "abc" $(( 1 + 2 )) $(echo hi) ...
 abc def ghi
+abc def xyz
 DEFAULTED=yes
 FOO001=hello
 FOO002=Hello World
@@ -22,3 +23,4 @@ FOO003=1
 FOO004=abc
 FOO005=1 2 3
 FOO008=abc def ghi
+FOO009=10
