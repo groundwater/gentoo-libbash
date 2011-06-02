@@ -33,6 +33,7 @@
 #include <boost/functional/factory.hpp>
 #include <boost/function.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/utility.hpp>
 
 #define BUILTIN_ARGS std::ostream &out, std::ostream &err, std::istream &in, interpreter &walker
 
@@ -41,7 +42,7 @@ class interpreter;
 /// \class cppbash_builtin
 /// \brief a virtual class to inherit builtin functions from
 ///
-class cppbash_builtin
+class cppbash_builtin: public boost::noncopyable
 {
   public:
     ///
@@ -51,9 +52,6 @@ class cppbash_builtin
     /// \param instream where to get standard input from.  Default: stdin
     ///
     explicit cppbash_builtin(BUILTIN_ARGS);
-    /// prevent copying
-    cppbash_builtin(const cppbash_builtin& ) = delete;
-    const cppbash_builtin& operator=( const cppbash_builtin& ) = delete;
 
     virtual ~cppbash_builtin() {};
     ///

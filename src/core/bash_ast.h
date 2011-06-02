@@ -33,6 +33,7 @@
 #include <vector>
 
 #include <antlr3.h>
+#include <boost/utility.hpp>
 
 #include "libbashWalker.h"
 
@@ -42,7 +43,7 @@ class interpreter;
 
 /// \class bash_ast
 /// \brief a wrapper class that helps interpret from istream and string
-class bash_ast
+class bash_ast: public boost::noncopyable
 {
   pANTLR3_INPUT_STREAM input;
   std::string script;

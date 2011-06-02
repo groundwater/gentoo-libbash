@@ -32,6 +32,7 @@
 #include <string>
 
 #include <antlr3basetree.h>
+#include <boost/utility.hpp>
 #include <boost/xpressive/xpressive.hpp>
 
 #include "core/symbols.hpp"
@@ -46,7 +47,7 @@ typedef struct libbashWalker_Ctx_struct * plibbashWalker;
 /// \class interpreter
 /// \brief implementation for bash interpreter
 ///
-class interpreter
+class interpreter: public boost::noncopyable
 {
 
   /// \var private::members
