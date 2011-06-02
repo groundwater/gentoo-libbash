@@ -21,6 +21,8 @@
 /// \brief runs unit tests for post_check
 ///
 
+#include <cstdio>
+
 #include<gtest/gtest.h>
 
 ///
@@ -28,6 +30,8 @@
 ///
 int main(int argc, char* argv[])
 {
+  if(!freopen("/dev/null", "w", stderr))
+    return EXIT_FAILURE;
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
