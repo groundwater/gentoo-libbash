@@ -18,7 +18,6 @@
 */
 ///
 /// \file interpreter.cpp
-/// \author Mu Qiao
 /// \brief implementations for bash interpreter (visitor pattern).
 ///
 

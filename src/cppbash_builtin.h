@@ -18,7 +18,6 @@
 */
 ///
 /// \file cppbash_builtin.h
-/// \author Nathan Eloe
 /// \brief Base class for builtin functions in bash
 ///
 

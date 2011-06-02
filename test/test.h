@@ -18,7 +18,6 @@
    */
 ///
 /// \file test.h
-/// \author Mu Qiao
 /// \brief helper functions for tests
 ///
 #ifndef LIBBASH_TEST_H_

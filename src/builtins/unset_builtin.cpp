@@ -18,7 +18,6 @@
 */
 ///
 /// \file unset_builtin.h
-/// \author Mu Qiao
 /// \brief implementation for the unset builtin
 ///
 #include <functional>

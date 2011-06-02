@@ -19,7 +19,6 @@
 ///
 /// \file declare_tests.cpp
 /// \brief series of unit tests for declare built in
-/// \author Mu Qiao Eloe
 ///
 #include <iostream>
 #include <sstream>

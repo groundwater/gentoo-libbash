@@ -18,7 +18,6 @@
 */
 ///
 /// \file shopt_builtin.cpp
-/// \author Mu Qiao
 /// \brief implementation for the shopt builtin
 ///
 

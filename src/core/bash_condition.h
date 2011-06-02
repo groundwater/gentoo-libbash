@@ -18,7 +18,6 @@
    */
 ///
 /// \file bash_condition.h
-/// \author Mu Qiao
 /// \brief implementation for Bash Conditional Expressions
 ///
 #ifndef LIBBASH_CORE_BASH_CONDITION_H_

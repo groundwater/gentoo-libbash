@@ -18,7 +18,6 @@
 */
 ///
 /// \file interpreter_test.cpp
-/// \author Mu Qiao
 /// \brief series of unit tests for interpreter.
 ///
 

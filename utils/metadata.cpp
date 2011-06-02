@@ -18,7 +18,6 @@
    */
 ///
 /// \file metadata.cpp
-/// \author Mu Qiao
 /// \brief a helper for printing metadata content
 ///
 #include <set>

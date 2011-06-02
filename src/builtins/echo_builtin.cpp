@@ -18,7 +18,6 @@
 */
 ///
 /// \file echo_builtin.cpp
-/// \author Nathan Eloe
 /// \brief class that implements the echo builtin
 ///
 

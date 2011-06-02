@@ -18,7 +18,6 @@
 */
 ///
 /// \file common.h
-/// \author Mu Qiao
 /// \brief common macros and includes
 ///
 

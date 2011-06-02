@@ -18,7 +18,6 @@
 */
 ///
 /// \file bash_ast.cpp
-/// \author Mu Qiao
 /// \brief a wrapper class that helps interpret from istream and string
 ///
 #include <fstream>

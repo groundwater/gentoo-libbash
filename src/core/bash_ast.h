@@ -18,7 +18,6 @@
 */
 ///
 /// \file bash_ast.h
-/// \author Mu Qiao
 /// \brief a class that helps interpret from istream and string
 ///
 

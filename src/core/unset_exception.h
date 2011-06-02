@@ -18,7 +18,6 @@
 */
 ///
 /// \file unset_exception.h
-/// \author Mu Qiao
 /// \brief implementation for unset_exception
 ///
 

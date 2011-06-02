@@ -18,7 +18,6 @@
 */
 ///
 /// \file source_builtin.h
-/// \author Mu Qiao
 /// \brief class that implements the source builtin
 ///
 

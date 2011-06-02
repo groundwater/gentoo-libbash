@@ -18,7 +18,6 @@
 */
 ///
 /// \file libbash.h
-/// \author Mu Qiao
 /// \brief public interface for libbash
 ///
 

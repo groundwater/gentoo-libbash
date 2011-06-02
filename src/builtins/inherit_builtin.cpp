@@ -18,7 +18,6 @@
 */
 ///
 /// \file inherit_builtin.cpp
-/// \author Mu Qiao
 /// \brief class that implements the inherit builtin
 ///
 

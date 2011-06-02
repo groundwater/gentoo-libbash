@@ -18,7 +18,6 @@
 */
 ///
 /// \file continue_builtin.h
-/// \author Mu Qiao
 /// \brief implementation for the continue builtin
 ///
 #include <boost/lexical_cast.hpp>

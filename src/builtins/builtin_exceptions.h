@@ -18,7 +18,6 @@
 */
 ///
 /// \file builtin_exceptions.h
-/// \author Mu Qiao
 /// \brief implementations for builtin exceptions
 ///
 

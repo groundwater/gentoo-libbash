@@ -18,7 +18,6 @@
 */
 ///
 /// \file return_builtin.h
-/// \author Mu Qiao
 /// \brief implementation for the return builtin
 ///
 

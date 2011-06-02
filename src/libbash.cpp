@@ -18,7 +18,6 @@
 */
 ///
 /// \file libbash.cpp
-/// \author Mu Qiao
 /// \brief implementation for libbash interface
 ///
 

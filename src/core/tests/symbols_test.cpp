@@ -18,7 +18,6 @@
 */
 ///
 /// \file symbols_test.cpp
-/// \author Mu Qiao
 /// \brief series of unit tests for symbols and symbol table.
 ///
 

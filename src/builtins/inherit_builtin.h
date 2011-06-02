@@ -18,7 +18,6 @@
 */
 ///
 /// \file inherit_builtin.h
-/// \author Mu Qiao
 /// \brief class that implements the inherit function from Portage
 ///
 

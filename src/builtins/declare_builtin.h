@@ -18,7 +18,6 @@
 */
 ///
 /// \file declare_builtin.h
-/// \author Mu Qiao
 /// \brief class that implements the declare builtin
 ///
 

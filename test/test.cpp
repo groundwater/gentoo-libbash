@@ -18,7 +18,6 @@
    */
 ///
 /// \file test.cpp
-/// \author Mu Qiao
 /// \brief helper functions for tests
 ///
 #include <cstdlib>

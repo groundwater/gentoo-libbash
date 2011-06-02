@@ -18,7 +18,6 @@
 */
 ///
 /// \file bash_condition_test.cpp
-/// \author Mu Qiao
 /// \brief series of unit tests for interpreter.
 ///
 #include <fcntl.h>

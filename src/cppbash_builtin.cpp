@@ -18,7 +18,6 @@
 */
 ///
 /// \file cppbash_builtin.cpp
-/// \author Nathan Eloe
 /// \brief Implementation of class to inherit builtins from
 ///
 

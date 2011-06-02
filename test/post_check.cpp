@@ -18,7 +18,6 @@
 */
 ///
 /// \file post_check.cpp
-/// \author Mu Qiao
 /// \brief series of unit tests for generated source files.
 ///
 

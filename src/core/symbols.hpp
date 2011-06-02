@@ -18,7 +18,6 @@
 */
 ///
 /// \file symbols.hpp
-/// \author Mu Qiao
 /// \brief template implementation for symbols and symbol table
 ///
 

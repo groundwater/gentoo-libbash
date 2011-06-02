@@ -18,7 +18,6 @@
 */
 ///
 /// \file interpreter_exception.h
-/// \author Mu Qiao
 /// \brief implementation for interpreter_exception
 ///
 

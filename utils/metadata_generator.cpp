@@ -18,7 +18,6 @@
    */
 ///
 /// \file metadata_generator.cpp
-/// \author Mu Qiao
 /// \brief a simple utility for generating metadata
 ///
 #include <iostream>

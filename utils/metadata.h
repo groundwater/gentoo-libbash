@@ -18,7 +18,6 @@
    */
 ///
 /// \file metadata.h
-/// \author Mu Qiao
 /// \brief a helper for printing metadata content
 ///
 #include <iostream>

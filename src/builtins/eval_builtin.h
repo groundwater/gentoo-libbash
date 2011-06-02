@@ -18,7 +18,6 @@
 */
 ///
 /// \file eval_builtin.h
-/// \author Mu Qiao
 /// \brief class that implements the eval builtin
 ///
 

@@ -18,7 +18,6 @@
    */
 ///
 /// \file bash_condition.cpp
-/// \author Mu Qiao
 /// \brief implementation for Bash Conditional Expressions
 ///
 #include <ctime>

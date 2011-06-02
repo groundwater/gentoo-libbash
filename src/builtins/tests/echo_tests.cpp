@@ -19,7 +19,6 @@
 ///
 /// \file echo_tests.cpp
 /// \brief series of unit tests for echo built in
-/// \author Nathan Eloe
 ///
 #include <iostream>
 #include <sstream>

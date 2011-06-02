@@ -18,7 +18,6 @@
 */
 ///
 /// \file let_builtin.h
-/// \author Mu Qiao
 /// \brief implementation for the let builtin
 ///
 #include <sstream>

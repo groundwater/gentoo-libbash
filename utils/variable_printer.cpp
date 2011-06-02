@@ -18,7 +18,6 @@
 */
 ///
 /// \file variable_printer.cpp
-/// \author Mu Qiao
 /// \brief a program to write variables in a script into standard output
 ///
 
