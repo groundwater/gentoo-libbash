@@ -20,14 +20,14 @@
 /// \file metadata.cpp
 /// \brief a helper for printing metadata content
 ///
+#include "utils/metadata.h"
+
 #include <set>
 
 #include <boost/spirit/include/karma.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
-
-#include "utils/metadata.h"
 
 static const std::vector<std::string> metadata_names = {"DEPEND", "RDEPEND", "SLOT", "SRC_URI",
                                                         "RESTRICT",  "HOMEPAGE",  "LICENSE", "DESCRIPTION",

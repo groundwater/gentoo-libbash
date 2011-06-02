@@ -20,12 +20,13 @@
 /// \file let_builtin.h
 /// \brief implementation for the let builtin
 ///
+#include "builtins/let_builtin.h"
+
 #include <sstream>
 
 #include <boost/algorithm/string/join.hpp>
 
 #include "core/interpreter.h"
-#include "builtins/let_builtin.h"
 
 int let_builtin::exec(const std::vector<std::string>& bash_args)
 {

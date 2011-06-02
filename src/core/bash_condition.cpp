@@ -20,6 +20,8 @@
 /// \file bash_condition.cpp
 /// \brief implementation for Bash Conditional Expressions
 ///
+#include "core/bash_condition.h"
+
 #include <ctime>
 
 #include <boost/lexical_cast.hpp>
@@ -29,8 +31,6 @@
 #include "core/bash_ast.h"
 #include "core/interpreter.h"
 #include "core/interpreter_exception.h"
-
-#include "core/bash_condition.h"
 
 namespace
 {

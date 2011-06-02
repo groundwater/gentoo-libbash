@@ -20,6 +20,7 @@
 /// \file interpreter.cpp
 /// \brief implementations for bash interpreter (visitor pattern).
 ///
+#include "core/interpreter.h"
 
 #include <cctype>
 
@@ -38,8 +39,6 @@
 #include "core/bash_ast.h"
 #include "core/unset_exception.h"
 #include "libbashWalker.h"
-
-#include "core/interpreter.h"
 
 interpreter::interpreter(): out(&std::cout), err(&std::cerr), in(&std::cin), bash_options(
     {

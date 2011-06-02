@@ -20,12 +20,12 @@
 /// \file continue_builtin.h
 /// \brief implementation for the continue builtin
 ///
+#include "builtins/continue_builtin.h"
+
 #include <boost/lexical_cast.hpp>
 
 #include "builtins/builtin_exceptions.h"
 #include "core/interpreter_exception.h"
-
-#include "builtins/continue_builtin.h"
 
 int continue_builtin::exec(const std::vector<std::string>& bash_args)
 {

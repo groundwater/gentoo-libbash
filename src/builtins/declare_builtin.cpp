@@ -20,12 +20,12 @@
 /// \file declare_builtin.cpp
 /// \brief class that implements the declare builtin
 ///
+#include "builtins/declare_builtin.h"
+
 #include <algorithm>
 #include <iostream>
 
 #include "core/interpreter.h"
-
-#include "builtins/declare_builtin.h"
 
 int declare_builtin::exec(const std::vector<std::string>& bash_args)
 {

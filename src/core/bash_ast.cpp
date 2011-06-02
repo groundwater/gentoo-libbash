@@ -20,6 +20,8 @@
 /// \file bash_ast.cpp
 /// \brief a wrapper class that helps interpret from istream and string
 ///
+#include "core/bash_ast.h"
+
 #include <fstream>
 
 #include <boost/numeric/conversion/cast.hpp>
@@ -27,8 +29,6 @@
 #include "core/interpreter_exception.h"
 #include "libbashLexer.h"
 #include "libbashParser.h"
-
-#include "core/bash_ast.h"
 
 bash_ast::bash_ast(const std::istream& source,
                    std::function<pANTLR3_BASE_TREE(plibbashParser)> p): parse(p)

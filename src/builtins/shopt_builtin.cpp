@@ -21,11 +21,11 @@
 /// \brief implementation for the shopt builtin
 ///
 
+#include "builtins/shopt_builtin.h"
+
 #include "core/interpreter.h"
 #include "core/interpreter_exception.h"
 #include "cppbash_builtin.h"
-
-#include "builtins/shopt_builtin.h"
 
 int shopt_builtin::set_opt(const std::vector<std::string>& bash_args, bool value)
 {

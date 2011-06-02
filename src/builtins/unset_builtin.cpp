@@ -20,12 +20,12 @@
 /// \file unset_builtin.h
 /// \brief implementation for the unset builtin
 ///
+#include "builtins/unset_builtin.h"
+
 #include <functional>
 
 #include "core/interpreter.h"
 #include "core/unset_exception.h"
-
-#include "builtins/unset_builtin.h"
 
 int unset_builtin::exec(const std::vector<std::string>& bash_args)
 {
