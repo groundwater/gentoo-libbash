@@ -46,7 +46,15 @@ int main(int argc, char** argv)
 
   std::unordered_map<std::string, std::vector<std::string>> variables;
   std::vector<std::string> functions;
-  libbash::interpret(argv[1], variables, functions);
+  try
+  {
+    libbash::interpret(argv[1], variables, functions);
+  }
+  catch(interpreter_exception& e)
+  {
+    std::cerr << e.what() << std::endl;
+    return EXIT_FAILURE;
+  }
 
   std::map<std::string, std::vector<std::string>> sorted(variables.begin(), variables.end());
   // Currently we don't need internal variables

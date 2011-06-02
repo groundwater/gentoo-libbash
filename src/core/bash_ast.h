@@ -51,7 +51,6 @@ class bash_ast: public boost::noncopyable
   libbashParser_Ctx_struct* parser;
   pANTLR3_BASE_TREE ast;
   pANTLR3_COMMON_TREE_NODE_STREAM nodes;
-  unsigned error_count;
   std::function<pANTLR3_BASE_TREE(libbashParser_Ctx_struct*)> parse;
 
   void init_parser(const std::string& script, const std::string& script_path);
@@ -64,11 +63,6 @@ public:
            std::function<pANTLR3_BASE_TREE(libbashParser_Ctx_struct*)> p=parser_start);
 
   ~bash_ast();
-
-  unsigned get_error_count() const
-  {
-    return error_count;
-  }
 
   static void walker_start(plibbashWalker tree_parser);
 

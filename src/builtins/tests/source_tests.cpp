@@ -84,11 +84,11 @@ TEST(source_builtin_test, invalid)
                                      std::cin,
                                      walker),
                interpreter_exception);
-  int status = cppbash_builtin::exec("source",
+  EXPECT_THROW(cppbash_builtin::exec("source",
                                      {get_src_dir() + "/scripts/illegal_script.sh"},
                                      std::cout,
                                      std::cerr,
                                      std::cin,
-                                     walker);
-  EXPECT_NE(status, 0);
+                                     walker),
+               interpreter_exception);
 }

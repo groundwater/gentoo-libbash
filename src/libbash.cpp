@@ -37,8 +37,6 @@ namespace internal
                 std::unordered_map<std::string, std::vector<std::string>>& variables,
                 std::vector<std::string>& functions)
   {
-    int result = 0;
-
     // Initialize bash environment
     for(auto iter = variables.begin(); iter != variables.end(); ++iter)
       walker.define(iter->first, (iter->second)[0]);
@@ -47,14 +45,12 @@ namespace internal
 
     bash_ast ast(path);
     ast.interpret_with(walker);
-    result += boost::numeric_cast<int>(ast.get_error_count());
 
     for(auto iter = walker.begin(); iter != walker.end(); ++iter)
       iter->second->get_all_values<std::string>(variables[iter->first]);
     walker.get_all_function_names(functions);
 
-    result += walker.get_status();
-    return result;
+    return walker.get_status();
   }
 }
 
@@ -78,12 +74,6 @@ namespace libbash
     // Preloading
     bash_ast preload_ast(preload_path);
     preload_ast.interpret_with(walker);
-    int result = boost::numeric_cast<int>(preload_ast.get_error_count());
-    if(result)
-    {
-      std::cerr << "Error occured while preloading" << std::endl;
-      return result;
-    }
 
     return internal::interpret(walker, target_path, variables, functions);
   }

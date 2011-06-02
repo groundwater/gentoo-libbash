@@ -33,17 +33,13 @@
 
 TEST(bash_ast, parse_illegal_script)
 {
-  bash_ast ast(get_src_dir() + std::string("/scripts/illegal_script.sh"));
-  EXPECT_NE(0, ast.get_error_count());
+  EXPECT_THROW(bash_ast ast(get_src_dir() + std::string("/scripts/illegal_script.sh")), interpreter_exception);
 }
 
 TEST(bash_ast, parse_legal_script)
 {
-  bash_ast ast(get_src_dir() + std::string("/scripts/source_true.sh"));
-  EXPECT_EQ(0, ast.get_error_count());
-
-  bash_ast ast2(get_src_dir() + std::string("/scripts/source_false.sh"));
-  EXPECT_EQ(0, ast2.get_error_count());
+  bash_ast(get_src_dir() + std::string("/scripts/source_true.sh"));
+  bash_ast(get_src_dir() + std::string("/scripts/source_false.sh"));
 }
 
 TEST(bash_ast, parse_arithmetics)

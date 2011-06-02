@@ -414,7 +414,7 @@ void interpreter::set_option(const std::string& name, bool value)
 {
   auto iter = bash_options.find(name);
   if(iter == bash_options.end())
-    throw interpreter_exception("Invalid bash option");
+    throw interpreter_exception(name + " is not a valid bash option");
 
   iter->second = value;
 }

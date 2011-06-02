@@ -494,8 +494,8 @@ execute_command[const std::string& name, std::vector<std::string>& libbash_args]
 		}
 		else
 		{
-			std::cerr << name << " is not supported yet" << std::endl;
 			walker->set_status(1);
+			throw interpreter_exception(name + " is not supported yet");
 		}
 	}
 	(BANG { walker->set_status(!walker->get_status()); })?;

@@ -27,49 +27,33 @@
 #include "core/interpreter_exception.h"
 #include "cppbash_builtin.h"
 
-int shopt_builtin::set_opt(const std::vector<std::string>& bash_args, bool value)
+void shopt_builtin::set_opt(const std::vector<std::string>& bash_args, bool value)
 {
-  int result = 0;
   for(auto iter = bash_args.begin() + 1; iter != bash_args.end(); ++iter)
-  {
-    try
-    {
       _walker.set_option(*iter, value);
-    }
-    catch(interpreter_exception& e)
-    {
-      std::cerr << *iter << " is not a valid bash option" << std::endl;
-      result = 1;
-    }
-  }
-  return result;
 }
 
 int shopt_builtin::exec(const std::vector<std::string>& bash_args)
 {
   if(bash_args.empty())
-  {
-    *_err_stream << "Arguments required for shopt" << std::endl;
-    return 1;
-  }
+    throw interpreter_exception("Arguments required for shopt");
   else if(bash_args[0].size() != 2)
-  {
-    *_err_stream << "Multiple arguments are not supported" << std::endl;
-    return 1;
-  }
+    throw interpreter_exception("Multiple arguments are not supported");
 
   switch(bash_args[0][1])
   {
     case 'u':
-      return set_opt(bash_args, false);
+      set_opt(bash_args, false);
+      break;
     case 's':
-      return set_opt(bash_args, true);
+      set_opt(bash_args, true);
+      break;
     case 'q':
     case 'o':
-      *_err_stream << "shopt " << bash_args[0] << " is not supported yet" << std::endl;
-      return 1;
+      throw interpreter_exception("shopt " + bash_args[0] + " is not supported yet");
     default:
-      *_err_stream << "Unrecognized option for shopt: " << bash_args[0] << std::endl;
-      return 1;
+      throw interpreter_exception("Unrecognized option for shopt: " + bash_args[0]);
   }
+
+  return 0;
 }

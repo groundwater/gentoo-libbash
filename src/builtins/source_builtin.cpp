@@ -46,14 +46,7 @@ int source_builtin::exec(const std::vector<std::string>& bash_args)
 
   auto& stored_ast = ast_cache[path];
   if(!stored_ast)
-  {
     stored_ast.reset(new bash_ast(path));
-    if(stored_ast->get_error_count())
-    {
-      std::cerr << path << " could not be parsed properly" << std::endl;
-      return 1;
-    }
-  }
 
   const std::string& original_path = _walker.resolve<std::string>("0");
   try

@@ -40,10 +40,8 @@ TEST(libbashapi, illegal_script)
 {
   std::unordered_map<std::string, std::vector<std::string>> variables;
   std::vector<std::string> functions;
-  int result = libbash::interpret(get_src_dir() + "/scripts/illegal_script.sh",
-                                  variables,
-                                  functions);
-  EXPECT_NE(0, result);
+  EXPECT_THROW(libbash::interpret(get_src_dir() + "/scripts/illegal_script.sh", variables, functions),
+               interpreter_exception);
 }
 
 TEST(libbashapi, legal_script)
@@ -78,9 +76,10 @@ TEST(libbashapi, preload)
                               variables,
                               functions);
   EXPECT_NE(0, result);
-  result = libbash::interpret(get_src_dir() + std::string("/scripts/source_true.sh"),
-                              get_src_dir() + std::string("/scripts/illegal_script.sh"),
-                              variables,
-                              functions);
-  EXPECT_NE(0, result);
+
+  EXPECT_THROW(libbash::interpret(get_src_dir() + std::string("/scripts/source_true.sh"),
+                                  get_src_dir() + std::string("/scripts/illegal_script.sh"),
+                                  variables,
+                                  functions),
+               interpreter_exception);
 }

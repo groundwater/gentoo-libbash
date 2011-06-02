@@ -78,31 +78,20 @@ void bash_ast::init_parser(const std::string& script, const std::string& script_
 
   lexer = libbashLexerNew(input);
   if ( lexer == NULL )
-  {
-    std::cerr << "Unable to create the lexer due to malloc() failure" << std::endl;
-    error_count = 1;
-    return;
-  }
+    throw interpreter_exception("Unable to create the lexer due to malloc() failure");
 
   token_stream = antlr3CommonTokenStreamSourceNew(
       ANTLR3_SIZE_HINT, lexer->pLexer->rec->state->tokSource);
   if (token_stream == NULL)
-  {
-    std::cerr << "Out of memory trying to allocate token stream" << std::endl;
-    error_count = 1;
-    return;
-  }
+    throw interpreter_exception("Out of memory trying to allocate token stream");
 
   parser = libbashParserNew(token_stream);
   if (parser == NULL)
-  {
-    std::cerr << "Out of memory trying to allocate parser" << std::endl;
-    error_count = 1;
-    return;
-  }
+    throw interpreter_exception("Out of memory trying to allocate parser");
 
   ast = parse(parser);
-  error_count = parser->pParser->rec->getNumberOfSyntaxErrors(parser->pParser->rec);
+  if(parser->pParser->rec->getNumberOfSyntaxErrors(parser->pParser->rec))
+    throw interpreter_exception("Something wrong happened while parsing");
   nodes = antlr3CommonTreeNodeStreamNewTree(ast, ANTLR3_SIZE_HINT);
 }
 
