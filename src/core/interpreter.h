@@ -62,11 +62,11 @@ class interpreter
   ///        local variables
   std::vector<scope> local_members;
 
-  std::ostream* out;
+  std::ostream* _out;
 
-  std::ostream* err;
+  std::ostream* _err;
 
-  std::istream* in;
+  std::istream* _in;
 
   std::unordered_map<std::string, bool> bash_options;
 
@@ -163,12 +163,12 @@ public:
 
   void set_output_stream(std::ostream* stream)
   {
-    out = stream;
+    _out = stream;
   }
 
   void restore_output_stream()
   {
-    out = &std::cout;
+    _out = &std::cout;
   }
 
   /// \brief parse the text value of a tree to integer
@@ -581,9 +581,9 @@ public:
   {
     return cppbash_builtin::exec(name,
                                  args,
-                                 output == 0 ? *out : *output,
-                                 error == 0 ? *err : *error,
-                                 input == 0 ? *in : *input,
+                                 output == 0 ? *_out : *output,
+                                 error == 0 ? *_err : *error,
+                                 input == 0 ? *_in : *input,
                                  *this);
   }
 

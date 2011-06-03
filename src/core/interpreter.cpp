@@ -40,7 +40,7 @@
 
 #include "core/interpreter.h"
 
-interpreter::interpreter(): out(&std::cout), err(&std::cerr), in(&std::cin), bash_options(
+interpreter::interpreter(): _out(&std::cout), _err(&std::cerr), _in(&std::cin), bash_options(
     {
       {"autocd", false},
       {"cdable_vars", false},
