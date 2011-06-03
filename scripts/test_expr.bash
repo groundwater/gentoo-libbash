@@ -38,3 +38,13 @@ echo $? # 0
 [[ -a "/" ]] && echo "true10"
 [[ . -ef . ]] && echo "true11"
 [[ 2 -ge 2 ]] && echo "true12"
+[[ "abc def xyz" == *"def"* ]] && echo "true13"
+[[ "abc def xyz" == *"defg"* ]] && echo "wrong"
+[[ "abc def xyz" != *"def"* ]] && echo "wrong"
+[[ "abc def xyz" != *"defg"* ]] && echo "true14"
+shopt -s extglob
+[[ "123" == *([[:digit:]]) ]] && echo "true15"
+i=2
+[[ i++ -gt 2 ]] && echo wrong
+[[ i++ -gt 2 ]] && echo true16
+unset i

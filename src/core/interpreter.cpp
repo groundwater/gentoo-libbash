@@ -35,6 +35,7 @@
 #include <boost/range/adaptor/map.hpp>
 #include <boost/range/algorithm/copy.hpp>
 
+#include "core/bash_ast.h"
 #include "core/unset_exception.h"
 #include "libbashWalker.h"
 
@@ -425,4 +426,10 @@ int interpreter::exp(int left, int right)
   while(right--)
     init *= left;
   return init;
+}
+
+int interpreter::eval_arithmetic(const std::string& expression)
+{
+  bash_ast ast(std::stringstream(expression), &bash_ast::parser_arithmetics);
+  return ast.interpret_with(*this, &bash_ast::walker_arithmetics);
 }

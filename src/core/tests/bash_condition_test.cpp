@@ -30,6 +30,7 @@
 #include <gtest/gtest.h>
 
 #include "core/bash_condition.h"
+#include "core/interpreter.h"
 #include "core/interpreter_exception.h"
 
 namespace
@@ -139,45 +140,52 @@ TEST(bash_condition, string_unary_operator)
 
 TEST_F(file_test, binary_operator)
 {
-  EXPECT_TRUE(internal::test_binary("nt", negative, positive));
-  EXPECT_FALSE(internal::test_binary("ot", negative, positive));
+  interpreter walker;
+  EXPECT_TRUE(internal::test_binary("nt", negative, positive, walker));
+  EXPECT_FALSE(internal::test_binary("ot", negative, positive, walker));
 
-  EXPECT_TRUE(internal::test_binary("ot", positive, negative));
-  EXPECT_FALSE(internal::test_binary("nt", positive, negative));
+  EXPECT_TRUE(internal::test_binary("ot", positive, negative, walker));
+  EXPECT_FALSE(internal::test_binary("nt", positive, negative, walker));
 
-  EXPECT_FALSE(internal::test_binary("ot", positive, positive));
-  EXPECT_FALSE(internal::test_binary("nt", positive, positive));
+  EXPECT_FALSE(internal::test_binary("ot", positive, positive, walker));
+  EXPECT_FALSE(internal::test_binary("nt", positive, positive, walker));
 
-  EXPECT_TRUE(internal::test_binary("ef", positive, positive));
-  EXPECT_FALSE(internal::test_binary("ef", positive, negative));
-  EXPECT_FALSE(internal::test_binary("ef", "not exist", negative));
+  EXPECT_TRUE(internal::test_binary("ef", positive, positive, walker));
+  EXPECT_FALSE(internal::test_binary("ef", positive, negative, walker));
+  EXPECT_FALSE(internal::test_binary("ef", "not exist", negative, walker));
 
-  EXPECT_THROW(internal::test_binary("efd", positive, negative), interpreter_exception);
+  EXPECT_THROW(internal::test_binary("efd", positive, negative, walker), interpreter_exception);
 }
 
 TEST(bash_condition, arithmetic_operator)
 {
-  EXPECT_TRUE(internal::test_binary("eq", "1", "1"));
-  EXPECT_FALSE(internal::test_binary("eq", "2", "1"));
+  interpreter walker;
+  walker.define("foo", 1);
 
-  EXPECT_TRUE(internal::test_binary("ne", "2", "1"));
-  EXPECT_FALSE(internal::test_binary("ne", "1", "1"));
+  EXPECT_TRUE(internal::test_binary("eq", "1", "1", walker));
+  EXPECT_FALSE(internal::test_binary("eq", "2", "1", walker));
 
-  EXPECT_TRUE(internal::test_binary("lt", "0", "1"));
-  EXPECT_FALSE(internal::test_binary("lt", "1", "1"));
-  EXPECT_FALSE(internal::test_binary("lt", "2", "1"));
+  EXPECT_TRUE(internal::test_binary("ne", "2", "1", walker));
+  EXPECT_FALSE(internal::test_binary("ne", "1", "1", walker));
 
-  EXPECT_TRUE(internal::test_binary("le", "0", "1"));
-  EXPECT_TRUE(internal::test_binary("le", "1", "1"));
-  EXPECT_FALSE(internal::test_binary("le", "2", "1"));
+  EXPECT_TRUE(internal::test_binary("lt", "0", "1", walker));
+  EXPECT_FALSE(internal::test_binary("lt", "1", "1", walker));
+  EXPECT_FALSE(internal::test_binary("lt", "2", "1", walker));
 
-  EXPECT_TRUE(internal::test_binary("gt", "1", "0"));
-  EXPECT_FALSE(internal::test_binary("gt", "1", "1"));
-  EXPECT_FALSE(internal::test_binary("gt", "0", "1"));
+  EXPECT_TRUE(internal::test_binary("le", "0", "1", walker));
+  EXPECT_TRUE(internal::test_binary("le", "1", "1", walker));
+  EXPECT_FALSE(internal::test_binary("le", "2", "1", walker));
 
-  EXPECT_TRUE(internal::test_binary("ge", "1", "1"));
-  EXPECT_TRUE(internal::test_binary("ge", "2", "1"));
-  EXPECT_FALSE(internal::test_binary("ge", "0", "1"));
+  EXPECT_TRUE(internal::test_binary("gt", "1", "0", walker));
+  EXPECT_FALSE(internal::test_binary("gt", "1", "1", walker));
+  EXPECT_FALSE(internal::test_binary("gt", "0", "1", walker));
 
-  EXPECT_FALSE(internal::test_binary("ge", "blah", "1"));
+  EXPECT_TRUE(internal::test_binary("ge", "1", "1", walker));
+  EXPECT_TRUE(internal::test_binary("ge", "2", "1", walker));
+  EXPECT_FALSE(internal::test_binary("ge", "0", "1", walker));
+
+  EXPECT_FALSE(internal::test_binary("ge", "blah", "1", walker));
+
+  EXPECT_FALSE(internal::test_binary("ge", "foo++", "2", walker));
+  EXPECT_TRUE(internal::test_binary("ge", "foo++", "2", walker));
 }

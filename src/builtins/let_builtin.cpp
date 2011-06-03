@@ -23,17 +23,14 @@
 #include <sstream>
 
 #include <boost/algorithm/string/join.hpp>
-#include <boost/numeric/conversion/cast.hpp>
 
-#include "core/bash_ast.h"
-
+#include "core/interpreter.h"
 #include "builtins/let_builtin.h"
 
 int let_builtin::exec(const std::vector<std::string>& bash_args)
 {
   std::string expression(boost::algorithm::join(bash_args, " "));
-  bash_ast ast(std::stringstream(expression), &bash_ast::parser_arithmetics);
-  ast.interpret_with(_walker, &bash_ast::walker_arithmetics);
+  _walker.eval_arithmetic(expression);
 
-  return boost::numeric_cast<int>(ast.get_error_count());
+  return 0;
 }
