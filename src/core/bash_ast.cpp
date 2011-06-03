@@ -52,47 +52,38 @@ bash_ast::bash_ast(const std::string& script_path,
   init_parser(script, script_path);
 }
 
-bash_ast::~bash_ast()
-{
-  nodes->free(nodes);
-  parser->free(parser);
-  token_stream->free(token_stream);
-  lexer->free(lexer);
-  input->close(input);
-}
-
 void bash_ast::init_parser(const std::string& script, const std::string& script_path)
 {
-  input = antlr3NewAsciiStringInPlaceStream(
+  input.reset(antlr3NewAsciiStringInPlaceStream(
     reinterpret_cast<pANTLR3_UINT8>(const_cast<char*>(script.c_str())),
     // We do not support strings longer than the max value of ANTLR3_UNIT32
     boost::numeric_cast<ANTLR3_UINT32>(script.size()),
-    NULL);
+    NULL));
 
-  if(input == NULL)
+  if(!input)
     throw interpreter_exception("Unable to open file " + script + " due to malloc() failure");
 
   input->fileName = input->strFactory->newStr(
       input->strFactory,
       reinterpret_cast<pANTLR3_UINT8>(const_cast<char*>(script_path.c_str())));
 
-  lexer = libbashLexerNew(input);
-  if ( lexer == NULL )
+  lexer.reset(libbashLexerNew(input.get()));
+  if(!lexer)
     throw interpreter_exception("Unable to create the lexer due to malloc() failure");
 
-  token_stream = antlr3CommonTokenStreamSourceNew(
-      ANTLR3_SIZE_HINT, lexer->pLexer->rec->state->tokSource);
-  if (token_stream == NULL)
+  token_stream.reset(antlr3CommonTokenStreamSourceNew(
+      ANTLR3_SIZE_HINT, lexer->pLexer->rec->state->tokSource));
+  if(!token_stream)
     throw interpreter_exception("Out of memory trying to allocate token stream");
 
-  parser = libbashParserNew(token_stream);
-  if (parser == NULL)
+  parser.reset(libbashParserNew(token_stream.get()));
+  if(!parser)
     throw interpreter_exception("Out of memory trying to allocate parser");
 
-  ast = parse(parser);
+  ast = parse(parser.get());
   if(parser->pParser->rec->getNumberOfSyntaxErrors(parser->pParser->rec))
     throw interpreter_exception("Something wrong happened while parsing");
-  nodes = antlr3CommonTreeNodeStreamNewTree(ast, ANTLR3_SIZE_HINT);
+  nodes.reset(antlr3CommonTreeNodeStreamNewTree(ast, ANTLR3_SIZE_HINT));
 }
 
 std::string bash_ast::get_dot_graph()
@@ -127,7 +118,7 @@ std::string bash_ast::get_tokens(std::function<std::string(ANTLR3_UINT32)> token
   // output line number for the first line
   result << line_counter++ << "\t";
 
-  pANTLR3_VECTOR token_list = token_stream->getTokens(token_stream);
+  pANTLR3_VECTOR token_list = token_stream->getTokens(token_stream.get());
   unsigned token_size = token_list->size(token_list);
 
   for(unsigned i = 0u; i != token_size; ++i)

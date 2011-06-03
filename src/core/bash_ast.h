@@ -40,17 +40,25 @@ struct libbashLexer_Ctx_struct;
 struct libbashParser_Ctx_struct;
 class interpreter;
 
+template<typename T>
+class antlr_pointer: public std::unique_ptr<T, std::function<void(T*)>>
+{
+  typedef std::unique_ptr<T, std::function<void(T*)>> parent;
+public:
+  antlr_pointer(T* p = 0) : parent(p, [](T* to_delete) { to_delete->free(to_delete); }) {};
+};
+
 /// \class bash_ast
 /// \brief a wrapper class that helps interpret from istream and string
 class bash_ast: public boost::noncopyable
 {
-  pANTLR3_INPUT_STREAM input;
+  antlr_pointer<ANTLR3_INPUT_STREAM_struct> input;
   std::string script;
-  libbashLexer_Ctx_struct* lexer;
-  pANTLR3_COMMON_TOKEN_STREAM token_stream;
-  libbashParser_Ctx_struct* parser;
+  antlr_pointer<libbashLexer_Ctx_struct> lexer;
+  antlr_pointer<ANTLR3_COMMON_TOKEN_STREAM_struct> token_stream;
+  antlr_pointer<libbashParser_Ctx_struct> parser;
   pANTLR3_BASE_TREE ast;
-  pANTLR3_COMMON_TREE_NODE_STREAM nodes;
+  antlr_pointer<ANTLR3_COMMON_TREE_NODE_STREAM_struct> nodes;
   std::function<pANTLR3_BASE_TREE(libbashParser_Ctx_struct*)> parse;
 
   void init_parser(const std::string& script, const std::string& script_path);
@@ -61,8 +69,6 @@ public:
 
   bash_ast(const std::string& script_path,
            std::function<pANTLR3_BASE_TREE(libbashParser_Ctx_struct*)> p=parser_start);
-
-  ~bash_ast();
 
   static void walker_start(plibbashWalker tree_parser);
 
@@ -81,9 +87,7 @@ public:
   interpret_with(interpreter& walker, Functor walk)
   {
     set_interpreter(&walker);
-    std::unique_ptr<libbashWalker_Ctx_struct, std::function<void(plibbashWalker)>> p_tree_parser(
-        libbashWalkerNew(nodes),
-        [](plibbashWalker tree_parser) { tree_parser->free(tree_parser); });
+    antlr_pointer<libbashWalker_Ctx_struct> p_tree_parser(libbashWalkerNew(nodes.get()));
     return walk(p_tree_parser.get());
   }
 
