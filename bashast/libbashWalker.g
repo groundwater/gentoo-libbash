@@ -182,7 +182,7 @@ string_expr returns[std::string libbash_value, bool quoted]
 			$libbash_value += $string_part.libbash_value;
 			$quoted = $string_part.quoted;
 		}
-	)+);
+	)*);
 
 string_part returns[std::string libbash_value, bool quoted]
 @init {

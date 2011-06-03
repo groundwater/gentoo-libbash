@@ -96,3 +96,4 @@ target="abc*abc"
 echo ${target/*}
 echo ${target/'*'}
 echo ${target/"*"}
+: ${FOO089:=}

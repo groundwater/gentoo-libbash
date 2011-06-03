@@ -268,8 +268,8 @@ var_ref
 	|	DOLLAR BANG -> ^(VAR_REF BANG);
 //Variable expansions
 var_exp	:	var_name (
-				  parameter_value_operator word
-					-> ^(parameter_value_operator var_name word)
+				  parameter_value_operator parameter_word
+					-> ^(parameter_value_operator var_name parameter_word)
 				| COLON wspace* os=explicit_arithmetic (COLON len=explicit_arithmetic)?
 					-> ^(OFFSET var_name $os ^($len)?)
 				| parameter_delete_operator parameter_pattern_part+
@@ -299,6 +299,9 @@ parameter_value_operator
 	|	EQUALS -> ASSIGN_DEFAULT_WHEN_UNSET
 	|	QMARK -> DISPLAY_ERROR_WHEN_UNSET
 	|	PLUS -> USE_ALTERNATE_WHEN_UNSET;
+parameter_word
+	:	word
+	|	-> ^(STRING);
 parameter_replace_pattern
 	:	((~SLASH) => parameter_pattern_part)+ -> ^(STRING parameter_pattern_part+);
 parameter_pattern_part

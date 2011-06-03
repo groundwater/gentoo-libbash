@@ -92,4 +92,5 @@ FOO085=1 2
 FOO086=5
 FOO087=4 5
 FOO088=filename 1 2 3 4 5
+FOO089=
 target=abc*abc
