@@ -506,15 +506,14 @@ redirect
 	};
 
 redirect_destination
-	:DIGIT MINUS?
-	|string_expr //path to a file
-	|FILE_DESCRIPTOR
-	|FILE_DESCRIPTOR_MOVE;
+	:string_expr //path to a file
+	|FILE_DESCRIPTOR DIGIT
+	|FILE_DESCRIPTOR_MOVE DIGIT;
 
 redirect_operator
 	:LESS_THAN
 	|GREATER_THAN
-	|DIGIT redirect_operator;
+	|FILE_DESCRIPTOR DIGIT redirect_operator;
 
 argument[std::vector<std::string>& args]
 	: string_expr {

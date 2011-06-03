@@ -151,12 +151,11 @@ redirect:	BLANK!* here_string_op^ BLANK!* fname
 	|	BLANK* redir_op BLANK* redir_dest -> ^(REDIR redir_op redir_dest)
 	|	BLANK!* process_substitution;
 redir_dest
-	:	DIGIT MINUS?
-	|	fname //path to a file
-	|	file_desc_as_file; //handles file descriptors0
+	:	file_desc_as_file //handles file descriptors
+	|	fname; //path to a file
 file_desc_as_file
-	:	AMP DIGIT -> FILE_DESCRIPTOR[$DIGIT]
-	|	AMP DIGIT MINUS -> FILE_DESCRIPTOR_MOVE[$DIGIT];
+	:	DIGIT -> ^(FILE_DESCRIPTOR DIGIT)
+	|	DIGIT MINUS -> ^(FILE_DESCRIPTOR_MOVE DIGIT);
 heredoc	:	(fname EOL!)*;
 here_string_op
 	:	HERE_STRING_OP;
