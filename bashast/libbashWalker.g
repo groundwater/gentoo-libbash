@@ -40,6 +40,7 @@ options
 
 @postinclude{
 
+	#include <fstream>
 	#include <iostream>
 	#include <sstream>
 
@@ -466,10 +467,16 @@ simple_command
 execute_command[const std::string& name, std::vector<std::string>& libbash_args]
 @declarations {
 	interpreter::local_scope current_scope(*walker);
+	std::unique_ptr<std::ostream> out;
+	std::unique_ptr<std::ostream> err;
+	std::unique_ptr<std::istream> in;
+	bool redirection = false;
 }
-	:var_def[true]* redirect* {
+	:var_def[true]* (redirect[out, err, in]{ redirection = true; })* {
 		if(walker->has_function(name))
 		{
+			if(redirection)
+				std::cerr << "We do not support redirection for function calls." << std::endl;
 			ANTLR3_MARKER command_index = INDEX();
 			try
 			{
@@ -485,7 +492,7 @@ execute_command[const std::string& name, std::vector<std::string>& libbash_args]
 		}
 		else if(cppbash_builtin::is_builtin(name))
 		{
-			walker->set_status(walker->execute_builtin(name, libbash_args));
+			walker->set_status(walker->execute_builtin(name, libbash_args, out.get(), err.get(), in.get()));
 		}
 		else if(name == "export")
 		{
@@ -500,21 +507,44 @@ execute_command[const std::string& name, std::vector<std::string>& libbash_args]
 	}
 	(BANG { walker->set_status(!walker->get_status()); })?;
 
-redirect
-	:^(REDIR redirect_operator redirect_destination) {
+redirect[std::unique_ptr<std::ostream>& out, std::unique_ptr<std::ostream>& err, std::unique_ptr<std::istream>& in]
+	:^(REDIR LESS_THAN redirect_destination_input[in]) {
+		std::cerr << "Redirection is not supported yet" << std::endl;
+	}
+	|^(REDIR GREATER_THAN redirect_destination_output[out])
+	|^(REDIR DIGIT LESS_THAN redirect_destination_input[in]) {
+		std::cerr << "Redirection is not supported yet" << std::endl;
+	}
+	|^(REDIR DIGIT GREATER_THAN redirect_destination_output[out]) {
 		std::cerr << "Redirection is not supported yet" << std::endl;
 	};
-
-redirect_destination
-	:DIGIT MINUS?
-	|string_expr //path to a file
-	|FILE_DESCRIPTOR
-	|FILE_DESCRIPTOR_MOVE;
 
 redirect_operator
 	:LESS_THAN
 	|GREATER_THAN
-	|DIGIT redirect_operator;
+	|FILE_DESCRIPTOR DIGIT redirect_operator;
+
+redirect_destination_output[std::unique_ptr<std::ostream>& out]
+	:string_expr {
+		out.reset(new std::ofstream($string_expr.libbash_value, std::ofstream::trunc));
+	}
+	|FILE_DESCRIPTOR DIGIT {
+		std::cerr << "FILE_DESCRIPTOR redirection is not supported yet" << std::endl;
+	}
+	|FILE_DESCRIPTOR_MOVE DIGIT {
+		std::cerr << "FILE_DESCRIPTOR_MOVE redirection is not supported yet" << std::endl;
+	};
+
+redirect_destination_input[std::unique_ptr<std::istream>& in]
+	:string_expr {
+		std::cerr << "Input redirection for file is not supported yet" << std::endl;
+	}
+	|FILE_DESCRIPTOR DIGIT {
+		std::cerr << "FILE_DESCRIPTOR redirection is not supported yet" << std::endl;
+	}
+	|FILE_DESCRIPTOR_MOVE DIGIT {
+		std::cerr << "FILE_DESCRIPTOR_MOVE redirection is not supported yet" << std::endl;
+	};
 
 argument[std::vector<std::string>& args]
 	: string_expr {

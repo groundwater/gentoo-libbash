@@ -5,7 +5,6 @@ right
 end
 command environment
 We do not support command env before the export builtin.
-Redirection is not supported yet
 FOO006=1 in unset_outer
 FOO007= in unset_outer
 FOO006= in unset_outer

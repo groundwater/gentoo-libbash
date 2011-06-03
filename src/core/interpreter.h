@@ -63,11 +63,11 @@ class interpreter: public boost::noncopyable
   ///        local variables
   std::vector<scope> local_members;
 
-  std::ostream* out;
+  std::ostream* _out;
 
-  std::ostream* err;
+  std::ostream* _err;
 
-  std::istream* in;
+  std::istream* _in;
 
   std::unordered_map<std::string, bool> bash_options;
 
@@ -164,12 +164,12 @@ public:
 
   void set_output_stream(std::ostream* stream)
   {
-    out = stream;
+    _out = stream;
   }
 
   void restore_output_stream()
   {
-    out = &std::cout;
+    _out = &std::cout;
   }
 
   /// \brief parse the text value of a tree to integer
@@ -572,9 +572,17 @@ public:
   /// \param builtin arguments
   /// \return the return value of the builtin
   int execute_builtin(const std::string& name,
-                      const std::vector<std::string>& args)
+                      const std::vector<std::string>& args,
+                      std::ostream* output=0,
+                      std::ostream* error=0,
+                      std::istream* input=0)
   {
-    return cppbash_builtin::exec(name, args, *out, *err, *in, *this);
+    return cppbash_builtin::exec(name,
+                                 args,
+                                 output == 0 ? *_out : *output,
+                                 error == 0 ? *_err : *error,
+                                 input == 0 ? *_in : *input,
+                                 *this);
   }
 
   /// \brief perform ${parameter:−word} expansion
