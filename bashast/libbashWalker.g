@@ -903,6 +903,7 @@ arithmetics returns[int value]
 	|^(GEQ l=arithmetics r=arithmetics) { $value = walker->greater_equal_than(l, r); }
 	|^(LESS_THAN l=arithmetics r=arithmetics) { $value = walker->less_than(l, r); }
 	|^(GREATER_THAN l=arithmetics r=arithmetics) { $value = walker->greater_than(l, r); }
+	|^(NOT_EQUALS l=arithmetics r=arithmetics) { $value = walker->not_equal_to(l, r); }
 	|^(LSHIFT l=arithmetics r=arithmetics) { $value = walker->left_shift(l, r); }
 	|^(RSHIFT l=arithmetics r=arithmetics) { $value = walker->right_shift(l, r); }
 	|^(PLUS l=arithmetics r=arithmetics) { $value = walker->plus(l, r); }

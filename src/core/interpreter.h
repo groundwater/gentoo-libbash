@@ -267,6 +267,15 @@ public:
     return left > right;
   }
 
+  /// \brief perform not equal to
+  /// \param the first operand
+  /// \param the second operand
+  /// \return the calculated result
+  static int not_equal_to(int left, int right)
+  {
+    return left != right;
+  }
+
   /// \brief perform left shift
   /// \param the first operand
   /// \param the second operand
