@@ -111,7 +111,7 @@ flcomment
 clist
 	:	list_level_2 -> ^(LIST list_level_2);
 list_level_1
-	:	pipeline (BLANK!*(LOGICAND^|LOGICOR^)BLANK!* pipeline)*;
+	:	pipeline (BLANK!*(LOGICAND^|LOGICOR^)(BLANK!|EOL!)* pipeline)*;
 // ';' '&' and EOL have lower operator precedence than '&&' and '||' so we need level2 here
 list_level_2
 	:	list_level_1 (BLANK!? command_separator (BLANK!? EOL!)* BLANK!? list_level_1)*;
