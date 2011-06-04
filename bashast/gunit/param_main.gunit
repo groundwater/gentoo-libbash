@@ -59,7 +59,7 @@ var_ref:
 "${$}" -> (VAR_REF $)
 "${PV//./_}" -> (VAR_REF (REPLACE_ALL PV (STRING .) (STRING _)))
 "${PV// }" -> (VAR_REF (REPLACE_ALL PV (STRING  )))
-"${PV//[-._]/}" -> (VAR_REF (REPLACE_ALL PV (STRING (MATCH_ANY - . _))))
+"${PV//[-._]/}" -> (VAR_REF (REPLACE_ALL PV (STRING (MATCH_ANY - . _)) STRING))
 "${PV/${pattern}/${replace}}" -> (VAR_REF (REPLACE_FIRST PV (STRING (VAR_REF pattern)) (STRING (VAR_REF replace))))
 "${PV/#foo/bar}" -> (VAR_REF (REPLACE_AT_START PV (STRING foo) (STRING bar)))
 "${PV/%foo/bar}" -> (VAR_REF (REPLACE_AT_END PV (STRING foo) (STRING bar)))

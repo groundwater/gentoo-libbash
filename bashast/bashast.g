@@ -268,14 +268,14 @@ var_ref
 	|	DOLLAR BANG -> ^(VAR_REF BANG);
 //Variable expansions
 var_exp	:	var_name (
-				  parameter_value_operator parameter_word
-					-> ^(parameter_value_operator var_name parameter_word)
+				parameter_value_operator parameter_expansion_value
+					-> ^(parameter_value_operator var_name parameter_expansion_value)
 				| COLON wspace* os=explicit_arithmetic (COLON len=explicit_arithmetic)?
 					-> ^(OFFSET var_name $os ^($len)?)
-				| parameter_delete_operator parameter_pattern_part+
-					-> ^(parameter_delete_operator var_name ^(STRING parameter_pattern_part+))
-				| parameter_replace_operator parameter_replace_pattern (SLASH parameter_replace_string?)?
-					-> ^(parameter_replace_operator var_name parameter_replace_pattern parameter_replace_string?)
+				| parameter_delete_operator parameter_expansion_value
+					-> ^(parameter_delete_operator var_name parameter_expansion_value)
+				| parameter_replace_operator parameter_replace_pattern (SLASH parameter_expansion_value?)?
+					-> ^(parameter_replace_operator var_name parameter_replace_pattern parameter_expansion_value?)
 				| -> var_name
 			 )
 	|	BANG var_name_for_bang  (
@@ -299,15 +299,13 @@ parameter_value_operator
 	|	EQUALS -> ASSIGN_DEFAULT_WHEN_UNSET
 	|	QMARK -> DISPLAY_ERROR_WHEN_UNSET
 	|	PLUS -> USE_ALTERNATE_WHEN_UNSET;
-parameter_word
-	:	word
-	|	-> ^(STRING);
 parameter_replace_pattern
 	:	((~SLASH) => parameter_pattern_part)+ -> ^(STRING parameter_pattern_part+);
 parameter_pattern_part
 	:	fname_part|BLANK|SEMIC;
-parameter_replace_string
-	:	parameter_pattern_part+ -> ^(STRING parameter_pattern_part+);
+parameter_expansion_value
+	:	parameter_pattern_part+ -> ^(STRING parameter_pattern_part+)
+	|	-> ^(STRING);
 parameter_replace_operator
 	:	SLASH SLASH -> REPLACE_ALL
 	|	SLASH PCT -> REPLACE_AT_END

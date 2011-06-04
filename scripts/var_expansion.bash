@@ -8,7 +8,7 @@ FOO003=123
 FOO004=$EAPI
 FOO005=$(( 1+1 ))
 FOO006=${EAPI:=hello}
-FOO007=${FOO008:=hello}
+FOO007=${FOO008:=hello world}
 FOO009=${EAPI:+hello}
 FOO010=${NOT_EXIST:+hello}
 FOO011=${FOO009:0}
@@ -71,7 +71,7 @@ FOO068=${FOO039/#He/he}
 FOO069=${FOO039/#ello/i}
 FOO070=${FOO039/%ld/d}
 FOO071=${FOO039/%rl/r}
-FOO072=${FOO039/+(l)}
+FOO072=${FOO039/+(l)/}
 FOO073=${FOO039/+(l|e)}
 FOO074=${FOO039/*(l)}
 FOO075=${FOO039//*(l)}
