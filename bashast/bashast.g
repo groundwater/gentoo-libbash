@@ -521,7 +521,13 @@ times_division_modulus
 	:	exponential ((TIMES^|SLASH^|PCT^) BLANK!* exponential)*;
 addsub	:	times_division_modulus ((PLUS^|MINUS^) BLANK!* times_division_modulus)*;
 shifts	:	addsub ((LSHIFT^|RSHIFT^) BLANK!* addsub)*;
-compare	:	shifts ((LEQ^|GEQ^|LESS_THAN^|GREATER_THAN^) BLANK!* shifts)?;
+compare	:	shifts (compare_operator^ BLANK!* shifts)?;
+compare_operator
+	:	LEQ
+	|	GEQ
+	|	LESS_THAN
+	|	GREATER_THAN
+	|	BANG EQUALS -> NOT_EQUALS;
 bitwiseand
 	:	compare (AMP^ BLANK!* compare)*;
 bitwisexor
