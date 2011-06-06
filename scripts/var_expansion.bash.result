@@ -1,7 +1,9 @@
 
 abcabc
 abcabc
-ARRAY=hi hello 1 2 3
+2 3 4 5
+2 3 4
+ARRAY=1 2 3 4 5
 ARRAY2=hello
 EAPI=3
 EAPI4=4
@@ -91,6 +93,6 @@ FOO084=1 2 3 4 5
 FOO085=1 2
 FOO086=5
 FOO087=4 5
-FOO088=filename 1 2 3 4 5
+FOO088=@srcdir@/scripts/var_expansion.bash 1 2 3 4 5
 FOO089=
 target=abc*abc

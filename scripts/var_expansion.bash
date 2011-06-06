@@ -97,3 +97,6 @@ echo ${target/*}
 echo ${target/'*'}
 echo ${target/"*"}
 : ${FOO089:=}
+ARRAY=(1 2 3 4 5)
+echo ${ARRAY[@]:1}
+echo ${ARRAY[@]:1:3}

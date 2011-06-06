@@ -342,8 +342,13 @@ var_name returns[std::string libbash_value, unsigned index]
 	|name {
 		$libbash_value = $name.libbash_value;
 		$index = $name.index;
-	}
-	|TIMES { $libbash_value = "*"; };
+	};
+
+array_name returns[std::string libbash_value]
+	:^(ARRAY name (AT|TIMES)) { $libbash_value = $name.libbash_value; }
+	// We do not care the difference between TIMES and AT for now
+	|TIMES { $libbash_value = "*"; }
+	|AT { $libbash_value = "@"; };
 
 var_expansion returns[std::string libbash_value]
 @declarations {
@@ -359,6 +364,12 @@ var_expansion returns[std::string libbash_value]
 	}
 	|^(USE_ALTERNATE_WHEN_UNSET_OR_NULL var_name libbash_word=word) {
 		libbash_value = walker->do_alternate_expansion($var_name.libbash_value, libbash_word, $var_name.index);
+	}
+	|(^(OFFSET array_name arithmetics arithmetics)) => ^(OFFSET libbash_name=array_name offset=arithmetics length=arithmetics) {
+		libbash_value = walker->do_subarray_expansion(libbash_name, offset, length);
+	}
+	|(^(OFFSET array_name offset=arithmetics)) => ^(OFFSET libbash_name=array_name offset=arithmetics) {
+		libbash_value = walker->do_subarray_expansion(libbash_name, offset);
 	}
 	|(^(OFFSET var_name arithmetics arithmetics)) => ^(OFFSET var_name offset=arithmetics length=arithmetics) {
 		libbash_value = walker->do_substring_expansion($var_name.libbash_value, offset, length, $var_name.index);
@@ -432,8 +443,8 @@ var_ref [bool double_quoted] returns[std::string libbash_value]
 	|^(VAR_REF libbash_string=num) {
 		$libbash_value = walker->resolve<std::string>(libbash_string);
 	}
-	|^(VAR_REF ^(libbash_string=name_base AT)) { walker->get_all_elements(libbash_string, $libbash_value); }
-	|^(VAR_REF ^(libbash_string=name_base TIMES)) {
+	|^(VAR_REF ^(ARRAY libbash_string=name_base AT)) { walker->get_all_elements(libbash_string, $libbash_value); }
+	|^(VAR_REF ^(ARRAY libbash_string=name_base TIMES)) {
 		if(double_quoted)
 			walker->get_all_elements_IFS_joined(libbash_string, $libbash_value);
 		else
