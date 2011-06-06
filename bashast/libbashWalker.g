@@ -348,7 +348,7 @@ array_name returns[std::string libbash_value]
 	:^(ARRAY name (AT|TIMES)) { $libbash_value = $name.libbash_value; }
 	// We do not care the difference between TIMES and AT for now
 	|TIMES { $libbash_value = "*"; }
-	|AT { $libbash_value = "@"; };
+	|AT { $libbash_value = "*"; };
 
 var_expansion returns[std::string libbash_value]
 @declarations {
@@ -437,26 +437,10 @@ word returns[std::string libbash_value]
 
 //variable reference
 var_ref [bool double_quoted] returns[std::string libbash_value]
-	:^(VAR_REF name) {
-		$libbash_value = walker->resolve<std::string>($name.libbash_value, $name.index);
+	:^(VAR_REF var_name) {
+		$libbash_value = walker->resolve<std::string>($var_name.libbash_value, $var_name.index);
 	}
-	|^(VAR_REF libbash_string=num) {
-		$libbash_value = walker->resolve<std::string>(libbash_string);
-	}
-	|^(VAR_REF ^(ARRAY libbash_string=name_base AT)) { walker->get_all_elements(libbash_string, $libbash_value); }
-	|^(VAR_REF ^(ARRAY libbash_string=name_base TIMES)) {
-		if(double_quoted)
-			walker->get_all_elements_IFS_joined(libbash_string, $libbash_value);
-		else
-			walker->get_all_elements(libbash_string, $libbash_value);
-	}
-	|^(VAR_REF TIMES) {
-		if(double_quoted)
-			walker->get_all_elements_IFS_joined("*", $libbash_value);
-		else
-			walker->get_all_elements("*", $libbash_value);
-	}
-	|^(VAR_REF AT) { std::cerr << "$@ has not been implemented yet" << std::endl; }
+	|^(VAR_REF libbash_string=array_name) { walker->get_all_elements_IFS_joined(libbash_string, $libbash_value); }
 	|^(VAR_REF POUND) { std::cerr << "$# has not been implemented yet" << std::endl; }
 	|^(VAR_REF QMARK) { $libbash_value = walker->get_status<std::string>(); }
 	|^(VAR_REF MINUS) { std::cerr << "$- has not been implemented yet" << std::endl; }
