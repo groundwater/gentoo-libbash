@@ -649,19 +649,28 @@ for_expr
 		}
 		)+
 		{
-			commands_index = INDEX();
-			for(auto iter = splitted_values.begin(); iter != splitted_values.end(); ++iter)
+			if(splitted_values.empty())
 			{
-				SEEK(commands_index);
-				walker->set_value(libbash_string, *iter);
-				try
+				//skip the body
+				seek_to_next_tree(ctx);
+				walker->set_status(0);
+			}
+			else
+			{
+				commands_index = INDEX();
+				for(auto iter = splitted_values.begin(); iter != splitted_values.end(); ++iter)
 				{
-					command_list(ctx);
-				}
-				catch(continue_exception& e)
-				{
-					e.rethrow_unless_correct_frame();
-					continue;
+					SEEK(commands_index);
+					walker->set_value(libbash_string, *iter);
+					try
+					{
+						command_list(ctx);
+					}
+					catch(continue_exception& e)
+					{
+						e.rethrow_unless_correct_frame();
+						continue;
+					}
 				}
 			}
 		})

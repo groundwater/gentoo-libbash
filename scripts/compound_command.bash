@@ -8,6 +8,13 @@ do
     echo $foo
 done
 
+bar=
+# We behave differently from bash with "for foo in ''"
+for foo in $bar
+do
+    echo "Shouldn't print this"
+done
+
 for (( i=1; i<4; ++i ))
 do
     echo $i

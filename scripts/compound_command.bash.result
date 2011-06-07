@@ -50,6 +50,7 @@ yep
 case end
 a=1
 b=2
+bar=
 file=bar
 foo=ghi
 i=4
