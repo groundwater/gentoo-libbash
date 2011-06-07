@@ -280,33 +280,17 @@ void interpreter::define_function_arguments(scope& current_stack,
   define("*", positional_args);
 }
 
-int interpreter::call(const std::string& name,
-                       const std::vector<std::string>& arguments,
-                       plibbashWalker ctx,
-                       std::function<void(plibbashWalker)> f)
+void interpreter::call(const std::string& name,
+                       const std::vector<std::string>& arguments)
 {
-  ANTLR3_MARKER func_index;
-  auto iter = functions.find(name);
-  if(iter == functions.end())
-    return -1;
-  func_index = iter->second;
-
   // Prepare arguments
   define_function_arguments(local_members.back(), arguments);
 
-  auto INPUT = ctx->pTreeParser->ctnstream;
-  auto ISTREAM = INPUT->tnstream->istream;
-  // Saving current index
-  ANTLR3_MARKER curr = ISTREAM->index(ISTREAM);
-  // Push function index into INPUT
-  // The actual type of ANTLR3_MARKER is ANTLR3_INT32
-  INPUT->push(INPUT, boost::numeric_cast<ANTLR3_INT32>(func_index));
-  // Execute function body
-  f(ctx);
-  // Reset to the previous index
-  ISTREAM->seek(ISTREAM, curr);
-
-  return 0;
+  auto iter = functions.find(name);
+  if(iter != functions.end())
+    iter->second.call(*this);
+  else
+    throw interpreter_exception(name + " is not defined.");
 }
 
 void interpreter::replace_all(std::string& value,

@@ -480,10 +480,10 @@ execute_command[const std::string& name, std::vector<std::string>& libbash_args]
 			ANTLR3_MARKER command_index = INDEX();
 			try
 			{
-				walker->set_status(walker->call(name,
-												libbash_args,
-												ctx,
-												compound_command));
+				ANTLR3_MARKER current_index = INDEX();
+				// Calling functions may change current index
+				walker->call(name, libbash_args);
+				SEEK(current_index);
 			}
 			catch(return_exception& e)
 			{

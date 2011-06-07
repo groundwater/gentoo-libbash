@@ -42,7 +42,16 @@ TEST(source_builtin_test, source_true)
                                      std::cin,
                                      walker);
   EXPECT_EQ(status, 0);
+
   EXPECT_TRUE(walker.has_function("foo"));
+
+  // Call the function defined in source_true.sh
+  std::stringstream output;
+  walker.set_output_stream(&output);
+  interpreter::local_scope current_scope(walker);
+  walker.call("foo", {});
+  EXPECT_STREQ("hi\n", output.str().c_str());
+
   EXPECT_STREQ("hello", walker.resolve<std::string>("FOO001").c_str());
   EXPECT_STREQ((get_src_dir() + "/scripts/source_true.sh").c_str(),
                 walker.resolve<std::string>("FOO002").c_str());

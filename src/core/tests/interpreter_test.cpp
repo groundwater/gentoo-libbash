@@ -208,6 +208,7 @@ TEST(interpreter, unset_variables)
 TEST(interpreter, unset_functions)
 {
   interpreter walker;
+  walker.push_current_ast(0);
   walker.define_function("foo", 0);
   EXPECT_TRUE(walker.has_function("foo"));
   walker.unset_function("foo");
@@ -245,12 +246,4 @@ TEST(interpreter, bash_option)
   EXPECT_FALSE(walker.get_option("extglob"));
   walker.set_option("extglob", true);
   EXPECT_TRUE(walker.get_option("extglob"));
-}
-
-TEST(interpreter, call_function)
-{
-  interpreter walker;
-  std::vector<std::string> arguments;
-
-  EXPECT_EQ(-1, walker.call("not exist", arguments, 0, 0));
 }

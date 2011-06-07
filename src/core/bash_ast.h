@@ -34,11 +34,11 @@
 #include <antlr3.h>
 #include <boost/utility.hpp>
 
+#include "core/interpreter.h"
 #include "libbashWalker.h"
 
 struct libbashLexer_Ctx_struct;
 struct libbashParser_Ctx_struct;
-class interpreter;
 
 template<typename T>
 class antlr_pointer: public std::unique_ptr<T, std::function<void(T*)>>
@@ -74,6 +74,9 @@ public:
 
   static int walker_arithmetics(plibbashWalker tree_parser);
 
+  static void call_function(plibbashWalker tree_parser,
+                            ANTLR3_MARKER index);
+
   static pANTLR3_BASE_TREE parser_start(libbashParser_Ctx_struct* parser);
 
   static pANTLR3_BASE_TREE parser_arithmetics(libbashParser_Ctx_struct* parser);
@@ -87,7 +90,14 @@ public:
   interpret_with(interpreter& walker, Functor walk)
   {
     set_interpreter(&walker);
-    antlr_pointer<libbashWalker_Ctx_struct> p_tree_parser(libbashWalkerNew(nodes.get()));
+    walker.push_current_ast(this);
+    std::unique_ptr<libbashWalker_Ctx_struct, std::function<void(plibbashWalker)>> p_tree_parser(
+        libbashWalkerNew(nodes.get()),
+        [&](plibbashWalker tree_parser)
+        {
+          tree_parser->free(tree_parser);
+          walker.pop_current_ast();
+        });
     return walk(p_tree_parser.get());
   }
 

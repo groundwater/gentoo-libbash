@@ -169,4 +169,13 @@ pANTLR3_BASE_TREE bash_ast::parser_arithmetics(plibbashParser parser)
   return parser->arithmetics(parser).tree;
 }
 
-
+void bash_ast::call_function(plibbashWalker ctx,
+                             ANTLR3_MARKER index)
+{
+  auto INPUT = ctx->pTreeParser->ctnstream;
+  // Push function index into INPUT
+  // The actual type of ANTLR3_MARKER is ANTLR3_INT32
+  INPUT->push(INPUT, boost::numeric_cast<ANTLR3_INT32>(index));
+  // Execute function body
+  ctx->compound_command(ctx);
+}

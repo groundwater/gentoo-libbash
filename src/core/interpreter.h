@@ -35,6 +35,7 @@
 #include <boost/xpressive/xpressive.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
+#include "core/function.h"
 #include "core/symbols.hpp"
 #include "cppbash_builtin.h"
 
@@ -55,7 +56,9 @@ class interpreter: public boost::noncopyable
 
   /// \var private::function_definitions
   /// \brief global symbol table for functions
-  std::unordered_map<std::string, ANTLR3_MARKER> functions;
+  std::unordered_map<std::string, function> functions;
+
+  std::stack<bash_ast*> ast_stack;
 
   /// \var private::local_members
   /// \brief local scope for function arguments, execution environment and
@@ -554,19 +557,27 @@ public:
   void define_function(const std::string& name,
                        ANTLR3_MARKER body_index)
   {
-    functions[name] = body_index;
+    functions.insert(make_pair(name, function(*ast_stack.top(), body_index)));
+  }
+
+  /// \brief push current AST, used for function definition
+  /// \param current ast
+  void push_current_ast(bash_ast* ast)
+  {
+    ast_stack.push(ast);
+  }
+
+  /// \brief pop current AST, used for function definition
+  void pop_current_ast()
+  {
+    ast_stack.pop();
   }
 
   /// \brief make function call
   /// \param function name
   /// \param function arguments
-  /// \param walker context
-  /// \param the function that needs to be executed
-  /// \return the return value of the function
-  int call(const std::string& name,
-           const std::vector<std::string>& arguments,
-           plibbashWalker ctx,
-           std::function<void(plibbashWalker)> f);
+  void call(const std::string& name,
+            const std::vector<std::string>& arguments);
 
   /// \brief check if we have 'name' defined as a function
   /// \param function name

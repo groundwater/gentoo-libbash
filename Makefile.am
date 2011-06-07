@@ -204,6 +204,8 @@ libcppbash_la_SOURCES = src/common.h \
 						src/core/interpreter.cpp \
 						src/core/interpreter.h \
 						src/core/symbols.hpp \
+						src/core/function.h \
+						src/core/function.cpp \
 						src/core/bash_condition.h \
 						src/core/bash_condition.cpp \
 						src/core/bash_ast.cpp \
