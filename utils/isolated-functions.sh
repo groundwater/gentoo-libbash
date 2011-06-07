@@ -1,9 +1,9 @@
 die(){
-    echo "Die is called. Something went wrong while interpreting"
+    echo "Die is called: $*"
 }
 
 has() {
-    hasq "$@"
+    hasq $*
 }
 
 hasq() {
@@ -17,32 +17,33 @@ hasq() {
 EXPORT_FUNCTIONS() {
     if [ -z "$ECLASS" ]; then 
         die "EXPORT_FUNCTIONS without a defined ECLASS"
+        return 1
     fi   
-    $__export_funcs_var="$__export_funcs_var $*" 
+    __export_funcs_var="$__export_funcs_var $*" 
 }
 
 use() {
-    echo "use should be called"
+    echo "use shouldn't be called"
     return 1
 }
 
 useq() {
-    echo "useq should be called"
+    echo "useq shouldn't be called"
     return 1
 }
 
 use_with() {
-    echo "use_with should be called"
+    echo "use_with shouldn't be called"
     return 1
 }
 
 use_enable() {
-    echo "use_enable should be called"
+    echo "use_enable shouldn't be called"
     return 1
 }
 
 eerror() {
-    echo "eerror: $*" >&2
+    echo "eerror: $*"
 }
 
 debug-print() {
@@ -50,5 +51,5 @@ debug-print() {
 }
 
 ewarn() {
-    echo "ewarn: $*" >&2
+    echo "ewarn: $*"
 }
