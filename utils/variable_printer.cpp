@@ -36,6 +36,15 @@ static const std::vector<std::string> special_variables
   "IFS", "?", "*", "0"
 };
 
+static std::string get_src_dir()
+{
+  std::string srcdir(".");
+  if(getenv("srcdir"))
+    srcdir = getenv("srcdir");
+
+  return srcdir;
+}
+
 int main(int argc, char** argv)
 {
   if(argc != 2)
@@ -48,7 +57,7 @@ int main(int argc, char** argv)
   std::vector<std::string> functions;
   try
   {
-    libbash::interpret(argv[1], variables, functions);
+    libbash::interpret(argv[1], get_src_dir() + "/utils/isolated-functions.sh", variables, functions);
   }
   catch(interpreter_exception& e)
   {
