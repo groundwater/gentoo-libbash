@@ -23,7 +23,12 @@
 
 #include "cppbash_builtin.h"
 
+#include <boost/spirit/include/karma.hpp>
+#include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/phoenix.hpp>
+
 #include "builtins/boolean_builtins.h"
+#include "builtins/builtin_exceptions.h"
 #include "builtins/continue_builtin.h"
 #include "builtins/declare_builtin.h"
 #include "builtins/echo_builtin.h"
@@ -31,9 +36,14 @@
 #include "builtins/inherit_builtin.h"
 #include "builtins/let_builtin.h"
 #include "builtins/return_builtin.h"
+#include "builtins/printf_builtin.h"
 #include "builtins/shopt_builtin.h"
 #include "builtins/source_builtin.h"
 #include "builtins/unset_builtin.h"
+
+namespace qi = boost::spirit::qi;
+namespace karma = boost::spirit::karma;
+namespace phoenix = boost::phoenix;
 
 cppbash_builtin::cppbash_builtin(BUILTIN_ARGS): _out_stream(&out), _err_stream(&err), _inp_stream(&in), _walker(walker)
 {
@@ -52,8 +62,41 @@ cppbash_builtin::builtins_type& cppbash_builtin::builtins() {
       {"true", boost::factory<true_builtin*>()},
       {"false", boost::factory<false_builtin*>()},
       {"return", boost::factory<return_builtin*>()},
+      {"printf", boost::factory<printf_builtin*>()},
       {"let", boost::factory<let_builtin*>()},
       {"unset", boost::factory<unset_builtin*>()},
   });
   return *p;
+}
+
+void cppbash_builtin::transform_escapes(const std::string &string,
+                                        std::ostream& output) const
+{
+  using phoenix::val;
+  using qi::lit;
+
+  auto escape_parser =
+  +(
+    lit('\\') >>
+    (
+     lit('a')[output << val("\a")] |
+     lit('b')[output << val("\b")] |
+     // \e is a GNU extension
+     lit('e')[output << val("\033")] |
+     lit('f')[output << val("\f")] |
+     lit('n')[output << val("\n")] |
+     lit('r')[output << val("\r")] |
+     lit('t')[output << val("\t")] |
+     lit('v')[output << val("\v")] |
+     lit('c')[phoenix::throw_(suppress_output())] |
+     lit('\\')[output << val('\\')] |
+     lit("0") >> qi::uint_parser<unsigned, 8, 1, 3>()[ output << phoenix::static_cast_<char>(qi::_1)] |
+     lit("x") >> qi::uint_parser<unsigned, 16, 1, 2>()[ output << phoenix::static_cast_<char>(qi::_1)]
+
+    ) |
+    qi::char_[output << qi::_1]
+  );
+
+  auto begin = string.begin();
+  qi::parse(begin, string.end(), escape_parser);
 }

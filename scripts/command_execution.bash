@@ -53,3 +53,5 @@ eval "FOO009=10"
 eval "echo abc" "def" "xyz"
 shopt -s extglob
 shopt -p
+printf "%s %s\n" abc def
+printf "%s %s\n" $FOO001, def

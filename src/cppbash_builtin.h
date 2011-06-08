@@ -120,6 +120,10 @@ class cppbash_builtin: public boost::noncopyable
     typedef std::map<std::string, boost::function< cppbash_builtin*(BUILTIN_ARGS) >> builtins_type;
     static builtins_type& builtins();
 
+    /// \brief transforms escapes in echo input
+    /// \param the target string
+    /// \param the place to write
+    void transform_escapes(const std::string &string, std::ostream& output) const;
 };
 
 #define BUILTIN_CONSTRUCTOR(name) \

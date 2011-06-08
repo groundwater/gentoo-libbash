@@ -53,6 +53,8 @@ shopt -u restricted
 shopt -u shift_verbose
 shopt -u sourcepath
 shopt -u xpg_echo
+abc def
+hello, def
 DEFAULTED=yes
 FOO001=hello
 FOO002=Hello World

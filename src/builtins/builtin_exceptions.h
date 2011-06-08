@@ -58,4 +58,8 @@ public:
     }
   }
 };
+
+class suppress_output: public std::exception
+{
+};
 #endif

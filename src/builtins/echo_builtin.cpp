@@ -26,14 +26,11 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 
+#include "builtins/builtin_exceptions.h"
 
 namespace qi = boost::spirit::qi;
 namespace karma = boost::spirit::karma;
 namespace phoenix = boost::phoenix;
-
-class suppress_output
-{
-};
 
 int echo_builtin::exec(const std::vector<std::string>& bash_args)
 {
@@ -64,7 +61,7 @@ int echo_builtin::exec(const std::vector<std::string>& bash_args)
         {
           try
           {
-            transform_escapes(*i);
+            transform_escapes(*i, out_buffer());
           }
           catch(suppress_output)
           {
@@ -120,35 +117,4 @@ bool echo_builtin::determine_options(const std::string &string, bool &suppress_n
 
     return false;
   }
-}
-
-void echo_builtin::transform_escapes(const std::string &string)
-{
-  using phoenix::val;
-  using qi::lit;
-
-  auto escape_parser =
-  +(
-    lit('\\') >>
-    (
-     lit('a')[this->out_buffer() << val("\a")] |
-     lit('b')[this->out_buffer() << val("\b")] |
-     // \e is a GNU extension
-     lit('e')[this->out_buffer() << val("\033")] |
-     lit('f')[this->out_buffer() << val("\f")] |
-     lit('n')[this->out_buffer() << val("\n")] |
-     lit('r')[this->out_buffer() << val("\r")] |
-     lit('t')[this->out_buffer() << val("\t")] |
-     lit('v')[this->out_buffer() << val("\v")] |
-     lit('c')[phoenix::throw_(suppress_output())] |
-     lit('\\')[this->out_buffer() << val('\\')] |
-     lit("0") >> qi::uint_parser<unsigned, 8, 1, 3>()[ this->out_buffer() << phoenix::static_cast_<char>(qi::_1)] |
-     lit("x") >> qi::uint_parser<unsigned, 16, 1, 2>()[ this->out_buffer() << phoenix::static_cast_<char>(qi::_1)]
-
-    ) |
-    qi::char_[this->out_buffer() << qi::_1]
-  );
-
-  auto begin = string.begin();
-  qi::parse(begin, string.end(), escape_parser);
 }
