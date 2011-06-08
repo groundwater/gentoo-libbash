@@ -72,6 +72,20 @@ TEST(declare_builtin_test, _F)
   EXPECT_EQ("declare -f bar\ndeclare -f foo\n", test_output3.str());
 }
 
+TEST(declare_built_test, _p)
+{
+  interpreter walker;
+  walker.define("foo", "bar");
+
+  stringstream test_output1;
+  EXPECT_EQ(0, cppbash_builtin::exec("declare", {"-p", "foo"}, test_output1, cerr, cin, walker));
+  EXPECT_EQ("declare -- foo=\"bar\"\n", test_output1.str());
+
+  stringstream test_output2;
+  EXPECT_EQ(1, cppbash_builtin::exec("declare", {"-p", "bar", "test"}, test_output2, cerr, cin, walker));
+  EXPECT_EQ("-bash: declare: bar: not found\n-bash: declare: test: not found\n", test_output2.str());
+}
+
 #define TEST_DECLARE(name, expected, ...) \
 	TEST(declare_builtin_test, name) { test_declare(expected, {__VA_ARGS__}); }
 
@@ -84,7 +98,6 @@ TEST_DECLARE(_r, "declare -r is not supported yet\n", "-r", "world")
 TEST_DECLARE(_t, "declare -t is not supported yet\n", "-t", "world")
 TEST_DECLARE(_u, "declare -u is not supported yet\n", "-u", "world")
 TEST_DECLARE(_x, "declare -x is not supported yet\n", "-x", "world")
-TEST_DECLARE(_p, "declare -p is not supported yet\n", "-p", "world")
 TEST_DECLARE(pa, "declare +a is not supported yet\n", "+a", "world")
 TEST_DECLARE(pA, "declare +A is not supported yet\n", "+A", "world")
 TEST_DECLARE(pf, "declare +f is not supported yet\n", "+f", "world")

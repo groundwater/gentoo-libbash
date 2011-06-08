@@ -73,6 +73,28 @@ int declare_builtin::exec(const std::vector<std::string>& bash_args)
           *_out_stream << "declare -f " << *iter << std::endl;
       }
       return result;
+    case 'p':
+      if(bash_args.size() > 1)
+      {
+        for(auto iter = bash_args.begin() + 1; iter != bash_args.end(); ++iter)
+        {
+          // We do not print the type of the variable for now
+          if(!_walker.is_unset(*iter))
+          {
+            *_out_stream << "declare -- " << *iter << "=\"" << _walker.resolve<std::string>(*iter) << "\"" << std::endl;
+          }
+          else
+          {
+            *_out_stream << "-bash: declare: " << *iter << ": not found" << std::endl;
+            result = 1;
+          }
+        }
+      }
+      else
+      {
+        throw interpreter_exception("We do not support declare -p without arguments for now");
+      }
+      return result;
     case 'a':
     case 'A':
     case 'f':
@@ -82,7 +104,6 @@ int declare_builtin::exec(const std::vector<std::string>& bash_args)
     case 't':
     case 'u':
     case 'x':
-    case 'p':
       *_err_stream << "declare " << bash_args[0] << " is not supported yet" << std::endl;
       return 1;
     default:
