@@ -28,6 +28,7 @@
 class shopt_builtin : public virtual cppbash_builtin
 {
   void set_opt(const std::vector<std::string>& bash_args, bool value);
+  void print_opts() const;
 public:
   BUILTIN_CONSTRUCTOR(shopt)
   virtual int exec(const std::vector<std::string>& );

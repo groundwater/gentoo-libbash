@@ -69,7 +69,8 @@ class interpreter: public boost::noncopyable
 
   std::istream* _in;
 
-  std::unordered_map<std::string, bool> bash_options;
+  // std::map is chosen for sorted output in shopt -p
+  std::map<std::string, bool> bash_options;
 
   /// \brief calculate the correct offset when offset < 0 and check whether
   ///        the real offset is in legal range
@@ -96,6 +97,8 @@ class interpreter: public boost::noncopyable
                             unsigned length,
                             const unsigned index) const;
 public:
+
+  typedef std::map<std::string, bool>::const_iterator option_iterator;
 
   ///
   /// \class local_scope
@@ -689,6 +692,21 @@ public:
   /// \param[in] true if option is enabled, false otherwise
   /// \return zero unless the name is not a valid shell option
   void set_option(const std::string& name, bool value);
+
+  /// \brief return an iterator referring to the first variable
+  /// \return iterator referring to the first variable
+  option_iterator options_begin() const
+  {
+    return bash_options.begin();
+  }
+
+  /// \brief return an iterator referring to the next element after the
+  ///        last variable
+  /// \return iterator referring to he next element after the last variable
+  option_iterator options_end() const
+  {
+    return bash_options.end();
+  }
 
   /// \brief evaluate arithmetic expression and return the result
   /// \param the arithmetic expression

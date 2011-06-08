@@ -15,6 +15,44 @@ unset_outer
 $FOO006 "abc" $(( 1 + 2 )) $(echo hi) ...
 abc def ghi
 abc def xyz
+shopt -u autocd
+shopt -u cdable_vars
+shopt -u cdspell
+shopt -u checkhash
+shopt -u checkjobs
+shopt -u checkwinsize
+shopt -u cmdhist
+shopt -u compat31
+shopt -u dirspell
+shopt -u dotglob
+shopt -u execfail
+shopt -u expand_aliases
+shopt -u extdebug
+shopt -s extglob
+shopt -u extquote
+shopt -u failglob
+shopt -u force_fignore
+shopt -u globstar
+shopt -u gnu_errfmt
+shopt -u histappend
+shopt -u histreedit
+shopt -u histverify
+shopt -u hostcomplete
+shopt -u huponexit
+shopt -u interactive
+shopt -u lithist
+shopt -u login_shell
+shopt -u mailwarn
+shopt -u no_empty_cmd_completion
+shopt -u nocaseglob
+shopt -u nocasematch
+shopt -u nullglob
+shopt -u progcomp
+shopt -u promptvars
+shopt -u restricted
+shopt -u shift_verbose
+shopt -u sourcepath
+shopt -u xpg_echo
 DEFAULTED=yes
 FOO001=hello
 FOO002=Hello World

@@ -51,3 +51,5 @@ echo "abc $(echo def) ghi"
 FOO008="abc $(echo def) ghi"
 eval "FOO009=10"
 eval "echo abc" "def" "xyz"
+shopt -s extglob
+shopt -p
