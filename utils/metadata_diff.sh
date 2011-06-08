@@ -27,7 +27,7 @@ do
         do
             filename=${path##*\/}
             diff -u $cache_dir/$file $outputdir/$category/$filename > $outputdir/$category/$filename.diff 2>>$outputdir/error_output
-            error_count+=$?
+            error_count+=$(($? != 0))
             total_num+=1
         done
     fi
