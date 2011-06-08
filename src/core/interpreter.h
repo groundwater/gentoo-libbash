@@ -37,7 +37,6 @@
 
 #include "core/symbols.hpp"
 #include "cppbash_builtin.h"
-#include "libbashLexer.h"
 
 typedef std::unordered_map<std::string, std::shared_ptr<variable>> scope;
 struct libbashWalker_Ctx_struct;
