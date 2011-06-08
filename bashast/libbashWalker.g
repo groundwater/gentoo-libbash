@@ -834,24 +834,24 @@ case_clause[const std::string& target] returns[bool matched]
 	std::vector<boost::xpressive::sregex> patterns;
 }
 	:^(CASE_PATTERN ( { patterns.push_back(boost::xpressive::sregex()); } bash_pattern[patterns.back(), true])+ {
-		if(LA(1) == CASE_COMMAND)
-		{
-			// omit CASE_COMMAND
-			SEEK(INDEX() + 1);
-			$matched = false;
+		$matched = false;
 
-			for(auto iter = patterns.begin(); iter != patterns.end(); ++iter)
+		for(auto iter = patterns.begin(); iter != patterns.end(); ++iter)
+		{
+			if(match(target, *iter))
 			{
-				if(match(target, *iter))
+				if(LA(1) == CASE_COMMAND)
 				{
+					// omit CASE_COMMAND
+					SEEK(INDEX() + 1);
 					command_list(ctx);
-					$matched = true;
-					break;
 				}
+				$matched = true;
+				break;
 			}
-			if(!$matched)
-				seek_to_next_tree(ctx);
 		}
+		if(!$matched)
+			seek_to_next_tree(ctx);
 	});
 
 command_substitution returns[std::string libbash_value]

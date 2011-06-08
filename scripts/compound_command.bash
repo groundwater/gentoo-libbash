@@ -181,6 +181,13 @@ case $target in
         echo "default"
         ;;
 esac
+case $target in
+    abc|bcd|xyz)
+        ;;
+    *)
+        echo "Shouldn't print this"
+        ;;
+esac
 target=a
 case $target in
     [def])
