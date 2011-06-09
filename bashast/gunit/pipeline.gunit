@@ -22,10 +22,10 @@ pipeline:
 "cat asdf" -> (COMMAND (STRING cat) (STRING asdf))
 "export VAR=bar LAA=laa foo" -> (VARIABLE_DEFINITIONS (= VAR (STRING bar)) (= LAA (STRING laa)))
 "LOCAL1=a  LOCAL2=b export GLOBAL1=2  GLOBAL2 GLOBAL3" -> (COMMAND (STRING export) (STRING GLOBAL1 = 2) (STRING GLOBAL2) (STRING GLOBAL3) (= LOCAL1 (STRING a)) (= LOCAL2 (STRING b)))
-"time -p cat file" -> (COMMAND (STRING cat) (STRING file) (time -p))
+"time -p cat file" -> (COMMAND (STRING cat) (STRING file) (time p))
 "time cat file | grep search" -> (| (COMMAND (STRING cat) (STRING file) time) (COMMAND (STRING grep) (STRING search)))
-"time -p cat | grep asdf | a.out" -> (| (| (COMMAND (STRING cat) (time -p)) (COMMAND (STRING grep) (STRING asdf))) (COMMAND (STRING a . out)))
-"time -p cat file |grep search >> log" -> (| (COMMAND (STRING cat) (STRING file) (time -p)) (COMMAND (STRING grep) (STRING search) (REDIR >> (STRING log))))
+"time -p cat | grep asdf | a.out" -> (| (| (COMMAND (STRING cat) (time p)) (COMMAND (STRING grep) (STRING asdf))) (COMMAND (STRING a . out)))
+"time -p cat file |grep search >> log" -> (| (COMMAND (STRING cat) (STRING file) (time p)) (COMMAND (STRING grep) (STRING search) (REDIR >> (STRING log))))
 "if time cat; then
 echo \"three\"
 fi" -> (IF_STATEMENT (if (LIST (COMMAND (STRING cat) time)) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING three))))))

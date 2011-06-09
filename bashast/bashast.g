@@ -123,7 +123,7 @@ pipeline
 	:	BLANK!* time? ((BANG) => (BANG BLANK!+))? command^ (BLANK!* PIPE^ BLANK!* command)*;
 time	:	TIME^ BLANK!+ ((time_posix) => time_posix)?;
 time_posix
-	:	TIME_POSIX BLANK!+;
+	:	MINUS! LETTER BLANK!+;
 //The structure of a command in bash
 command
 	:	compound_command
@@ -417,7 +417,7 @@ ns_str_part
 	|	esc_char
 	|OTHER|EQUALS|PCT|PCTPCT|MINUS|DOT|DOTDOT|COLON|TEST_EXPR
 	|TILDE|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN
-	|TIME_POSIX|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN
+	|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN
 	|OR_ASSIGN|CARET|POUND|POUNDPOUND|COMMA|EXPORT|LOCAL;
 
 //Generic strings/filenames.
@@ -689,9 +689,6 @@ ESC_LPAREN
 	:	ESC LPAREN;
 ESC_LT	:	ESC'<';
 ESC_GT	:	ESC'>';
-//For pipeline
-TIME_POSIX
-	:	'-p';
 //Handle ANSI C escaped characters: escaped octal, escaped hex, escaped ctrl+ chars, then all others
 ESC	:	'\\';
 UNDERSCORE : '_';
