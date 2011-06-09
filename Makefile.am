@@ -163,6 +163,7 @@ CLEANFILES = $(GENERATED_PARSER_C) \
 			 $(check_JAVA) \
 			 libbash.g \
 			 libbash.tokens \
+			 libbash.tokens.md5 \
 			 bashast/bashast.tokens \
 			 libbashWalker.tokens \
 			 javagrammar.run \
@@ -277,9 +278,13 @@ libbash.g: bashast/bashast.g
 				  -e 's/language	= Java;/language	= C;/g' \
 				  -e 's/grammar bashast;/grammar libbash;/g' $< > $@
 
+# http://www.kolpackov.net/pipermail/notes/2004-September.txt
+libbash.tokens.md5: libbash.tokens
+	$(AM_V_at)md5sum $< | cmp -s $@ -; if test $$? -ne 0; then md5sum $< > $@; fi
+
 # Avoid initializing C++ type to NULL by sed, variables whose name
 # starts with libbash_ will be stripped
-walker.run: bashast/libbashWalker.g cgrammar.run
+walker.run: bashast/libbashWalker.g libbash.tokens.md5
 	$(AM_V_at)touch $@.tmp
 	$(AM_V_GEN)$(ANTLR) -fo . $<
 	$(AM_V_at)sed -i -e 's/\(libbash_.*\) = NULL/\1/' libbashWalker.c
@@ -288,6 +293,7 @@ walker.run: bashast/libbashWalker.g cgrammar.run
 
 $(GENERATED_PARSER_C): cgrammar.run
 $(GENERATED_PARSER_H): cgrammar.run
+libbash.tokens: cgrammar.run
 
 $(GENERATED_WALKER_CPP): walker.run
 $(GENERATED_WALKER_H): walker.run
