@@ -244,13 +244,14 @@ cond_comparison
 var_def
 	:	name LSQUARE BLANK? explicit_arithmetic BLANK* RSQUARE EQUALS fname? -> ^(EQUALS ^(name explicit_arithmetic) fname?)
 	|	name EQUALS^ value?
+	|	name PLUS_ASSIGN array_value -> ^(PLUS_ASSIGN name array_value)
 	|	name PLUS_ASSIGN fname_part? -> ^(EQUALS name ^(STRING ^(VAR_REF name) fname_part?));
 //Possible values of a variable
 value	:	fname
-	|	LPAREN! wspace!* arr_val RPAREN!;
+	|	array_value;
 //allow the parser to create array variables
-arr_val	:
-	|	(ag+=array_atom wspace*)+ -> ^(ARRAY $ag+);
+array_value
+	:	LPAREN wspace* (array_atom wspace*)* RPAREN -> ^(ARRAY array_atom*);
 array_atom
 	:	(LSQUARE) => LSQUARE! BLANK!* explicit_arithmetic BLANK!? RSQUARE! EQUALS^ fname
 	|	fname;

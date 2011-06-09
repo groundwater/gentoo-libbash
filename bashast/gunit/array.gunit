@@ -26,6 +26,9 @@ var_def:
 		--disable-dependency-tracking
 		${VAR}
 )" -> (= asdf (ARRAY (STRING - - disable - dependency - tracking) (STRING (VAR_REF VAR))))
+"asdf=()" -> (= asdf ARRAY)
+"asdf+=()" -> (+= asdf ARRAY)
+"asdf+=(a)" -> (+= asdf (ARRAY (STRING a)))
 
 var_ref:
 "$asdf" -> (VAR_REF asdf)
