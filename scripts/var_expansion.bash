@@ -98,6 +98,7 @@ function positional_parameter_test(){
     FOO094=${@: -1}
     FOO095=${@: -2:5}
     FOO096=${@:0}
+    echo $#
 }
 positional_parameter_test 1 2 3 4 5
 target="abc*abc"
@@ -108,3 +109,4 @@ echo ${target/"*"}
 ARRAY=(1 2 3 4 5)
 echo ${ARRAY[@]:1}
 echo ${ARRAY[@]:1:3}
+echo $#

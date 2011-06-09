@@ -444,7 +444,7 @@ var_ref [bool double_quoted] returns[std::string libbash_value]
 		$libbash_value = walker->resolve<std::string>($var_name.libbash_value, $var_name.index);
 	}
 	|^(VAR_REF libbash_string=array_name) { walker->get_all_elements_IFS_joined(libbash_string, $libbash_value); }
-	|^(VAR_REF POUND) { std::cerr << "$# has not been implemented yet" << std::endl; }
+	|^(VAR_REF POUND) { $libbash_value = boost::lexical_cast<std::string>(walker->get_array_length("*")); }
 	|^(VAR_REF QMARK) { $libbash_value = walker->get_status<std::string>(); }
 	|^(VAR_REF MINUS) { std::cerr << "$- has not been implemented yet" << std::endl; }
 	|^(VAR_REF BANG) { std::cerr << "$! has not been implemented yet" << std::endl; }
