@@ -105,21 +105,11 @@ std::shared_ptr<variable> interpreter::resolve_variable(const std::string& name)
   if(name.empty())
     return std::shared_ptr<variable>();
 
-  // positional parameter
-  if(isdigit(name[0]) && !local_members.empty())
+  BOOST_REVERSE_FOREACH(auto& frame, local_members)
   {
-    auto iter_local = local_members.back().find(name);
-    if(iter_local != local_members.back().end())
+    auto iter_local = frame.find(name);
+    if(iter_local != frame.end())
       return iter_local->second;
-  }
-  else
-  {
-    BOOST_REVERSE_FOREACH(auto& frame, local_members)
-    {
-      auto iter_local = frame.find(name);
-      if(iter_local != frame.end())
-        return iter_local->second;
-    }
   }
 
   auto iter_global = members.find(name);
@@ -286,14 +276,10 @@ void interpreter::define_function_arguments(scope& current_stack,
 {
   std::map<unsigned, std::string> positional_args;
 
-  for(auto i = 0u; i != arguments.size(); ++i)
-  {
-    const std::string& name = boost::lexical_cast<std::string>(i + 1);
-    current_stack[name].reset(new variable(name, arguments[i]));
-    positional_args[i] = arguments[i];
-  }
+  for(auto i = 1u; i <= arguments.size(); ++i)
+    positional_args[i] = arguments[i - 1];
 
-  define("*", positional_args);
+  current_stack["*"].reset(new variable("*", positional_args, true));
 }
 
 void interpreter::call(const std::string& name,

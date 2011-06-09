@@ -338,7 +338,10 @@ var_name returns[std::string libbash_value, unsigned index]
 @init {
 	$var_name.index = 0;
 }
-	:libbash_string=num { $libbash_value = libbash_string; }
+	:libbash_string=num {
+		$index = boost::lexical_cast<unsigned>(libbash_string);
+		$libbash_value = ($index != 0 ? "*" : "0");
+	}
 	|name {
 		$libbash_value = $name.libbash_value;
 		$index = $name.index;
