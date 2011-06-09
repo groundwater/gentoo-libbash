@@ -458,11 +458,11 @@ public:
   template <typename T>
   bool resolve_array(const std::string& name, std::vector<T>& values) const
   {
-    auto i = members.find(name);
-    if(i == members.end())
+    auto var = resolve_variable(name);
+    if(!var)
       return false;
 
-    i->second->get_all_values(values);
+    var->get_all_values(values);
     return true;
   }
 

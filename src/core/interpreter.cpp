@@ -131,11 +131,10 @@ std::shared_ptr<variable> interpreter::resolve_variable(const std::string& name)
 bool interpreter::is_unset_or_null(const std::string& name,
                                    const unsigned index) const
 {
-  auto i = members.find(name);
-  if(i == members.end())
+  auto var = resolve_variable(name);
+  if(!var)
     return true;
-  else
-    return i->second->is_null(index);
+  return var->is_null(index);
 }
 
 std::string interpreter::get_substring(const std::string& name,
@@ -228,19 +227,18 @@ std::string interpreter::do_replace_expansion(const std::string& name,
 std::string::size_type interpreter::get_length(const std::string& name,
                                  const unsigned index) const
 {
-  auto i = members.find(name);
-  if(i == members.end())
+  auto var = resolve_variable(name);
+  if(!var)
     return 0;
-  return i->second->get_length(index);
+  return var->get_length(index);
 }
 
 variable::size_type interpreter::get_array_length(const std::string& name) const
 {
-  auto i = members.find(name);
-  if(i == members.end())
+  auto var = resolve_variable(name);
+  if(!var)
     return 0;
-  else
-    return i->second->get_array_length();
+  return var->get_array_length();
 }
 
 void interpreter::get_all_elements_joined(const std::string& name,

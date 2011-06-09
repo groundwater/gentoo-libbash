@@ -50,6 +50,14 @@ func_nested2() {
     local foo_nested=hi bar_nested=(1 2
     3) localbar
     localbar=1
+    echo ${bar_nested[@]}
+    echo ${not_exist[@]}
+    echo ${#bar_nested[@]}
+    echo ${#non_exist[@]}
+    echo ${#foo_nested}
+    echo ${#non_exist}
+    echo ${foo_nested:-wrong}
+    echo ${non_exist:-right}
     func_nested1
 }
 func_nested2
