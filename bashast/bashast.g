@@ -181,7 +181,6 @@ range	:	DIGIT DOTDOT^ DIGIT
 	|	LETTER DOTDOT^ LETTER;
 brace_expansion_part
 	:	(((~COMMA) => fname_part)+ -> ^(STRING fname_part+))+
-	|	brace_expansion
 	|	-> EMPTY_BRACE_EXPANSION_ATOM;
 commasep:	brace_expansion_part(COMMA! brace_expansion_part)+;
 command_sub

@@ -23,8 +23,9 @@ brace_expansion:
 "{$a/$b,b}"-> (BRACE_EXP (STRING (VAR_REF a) / (VAR_REF b)) (STRING b))
 "{a,b,c}" -> (BRACE_EXP (STRING a) (STRING b) (STRING c))
 "{a..d}" -> (BRACE_EXP (.. a d))
-"{{a,b},c,d}" -> (BRACE_EXP (BRACE_EXP (STRING a) (STRING b)) (STRING c) (STRING d))
+"{{a,b},c,d}" -> (BRACE_EXP (STRING (BRACE_EXP (STRING a) (STRING b))) (STRING c) (STRING d))
 "{.txt,,}" -> (BRACE_EXP (STRING . txt) EMPTY_BRACE_EXPANSION_ATOM EMPTY_BRACE_EXPANSION_ATOM)
+"{GNUmakefile,{M,m}akefile}" -> (BRACE_EXP (STRING GNUmakefile) (STRING (BRACE_EXP (STRING M) (STRING m)) akefile))
 
 fname:
 "a{b,c}" -> (STRING a (BRACE_EXP (STRING b) (STRING c)))
