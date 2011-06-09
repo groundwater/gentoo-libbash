@@ -200,7 +200,7 @@ compound_command
 	|	cond_comparison;
 //Expressions allowed inside a compound command
 for_expr:	FOR BLANK+ name (wspace IN (BLANK+ fname)+)? semiel DO wspace* clist semiel DONE -> ^(FOR name (fname+)? clist)
-	|	FOR BLANK* LLPAREN EOL? (BLANK* init=arithmetic BLANK*|BLANK+)? (SEMIC (BLANK? fcond=arithmetic BLANK*|BLANK+)? SEMIC|DOUBLE_SEMIC) (BLANK* mod=arithmetic)? wspace* RRPAREN semiel DO wspace clist semiel DONE
+	|	FOR BLANK* LLPAREN EOL? (BLANK* init=arithmetic BLANK*|BLANK+)? (SEMIC (BLANK? fcond=arithmetic BLANK*|BLANK+)? SEMIC|DOUBLE_SEMIC) (BLANK* mod=arithmetic)? wspace* RPAREN RPAREN semiel DO wspace clist semiel DONE
 		-> ^(CFOR ^(FOR_INIT $init)? ^(FOR_COND $fcond)? clist ^(FOR_MOD $mod)?)
 	;
 sel_expr:	SELECT BLANK+ name (wspace IN BLANK+ word)? semiel DO wspace* clist semiel DONE -> ^(SELECT name (word)? clist)
@@ -235,7 +235,7 @@ current_shell
 	:	LBRACE wspace clist semiel wspace* RBRACE redirect? -> ^(CURRENT_SHELL clist redirect?);
 //comparison using arithmetic
 arith_comparison
-	:	LLPAREN wspace? arithmetic wspace? RRPAREN -> ^(COMPOUND_ARITH arithmetic);
+	:	LLPAREN wspace? arithmetic wspace? RPAREN RPAREN -> ^(COMPOUND_ARITH arithmetic);
 cond_comparison
 	:	cond_expr -> ^(COMPOUND_COND cond_expr);
 //Variables
@@ -554,13 +554,13 @@ arithmetics
 	:	arithmetic (COMMA! BLANK!* arithmetic)*;
 //explicit arithmetic in places like array indexes
 explicit_arithmetic
-	:	(DOLLAR LLPAREN BLANK*)? arithmetics RRPAREN? -> arithmetics
+	:	(DOLLAR LLPAREN BLANK*)? arithmetics (RPAREN RPAREN)? -> arithmetics
 	|	(DOLLAR LSQUARE BLANK*)? arithmetics RSQUARE? -> arithmetics;
 //Arithmetic expansion
 //the square bracket from is deprecated
 //http://permalink.gmane.org/gmane.comp.shells.bash.bugs/14479
 arithmetic_expansion
-	:	DOLLAR LLPAREN BLANK* arithmetics BLANK* RRPAREN -> ^(ARITHMETIC_EXPRESSION arithmetics)
+	:	DOLLAR LLPAREN BLANK* arithmetics BLANK* RPAREN RPAREN -> ^(ARITHMETIC_EXPRESSION arithmetics)
 	|	DOLLAR LSQUARE BLANK* arithmetics BLANK* RSQUARE -> ^(ARITHMETIC_EXPRESSION arithmetics);
 
 process_substitution
@@ -613,7 +613,6 @@ TIME	:	'time';
 RPAREN	:	')';
 LPAREN	:	'(';
 LLPAREN	:	'((';
-RRPAREN	:	'))';
 LSQUARE	:	'[';
 RSQUARE	:	']';
 TICK	:	'`';
