@@ -360,7 +360,8 @@ builtin_cond_unary
 keyword_cond
 	:	(negate_primary|cond_primary) (BLANK!* (LOGICOR^|LOGICAND^) BLANK!* keyword_cond)?;
 builtin_cond
-	:	(negate_builtin_primary|builtin_cond_primary) (BLANK!* (LOGICOR^|LOGICAND^) BLANK!* builtin_cond)?;
+	:	negate_builtin_primary
+	|	builtin_cond_primary;
 negate_primary
 	:	BANG BLANK+ cond_primary -> ^(NEGATION cond_primary);
 negate_builtin_primary
