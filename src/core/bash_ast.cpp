@@ -27,8 +27,10 @@
 #include <boost/numeric/conversion/cast.hpp>
 
 #include "core/interpreter_exception.h"
+#include "core/interpreter.h"
 #include "libbashLexer.h"
 #include "libbashParser.h"
+#include "libbashWalker.h"
 
 bash_ast::bash_ast(const std::istream& source,
                    std::function<pANTLR3_BASE_TREE(plibbashParser)> p): parse(p)
@@ -178,4 +180,18 @@ void bash_ast::call_function(plibbashWalker ctx,
   INPUT->push(INPUT, boost::numeric_cast<ANTLR3_INT32>(index));
   // Execute function body
   ctx->compound_command(ctx);
+}
+
+bash_ast::walker_pointer bash_ast::create_walker(interpreter& walker)
+{
+    set_interpreter(&walker);
+    walker.push_current_ast(this);
+
+    auto deleter = [&](plibbashWalker tree_parser)
+    {
+      tree_parser->free(tree_parser);
+      walker.pop_current_ast();
+    };
+
+    return walker_pointer(libbashWalkerNew(nodes.get()), deleter);
 }

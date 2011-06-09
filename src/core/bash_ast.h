@@ -34,11 +34,11 @@
 #include <antlr3.h>
 #include <boost/utility.hpp>
 
-#include "core/interpreter.h"
-#include "libbashWalker.h"
-
 struct libbashLexer_Ctx_struct;
 struct libbashParser_Ctx_struct;
+struct libbashWalker_Ctx_struct;
+typedef libbashWalker_Ctx_struct* plibbashWalker;
+class interpreter;
 
 template<typename T>
 class antlr_pointer: public std::unique_ptr<T, std::function<void(T*)>>
@@ -61,7 +61,10 @@ class bash_ast: public boost::noncopyable
   antlr_pointer<ANTLR3_COMMON_TREE_NODE_STREAM_struct> nodes;
   std::function<pANTLR3_BASE_TREE(libbashParser_Ctx_struct*)> parse;
 
+  typedef std::unique_ptr<libbashWalker_Ctx_struct, std::function<void(plibbashWalker)>> walker_pointer;
+
   void init_parser(const std::string& script, const std::string& script_path);
+  walker_pointer create_walker(interpreter& walker);
 
 public:
   bash_ast(const std::istream& source,
@@ -89,15 +92,7 @@ public:
   typename std::result_of<Functor(plibbashWalker)>::type
   interpret_with(interpreter& walker, Functor walk)
   {
-    set_interpreter(&walker);
-    walker.push_current_ast(this);
-    std::unique_ptr<libbashWalker_Ctx_struct, std::function<void(plibbashWalker)>> p_tree_parser(
-        libbashWalkerNew(nodes.get()),
-        [&](plibbashWalker tree_parser)
-        {
-          tree_parser->free(tree_parser);
-          walker.pop_current_ast();
-        });
+    walker_pointer p_tree_parser = create_walker(walker);
     return walk(p_tree_parser.get());
   }
 
