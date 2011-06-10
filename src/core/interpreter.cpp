@@ -38,7 +38,6 @@
 
 #include "core/bash_ast.h"
 #include "core/unset_exception.h"
-#include "libbashWalker.h"
 
 interpreter::interpreter(): _out(&std::cout), _err(&std::cerr), _in(&std::cin), bash_options(
     {
@@ -84,20 +83,6 @@ interpreter::interpreter(): _out(&std::cout), _err(&std::cerr), _in(&std::cin), 
     )
 {
   define("IFS", " \t\n");
-}
-
-std::string interpreter::get_string(pANTLR3_BASE_TREE node)
-{
-  pANTLR3_COMMON_TOKEN token = node->getToken(node);
-  // The tree walker may send null pointer here, so return an empty
-  // string if that's the case.
-  if(!token->start)
-    return "";
-  // Use reinterpret_cast here because we have to cast C code.
-  // The real type here is int64_t which is used as a pointer.
-  // token->stop - token->start + 1 should be bigger than 0.
-  return std::string(reinterpret_cast<const char *>(token->start),
-                     boost::numeric_cast<unsigned>(token->stop - token->start + 1));
 }
 
 std::shared_ptr<variable> interpreter::resolve_variable(const std::string& name) const

@@ -115,6 +115,32 @@ options
 	{
 	  return boost::xpressive::regex_match(target, pattern);
 	}
+
+	/// \brief parse the text value of a tree to integer
+	/// \param the target tree
+	/// \return the parsed value
+	static int parse_int(ANTLR3_BASE_TREE* tree)
+	{
+		return tree->getText(tree)->toInt32(tree->getText(tree));
+	}
+
+	/// \brief a helper function that get the string value
+	///        of the given pANTLR3_BASE_TREE node.
+	/// \param the target tree node
+	/// \return the value of node->text
+	static std::string get_string(pANTLR3_BASE_TREE node)
+	{
+		pANTLR3_COMMON_TOKEN token = node->getToken(node);
+		// The tree walker may send null pointer here, so return an empty
+		// string if that's the case.
+		if(!token->start)
+			return "";
+		// Use reinterpret_cast here because we have to cast C code.
+		// The real type here is int64_t which is used as a pointer.
+		// token->stop - token->start + 1 should be bigger than 0.
+		return std::string(reinterpret_cast<const char *>(token->start),
+						   boost::numeric_cast<unsigned>(token->stop - token->start + 1));
+	}
 }
 
 start: list EOF;
@@ -128,8 +154,8 @@ variable_definitions
 	:^(VARIABLE_DEFINITIONS (LOCAL { local = true; })? var_def[local]*);
 
 name_base returns[std::string libbash_value]
-	:NAME { $libbash_value = walker->get_string($NAME); }
-	|LETTER { $libbash_value = walker->get_string($LETTER); }
+	:NAME { $libbash_value = get_string($NAME); }
+	|LETTER { $libbash_value = get_string($LETTER); }
 	|'_' { $libbash_value="_"; };
 
 name returns[std::string libbash_value, unsigned index]
@@ -146,8 +172,8 @@ name returns[std::string libbash_value, unsigned index]
 
 num returns[std::string libbash_value]
 options{ k=1; }
-	:DIGIT { $libbash_value = walker->get_string($DIGIT); }
-	|NUMBER { $libbash_value = walker->get_string($NUMBER); };
+	:DIGIT { $libbash_value = get_string($DIGIT); }
+	|NUMBER { $libbash_value = get_string($NUMBER); };
 
 var_def[bool local]
 @declarations {
@@ -295,7 +321,7 @@ basic_pattern[boost::xpressive::sregex& pattern, bool greedy, bool& do_append]
 	|(MATCH_ANY_EXCEPT|MATCH_ANY) =>
 	^((MATCH_ANY_EXCEPT { negation = true; } | MATCH_ANY { negation = false; })
 	  ((CHARACTER_CLASS) => ^(CHARACTER_CLASS n=NAME) {
-			std::string class_name = walker->get_string(n);
+			std::string class_name = get_string(n);
 			if(class_name == "word")
 				pattern_str += "A-Za-z0-9_";
 			else if(class_name == "ascii")
@@ -331,7 +357,7 @@ any_string returns[std::string libbash_value]
 @declarations {
 	pANTLR3_BASE_TREE any_token;
 }
-	:any_token=. { $libbash_value = walker->get_string(any_token); };
+	:any_token=. { $libbash_value = get_string(any_token); };
 
 //Allowable variable names in the variable expansion
 var_name returns[std::string libbash_value, unsigned index]
@@ -586,7 +612,7 @@ common_condition returns[bool status]
 }
 	// -eq, -ne, -lt, -le, -gt, or -ge for arithmetic. -nt -ot -ef for files
 	:^(NAME left_str=string_expr right_str=string_expr) {
-		$status = internal::test_binary(walker->get_string($NAME), left_str.libbash_value, right_str.libbash_value, *walker);
+		$status = internal::test_binary(get_string($NAME), left_str.libbash_value, right_str.libbash_value, *walker);
 	}
 	// -o for shell option,  -z -n for string, -abcdefghkprstuwxOGLSN for files
 	|^(op=LETTER string_expr) {
@@ -1010,7 +1036,7 @@ arithmetics returns[int value]
 		                           walker->resolve<int>($primary.libbash_value, $primary.index) | l,
 								   $primary.index);
 	}
-	| NUMBER { $value = walker->parse_int($NUMBER);}
-	| DIGIT { $value = walker->parse_int($DIGIT);}
+	| NUMBER { $value =parse_int($NUMBER);}
+	| DIGIT { $value = parse_int($DIGIT);}
 	| ^(VAR_REF libbash_string=var_expansion) { $value = boost::lexical_cast<int>(libbash_string); }
 	;

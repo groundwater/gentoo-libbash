@@ -28,7 +28,6 @@
 #include <memory>
 #include <string>
 
-#include <antlr3basetree.h>
 #include <boost/utility.hpp>
 #include <boost/xpressive/xpressive.hpp>
 #include <boost/numeric/conversion/cast.hpp>
@@ -38,8 +37,6 @@
 #include "cppbash_builtin.h"
 
 typedef std::unordered_map<std::string, std::shared_ptr<variable>> scope;
-struct libbashWalker_Ctx_struct;
-typedef struct libbashWalker_Ctx_struct * plibbashWalker;
 
 ///
 /// \class interpreter
@@ -174,20 +171,6 @@ public:
   {
     _out = &std::cout;
   }
-
-  /// \brief parse the text value of a tree to integer
-  /// \param the target tree
-  /// \return the parsed value
-  static int parse_int(ANTLR3_BASE_TREE* tree)
-  {
-    return tree->getText(tree)->toInt32(tree->getText(tree));
-  }
-
-  /// \brief a helper function that get the string value
-  ///        of the given pANTLR3_BASE_TREE node.
-  /// \param the target tree node
-  /// \return the value of node->text
-  static std::string get_string(pANTLR3_BASE_TREE node);
 
   /// \brief resolve string/int variable, local scope will be
   ///        checked first, then global scope
