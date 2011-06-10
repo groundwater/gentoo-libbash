@@ -903,70 +903,112 @@ primary returns[std::string libbash_value, unsigned index]
 
 // shell arithmetic
 arithmetics returns[int value]
-	:^(LOGICOR l=arithmetics r=arithmetics) { $value = walker->logicor(l, r); }
-	|^(LOGICAND l=arithmetics r=arithmetics) { $value = walker->logicand(l, r); }
-	|^(PIPE l=arithmetics r=arithmetics) { $value = walker->bitwiseor(l, r); }
-	|^(CARET l=arithmetics r=arithmetics) { $value = walker->bitwisexor(l, r); }
-	|^(AMP l=arithmetics r=arithmetics) { $value = walker->bitwiseand(l, r); }
-	|^(LEQ l=arithmetics r=arithmetics) { $value = walker->less_equal_than(l, r); }
-	|^(GEQ l=arithmetics r=arithmetics) { $value = walker->greater_equal_than(l, r); }
-	|^(LESS_THAN l=arithmetics r=arithmetics) { $value = walker->less_than(l, r); }
-	|^(GREATER_THAN l=arithmetics r=arithmetics) { $value = walker->greater_than(l, r); }
-	|^(NOT_EQUALS l=arithmetics r=arithmetics) { $value = walker->not_equal_to(l, r); }
-	|^(LSHIFT l=arithmetics r=arithmetics) { $value = walker->left_shift(l, r); }
-	|^(RSHIFT l=arithmetics r=arithmetics) { $value = walker->right_shift(l, r); }
-	|^(PLUS l=arithmetics r=arithmetics) { $value = walker->plus(l, r); }
+	:^(LOGICOR l=arithmetics r=arithmetics) { $value = l || r; }
+	|^(LOGICAND l=arithmetics r=arithmetics) { $value = l && r; }
+	|^(PIPE l=arithmetics r=arithmetics) { $value = l | r; }
+	|^(CARET l=arithmetics r=arithmetics) { $value = l ^ r; }
+	|^(AMP l=arithmetics r=arithmetics) { $value = l & r; }
+	|^(LEQ l=arithmetics r=arithmetics) { $value = l <= r; }
+	|^(GEQ l=arithmetics r=arithmetics) { $value = l >= r; }
+	|^(LESS_THAN l=arithmetics r=arithmetics) { $value = l < r; }
+	|^(GREATER_THAN l=arithmetics r=arithmetics) { $value = l > r; }
+	|^(NOT_EQUALS l=arithmetics r=arithmetics) { $value = l != r; }
+	|^(LSHIFT l=arithmetics r=arithmetics) { $value = l << r; }
+	|^(RSHIFT l=arithmetics r=arithmetics) { $value = l >> r; }
+	|^(PLUS l=arithmetics r=arithmetics) { $value = l + r; }
 	|^(PLUS_SIGN l=arithmetics) { $value = l; }
-	|^(MINUS l=arithmetics r=arithmetics) { $value = walker->minus(l, r); }
+	|^(MINUS l=arithmetics r=arithmetics) { $value = l - r; }
 	|^(MINUS_SIGN l=arithmetics) { $value = -l; }
-	|^(TIMES l=arithmetics r=arithmetics) { $value = walker->multiply(l, r); }
-	|^(SLASH l=arithmetics r=arithmetics) { $value = walker->divide(l, r); }
-	|^(PCT l=arithmetics r=arithmetics) { $value = walker->mod(l, r); }
-	|^(EXP l=arithmetics r=arithmetics) { $value = walker->exp(l, r); }
-	|^(BANG l=arithmetics) { $value = walker->negation(l); }
-	|^(TILDE l=arithmetics) { $value = walker->bitwise_negation(l); }
+	|^(TIMES l=arithmetics r=arithmetics) { $value = l * r; }
+	|^(SLASH l=arithmetics r=arithmetics) { $value = l / r; }
+	|^(PCT l=arithmetics r=arithmetics) { $value = l \% r; }
+	|^(EXP l=arithmetics r=arithmetics) {
+		$value = 1;
+		while(r--)
+			$value *= l;
+	}
+	|^(BANG l=arithmetics) { $value = !l; }
+	|^(TILDE l=arithmetics) { $value = ~l; }
 	|^(ARITHMETIC_CONDITION cnd=arithmetics l=arithmetics r=arithmetics) {
-		$value = walker->arithmetic_condition(cnd, l, r);
+		$value = (cnd ? l : r);
 	}
 	|primary {
 		$value = walker->resolve<int>($primary.libbash_value, $primary.index);
 	}
-	|^(PRE_INCR primary) { $value = walker->pre_incr($primary.libbash_value, $primary.index); }
-	|^(PRE_DECR primary) { $value = walker->pre_decr($primary.libbash_value, $primary.index); }
-	|^(POST_INCR primary) { $value = walker->post_incr($primary.libbash_value, $primary.index); }
-	|^(POST_DECR primary) { $value = walker->post_decr($primary.libbash_value, $primary.index); }
+	|^(PRE_INCR primary) {
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) + 1,
+								   $primary.index);
+	}
+	|^(PRE_DECR primary) {
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) - 1,
+								   $primary.index);
+	}
+	|^(POST_INCR primary) {
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) + 1,
+								   $primary.index);
+		--$value;
+	}
+	|^(POST_DECR primary) {
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) - 1,
+								   $primary.index);
+		++$value;
+	}
 	|^(EQUALS primary l=arithmetics) {
 		$value = walker->set_value($primary.libbash_value, l, $primary.index);
 	}
 	|^(MUL_ASSIGN primary l=arithmetics) {
-		$value = walker->assign(&interpreter::multiply, $primary.libbash_value, l, $primary.index);
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) * l,
+								   $primary.index);
 	}
 	|^(DIVIDE_ASSIGN primary l=arithmetics) {
-		$value = walker->assign(&interpreter::divide, $primary.libbash_value, l, $primary.index);
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) / l,
+								   $primary.index);
 	}
 	|^(MOD_ASSIGN primary l=arithmetics) {
-		$value = walker->assign(&interpreter::mod, $primary.libbash_value, l, $primary.index);
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) \% l,
+								   $primary.index);
 	}
 	|^(PLUS_ASSIGN primary l=arithmetics) {
-		$value = walker->assign(&interpreter::plus, $primary.libbash_value, l, $primary.index);
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) + l,
+								   $primary.index);
 	}
 	|^(MINUS_ASSIGN primary l=arithmetics) {
-		$value = walker->assign(&interpreter::minus, $primary.libbash_value, l, $primary.index);
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) - l,
+								   $primary.index);
 	}
 	|^(LSHIFT_ASSIGN primary l=arithmetics) {
-		$value = walker->assign(&interpreter::left_shift, $primary.libbash_value, l, $primary.index);
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) << l,
+								   $primary.index);
 	}
 	|^(RSHIFT_ASSIGN primary l=arithmetics) {
-		$value = walker->assign(&interpreter::right_shift, $primary.libbash_value, l, $primary.index);
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) >> l,
+								   $primary.index);
 	}
 	|^(AND_ASSIGN primary l=arithmetics) {
-		$value = walker->assign(&interpreter::bitwiseand, $primary.libbash_value, l, $primary.index);
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) & l,
+								   $primary.index);
 	}
 	|^(XOR_ASSIGN primary l=arithmetics) {
-		$value = walker->assign(&interpreter::bitwisexor, $primary.libbash_value, l, $primary.index);
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) ^ l,
+								   $primary.index);
 	}
 	|^(OR_ASSIGN primary l=arithmetics) {
-		$value = walker->assign(&interpreter::bitwiseor, $primary.libbash_value, l, $primary.index);
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) | l,
+								   $primary.index);
 	}
 	| NUMBER { $value = walker->parse_int($NUMBER);}
 	| DIGIT { $value = walker->parse_int($DIGIT);}

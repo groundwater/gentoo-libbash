@@ -58,7 +58,7 @@ inline bool inherit_builtin::hasq(const std::string& value, const std::string& n
 // We do not support any QA warning
 int inherit_builtin::exec(const std::vector<std::string>& bash_args)
 {
-  _walker.pre_incr("ECLASS_DEPTH", 0);
+  _walker.set_value("ECLASS_DEPTH", _walker.resolve<int>("ECLASS_DEPTH") + 1);
 
   // find eclass directory
   std::string eclassdir;
@@ -114,7 +114,7 @@ int inherit_builtin::exec(const std::vector<std::string>& bash_args)
       _walker.set_value("INHERITED", _walker.resolve<std::string>("INHERITED") + " " + *iter);
   }
 
-  _walker.pre_decr("ECLASS_DEPTH", 0);
+  _walker.set_value("ECLASS_DEPTH", _walker.resolve<int>("ECLASS_DEPTH") - 1);
   if(_walker.resolve<int>("ECLASS_DEPTH") > 0)
   {
     _walker.set_value("ECLASS", PECLASS);

@@ -403,14 +403,6 @@ void interpreter::set_option(const std::string& name, bool value)
   iter->second = value;
 }
 
-int interpreter::exp(int left, int right)
-{
-  int init = 1;
-  while(right--)
-    init *= left;
-  return init;
-}
-
 int interpreter::eval_arithmetic(const std::string& expression)
 {
   bash_ast ast(std::stringstream(expression), &bash_ast::parser_arithmetics);
