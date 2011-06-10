@@ -236,7 +236,7 @@ void interpreter::get_all_elements_IFS_joined(const std::string& name,
                           result);
 }
 
-void interpreter::split_word(const std::string& word, std::vector<std::string>& output)
+void interpreter::split_word(const std::string& word, std::vector<std::string>& output) const
 {
   const std::string& delimeter = resolve<std::string>("IFS");
   std::string trimmed(word);
@@ -313,7 +313,7 @@ void interpreter::trim_trailing_eols(std::string& value)
   boost::trim_right_if(value, boost::is_any_of("\n"));
 }
 
-void interpreter::get_all_function_names(std::vector<std::string>& function_names)
+void interpreter::get_all_function_names(std::vector<std::string>& function_names) const
 {
   boost::copy(functions | boost::adaptors::map_keys, back_inserter(function_names));
 }

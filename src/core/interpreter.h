@@ -245,7 +245,7 @@ public:
   /// \brief get the return status of the last command
   /// \param the value of the return status
   template <typename T=int>
-  T get_status(void)
+  T get_status(void) const
   {
     return resolve<T>("?");
   }
@@ -322,12 +322,12 @@ public:
   /// \brief check if we have 'name' defined as a function
   /// \param function name
   /// \return whether 'name' is a function
-  bool has_function(const std::string& name)
+  bool has_function(const std::string& name) const
   {
     return functions.find(name) != functions.end();
   }
 
-  void get_all_function_names(std::vector<std::string>& function_names);
+  void get_all_function_names(std::vector<std::string>& function_names) const;
 
   /// \brief execute builtin
   /// \param builtin name
@@ -430,7 +430,7 @@ public:
   /// \brief implementation of word splitting
   /// \param the value of the word
   //. \param[out] the splitted result will be appended to output
-  void split_word(const std::string& word, std::vector<std::string>& output);
+  void split_word(const std::string& word, std::vector<std::string>& output) const;
 
   /// \brief get the status of shell optional behavior
   /// \param the option name
