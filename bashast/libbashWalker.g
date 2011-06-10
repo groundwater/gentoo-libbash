@@ -62,84 +62,87 @@ options
 		walker = w;
 	}
 
-	inline void set_index(const std::string& name, unsigned& index, int value)
+	namespace
 	{
-		if(value < 0)
-			throw interpreter_exception((boost::format("Array index is less than 0: \%s[\%d]") \% name \% value).str());
-		index = value;
-	}
-
-	// seek to LT(2) and consume
-	static void seek_to_next_tree(plibbashWalker ctx)
-	{
-		// Current depth of the tree we are traversing
-		int depth = 1;
-
-		// The beginning should always be ROOT DOWN ANY_TOKEN
-		// So we start from LA(4)
-		int index = 4;
-		for(; depth != 0; ++index)
+		void set_index(const std::string& name, unsigned& index, int value)
 		{
-			// Go one level done if we encounter DOWN
-			if(LA(index) == DOWN)
-				++depth;
-			// Go one level up if we encounter UP. When depth==0, we finishe one node
-			else if(LA(index) == UP)
-				--depth;
+			if(value < 0)
+				throw interpreter_exception((boost::format("Array index is less than 0: \%s[\%d]") \% name \% value).str());
+			index = value;
 		}
 
-		// Seek to the correct offset and consume.
-		SEEK(INDEX() + index - 2);
-		CONSUME();
-	}
-
-	// The method is used to append a pattern with another one. Because it's not allowed to append an empty pattern,
-	// we need the argument 'do_append' to indicate whether the pattern is empty. 'do_append' will be set to true after
-	// the first assignment.
-	inline void append(boost::xpressive::sregex& pattern, const boost::xpressive::sregex& new_pattern, bool& do_append)
-	{
-		using namespace boost::xpressive;
-		if(do_append)
+		// seek to LT(2) and consume
+		void seek_to_next_tree(plibbashWalker ctx)
 		{
-			pattern = sregex(pattern >> new_pattern);
+			// Current depth of the tree we are traversing
+			int depth = 1;
+
+			// The beginning should always be ROOT DOWN ANY_TOKEN
+			// So we start from LA(4)
+			int index = 4;
+			for(; depth != 0; ++index)
+			{
+				// Go one level done if we encounter DOWN
+				if(LA(index) == DOWN)
+					++depth;
+				// Go one level up if we encounter UP. When depth==0, we finishe one node
+				else if(LA(index) == UP)
+					--depth;
+			}
+
+			// Seek to the correct offset and consume.
+			SEEK(INDEX() + index - 2);
+			CONSUME();
 		}
-		else
+
+		// The method is used to append a pattern with another one. Because it's not allowed to append an empty pattern,
+		// we need the argument 'do_append' to indicate whether the pattern is empty. 'do_append' will be set to true after
+		// the first assignment.
+		void append(boost::xpressive::sregex& pattern, const boost::xpressive::sregex& new_pattern, bool& do_append)
 		{
-			pattern = new_pattern;
-			do_append = true;
+			using namespace boost::xpressive;
+			if(do_append)
+			{
+				pattern = sregex(pattern >> new_pattern);
+			}
+			else
+			{
+				pattern = new_pattern;
+				do_append = true;
+			}
 		}
-	}
 
-	bool match(const std::string& target,
-			   const boost::xpressive::sregex& pattern)
-	{
-	  return boost::xpressive::regex_match(target, pattern);
-	}
+		bool match(const std::string& target,
+				   const boost::xpressive::sregex& pattern)
+		{
+		  return boost::xpressive::regex_match(target, pattern);
+		}
 
-	/// \brief parse the text value of a tree to integer
-	/// \param the target tree
-	/// \return the parsed value
-	static int parse_int(ANTLR3_BASE_TREE* tree)
-	{
-		return tree->getText(tree)->toInt32(tree->getText(tree));
-	}
+		/// \brief parse the text value of a tree to integer
+		/// \param the target tree
+		/// \return the parsed value
+		int parse_int(ANTLR3_BASE_TREE* tree)
+		{
+			return tree->getText(tree)->toInt32(tree->getText(tree));
+		}
 
-	/// \brief a helper function that get the string value
-	///        of the given pANTLR3_BASE_TREE node.
-	/// \param the target tree node
-	/// \return the value of node->text
-	static std::string get_string(pANTLR3_BASE_TREE node)
-	{
-		pANTLR3_COMMON_TOKEN token = node->getToken(node);
-		// The tree walker may send null pointer here, so return an empty
-		// string if that's the case.
-		if(!token->start)
-			return "";
-		// Use reinterpret_cast here because we have to cast C code.
-		// The real type here is int64_t which is used as a pointer.
-		// token->stop - token->start + 1 should be bigger than 0.
-		return std::string(reinterpret_cast<const char *>(token->start),
-						   boost::numeric_cast<unsigned>(token->stop - token->start + 1));
+		/// \brief a helper function that get the string value
+		///        of the given pANTLR3_BASE_TREE node.
+		/// \param the target tree node
+		/// \return the value of node->text
+		std::string get_string(pANTLR3_BASE_TREE node)
+		{
+			pANTLR3_COMMON_TOKEN token = node->getToken(node);
+			// The tree walker may send null pointer here, so return an empty
+			// string if that's the case.
+			if(!token->start)
+				return "";
+			// Use reinterpret_cast here because we have to cast C code.
+			// The real type here is int64_t which is used as a pointer.
+			// token->stop - token->start + 1 should be bigger than 0.
+			return std::string(reinterpret_cast<const char *>(token->start),
+							   boost::numeric_cast<unsigned>(token->stop - token->start + 1));
+		}
 	}
 }
 
