@@ -203,7 +203,7 @@ for_expr:	FOR BLANK+ name (wspace IN (BLANK+ fname)+)? semiel DO wspace* clist s
 	|	FOR BLANK* LLPAREN EOL? (BLANK* init=arithmetic BLANK*|BLANK+)? (SEMIC (BLANK? fcond=arithmetic BLANK*|BLANK+)? SEMIC|DOUBLE_SEMIC) (BLANK* mod=arithmetic)? wspace* RPAREN RPAREN semiel DO wspace clist semiel DONE
 		-> ^(CFOR ^(FOR_INIT $init)? ^(FOR_COND $fcond)? clist ^(FOR_MOD $mod)?)
 	;
-sel_expr:	SELECT BLANK+ name (wspace IN BLANK+ word)? semiel DO wspace* clist semiel DONE -> ^(SELECT name (word)? clist)
+sel_expr:	SELECT BLANK+ name (wspace IN BLANK+ fname)? semiel DO wspace* clist semiel DONE -> ^(SELECT name fname? clist)
 	;
 if_expr	:	IF wspace+ ag=clist semiel THEN wspace+ iflist=clist semiel EOL* (elif_expr)* (ELSE wspace+ else_list=clist semiel EOL*)? FI
 		-> ^(IF_STATEMENT ^(IF $ag $iflist) (elif_expr)* ^(ELSE $else_list)?)
@@ -218,7 +218,7 @@ until_expr
 	;
 // double semicolon is optional for the last alternative
 case_expr
-	:	CASE BLANK+ word wspace IN wspace case_body? ESAC -> ^(CASE word case_body?);
+	:	CASE BLANK+ fname wspace IN wspace case_body? ESAC -> ^(CASE fname case_body?);
 case_body
 	:	case_stmt (wspace* DOUBLE_SEMIC case_stmt)* wspace* DOUBLE_SEMIC? wspace* -> case_stmt*;
 case_stmt
@@ -388,14 +388,6 @@ cond_part:	brace_expansion
 //Rules for whitespace/line endings
 wspace	:	BLANK+|EOL+;
 semiel	:	BLANK* (SEMIC EOL?|EOL) BLANK*;
-
-//definition of word.  this is just going to grow...
-word	:	(brace_expansion) => brace_expansion
-	|	(command_sub) => command_sub
-	|	(var_ref) => var_ref
-	|	(num) => num
-	|	(arithmetic_expansion) => arithmetic_expansion
-	|	fname;
 
 num
 options{k=1;backtrack=false;}
