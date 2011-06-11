@@ -316,15 +316,17 @@ parameter_replace_operator
 //either directly or through array
 var_name
 	:	num
+	|	name LSQUARE AT RSQUARE -> ^(ARRAY name AT)
+	|	name LSQUARE TIMES RSQUARE -> ^(ARRAY name TIMES)
 	|	var_name_no_digit
-	|	TIMES
 	|	DOLLAR
-	|	AT;
+	|	TIMES
+	|	AT
+	|	POUND;
 //Inside arithmetic we can't allow digits
 var_name_no_digit
-	:	name^ LSQUARE! (AT|TIMES|explicit_arithmetic) RSQUARE!
-	|	name
-	|	POUND;
+	:	name^ LSQUARE! (explicit_arithmetic) RSQUARE!
+	|	name;
 //with bang the array syntax is used for array indexes
 var_name_for_bang
 	:	num|name|POUND;

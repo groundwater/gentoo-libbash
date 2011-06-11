@@ -90,21 +90,11 @@ std::shared_ptr<variable> interpreter::resolve_variable(const std::string& name)
   if(name.empty())
     return std::shared_ptr<variable>();
 
-  // positional parameter
-  if(isdigit(name[0]) && !local_members.empty())
+  BOOST_REVERSE_FOREACH(auto& frame, local_members)
   {
-    auto iter_local = local_members.back().find(name);
-    if(iter_local != local_members.back().end())
+    auto iter_local = frame.find(name);
+    if(iter_local != frame.end())
       return iter_local->second;
-  }
-  else
-  {
-    BOOST_REVERSE_FOREACH(auto& frame, local_members)
-    {
-      auto iter_local = frame.find(name);
-      if(iter_local != frame.end())
-        return iter_local->second;
-    }
   }
 
   auto iter_global = members.find(name);
@@ -116,53 +106,22 @@ std::shared_ptr<variable> interpreter::resolve_variable(const std::string& name)
 bool interpreter::is_unset_or_null(const std::string& name,
                                    const unsigned index) const
 {
-  auto i = members.find(name);
-  if(i == members.end())
+  auto var = resolve_variable(name);
+  if(!var)
     return true;
-  else
-    return i->second->is_null(index);
+  return var->is_null(index);
 }
 
-// This method temporarily supports array offset expansion for $* and $@.
-// That logic will be refactored and applied to normal array variables in future.
 std::string interpreter::get_substring(const std::string& name,
                                        long long offset,
                                        unsigned length,
                                        const unsigned index) const
 {
-  if(name != "*" && name != "@")
-  {
-    std::string value = resolve<std::string>(name, index);
-    if(!get_real_offset(offset, boost::numeric_cast<unsigned>(value.size())))
-      return "";
-    // After get_real_offset, we know offset can be cast to unsigned.
-    return value.substr(boost::numeric_cast<std::string::size_type>(offset), length);
-  }
-  else
-  {
-    std::vector<std::string> array;
-    // ${*:1} has the same content as ${*}, ${*:0} contains current script name as the first element
-    if(offset > 0)
-      offset--;
-    else if(offset == 0)
-      // Need to replace this with the real script name
-      array.push_back("filename");
-    // We do not support arrays that have size bigger than numeric_limits<unsigned>::max()
-    if(resolve_array(name, array) && get_real_offset(offset, boost::numeric_cast<unsigned>(array.size())))
-    {
-      // We do not support arrays that have size bigger than numeric_limits<unsigned>::max()
-      // After get_real_offset, we know offset can be cast to unsigned.
-      unsigned max_length = boost::numeric_cast<unsigned>(array.size()) - boost::numeric_cast<unsigned>(offset);
-      if(length > max_length)
-        length = max_length;
-
-      auto start = array.begin() + boost::numeric_cast<std::vector<std::string>::difference_type>(offset);
-      auto end = array.begin() + boost::numeric_cast<std::vector<std::string>::difference_type>(offset + length);
-      return boost::algorithm::join(std::vector<std::string>(start, end), resolve<std::string>("IFS").substr(0, 1));
-    }
-    else
-      return "";
-  }
+  std::string value = resolve<std::string>(name, index);
+  if(!get_real_offset(offset, boost::numeric_cast<unsigned>(value.size())))
+    return "";
+  // After get_real_offset, we know offset can be cast to unsigned.
+  return value.substr(boost::numeric_cast<std::string::size_type>(offset), length);
 }
 
 const std::string interpreter::do_substring_expansion(const std::string& name,
@@ -183,6 +142,54 @@ const std::string interpreter::do_substring_expansion(const std::string& name,
   return get_substring(name, offset, boost::numeric_cast<unsigned>(length), index);
 }
 
+std::string interpreter::get_subarray(const std::string& name,
+                                      long long offset,
+                                      unsigned length) const
+{
+  std::vector<std::string> array;
+  if(name == "*" || name == "@")
+  {
+    // ${*:1} has the same content as ${*}, ${*:0} contains current script name as the first element
+    if(offset > 0)
+      offset--;
+    else if(offset == 0)
+      array.push_back(resolve<std::string>("0"));
+  }
+  // We do not support arrays that have size bigger than numeric_limits<unsigned>::max()
+  if(resolve_array(name, array) && get_real_offset(offset, boost::numeric_cast<unsigned>(array.size())))
+  {
+    // We do not support arrays that have size bigger than numeric_limits<unsigned>::max()
+    // After get_real_offset, we know offset can be cast to unsigned.
+    unsigned max_length = boost::numeric_cast<unsigned>(array.size()) - boost::numeric_cast<unsigned>(offset);
+    if(length > max_length)
+      length = max_length;
+
+    auto start = array.begin() + boost::numeric_cast<std::vector<std::string>::difference_type>(offset);
+    auto end = array.begin() + boost::numeric_cast<std::vector<std::string>::difference_type>(offset + length);
+    return boost::algorithm::join(std::vector<std::string>(start, end), resolve<std::string>("IFS").substr(0, 1));
+  }
+  else
+  {
+    return "";
+  }
+}
+
+const std::string interpreter::do_subarray_expansion(const std::string& name,
+                                                     long long offset) const
+{
+  return get_subarray(name, offset, std::numeric_limits<unsigned>::max());
+}
+
+const std::string interpreter::do_subarray_expansion(const std::string& name,
+                                                     long long offset,
+                                                     int length) const
+{
+  if(length < 0)
+    throw interpreter_exception("length of substring expression should be greater or equal to zero");
+
+  return get_subarray(name, offset, boost::numeric_cast<unsigned>(length));
+}
+
 std::string interpreter::do_replace_expansion(const std::string& name,
                                               std::function<void(std::string&)> replacer,
                                               const unsigned index) const
@@ -195,19 +202,18 @@ std::string interpreter::do_replace_expansion(const std::string& name,
 std::string::size_type interpreter::get_length(const std::string& name,
                                  const unsigned index) const
 {
-  auto i = members.find(name);
-  if(i == members.end())
+  auto var = resolve_variable(name);
+  if(!var)
     return 0;
-  return i->second->get_length(index);
+  return var->get_length(index);
 }
 
 variable::size_type interpreter::get_array_length(const std::string& name) const
 {
-  auto i = members.find(name);
-  if(i == members.end())
+  auto var = resolve_variable(name);
+  if(!var)
     return 0;
-  else
-    return i->second->get_array_length();
+  return var->get_array_length();
 }
 
 void interpreter::get_all_elements_joined(const std::string& name,
@@ -255,14 +261,10 @@ void interpreter::define_function_arguments(scope& current_stack,
 {
   std::map<unsigned, std::string> positional_args;
 
-  for(auto i = 0u; i != arguments.size(); ++i)
-  {
-    const std::string& name = boost::lexical_cast<std::string>(i + 1);
-    current_stack[name].reset(new variable(name, arguments[i]));
-    positional_args[i] = arguments[i];
-  }
+  for(auto i = 1u; i <= arguments.size(); ++i)
+    positional_args[i] = arguments[i - 1];
 
-  define("*", positional_args);
+  current_stack["*"].reset(new variable("*", positional_args, true));
 }
 
 void interpreter::call(const std::string& name,

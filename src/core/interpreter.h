@@ -93,6 +93,10 @@ class interpreter: public boost::noncopyable
                             long long offset,
                             unsigned length,
                             const unsigned index) const;
+
+  std::string get_subarray(const std::string& name,
+                           long long offset,
+                           unsigned length) const;
 public:
 
   typedef std::map<std::string, bool>::const_iterator option_iterator;
@@ -194,11 +198,11 @@ public:
   template <typename T>
   bool resolve_array(const std::string& name, std::vector<T>& values) const
   {
-    auto i = members.find(name);
-    if(i == members.end())
+    auto var = resolve_variable(name);
+    if(!var)
       return false;
 
-    i->second->get_all_values(values);
+    var->get_all_values(values);
     return true;
   }
 
@@ -397,6 +401,20 @@ public:
                                            long long offset,
                                            int length,
                                            const unsigned index) const;
+
+  /// \brief perform subarray expansion
+  /// \param the offset of the subarray
+  /// \return the expansion result
+  const std::string do_subarray_expansion(const std::string& name,
+                                          long long offset) const;
+
+  /// \brief perform subarray expansion
+  /// \param the offset of the subarray
+  /// \param the length of the subarray
+  /// \return the expansion result
+  const std::string do_subarray_expansion(const std::string& name,
+                                          long long offset,
+                                          int length) const;
 
   /// \brief perform replacement expansion
   /// \param the name of the varaible that needs to be expanded
