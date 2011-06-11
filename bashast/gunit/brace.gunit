@@ -31,3 +31,4 @@ fname:
 "a{b,c}" -> (STRING a (BRACE_EXP (STRING b) (STRING c)))
 "{c..d}f" -> (STRING (BRACE_EXP (.. c d)) f)
 "a{a,b}b{c,d}" -> (STRING a (BRACE_EXP (STRING a) (STRING b)) b (BRACE_EXP (STRING c) (STRING d)))
+"[{a,b}-c]*" -> (STRING (MATCH_ANY (BRACE_EXP (STRING a) (STRING b)) - c) MATCH_ALL)
