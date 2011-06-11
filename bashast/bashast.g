@@ -455,20 +455,16 @@ pattern_match_trigger
 	|	AT;
 //Pattern matching using brackets
 bracket_pattern_match
-	:	LSQUARE! bracket_pattern_match_operator
+	:	LSQUARE! bracket_pattern_match_operator^ pattern_match RSQUARE!
 	|	TIMES -> MATCH_ALL
 	|	QMARK -> MATCH_ONE;
 bracket_pattern_match_operator
-	:	RSQUARE (BANG|CARET) pattern_match RSQUARE -> ^(MATCH_ANY_EXCEPT RSQUARE pattern_match)
-	|	RSQUARE              pattern_match RSQUARE -> ^(MATCH_ANY RSQUARE pattern_match)
-	|	(BANG|CARET)         pattern_match RSQUARE -> ^(MATCH_ANY_EXCEPT pattern_match)
-	|	                     pattern_match RSQUARE -> ^(MATCH_ANY pattern_match);
-pattern_match
-	:	pattern_match_atom+;
+	:	(BANG) => BANG -> MATCH_ANY_EXCEPT
+	|	(CARET) => CARET -> MATCH_ANY_EXCEPT
+	|	-> MATCH_ANY;
 //allowable patterns with bracket pattern matching
-pattern_match_atom
-	:	pattern_class_match
-	|	(~RSQUARE) => fname_part;
+pattern_match
+	:	(pattern_class_match|fname_part) (pattern_class_match| (~RSQUARE) => fname_part)*;
 
 //special class patterns to match: [:alpha:] etc
 pattern_class_match

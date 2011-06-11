@@ -56,6 +56,7 @@ fname:
 "ab[!d-h]" -> (STRING ab (MATCH_ANY_EXCEPT d - h))
 "ab[^d-h]" -> (STRING ab (MATCH_ANY_EXCEPT d - h))
 "ab[]c]" -> (STRING ab (MATCH_ANY ] c))
+"ab[]!]" -> (STRING ab (MATCH_ANY ] !))
 "ab[:alpha:]" -> (STRING ab (MATCH_ANY : alpha :))
 "ab[=c=]" -> (STRING ab (MATCH_ANY = c =))
 "ab[.c.]" -> (STRING ab (MATCH_ANY . c .))
