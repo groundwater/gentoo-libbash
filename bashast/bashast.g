@@ -222,12 +222,8 @@ case_expr
 case_body
 	:	case_stmt (wspace* DOUBLE_SEMIC case_stmt)* wspace* DOUBLE_SEMIC? wspace* -> case_stmt*;
 case_stmt
-	:	wspace* (LPAREN BLANK*)? case_pattern (BLANK* PIPE BLANK? case_pattern)* BLANK* RPAREN (wspace* clist)?
-		-> ^(CASE_PATTERN case_pattern+ (CASE_COMMAND clist)?);
-case_pattern
-	:	command_sub
-	|	fname
-	|	TIMES;
+	:	wspace* (LPAREN BLANK*)? fname (BLANK* PIPE BLANK? fname)* BLANK* RPAREN (wspace* clist)?
+		-> ^(CASE_PATTERN fname+ (CASE_COMMAND clist)?);
 //A grouping of commands executed in a subshell
 subshell:	LPAREN wspace? clist (BLANK* SEMIC)? (BLANK* EOL)* BLANK* RPAREN redirect? -> ^(SUBSHELL clist redirect?);
 //A grouping of commands executed in the current shell
