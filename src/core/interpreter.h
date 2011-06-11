@@ -24,13 +24,10 @@
 #ifndef LIBBASH_CORE_INTERPRETER_H_
 #define LIBBASH_CORE_INTERPRETER_H_
 
-#include <cmath>
-
 #include <functional>
 #include <memory>
 #include <string>
 
-#include <antlr3basetree.h>
 #include <boost/utility.hpp>
 #include <boost/xpressive/xpressive.hpp>
 #include <boost/numeric/conversion/cast.hpp>
@@ -40,8 +37,6 @@
 #include "cppbash_builtin.h"
 
 typedef std::unordered_map<std::string, std::shared_ptr<variable>> scope;
-struct libbashWalker_Ctx_struct;
-typedef struct libbashWalker_Ctx_struct * plibbashWalker;
 
 ///
 /// \class interpreter
@@ -177,261 +172,6 @@ public:
     _out = &std::cout;
   }
 
-  /// \brief parse the text value of a tree to integer
-  /// \param the target tree
-  /// \return the parsed value
-  static int parse_int(ANTLR3_BASE_TREE* tree)
-  {
-    return tree->getText(tree)->toInt32(tree->getText(tree));
-  }
-
-  /// \brief a helper function that get the string value
-  ///        of the given pANTLR3_BASE_TREE node.
-  /// \param the target tree node
-  /// \return the value of node->text
-  static std::string get_string(pANTLR3_BASE_TREE node);
-
-  /// \brief perform logic or
-  /// \param the first operand
-  /// \param the second operand
-  /// \return the calculated result
-  static int logicor(int left, int right)
-  {
-    return left || right;
-  }
-
-  /// \brief perform logic and
-  /// \param the first operand
-  /// \param the second operand
-  /// \return the calculated result
-  static int logicand(int left, int right)
-  {
-    return left && right;
-  }
-
-  /// \brief perform bitwise or
-  /// \param the first operand
-  /// \param the second operand
-  /// \return the calculated result
-  static int bitwiseor(int left, int right)
-  {
-    return left | right;
-  }
-
-  /// \brief perform bitwise and
-  /// \param the first operand
-  /// \param the second operand
-  /// \return the calculated result
-  static int bitwiseand(int left, int right)
-  {
-    return left & right;
-  }
-
-  /// \brief perform bitwise xor
-  /// \param the first operand
-  /// \param the second operand
-  /// \return the calculated result
-  static int bitwisexor(int left, int right)
-  {
-    return left ^ right;
-  }
-
-  /// \brief perform left or equal to
-  /// \param the first operand
-  /// \param the second operand
-  /// \return the calculated result
-  static int less_equal_than(int left, int right)
-  {
-    return left <= right;
-  }
-
-  /// \brief perform greater or equal to
-  /// \param the first operand
-  /// \param the second operand
-  /// \return the calculated result
-  static int greater_equal_than(int left, int right)
-  {
-    return left >= right;
-  }
-
-  /// \brief perform less than
-  /// \param the first operand
-  /// \param the second operand
-  /// \return the calculated result
-  static int less_than(int left, int right)
-  {
-    return left < right;
-  }
-
-  /// \brief perform greater than
-  /// \param the first operand
-  /// \param the second operand
-  /// \return the calculated result
-  static int greater_than(int left, int right)
-  {
-    return left > right;
-  }
-
-  /// \brief perform not equal to
-  /// \param the first operand
-  /// \param the second operand
-  /// \return the calculated result
-  static int not_equal_to(int left, int right)
-  {
-    return left != right;
-  }
-
-  /// \brief perform left shift
-  /// \param the first operand
-  /// \param the second operand
-  /// \return the calculated result
-  static int left_shift(int left, int right)
-  {
-    return left << right;
-  }
-
-  /// \brief perform right shift
-  /// \param the first operand
-  /// \param the second operand
-  /// \return the calculated result
-  static int right_shift(int left, int right)
-  {
-    return left >> right;
-  }
-
-  /// \brief perform plus
-  /// \param the first operand
-  /// \param the second operand
-  /// \return the calculated result
-  static int plus(int left, int right)
-  {
-    return left + right;
-  }
-
-  /// \brief perform minus
-  /// \param the first operand
-  /// \param the second operand
-  /// \return the calculated result
-  static int minus(int left, int right)
-  {
-    return left - right;
-  }
-
-  /// \brief perform multiply
-  /// \param the first operand
-  /// \param the second operand
-  /// \return the calculated result
-  static int multiply(int left, int right)
-  {
-    return left * right;
-  }
-
-  /// \brief perform divide
-  /// \param the first operand
-  /// \param the second operand
-  /// \return the calculated result
-  static int divide(int left, int right)
-  {
-    // We are not handling division by zero right now
-    return left / right;
-  }
-
-  /// \brief perform modulo
-  /// \param the first operand
-  /// \param the second operand
-  /// \return the calculated result
-  static int mod(int left, int right)
-  {
-    return left % right;
-  }
-
-  /// \brief perform exponential operation
-  /// \param the first operand
-  /// \param the second operand
-  /// \return the calculated result
-  static int exp(int left, int right);
-
-  /// \brief perform logic negation
-  /// \param the first operand
-  /// \param the second operand
-  /// \return the calculated result
-  static int negation(int element)
-  {
-    return !element;
-  }
-
-  /// \brief perform bitwise negation
-  /// \param the first operand
-  /// \param the second operand
-  /// \return the calculated result
-  static int bitwise_negation(int element)
-  {
-    return ~element;
-  }
-
-
-  /// \brief perform the ternary operator
-  /// \param the condition
-  /// \param the first operand
-  /// \param the second operand
-  /// \return the calculated result
-  static int arithmetic_condition(int cnd, int left, int right)
-  {
-    return (cnd? left : right);
-  }
-
-  /// \brief perform pre-increment
-  /// \param the variable name
-  /// \return the increased value
-  int pre_incr(const std::string& name, const unsigned index)
-  {
-    int value = resolve<int>(name, index);
-    set_value(name, ++value);
-    return value;
-  }
-
-  /// \brief perform pre-decrement
-  /// \param the variable name
-  /// \return the decreased value
-  int pre_decr(const std::string& name, const unsigned index)
-  {
-    int value = resolve<int>(name, index);
-    set_value(name, --value);
-    return value;
-  }
-
-  /// \brief perform post-increment
-  /// \param the variable name
-  /// \return the original value
-  int post_incr(const std::string& name, const unsigned index)
-  {
-    int value = resolve<int>(name, index);
-    set_value(name, value + 1);
-    return value;
-  }
-
-  /// \brief perform post-decrement
-  /// \param the variable name
-  /// \return the original value
-  int post_decr(const std::string& name, const unsigned index)
-  {
-    int value = resolve<int>(name, index);
-    set_value(name, value - 1);
-    return value;
-  }
-
-  /// \brief assign with an operator (for example multiply)
-  /// \param a function object to do an operation while assigning
-  /// \param the name of the variable
-  /// \param the value to assign
-  /// \return the new value of the variable
-  int assign(std::function<int(int,int)> f, const std::string& name, int value, const unsigned index)
-  {
-    int new_value = f(resolve<int>(name, index), value);
-    set_value(name, new_value, index);
-    return new_value;
-  }
-
   /// \brief resolve string/int variable, local scope will be
   ///        checked first, then global scope
   /// \param variable name
@@ -505,7 +245,7 @@ public:
   /// \brief get the return status of the last command
   /// \param the value of the return status
   template <typename T=int>
-  T get_status(void)
+  T get_status(void) const
   {
     return resolve<T>("?");
   }
@@ -582,12 +322,12 @@ public:
   /// \brief check if we have 'name' defined as a function
   /// \param function name
   /// \return whether 'name' is a function
-  bool has_function(const std::string& name)
+  bool has_function(const std::string& name) const
   {
     return functions.find(name) != functions.end();
   }
 
-  void get_all_function_names(std::vector<std::string>& function_names);
+  void get_all_function_names(std::vector<std::string>& function_names) const;
 
   /// \brief execute builtin
   /// \param builtin name
@@ -690,7 +430,7 @@ public:
   /// \brief implementation of word splitting
   /// \param the value of the word
   //. \param[out] the splitted result will be appended to output
-  void split_word(const std::string& word, std::vector<std::string>& output);
+  void split_word(const std::string& word, std::vector<std::string>& output) const;
 
   /// \brief get the status of shell optional behavior
   /// \param the option name

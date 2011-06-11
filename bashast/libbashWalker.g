@@ -62,58 +62,87 @@ options
 		walker = w;
 	}
 
-	inline void set_index(const std::string& name, unsigned& index, int value)
+	namespace
 	{
-		if(value < 0)
-			throw interpreter_exception((boost::format("Array index is less than 0: \%s[\%d]") \% name \% value).str());
-		index = value;
-	}
-
-	// seek to LT(2) and consume
-	static void seek_to_next_tree(plibbashWalker ctx)
-	{
-		// Current depth of the tree we are traversing
-		int depth = 1;
-
-		// The beginning should always be ROOT DOWN ANY_TOKEN
-		// So we start from LA(4)
-		int index = 4;
-		for(; depth != 0; ++index)
+		void set_index(const std::string& name, unsigned& index, int value)
 		{
-			// Go one level done if we encounter DOWN
-			if(LA(index) == DOWN)
-				++depth;
-			// Go one level up if we encounter UP. When depth==0, we finishe one node
-			else if(LA(index) == UP)
-				--depth;
+			if(value < 0)
+				throw interpreter_exception((boost::format("Array index is less than 0: \%s[\%d]") \% name \% value).str());
+			index = value;
 		}
 
-		// Seek to the correct offset and consume.
-		SEEK(INDEX() + index - 2);
-		CONSUME();
-	}
-
-	// The method is used to append a pattern with another one. Because it's not allowed to append an empty pattern,
-	// we need the argument 'do_append' to indicate whether the pattern is empty. 'do_append' will be set to true after
-	// the first assignment.
-	inline void append(boost::xpressive::sregex& pattern, const boost::xpressive::sregex& new_pattern, bool& do_append)
-	{
-		using namespace boost::xpressive;
-		if(do_append)
+		// seek to LT(2) and consume
+		void seek_to_next_tree(plibbashWalker ctx)
 		{
-			pattern = sregex(pattern >> new_pattern);
-		}
-		else
-		{
-			pattern = new_pattern;
-			do_append = true;
-		}
-	}
+			// Current depth of the tree we are traversing
+			int depth = 1;
 
-	bool match(const std::string& target,
-			   const boost::xpressive::sregex& pattern)
-	{
-	  return boost::xpressive::regex_match(target, pattern);
+			// The beginning should always be ROOT DOWN ANY_TOKEN
+			// So we start from LA(4)
+			int index = 4;
+			for(; depth != 0; ++index)
+			{
+				// Go one level done if we encounter DOWN
+				if(LA(index) == DOWN)
+					++depth;
+				// Go one level up if we encounter UP. When depth==0, we finishe one node
+				else if(LA(index) == UP)
+					--depth;
+			}
+
+			// Seek to the correct offset and consume.
+			SEEK(INDEX() + index - 2);
+			CONSUME();
+		}
+
+		// The method is used to append a pattern with another one. Because it's not allowed to append an empty pattern,
+		// we need the argument 'do_append' to indicate whether the pattern is empty. 'do_append' will be set to true after
+		// the first assignment.
+		void append(boost::xpressive::sregex& pattern, const boost::xpressive::sregex& new_pattern, bool& do_append)
+		{
+			using namespace boost::xpressive;
+			if(do_append)
+			{
+				pattern = sregex(pattern >> new_pattern);
+			}
+			else
+			{
+				pattern = new_pattern;
+				do_append = true;
+			}
+		}
+
+		bool match(const std::string& target,
+				   const boost::xpressive::sregex& pattern)
+		{
+		  return boost::xpressive::regex_match(target, pattern);
+		}
+
+		/// \brief parse the text value of a tree to integer
+		/// \param the target tree
+		/// \return the parsed value
+		int parse_int(ANTLR3_BASE_TREE* tree)
+		{
+			return tree->getText(tree)->toInt32(tree->getText(tree));
+		}
+
+		/// \brief a helper function that get the string value
+		///        of the given pANTLR3_BASE_TREE node.
+		/// \param the target tree node
+		/// \return the value of node->text
+		std::string get_string(pANTLR3_BASE_TREE node)
+		{
+			pANTLR3_COMMON_TOKEN token = node->getToken(node);
+			// The tree walker may send null pointer here, so return an empty
+			// string if that's the case.
+			if(!token->start)
+				return "";
+			// Use reinterpret_cast here because we have to cast C code.
+			// The real type here is int64_t which is used as a pointer.
+			// token->stop - token->start + 1 should be bigger than 0.
+			return std::string(reinterpret_cast<const char *>(token->start),
+							   boost::numeric_cast<unsigned>(token->stop - token->start + 1));
+		}
 	}
 }
 
@@ -128,8 +157,8 @@ variable_definitions
 	:^(VARIABLE_DEFINITIONS (LOCAL { local = true; })? var_def[local]*);
 
 name_base returns[std::string libbash_value]
-	:NAME { $libbash_value = walker->get_string($NAME); }
-	|LETTER { $libbash_value = walker->get_string($LETTER); }
+	:NAME { $libbash_value = get_string($NAME); }
+	|LETTER { $libbash_value = get_string($LETTER); }
 	|'_' { $libbash_value="_"; };
 
 name returns[std::string libbash_value, unsigned index]
@@ -146,8 +175,8 @@ name returns[std::string libbash_value, unsigned index]
 
 num returns[std::string libbash_value]
 options{ k=1; }
-	:DIGIT { $libbash_value = walker->get_string($DIGIT); }
-	|NUMBER { $libbash_value = walker->get_string($NUMBER); };
+	:DIGIT { $libbash_value = get_string($DIGIT); }
+	|NUMBER { $libbash_value = get_string($NUMBER); };
 
 var_def[bool local]
 @declarations {
@@ -295,7 +324,7 @@ basic_pattern[boost::xpressive::sregex& pattern, bool greedy, bool& do_append]
 	|(MATCH_ANY_EXCEPT|MATCH_ANY) =>
 	^((MATCH_ANY_EXCEPT { negation = true; } | MATCH_ANY { negation = false; })
 	  ((CHARACTER_CLASS) => ^(CHARACTER_CLASS n=NAME) {
-			std::string class_name = walker->get_string(n);
+			std::string class_name = get_string(n);
 			if(class_name == "word")
 				pattern_str += "A-Za-z0-9_";
 			else if(class_name == "ascii")
@@ -331,7 +360,7 @@ any_string returns[std::string libbash_value]
 @declarations {
 	pANTLR3_BASE_TREE any_token;
 }
-	:any_token=. { $libbash_value = walker->get_string(any_token); };
+	:any_token=. { $libbash_value = get_string(any_token); };
 
 //Allowable variable names in the variable expansion
 var_name returns[std::string libbash_value, unsigned index]
@@ -586,7 +615,7 @@ common_condition returns[bool status]
 }
 	// -eq, -ne, -lt, -le, -gt, or -ge for arithmetic. -nt -ot -ef for files
 	:^(NAME left_str=string_expr right_str=string_expr) {
-		$status = internal::test_binary(walker->get_string($NAME), left_str.libbash_value, right_str.libbash_value, *walker);
+		$status = internal::test_binary(get_string($NAME), left_str.libbash_value, right_str.libbash_value, *walker);
 	}
 	// -o for shell option,  -z -n for string, -abcdefghkprstuwxOGLSN for files
 	|^(op=LETTER string_expr) {
@@ -903,72 +932,114 @@ primary returns[std::string libbash_value, unsigned index]
 
 // shell arithmetic
 arithmetics returns[int value]
-	:^(LOGICOR l=arithmetics r=arithmetics) { $value = walker->logicor(l, r); }
-	|^(LOGICAND l=arithmetics r=arithmetics) { $value = walker->logicand(l, r); }
-	|^(PIPE l=arithmetics r=arithmetics) { $value = walker->bitwiseor(l, r); }
-	|^(CARET l=arithmetics r=arithmetics) { $value = walker->bitwisexor(l, r); }
-	|^(AMP l=arithmetics r=arithmetics) { $value = walker->bitwiseand(l, r); }
-	|^(LEQ l=arithmetics r=arithmetics) { $value = walker->less_equal_than(l, r); }
-	|^(GEQ l=arithmetics r=arithmetics) { $value = walker->greater_equal_than(l, r); }
-	|^(LESS_THAN l=arithmetics r=arithmetics) { $value = walker->less_than(l, r); }
-	|^(GREATER_THAN l=arithmetics r=arithmetics) { $value = walker->greater_than(l, r); }
-	|^(NOT_EQUALS l=arithmetics r=arithmetics) { $value = walker->not_equal_to(l, r); }
-	|^(LSHIFT l=arithmetics r=arithmetics) { $value = walker->left_shift(l, r); }
-	|^(RSHIFT l=arithmetics r=arithmetics) { $value = walker->right_shift(l, r); }
-	|^(PLUS l=arithmetics r=arithmetics) { $value = walker->plus(l, r); }
+	:^(LOGICOR l=arithmetics r=arithmetics) { $value = l || r; }
+	|^(LOGICAND l=arithmetics r=arithmetics) { $value = l && r; }
+	|^(PIPE l=arithmetics r=arithmetics) { $value = l | r; }
+	|^(CARET l=arithmetics r=arithmetics) { $value = l ^ r; }
+	|^(AMP l=arithmetics r=arithmetics) { $value = l & r; }
+	|^(LEQ l=arithmetics r=arithmetics) { $value = l <= r; }
+	|^(GEQ l=arithmetics r=arithmetics) { $value = l >= r; }
+	|^(LESS_THAN l=arithmetics r=arithmetics) { $value = l < r; }
+	|^(GREATER_THAN l=arithmetics r=arithmetics) { $value = l > r; }
+	|^(NOT_EQUALS l=arithmetics r=arithmetics) { $value = l != r; }
+	|^(LSHIFT l=arithmetics r=arithmetics) { $value = l << r; }
+	|^(RSHIFT l=arithmetics r=arithmetics) { $value = l >> r; }
+	|^(PLUS l=arithmetics r=arithmetics) { $value = l + r; }
 	|^(PLUS_SIGN l=arithmetics) { $value = l; }
-	|^(MINUS l=arithmetics r=arithmetics) { $value = walker->minus(l, r); }
+	|^(MINUS l=arithmetics r=arithmetics) { $value = l - r; }
 	|^(MINUS_SIGN l=arithmetics) { $value = -l; }
-	|^(TIMES l=arithmetics r=arithmetics) { $value = walker->multiply(l, r); }
-	|^(SLASH l=arithmetics r=arithmetics) { $value = walker->divide(l, r); }
-	|^(PCT l=arithmetics r=arithmetics) { $value = walker->mod(l, r); }
-	|^(EXP l=arithmetics r=arithmetics) { $value = walker->exp(l, r); }
-	|^(BANG l=arithmetics) { $value = walker->negation(l); }
-	|^(TILDE l=arithmetics) { $value = walker->bitwise_negation(l); }
+	|^(TIMES l=arithmetics r=arithmetics) { $value = l * r; }
+	|^(SLASH l=arithmetics r=arithmetics) { $value = l / r; }
+	|^(PCT l=arithmetics r=arithmetics) { $value = l \% r; }
+	|^(EXP l=arithmetics r=arithmetics) {
+		$value = 1;
+		while(r--)
+			$value *= l;
+	}
+	|^(BANG l=arithmetics) { $value = !l; }
+	|^(TILDE l=arithmetics) { $value = ~l; }
 	|^(ARITHMETIC_CONDITION cnd=arithmetics l=arithmetics r=arithmetics) {
-		$value = walker->arithmetic_condition(cnd, l, r);
+		$value = (cnd ? l : r);
 	}
 	|primary {
 		$value = walker->resolve<int>($primary.libbash_value, $primary.index);
 	}
-	|^(PRE_INCR primary) { $value = walker->pre_incr($primary.libbash_value, $primary.index); }
-	|^(PRE_DECR primary) { $value = walker->pre_decr($primary.libbash_value, $primary.index); }
-	|^(POST_INCR primary) { $value = walker->post_incr($primary.libbash_value, $primary.index); }
-	|^(POST_DECR primary) { $value = walker->post_decr($primary.libbash_value, $primary.index); }
+	|^(PRE_INCR primary) {
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) + 1,
+								   $primary.index);
+	}
+	|^(PRE_DECR primary) {
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) - 1,
+								   $primary.index);
+	}
+	|^(POST_INCR primary) {
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) + 1,
+								   $primary.index);
+		--$value;
+	}
+	|^(POST_DECR primary) {
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) - 1,
+								   $primary.index);
+		++$value;
+	}
 	|^(EQUALS primary l=arithmetics) {
 		$value = walker->set_value($primary.libbash_value, l, $primary.index);
 	}
 	|^(MUL_ASSIGN primary l=arithmetics) {
-		$value = walker->assign(&interpreter::multiply, $primary.libbash_value, l, $primary.index);
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) * l,
+								   $primary.index);
 	}
 	|^(DIVIDE_ASSIGN primary l=arithmetics) {
-		$value = walker->assign(&interpreter::divide, $primary.libbash_value, l, $primary.index);
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) / l,
+								   $primary.index);
 	}
 	|^(MOD_ASSIGN primary l=arithmetics) {
-		$value = walker->assign(&interpreter::mod, $primary.libbash_value, l, $primary.index);
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) \% l,
+								   $primary.index);
 	}
 	|^(PLUS_ASSIGN primary l=arithmetics) {
-		$value = walker->assign(&interpreter::plus, $primary.libbash_value, l, $primary.index);
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) + l,
+								   $primary.index);
 	}
 	|^(MINUS_ASSIGN primary l=arithmetics) {
-		$value = walker->assign(&interpreter::minus, $primary.libbash_value, l, $primary.index);
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) - l,
+								   $primary.index);
 	}
 	|^(LSHIFT_ASSIGN primary l=arithmetics) {
-		$value = walker->assign(&interpreter::left_shift, $primary.libbash_value, l, $primary.index);
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) << l,
+								   $primary.index);
 	}
 	|^(RSHIFT_ASSIGN primary l=arithmetics) {
-		$value = walker->assign(&interpreter::right_shift, $primary.libbash_value, l, $primary.index);
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) >> l,
+								   $primary.index);
 	}
 	|^(AND_ASSIGN primary l=arithmetics) {
-		$value = walker->assign(&interpreter::bitwiseand, $primary.libbash_value, l, $primary.index);
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) & l,
+								   $primary.index);
 	}
 	|^(XOR_ASSIGN primary l=arithmetics) {
-		$value = walker->assign(&interpreter::bitwisexor, $primary.libbash_value, l, $primary.index);
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) ^ l,
+								   $primary.index);
 	}
 	|^(OR_ASSIGN primary l=arithmetics) {
-		$value = walker->assign(&interpreter::bitwiseor, $primary.libbash_value, l, $primary.index);
+		$value = walker->set_value($primary.libbash_value,
+		                           walker->resolve<int>($primary.libbash_value, $primary.index) | l,
+								   $primary.index);
 	}
-	| NUMBER { $value = walker->parse_int($NUMBER);}
-	| DIGIT { $value = walker->parse_int($DIGIT);}
+	| NUMBER { $value =parse_int($NUMBER);}
+	| DIGIT { $value = parse_int($DIGIT);}
 	| ^(VAR_REF libbash_string=var_expansion) { $value = boost::lexical_cast<int>(libbash_string); }
 	;
