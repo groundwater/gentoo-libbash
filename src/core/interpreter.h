@@ -69,6 +69,10 @@ class interpreter: public boost::noncopyable
   // std::map is chosen for sorted output in shopt -p
   std::map<std::string, bool> additional_options;
 
+  // std::map is chosen for sorted output in $-. The order may not be the same
+  // as bash implementation.
+  std::map<char, bool> options;
+
   /// \brief calculate the correct offset when offset < 0 and check whether
   ///        the real offset is in legal range
   /// \param[in,out] a value/result argument referring to offset

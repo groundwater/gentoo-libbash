@@ -247,3 +247,10 @@ TEST(interpreter, bash_additional_option)
   walker.set_additional_option("extglob", true);
   EXPECT_TRUE(walker.get_additional_option("extglob"));
 }
+
+TEST(interpreter, bash_option)
+{
+  interpreter walker;
+
+  EXPECT_STREQ("Bh", walker.resolve<std::string>("-").c_str());
+}

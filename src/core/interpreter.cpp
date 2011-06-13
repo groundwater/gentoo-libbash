@@ -33,11 +33,28 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/foreach.hpp>
+#include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/adaptor/map.hpp>
 #include <boost/range/algorithm/copy.hpp>
 
 #include "core/bash_ast.h"
 #include "core/unset_exception.h"
+
+namespace
+{
+  std::string get_options(std::map<char, bool>& options)
+  {
+    std::string result;
+    boost::copy(options | boost::adaptors::map_keys
+                        | boost::adaptors::filtered(
+                          [&](char option) -> bool {
+                            return options[option];
+                          }
+                        ),
+                back_inserter(result));
+    return result;
+  }
+}
 
 interpreter::interpreter(): _out(&std::cout), _err(&std::cerr), _in(&std::cin), additional_options(
     {
@@ -80,9 +97,33 @@ interpreter::interpreter(): _out(&std::cout), _err(&std::cerr), _in(&std::cin), 
       {"sourcepath", false},
       {"xpg_echo", false},
     }
+    ), options(
+    {
+      {'a', false},
+      {'b', false},
+      {'e', false},
+      {'f', false},
+      {'h', true},
+      {'k', false},
+      {'m', false},
+      {'n', false},
+      {'p', false},
+      {'t', false},
+      {'u', false},
+      {'v', false},
+      {'x', false},
+      {'B', true},
+      {'C', false},
+      {'E', false},
+      {'H', false},
+      {'P', false},
+      {'T', false},
+    }
     )
 {
   define("IFS", " \t\n");
+  // We do not support the options set by the shell itself (such as the -i option)
+  define("-", get_options(options));
 }
 
 std::shared_ptr<variable> interpreter::resolve_variable(const std::string& name) const
