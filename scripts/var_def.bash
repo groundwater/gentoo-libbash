@@ -36,7 +36,7 @@ FOO001="networkmanager"
 FOO002="0.8.2"
 FOO003=${FOO001}-${FOO002}
 FOO004=$?
-FOO004=$-
 FOO004=$!
 FOO005=abc
 FOO005+=def
+echo $-
