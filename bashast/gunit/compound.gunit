@@ -94,7 +94,6 @@ done" -> (for each (STRING (COMMAND_SUB (LIST (| (COMMAND (STRING ls)) (COMMAND 
 "for ((;5+3 ;5+3)); do echo yay; done" -> (CFOR (FOR_COND (+ 5 3)) (LIST (COMMAND (STRING echo) (STRING yay))) (FOR_MOD (+ 5 3)))
 "for ((5+3;;5+3)); do echo yay; done" -> (CFOR (FOR_INIT (+ 5 3)) (LIST (COMMAND (STRING echo) (STRING yay))) (FOR_MOD (+ 5 3)))
 
-
 sel_expr:
 "select each in `ls |grep log`; do
   echo \"file found\"
@@ -129,11 +128,11 @@ while_expr:
 echo \"file found\"
 done" -> (while (LIST (COMMAND (STRING echo) (STRING true))) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found)))))
 "while echo true; do echo \"file found\"; done" -> (while (LIST (COMMAND (STRING echo) (STRING true))) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found)))))
-"while(( 1>0 )); do echo ok; done" -> (while (LIST (COMPOUND_ARITH (> 1 0))) (LIST (COMMAND (STRING echo) (STRING ok))))
+"while(( 1>0 )); do echo ok; done" -> (while (LIST (COMMAND (COMPOUND_ARITH (> 1 0)))) (LIST (COMMAND (STRING echo) (STRING ok))))
 "while echo true`; do echo file done" FAIL
 "while [[ -n \"$ver_str\" ]] ; do
 		echo true
-	done" -> (while (LIST (COMPOUND_COND (KEYWORD_TEST (n (STRING (DOUBLE_QUOTED_STRING (VAR_REF ver_str))))))) (LIST (COMMAND (STRING echo) (STRING true))))
+	done" -> (while (LIST (COMMAND (COMPOUND_COND (KEYWORD_TEST (n (STRING (DOUBLE_QUOTED_STRING (VAR_REF ver_str)))))))) (LIST (COMMAND (STRING echo) (STRING true))))
 
 until_expr:
 "until echo true; do
@@ -170,3 +169,22 @@ echo \"Usage: $0 start|stop\" >&2
 exit 3
 ;;
 esac" -> (case (STRING (DOUBLE_QUOTED_STRING (VAR_REF 1))) (CASE_PATTERN (STRING stop)) (CASE_PATTERN (STRING MATCH_ALL) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING Usage :   (VAR_REF 0)   start | stop)) (REDIR >& (FILE_DESCRIPTOR 2))) (COMMAND (STRING exit) (STRING 3)))))
+
+command:
+"[[ asdf > qwert ]] > /dev/null" -> (COMMAND (COMPOUND_COND (KEYWORD_TEST (> (STRING asdf) (STRING qwert)))) (REDIR > (STRING / dev / null)))
+"(( 5+3 )) > /dev/null" -> (COMMAND (COMPOUND_ARITH (+ 5 3)) (REDIR > (STRING / dev / null)))
+"{ time cat; } > /dev/null" -> (COMMAND (CURRENT_SHELL (LIST (COMMAND (STRING cat) time))) (REDIR > (STRING / dev / null)))
+"(time cat) > /dev/null" -> (COMMAND (SUBSHELL (LIST (COMMAND (STRING cat) time))) (REDIR > (STRING / dev / null)))
+"case a in esac >/dev/null" -> (COMMAND (case (STRING a)) (REDIR > (STRING / dev / null)))
+"for i in foo$var bar; do echo $i; done >/dev/null" -> (COMMAND (for i (STRING foo (VAR_REF var)) (STRING bar) (LIST (COMMAND (STRING echo) (STRING (VAR_REF i))))) (REDIR > (STRING / dev / null)))
+"for ((5+3;;5+3)); do echo yay; done >/dev/null" -> (COMMAND (CFOR (FOR_INIT (+ 5 3)) (LIST (COMMAND (STRING echo) (STRING yay))) (FOR_MOD (+ 5 3))) (REDIR > (STRING / dev / null)))
+"select each in `ls |grep log`; do echo \"file found\"; done >/dev/null" -> (COMMAND (select each (STRING (COMMAND_SUB (LIST (| (COMMAND (STRING ls)) (COMMAND (STRING grep) (STRING log)))))) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found))))) (REDIR > (STRING / dev / null)))
+
+"if echo yay2;
+then
+echo yay
+elif echo yay3; then
+echo boo
+fi > /dev/null" -> (COMMAND (IF_STATEMENT (if (LIST (COMMAND (STRING echo) (STRING yay2))) (LIST (COMMAND (STRING echo) (STRING yay)))) (if (LIST (COMMAND (STRING echo) (STRING yay3))) (LIST (COMMAND (STRING echo) (STRING boo))))) (REDIR > (STRING / dev / null)))
+"while echo true; do echo \"file found\"; done > /dev/null" -> (COMMAND (while (LIST (COMMAND (STRING echo) (STRING true))) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found))))) (REDIR > (STRING / dev / null)))
+"until echo true; do echo \"file found\"; done >/dev/null" -> (COMMAND (until (LIST (COMMAND (STRING echo) (STRING true))) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found))))) (REDIR > (STRING / dev / null)))

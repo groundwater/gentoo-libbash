@@ -480,6 +480,9 @@ var_ref [bool double_quoted] returns[std::string libbash_value]
 	|^(VAR_REF libbash_string=var_expansion) { $libbash_value = libbash_string; };
 
 command
+	:^(COMMAND command_atom);
+
+command_atom
 	:variable_definitions
 	|function_definition
 	|simple_command
@@ -489,7 +492,7 @@ simple_command
 @declarations {
 	std::vector<std::string> libbash_args;
 }
-	:^(COMMAND string_expr (argument[libbash_args])* execute_command[$string_expr.libbash_value, libbash_args]);
+	:string_expr (argument[libbash_args])* execute_command[$string_expr.libbash_value, libbash_args];
 
 execute_command[const std::string& name, std::vector<std::string>& libbash_args]
 @declarations {

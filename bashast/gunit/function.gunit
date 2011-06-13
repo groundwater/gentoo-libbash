@@ -32,15 +32,9 @@ function:
 "foo()   { :; }" -> (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
 "foo(){ :; }" -> (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
 
-"function quit { exit; } > /dev/null" -> (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit))) (REDIR > (STRING / dev / null))))
-"function quit {
-    # comment
-    exit; } > /dev/null" -> (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit))) (REDIR > (STRING / dev / null))))
-"function help { echo hi; } 2> /dev/null" -> (function (STRING help) (CURRENT_SHELL (LIST (COMMAND (STRING echo) (STRING hi))) (REDIR 2 > (STRING / dev / null))))
-"function help { echo 3; } 2> /dev/null > output" OK
 "xorg-2_reconf_source() { :; }" -> (function (STRING xorg - 2 _reconf_source) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
 
-"function out() { function inner() { :; }; }" -> (function (STRING out) (CURRENT_SHELL (LIST (function (STRING inner) (CURRENT_SHELL (LIST (COMMAND (STRING :))))))))
+"function out() { function inner() { :; }; }" -> (function (STRING out) (CURRENT_SHELL (LIST (COMMAND (function (STRING inner) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))))))
 
 function_name:
 "xemacs-packages_src_unpack" OK
@@ -49,3 +43,11 @@ function_name:
 "a\"" FAIL
 "333" FAIL
 "aa$aa" FAIL
+
+command:
+"function quit { exit; } > /dev/null" -> (COMMAND (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit))))) (REDIR > (STRING / dev / null)))
+"function quit {
+    # comment
+    exit; } > /dev/null" -> (COMMAND (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit))))) (REDIR > (STRING / dev / null)))
+"function help { echo hi; } 2> /dev/null" -> (COMMAND (function (STRING help) (CURRENT_SHELL (LIST (COMMAND (STRING echo) (STRING hi))))) (REDIR 2 > (STRING / dev / null)))
+"function help { echo 3; } 2> /dev/null > output" OK

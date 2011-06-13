@@ -19,14 +19,16 @@
 gunit bashast;
 
 simple_command:
-"./command" -> (COMMAND (STRING . / command))
-"asdf=5 cat" -> (COMMAND (STRING cat) (= asdf (STRING 5)))
+"./command" -> (STRING . / command)
+"asdf=5 cat" -> (STRING cat) (= asdf (STRING 5))
+"i=3 g=4 h=18 grep asdf" -> (STRING grep) (STRING asdf) (= i (STRING 3)) (= g (STRING 4)) (= h (STRING 18))
+"./configure --prefix=/usr/local" -> (STRING . / configure) (STRING - - prefix = / usr / local)
+"[[while" -> (STRING [ [ while)
+"./foobär" -> (STRING . / foob ä r)
+"cat ~/Documents/todo.txt" -> (STRING cat) (STRING ~ / Documents / todo . txt)
+"dodir ${foo}/${bar}" -> (STRING dodir) (STRING (VAR_REF foo) / (VAR_REF bar))
+"local a=123 b=(1 2 3) c" -> (VARIABLE_DEFINITIONS local (= a (STRING 123)) (= b (ARRAY (STRING 1) (STRING 2) (STRING 3))) (EQUALS c))
+
+command:
 "asdf=5 cat out.log > result" -> (COMMAND (STRING cat) (STRING out . log) (= asdf (STRING 5)) (REDIR > (STRING result)))
 "cat results.log > asdf 2> /dev/null" -> (COMMAND (STRING cat) (STRING results . log) (REDIR > (STRING asdf)) (REDIR 2 > (STRING / dev / null)))
-"i=3 g=4 h=18 grep asdf" -> (COMMAND (STRING grep) (STRING asdf) (= i (STRING 3)) (= g (STRING 4)) (= h (STRING 18)))
-"./configure --prefix=/usr/local" -> (COMMAND (STRING . / configure) (STRING - - prefix = / usr / local))
-"[[while" -> (COMMAND (STRING [ [ while))
-"./foobär" -> (COMMAND (STRING . / foob ä r))
-"cat ~/Documents/todo.txt" -> (COMMAND (STRING cat) (STRING ~ / Documents / todo . txt))
-"dodir ${foo}/${bar}" -> (COMMAND (STRING dodir) (STRING (VAR_REF foo) / (VAR_REF bar)))
-"local a=123 b=(1 2 3) c" -> (VARIABLE_DEFINITIONS local (= a (STRING 123)) (= b (ARRAY (STRING 1) (STRING 2) (STRING 3))) (EQUALS c))

@@ -36,11 +36,11 @@ cp arch/x86_64/boot/bzImage /boot/kernel" -> (LIST (COMMAND (STRING make)) (COMM
 
 "a=asdf
 b=three
-echo \"a b\"" -> (LIST (VARIABLE_DEFINITIONS (= a (STRING asdf))) (VARIABLE_DEFINITIONS (= b (STRING three))) (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING a   b))))
-"echo one && (echo two || echo three)" -> (LIST (&& (COMMAND (STRING echo) (STRING one)) (SUBSHELL (LIST (|| (COMMAND (STRING echo) (STRING two)) (COMMAND (STRING echo) (STRING three)))))))
-"FOO='bar' ;" -> (LIST (VARIABLE_DEFINITIONS (= FOO (STRING (SINGLE_QUOTED_STRING bar)))))
+echo \"a b\"" -> (LIST (COMMAND (VARIABLE_DEFINITIONS (= a (STRING asdf)))) (COMMAND (VARIABLE_DEFINITIONS (= b (STRING three)))) (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING a   b))))
+"echo one && (echo two || echo three)" -> (LIST (&& (COMMAND (STRING echo) (STRING one)) (COMMAND (SUBSHELL (LIST (|| (COMMAND (STRING echo) (STRING two)) (COMMAND (STRING echo) (STRING three))))))))
+"FOO='bar' ;" -> (LIST (COMMAND (VARIABLE_DEFINITIONS (= FOO (STRING (SINGLE_QUOTED_STRING bar))))))
 "true;
 true" -> (LIST (COMMAND (STRING true)) (COMMAND (STRING true)))
-"(echo hi > /dev/null) >> 1" -> (LIST (SUBSHELL (LIST (COMMAND (STRING echo) (STRING hi) (REDIR > (STRING / dev / null)))) (REDIR >> (FILE_DESCRIPTOR 1))))
-"{ echo hi > /dev/null; } >> 1" -> (LIST (CURRENT_SHELL (LIST (COMMAND (STRING echo) (STRING hi) (REDIR > (STRING / dev / null)))) (REDIR >> (FILE_DESCRIPTOR 1))))
-"test 1 -gt 0 || return 0" -> (LIST (|| (COMPOUND_COND (BUILTIN_TEST (gt (STRING 1) (STRING 0)))) (COMMAND (STRING return) (STRING 0))))
+"(echo hi > /dev/null) >> 1" -> (LIST (COMMAND (SUBSHELL (LIST (COMMAND (STRING echo) (STRING hi) (REDIR > (STRING / dev / null))))) (REDIR >> (FILE_DESCRIPTOR 1))))
+"{ echo hi > /dev/null; } >> 1" -> (LIST (COMMAND (CURRENT_SHELL (LIST (COMMAND (STRING echo) (STRING hi) (REDIR > (STRING / dev / null))))) (REDIR >> (FILE_DESCRIPTOR 1))))
+"test 1 -gt 0 || return 0" -> (LIST (|| (COMMAND (COMPOUND_COND (BUILTIN_TEST (gt (STRING 1) (STRING 0))))) (COMMAND (STRING return) (STRING 0))))

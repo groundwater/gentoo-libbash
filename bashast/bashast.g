@@ -126,14 +126,16 @@ time_posix
 	:	MINUS! LETTER BLANK!+;
 //The structure of a command in bash
 command
+	: command_atom redirect? -> ^(COMMAND command_atom redirect?);
+command_atom
 	:	compound_command
 	|	function
 	|	simple_command;
 //Simple bash commands
 simple_command
-	:	variable_definitions BLANK!+ bash_command^ redirect?
+	:	variable_definitions BLANK+ bash_command -> bash_command variable_definitions
 	|	variable_definitions -> ^(VARIABLE_DEFINITIONS variable_definitions)
-	|	bash_command^ redirect?;
+	|	bash_command;
 variable_definitions
 	:	var_def (BLANK!+ var_def)*
 	|	LOCAL BLANK!+ local_item (BLANK!+ local_item)*
@@ -145,7 +147,7 @@ export_item
 	:var_def
 	|name ->;
 bash_command
-	:	fname_no_res_word (BLANK+ fname)* -> ^(COMMAND fname_no_res_word fname*);
+	:	fname_no_res_word (BLANK!+ fname)*;
 redirect:	(BLANK!* redirect_atom)*;
 redirect_atom:	here_string_op^ BLANK!* fname
 	|	here_doc_op^ BLANK!* fname EOL! heredoc
@@ -225,10 +227,10 @@ case_stmt
 	:	wspace* (LPAREN BLANK*)? fname (BLANK* PIPE BLANK? fname)* BLANK* RPAREN (wspace* clist)?
 		-> ^(CASE_PATTERN fname+ (CASE_COMMAND clist)?);
 //A grouping of commands executed in a subshell
-subshell:	LPAREN wspace? clist (BLANK* SEMIC)? (BLANK* EOL)* BLANK* RPAREN redirect? -> ^(SUBSHELL clist redirect?);
+subshell:	LPAREN wspace? clist (BLANK* SEMIC)? (BLANK* EOL)* BLANK* RPAREN -> ^(SUBSHELL clist );
 //A grouping of commands executed in the current shell
 current_shell
-	:	LBRACE wspace clist semiel wspace* RBRACE redirect? -> ^(CURRENT_SHELL clist redirect?);
+	:	LBRACE wspace clist semiel wspace* RBRACE -> ^(CURRENT_SHELL clist);
 //comparison using arithmetic
 arith_comparison
 	:	LLPAREN wspace? arithmetic wspace? RPAREN RPAREN -> ^(COMPOUND_ARITH arithmetic);
