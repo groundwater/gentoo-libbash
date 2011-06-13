@@ -247,7 +247,7 @@ bash_pattern[boost::xpressive::sregex& pattern, bool greedy]
 	bool do_append = false;
 	sregex pattern_list;
 	auto check_extglob = [&]() {
-		if(!walker->get_option("extglob"))
+		if(!walker->get_additional_option("extglob"))
 			throw interpreter_exception("Entered extended pattern matching with extglob disabled");
 	};
 }

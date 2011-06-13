@@ -39,7 +39,7 @@
 #include "core/bash_ast.h"
 #include "core/unset_exception.h"
 
-interpreter::interpreter(): _out(&std::cout), _err(&std::cerr), _in(&std::cin), bash_options(
+interpreter::interpreter(): _out(&std::cout), _err(&std::cerr), _in(&std::cin), additional_options(
     {
       {"autocd", false},
       {"cdable_vars", false},
@@ -372,19 +372,19 @@ void interpreter::unset(const std::string& name,
   }
 }
 
-bool interpreter::get_option(const std::string& name) const
+bool interpreter::get_additional_option(const std::string& name) const
 {
-  auto iter = bash_options.find(name);
-  if(iter == bash_options.end())
+  auto iter = additional_options.find(name);
+  if(iter == additional_options.end())
     throw interpreter_exception("Invalid bash option");
 
   return iter->second;
 }
 
-void interpreter::set_option(const std::string& name, bool value)
+void interpreter::set_additional_option(const std::string& name, bool value)
 {
-  auto iter = bash_options.find(name);
-  if(iter == bash_options.end())
+  auto iter = additional_options.find(name);
+  if(iter == additional_options.end())
     throw interpreter_exception(name + " is not a valid bash option");
 
   iter->second = value;
