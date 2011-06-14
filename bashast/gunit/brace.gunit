@@ -24,7 +24,7 @@ brace_expansion:
 "{a,b,c}" -> (BRACE_EXP (STRING a) (STRING b) (STRING c))
 "{a..d}" -> (BRACE_EXP (.. a d))
 "{{a,b},c,d}" -> (BRACE_EXP (STRING (BRACE_EXP (STRING a) (STRING b))) (STRING c) (STRING d))
-"{.txt,,}" -> (BRACE_EXP (STRING . txt) EMPTY_BRACE_EXPANSION_ATOM EMPTY_BRACE_EXPANSION_ATOM)
+"{.txt,,}" -> (BRACE_EXP (STRING . txt) STRING STRING)
 "{GNUmakefile,{M,m}akefile}" -> (BRACE_EXP (STRING GNUmakefile) (STRING (BRACE_EXP (STRING M) (STRING m)) akefile))
 
 fname:

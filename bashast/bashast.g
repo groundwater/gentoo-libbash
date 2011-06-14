@@ -30,7 +30,6 @@ tokens{
 	ARRAY;
 	ARRAY_SIZE;
 	BRACE_EXP;
-	EMPTY_BRACE_EXPANSION_ATOM;
 	COMMAND_SUB;
 	CASE_PATTERN;
 	CASE_COMMAND;
@@ -189,7 +188,7 @@ range	:	DIGIT DOTDOT^ DIGIT
 	|	LETTER DOTDOT^ LETTER;
 brace_expansion_part
 	:	(((~COMMA) => fname_part)+ -> ^(STRING fname_part+))+
-	|	-> EMPTY_BRACE_EXPANSION_ATOM;
+	|	-> ^(STRING);
 commasep:	brace_expansion_part(COMMA! brace_expansion_part)+;
 command_sub
 	:	DOLLAR LPAREN clist BLANK? RPAREN -> ^(COMMAND_SUB clist)
