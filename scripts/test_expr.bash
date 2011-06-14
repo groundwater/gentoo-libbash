@@ -50,3 +50,5 @@ i=2
 unset i
 [[ "setup.py" =~ ^(setup\.py|nosetests|py\.test|trial(\ .*)?)$ ]] && echo true17
 [[ "setup.py" =~ ^(setup\.p|nosetests|py\.test|trial(\ .*)?)$ ]] && echo false
+[ abc = bcd -o abc = abc ] && echo true18
+[ abc = bcd -a abc = abc ] || echo true19

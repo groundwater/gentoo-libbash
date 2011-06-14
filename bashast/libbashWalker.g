@@ -143,6 +143,11 @@ options
 			return std::string(reinterpret_cast<const char *>(token->start),
 							   boost::numeric_cast<unsigned>(token->stop - token->start + 1));
 		}
+
+		char get_char(pANTLR3_BASE_TREE node)
+		{
+			return *reinterpret_cast<const char *>(node->getToken(node)->start);
+		}
 	}
 }
 
@@ -622,7 +627,7 @@ common_condition returns[bool status]
 	}
 	// -o for shell option,  -z -n for string, -abcdefghkprstuwxOGLSN for files
 	|^(op=LETTER string_expr) {
-		$status = internal::test_unary(*reinterpret_cast<const char *>(op->getToken(op)->start),
+		$status = internal::test_unary(get_char(op),
 		                               $string_expr.libbash_value);
 	}
 	|^(EQUALS left_str=string_expr right_str=string_expr) {
@@ -659,6 +664,15 @@ keyword_condition returns[bool status]
 
 builtin_condition returns[bool status]
 	:^(NEGATION l=builtin_condition) { $status = !l; }
+	|^(BUILTIN_LOGIC o=LETTER l=builtin_condition r=builtin_condition) {
+		char op = get_char(o);
+		if(op == 'a')
+			$status = l && r;
+		else if(op == 'o')
+			$status = l || r;
+		else
+			throw libbash::interpreter_exception(std::string("unrecognized operator in built-in test: ") + op);
+	}
 	|s=builtin_condition_primary { $status = s; };
 
 builtin_condition_primary returns[bool status]
