@@ -44,15 +44,25 @@ int source_builtin::exec(const std::vector<std::string>& bash_args)
   // we need fix this to pass extra arguments as positional parameters
   const std::string& path = bash_args[0];
 
-  auto& stored_ast = ast_cache[path];
-  if(!stored_ast)
-    stored_ast.reset(new bash_ast(path));
+  auto stored_ast = ast_cache.find(path);
+  if(stored_ast == ast_cache.end())
+  {
+    // ensure the path is cached
+    auto iter = ast_cache.insert(make_pair(path, std::shared_ptr<bash_ast>()));
+    // this may throw exception
+    iter.first->second.reset(new bash_ast(path));
+    stored_ast = iter.first;
+  }
+  else if(!(stored_ast->second))
+  {
+    throw libbash::interpreter_exception(path + " cannot be fully parsed");
+  }
 
   const std::string& original_path = _walker.resolve<std::string>("0");
   try
   {
     _walker.define("0", path, true);
-    stored_ast->interpret_with(_walker);
+    stored_ast->second->interpret_with(_walker);
   }
   catch(return_exception& e) {}
 
