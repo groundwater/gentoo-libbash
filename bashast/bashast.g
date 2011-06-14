@@ -103,6 +103,7 @@ tokens{
 	MINUS_SIGN;
 	// Operators
 	NOT_EQUALS;
+	BUILTIN_LOGIC;
 }
 
 start	:	(flcomment)? EOL* clist BLANK* (SEMIC|AMP|EOL)? EOF -> clist;
@@ -364,8 +365,7 @@ builtin_cond_unary
 keyword_cond
 	:	(negate_primary|cond_primary) (BLANK!* (LOGICOR^|LOGICAND^) BLANK!* keyword_cond)?;
 builtin_cond
-	:	negate_builtin_primary
-	|	builtin_cond_primary;
+	:	(negate_builtin_primary|builtin_cond_primary) (BLANK!* builtin_logic_operator^ BLANK!* builtin_cond)?;
 negate_primary
 	:	BANG BLANK+ cond_primary -> ^(NEGATION cond_primary);
 negate_builtin_primary
@@ -388,6 +388,7 @@ bop	:	MINUS! NAME^;
 unary_cond
 	:	uop^ BLANK! cond_part;
 uop	:	MINUS! LETTER;
+builtin_logic_operator	:	uop -> ^(BUILTIN_LOGIC uop);
 //Allowable parts of conditions
 cond_part:	brace_expansion
 	|	fname;
