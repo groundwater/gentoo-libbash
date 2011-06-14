@@ -35,7 +35,7 @@ static void test_shopt_builtin(const std::string& expected, const std::vector<st
     cppbash_builtin::exec("shopt", args, std::cout, output, std::cin, walker);
     FAIL();
   }
-  catch(interpreter_exception& e)
+  catch(libbash::interpreter_exception& e)
   {
     EXPECT_STREQ(expected.c_str(), e.what());
   }

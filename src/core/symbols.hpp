@@ -181,7 +181,7 @@ public:
                  const unsigned index=0)
   {
     if(readonly)
-      throw interpreter_exception(get_name() + " is readonly variable");
+      throw libbash::interpreter_exception(get_name() + " is readonly variable");
 
     value[index] = new_value;
   }
@@ -191,7 +191,7 @@ public:
   void unset_value(const unsigned index)
   {
     if(readonly)
-      throw interpreter_exception(get_name() + " is readonly variable");
+      throw libbash::interpreter_exception(get_name() + " is readonly variable");
 
     value.erase(index);
   }

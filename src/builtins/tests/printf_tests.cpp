@@ -36,7 +36,7 @@ namespace
       cppbash_builtin::exec("printf", arguments, std::cout, std::cerr, std::cin, walker);
       FAIL();
     }
-    catch(interpreter_exception& e)
+    catch(libbash::interpreter_exception& e)
     {
       EXPECT_STREQ(expected.c_str(), e.what());
     }

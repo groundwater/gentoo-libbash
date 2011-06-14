@@ -33,7 +33,7 @@
 
 TEST(bash_ast, parse_illegal_script)
 {
-  EXPECT_THROW(bash_ast ast(get_src_dir() + std::string("/scripts/illegal_script.sh")), interpreter_exception);
+  EXPECT_THROW(bash_ast ast(get_src_dir() + std::string("/scripts/illegal_script.sh")), libbash::interpreter_exception);
 }
 
 TEST(bash_ast, parse_legal_script)
@@ -52,5 +52,5 @@ TEST(bash_ast, parse_arithmetics)
 
 TEST(bash_ast, illegal_path)
 {
-  EXPECT_THROW(bash_ast("not_exist"), interpreter_exception);
+  EXPECT_THROW(bash_ast("not_exist"), libbash::interpreter_exception);
 }

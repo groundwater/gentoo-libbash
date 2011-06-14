@@ -67,7 +67,7 @@ options
 		void set_index(const std::string& name, unsigned& index, int value)
 		{
 			if(value < 0)
-				throw interpreter_exception((boost::format("Array index is less than 0: \%s[\%d]") \% name \% value).str());
+				throw libbash::interpreter_exception((boost::format("Array index is less than 0: \%s[\%d]") \% name \% value).str());
 			index = value;
 		}
 
@@ -248,7 +248,7 @@ bash_pattern[boost::xpressive::sregex& pattern, bool greedy]
 	sregex pattern_list;
 	auto check_extglob = [&]() {
 		if(!walker->get_option("extglob"))
-			throw interpreter_exception("Entered extended pattern matching with extglob disabled");
+			throw libbash::interpreter_exception("Entered extended pattern matching with extglob disabled");
 	};
 }
 	:^(STRING (
@@ -280,7 +280,7 @@ bash_pattern[boost::xpressive::sregex& pattern, bool greedy]
 		}
 		|(EXTENDED_MATCH_NONE) => ^(EXTENDED_MATCH_NONE composite_pattern[pattern_list, $greedy]) {
 			check_extglob();
-			throw interpreter_exception("!(blah) is not supported for now");
+			throw libbash::interpreter_exception("!(blah) is not supported for now");
 		}
 		|basic_pattern[$pattern, $greedy, do_append])+);
 
@@ -532,7 +532,7 @@ execute_command[const std::string& name, std::vector<std::string>& libbash_args]
 		else
 		{
 			walker->set_status(1);
-			throw interpreter_exception(name + " is not supported yet");
+			throw libbash::interpreter_exception(name + " is not supported yet");
 		}
 	}
 	(BANG { walker->set_status(!walker->get_status()); })?;

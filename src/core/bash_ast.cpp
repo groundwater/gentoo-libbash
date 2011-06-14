@@ -47,7 +47,7 @@ bash_ast::bash_ast(const std::string& script_path,
   std::stringstream stream;
   std::ifstream file_stream(script_path);
   if(!file_stream)
-    throw interpreter_exception(script_path + " can't be read");
+    throw libbash::interpreter_exception(script_path + " can't be read");
 
   stream << file_stream.rdbuf();
   script = stream.str();
@@ -63,7 +63,7 @@ void bash_ast::init_parser(const std::string& script, const std::string& script_
     NULL));
 
   if(!input)
-    throw interpreter_exception("Unable to open file " + script + " due to malloc() failure");
+    throw libbash::interpreter_exception("Unable to open file " + script + " due to malloc() failure");
 
   input->fileName = input->strFactory->newStr(
       input->strFactory,
@@ -71,20 +71,20 @@ void bash_ast::init_parser(const std::string& script, const std::string& script_
 
   lexer.reset(libbashLexerNew(input.get()));
   if(!lexer)
-    throw interpreter_exception("Unable to create the lexer due to malloc() failure");
+    throw libbash::interpreter_exception("Unable to create the lexer due to malloc() failure");
 
   token_stream.reset(antlr3CommonTokenStreamSourceNew(
       ANTLR3_SIZE_HINT, lexer->pLexer->rec->state->tokSource));
   if(!token_stream)
-    throw interpreter_exception("Out of memory trying to allocate token stream");
+    throw libbash::interpreter_exception("Out of memory trying to allocate token stream");
 
   parser.reset(libbashParserNew(token_stream.get()));
   if(!parser)
-    throw interpreter_exception("Out of memory trying to allocate parser");
+    throw libbash::interpreter_exception("Out of memory trying to allocate parser");
 
   ast = parse(parser.get());
   if(parser->pParser->rec->getNumberOfSyntaxErrors(parser->pParser->rec))
-    throw interpreter_exception("Something wrong happened while parsing");
+    throw libbash::interpreter_exception("Something wrong happened while parsing");
   nodes.reset(antlr3CommonTreeNodeStreamNewTree(ast, ANTLR3_SIZE_HINT));
 }
 

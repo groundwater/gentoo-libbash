@@ -135,7 +135,7 @@ TEST(bash_condition, string_unary_operator)
   EXPECT_FALSE(internal::test_unary('n', ""));
   EXPECT_TRUE(internal::test_unary('n', "hello"));
 
-  EXPECT_THROW(internal::test_unary('o', "extglob"), interpreter_exception);
+  EXPECT_THROW(internal::test_unary('o', "extglob"), libbash::interpreter_exception);
 }
 
 TEST_F(file_test, binary_operator)
@@ -154,7 +154,7 @@ TEST_F(file_test, binary_operator)
   EXPECT_FALSE(internal::test_binary("ef", positive, negative, walker));
   EXPECT_FALSE(internal::test_binary("ef", "not exist", negative, walker));
 
-  EXPECT_THROW(internal::test_binary("efd", positive, negative, walker), interpreter_exception);
+  EXPECT_THROW(internal::test_binary("efd", positive, negative, walker), libbash::interpreter_exception);
 }
 
 TEST(bash_condition, arithmetic_operator)

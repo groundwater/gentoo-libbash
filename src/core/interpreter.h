@@ -220,7 +220,7 @@ public:
     return members.find(name) == members.end();
   }
 
-  /// \brief update the variable value, raise interpreter_exception if
+  /// \brief update the variable value, raise libbash::interpreter_exception if
   ///        it's readonly, will define the variable if it doesn't exist
   /// \param variable name
   /// \param new value

@@ -59,7 +59,7 @@ int main(int argc, char** argv)
   {
     libbash::interpret(argv[1], get_src_dir() + "/utils/isolated-functions.sh", variables, functions);
   }
-  catch(interpreter_exception& e)
+  catch(libbash::interpreter_exception& e)
   {
     std::cerr << e.what() << std::endl;
     return EXIT_FAILURE;

@@ -105,7 +105,7 @@ void worker(const std::shared_ptr<PackageIDSequence> &ids)
     {
       libbash::interpret(ebuild_path, "utils/isolated-functions.sh", variables, functions);
     }
-    catch(const interpreter_exception& e)
+    catch(const libbash::interpreter_exception& e)
     {
       cerr << "Exception occurred while interpreting " << ebuild_path << ". The error message is:\n"
         << e.what() << endl;

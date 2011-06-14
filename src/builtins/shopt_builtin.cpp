@@ -42,9 +42,9 @@ void shopt_builtin::print_opts() const
 int shopt_builtin::exec(const std::vector<std::string>& bash_args)
 {
   if(bash_args.empty())
-    throw interpreter_exception("Arguments required for shopt");
+    throw libbash::interpreter_exception("Arguments required for shopt");
   else if(bash_args[0].size() != 2)
-    throw interpreter_exception("Multiple arguments are not supported");
+    throw libbash::interpreter_exception("Multiple arguments are not supported");
 
   switch(bash_args[0][1])
   {
@@ -59,9 +59,9 @@ int shopt_builtin::exec(const std::vector<std::string>& bash_args)
       break;
     case 'q':
     case 'o':
-      throw interpreter_exception("shopt " + bash_args[0] + " is not supported yet");
+      throw libbash::interpreter_exception("shopt " + bash_args[0] + " is not supported yet");
     default:
-      throw interpreter_exception("Unrecognized option for shopt: " + bash_args[0]);
+      throw libbash::interpreter_exception("Unrecognized option for shopt: " + bash_args[0]);
   }
 
   return 0;

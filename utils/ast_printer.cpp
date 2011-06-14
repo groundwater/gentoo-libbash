@@ -181,7 +181,7 @@ int main(int argc, char** argv)
     else
       print_cin(printer);
   }
-  catch(interpreter_exception& e)
+  catch(libbash::interpreter_exception& e)
   {
     if(!vm.count("silent"))
       std::cerr << e.what() << std::endl;

@@ -30,10 +30,10 @@
 TEST(continue_builtin_test, bad_argument)
 {
   interpreter walker;
-  EXPECT_THROW(cppbash_builtin::exec("continue", {"abc"}, std::cout, std::cerr, std::cin, walker), interpreter_exception);
-  EXPECT_THROW(cppbash_builtin::exec("continue", {"1", "2"}, std::cout, std::cerr, std::cin, walker), interpreter_exception);
-  EXPECT_THROW(cppbash_builtin::exec("continue", {"0"}, std::cout, std::cerr, std::cin, walker), interpreter_exception);
-  EXPECT_THROW(cppbash_builtin::exec("continue", {"-1"}, std::cout, std::cerr, std::cin, walker), interpreter_exception);
+  EXPECT_THROW(cppbash_builtin::exec("continue", {"abc"}, std::cout, std::cerr, std::cin, walker), libbash::interpreter_exception);
+  EXPECT_THROW(cppbash_builtin::exec("continue", {"1", "2"}, std::cout, std::cerr, std::cin, walker), libbash::interpreter_exception);
+  EXPECT_THROW(cppbash_builtin::exec("continue", {"0"}, std::cout, std::cerr, std::cin, walker), libbash::interpreter_exception);
+  EXPECT_THROW(cppbash_builtin::exec("continue", {"-1"}, std::cout, std::cerr, std::cin, walker), libbash::interpreter_exception);
 }
 
 TEST(continue_builtin_test, throw_exception)

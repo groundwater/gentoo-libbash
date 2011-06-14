@@ -29,15 +29,18 @@
 
 #include "common.h"
 
-///
-/// \class interpreter_exception
-/// \brief runtime exception occured during interpreting
-///
-class LIBBASH_API interpreter_exception: public std::runtime_error
+namespace libbash
 {
-public:
-  explicit interpreter_exception(const std::string& err_msg):
-    runtime_error(err_msg){}
-};
+  ///
+  /// \class interpreter_exception
+  /// \brief runtime exception occured during interpreting
+  ///
+  class LIBBASH_API interpreter_exception: public std::runtime_error
+  {
+  public:
+    explicit interpreter_exception(const std::string& err_msg):
+      runtime_error(err_msg){}
+  };
+}
 
 #endif

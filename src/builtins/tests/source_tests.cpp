@@ -92,12 +92,12 @@ TEST(source_builtin_test, invalid)
                                      std::cerr,
                                      std::cin,
                                      walker),
-               interpreter_exception);
+               libbash::interpreter_exception);
   EXPECT_THROW(cppbash_builtin::exec("source",
                                      {get_src_dir() + "/scripts/illegal_script.sh"},
                                      std::cout,
                                      std::cerr,
                                      std::cin,
                                      walker),
-               interpreter_exception);
+               libbash::interpreter_exception);
 }

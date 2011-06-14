@@ -33,11 +33,11 @@
 /// \class unset_exception
 /// \brief exception for unsetting variables
 ///
-class unset_exception: public interpreter_exception
+class unset_exception: public libbash::interpreter_exception
 {
 public:
   explicit unset_exception(const std::string& err_msg):
-    interpreter_exception(err_msg){}
+    libbash::interpreter_exception(err_msg){}
 };
 
 #endif

@@ -34,7 +34,7 @@ int printf_builtin::exec(const std::vector<std::string>& bash_args)
   if(!(bash_args[0] == "-v"))
     begin = bash_args.begin();
   else if(bash_args.size() < 3)
-    throw interpreter_exception("printf: illegal number of arguments");
+    throw libbash::interpreter_exception("printf: illegal number of arguments");
   else
     begin = bash_args.begin() + 2;
 
@@ -56,7 +56,7 @@ int printf_builtin::exec(const std::vector<std::string>& bash_args)
   }
   else
   {
-    throw interpreter_exception("printf: invalid option: " + bash_args[0]);
+    throw libbash::interpreter_exception("printf: invalid option: " + bash_args[0]);
   }
 
   return 0;

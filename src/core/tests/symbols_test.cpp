@@ -33,7 +33,7 @@ TEST(symbol_test, int_variable)
   variable ro_integer("integer", 10, true);
   EXPECT_STREQ("integer", ro_integer.get_name().c_str());
   EXPECT_EQ(10, ro_integer.get_value<int>());
-  EXPECT_THROW(ro_integer.set_value(100), interpreter_exception);
+  EXPECT_THROW(ro_integer.set_value(100), libbash::interpreter_exception);
   EXPECT_EQ(10, ro_integer.get_value<int>());
 
   // normal only integer
@@ -51,7 +51,7 @@ TEST(symbol_test, string_variable)
   variable ro_string("string", "hello", true);
   EXPECT_STREQ("string", ro_string.get_name().c_str());
   EXPECT_STREQ("hello", ro_string.get_value<string>().c_str());
-  EXPECT_THROW(ro_string.set_value("hello world"), interpreter_exception);
+  EXPECT_THROW(ro_string.set_value("hello world"), libbash::interpreter_exception);
   EXPECT_STREQ("hello", ro_string.get_value<string>().c_str());
 
   // normal string
@@ -76,7 +76,7 @@ TEST(symbol_test, array_variable)
   EXPECT_STREQ("1", ro_array.get_value<string>(0).c_str());
   EXPECT_STREQ("2", ro_array.get_value<string>(1).c_str());
   EXPECT_STREQ("3", ro_array.get_value<string>(2).c_str());
-  EXPECT_THROW(ro_array.set_value("4", 0), interpreter_exception);
+  EXPECT_THROW(ro_array.set_value("4", 0), libbash::interpreter_exception);
   EXPECT_STREQ("1", ro_array.get_value<string>(0).c_str());
 
   // out of bound

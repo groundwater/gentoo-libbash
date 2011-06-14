@@ -137,7 +137,7 @@ const std::string interpreter::do_substring_expansion(const std::string& name,
                                                       const unsigned index) const
 {
   if(length < 0)
-    throw interpreter_exception("length of substring expression should be greater or equal to zero");
+    throw libbash::interpreter_exception("length of substring expression should be greater or equal to zero");
 
   return get_substring(name, offset, boost::numeric_cast<unsigned>(length), index);
 }
@@ -185,7 +185,7 @@ const std::string interpreter::do_subarray_expansion(const std::string& name,
                                                      int length) const
 {
   if(length < 0)
-    throw interpreter_exception("length of substring expression should be greater or equal to zero");
+    throw libbash::interpreter_exception("length of substring expression should be greater or equal to zero");
 
   return get_subarray(name, offset, boost::numeric_cast<unsigned>(length));
 }
@@ -277,7 +277,7 @@ void interpreter::call(const std::string& name,
   if(iter != functions.end())
     iter->second.call(*this);
   else
-    throw interpreter_exception(name + " is not defined.");
+    throw libbash::interpreter_exception(name + " is not defined.");
 }
 
 void interpreter::replace_all(std::string& value,
@@ -376,7 +376,7 @@ bool interpreter::get_option(const std::string& name) const
 {
   auto iter = bash_options.find(name);
   if(iter == bash_options.end())
-    throw interpreter_exception("Invalid bash option");
+    throw libbash::interpreter_exception("Invalid bash option");
 
   return iter->second;
 }
@@ -385,7 +385,7 @@ void interpreter::set_option(const std::string& name, bool value)
 {
   auto iter = bash_options.find(name);
   if(iter == bash_options.end())
-    throw interpreter_exception(name + " is not a valid bash option");
+    throw libbash::interpreter_exception(name + " is not a valid bash option");
 
   iter->second = value;
 }

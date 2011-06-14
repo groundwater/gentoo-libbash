@@ -39,7 +39,7 @@ int source_builtin::exec(const std::vector<std::string>& bash_args)
   static std::unordered_map<std::string, std::shared_ptr<bash_ast>> ast_cache;
 
   if(bash_args.size() == 0)
-    throw interpreter_exception("should provide one argument for source builtin");
+    throw libbash::interpreter_exception("should provide one argument for source builtin");
 
   // we need fix this to pass extra arguments as positional parameters
   const std::string& path = bash_args[0];
