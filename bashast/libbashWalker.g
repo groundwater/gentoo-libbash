@@ -969,7 +969,8 @@ arithmetics returns[int value]
 		$value = (cnd ? l : r);
 	}
 	|primary {
-		$value = walker->resolve<int>($primary.libbash_value, $primary.index);
+		std::string primary_value(walker->resolve<std::string>($primary.libbash_value, $primary.index));
+		$value = (primary_value.empty() ? 0 : walker->eval_arithmetic(primary_value));
 	}
 	|^(PRE_INCR primary) {
 		$value = walker->set_value($primary.libbash_value,

@@ -14,3 +14,11 @@ FOO012="$((${FOO011[0]}=10))"
 FOO013="$((3!=5))"
 value=100
 let "value=${value}"
+a=c
+b=d
+c=1
+d=2
+e="1+2"
+echo $(($a + $b))
+echo $(($a + $e))
+
