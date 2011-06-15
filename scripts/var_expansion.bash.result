@@ -5,6 +5,9 @@ abcabc
 2 3 4 5
 2 3 4
 0
+abd acd
+aadef aadf abcdef abcdf
+aabdef aabdgh acddef acddgh
 ARRAY=1 2 3 4 5
 ARRAY2=hello
 EAPI=3

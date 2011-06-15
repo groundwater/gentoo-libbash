@@ -45,6 +45,7 @@ options
 	#include <sstream>
 
 	#include <boost/format.hpp>
+	#include <boost/algorithm/string/join.hpp>
 
 	#include "builtins/builtin_exceptions.h"
 	#include "core/bash_condition.h"
@@ -210,17 +211,47 @@ var_def[bool local]
 string_expr returns[std::string libbash_value, bool quoted]
 @init {
 	$quoted = true;
+	bool is_raw_string = true;
+	std::vector<std::string> brace_expansion_base{""};
+	std::vector<std::string> brace_expansion_elements;
+}
+@after {
+	if(!is_raw_string && brace_expansion_base.size() > 1)
+		throw libbash::interpreter_exception("We only support brace expansion in raw string for now");
+	$libbash_value = boost::algorithm::join(brace_expansion_base, " ");
 }
 	:^(STRING (
 		string_part {
-			$libbash_value += $string_part.libbash_value;
+			for(auto iter = brace_expansion_base.begin(); iter != brace_expansion_base.end(); ++iter)
+				*iter += $string_part.libbash_value;
 			$quoted = $string_part.quoted;
+			if(is_raw_string)
+				is_raw_string = $string_part.is_raw_string;
+		}
+		|(BRACE_EXP) => ^(BRACE_EXP brace_expansion[brace_expansion_elements]) {
+			auto group_number = brace_expansion_elements.size();
+			auto group_size = brace_expansion_base.size();
+			std::vector<std::string> expanded_values;
+
+			expanded_values.reserve(group_number * group_size);
+			for(auto iter = brace_expansion_base.begin(); iter != brace_expansion_base.end(); ++iter)
+				for(std::vector<std::string>::size_type i = 0u; i != group_number; ++i)
+					expanded_values.push_back(*iter + brace_expansion_elements[i \% group_number]);
+
+			brace_expansion_base.swap(expanded_values);
+			brace_expansion_elements.clear();
 		}
 	)*);
 
-string_part returns[std::string libbash_value, bool quoted]
+brace_expansion[std::vector<std::string>& elements]
+	:(string_expr{
+		$elements.push_back($string_expr.libbash_value);
+	})+;
+
+string_part returns[std::string libbash_value, bool quoted, bool is_raw_string]
 @init {
 	$quoted = false;
+	$is_raw_string = true;
 }
 	:(DOUBLE_QUOTED_STRING) =>
 		^(DOUBLE_QUOTED_STRING (libbash_string=double_quoted_string {
@@ -235,12 +266,15 @@ string_part returns[std::string libbash_value, bool quoted]
 	|(ARITHMETIC_EXPRESSION) =>
 		^(ARITHMETIC_EXPRESSION value=arithmetics {
 			$libbash_value = boost::lexical_cast<std::string>(value);
+			$is_raw_string = false;
 		})
 	|(var_ref[false]) => libbash_string=var_ref[false] {
 		$libbash_value = libbash_string;
+		$is_raw_string = false;
 	}
 	|libbash_string=command_substitution {
 		$libbash_value = libbash_string;
+		$is_raw_string = false;
 	}
 	|(libbash_string=any_string {
 		$libbash_value = libbash_string;

@@ -110,3 +110,6 @@ ARRAY=(1 2 3 4 5)
 echo ${ARRAY[@]:1}
 echo ${ARRAY[@]:1:3}
 echo $#
+echo a{b,c}d
+echo a{a,bc}d{e,}f
+echo a{ab,cd}d{ef,gh}

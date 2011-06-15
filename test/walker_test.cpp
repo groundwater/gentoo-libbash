@@ -90,3 +90,13 @@ TEST(extglob, used_when_disabled)
     EXPECT_STREQ(e.what(), "Entered extended pattern matching with extglob disabled");
   }
 }
+
+TEST(brace_expansion, not_in_raw_string)
+{
+  interpreter walker;
+
+  std::string script = "echo $ab{c,d}e";
+  std::istringstream input(script);
+  bash_ast ast(input);
+  EXPECT_THROW(ast.interpret_with(walker), libbash::interpreter_exception);
+}
