@@ -441,7 +441,9 @@ dqstr_part
 	:	var_ref
 	|	command_sub
 	|	arithmetic_expansion
-	| 	ESC DQUOTE
+	| 	ESC DQUOTE -> DQUOTE
+	| 	ESC TICK -> TICK
+	| 	ESC DOLLAR -> DOLLAR
 	|	~(DOLLAR|TICK|DQUOTE);
 //single quoted string rule, no expansions
 sqstr_part

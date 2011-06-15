@@ -70,4 +70,4 @@ fname:
 "--preserve=timestamps,mode" -> (STRING - - preserve = timestamps , mode)
 
 dqstr:
-"\"\\\"\"" -> (DOUBLE_QUOTED_STRING \ ")
+"\"\\\\\"\$\`\"" -> (DOUBLE_QUOTED_STRING \ " $ `)
