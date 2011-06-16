@@ -149,7 +149,7 @@ export_item
 bash_command
 	:	fname_no_res_word (BLANK!+ fname)*;
 redirect:	(BLANK!* redirect_atom)*;
-redirect_atom:	here_string_op^ BLANK!* fname
+redirect_atom:	HERE_STRING_OP^ BLANK!* fname
 	|	here_doc_op^ BLANK!* fname EOL! heredoc
 	|	redir_op BLANK* redir_dest -> ^(REDIR redir_op redir_dest)
 	|	process_substitution;
@@ -160,8 +160,6 @@ file_desc_as_file
 	:	DIGIT -> ^(FILE_DESCRIPTOR DIGIT)
 	|	DIGIT MINUS -> ^(FILE_DESCRIPTOR_MOVE DIGIT);
 heredoc	:	(fname EOL!)*;
-here_string_op
-	:	HERE_STRING_OP;
 here_doc_op
 	:	LSHIFT MINUS -> OP["<<-"]
 	|	LSHIFT -> OP["<<"];
