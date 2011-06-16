@@ -30,12 +30,12 @@
 void shopt_builtin::set_opt(const std::vector<std::string>& bash_args, bool value)
 {
   for(auto iter = bash_args.begin() + 1; iter != bash_args.end(); ++iter)
-      _walker.set_option(*iter, value);
+      _walker.set_additional_option(*iter, value);
 }
 
 void shopt_builtin::print_opts() const
 {
-  for(auto iter = _walker.options_begin(); iter != _walker.options_end(); ++iter)
+  for(auto iter = _walker.additional_options_begin(); iter != _walker.additional_options_end(); ++iter)
       *_out_stream << "shopt " << (iter->second ? "-s " : "-u ") << iter->first << std::endl;
 }
 

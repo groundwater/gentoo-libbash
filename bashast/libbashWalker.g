@@ -247,7 +247,7 @@ bash_pattern[boost::xpressive::sregex& pattern, bool greedy]
 	bool do_append = false;
 	sregex pattern_list;
 	auto check_extglob = [&]() {
-		if(!walker->get_option("extglob"))
+		if(!walker->get_additional_option("extglob"))
 			throw libbash::interpreter_exception("Entered extended pattern matching with extglob disabled");
 	};
 }
@@ -374,6 +374,9 @@ var_name returns[std::string libbash_value, unsigned index]
 	|name {
 		$libbash_value = $name.libbash_value;
 		$index = $name.index;
+	}
+	|MINUS {
+		$libbash_value = "-";
 	};
 
 array_name returns[std::string libbash_value]
@@ -475,7 +478,6 @@ var_ref [bool double_quoted] returns[std::string libbash_value]
 	|^(VAR_REF libbash_string=array_name) { walker->get_all_elements_IFS_joined(libbash_string, $libbash_value); }
 	|^(VAR_REF POUND) { $libbash_value = boost::lexical_cast<std::string>(walker->get_array_length("*")); }
 	|^(VAR_REF QMARK) { $libbash_value = walker->get_status<std::string>(); }
-	|^(VAR_REF MINUS) { std::cerr << "$- has not been implemented yet" << std::endl; }
 	|^(VAR_REF BANG) { std::cerr << "$! has not been implemented yet" << std::endl; }
 	|^(VAR_REF libbash_string=var_expansion) { $libbash_value = libbash_string; };
 

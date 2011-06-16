@@ -33,7 +33,7 @@
 
 static const std::vector<std::string> special_variables
 {
-  "IFS", "?", "*", "0"
+  "IFS", "?", "*", "0", "-"
 };
 
 static std::string get_src_dir()

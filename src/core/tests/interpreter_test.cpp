@@ -236,14 +236,21 @@ TEST(interpreter, word_split)
   EXPECT_STREQ("bar", splitted_values[1].c_str());
 }
 
+TEST(interpreter, bash_additional_option)
+{
+  interpreter walker;
+
+  EXPECT_THROW(walker.set_additional_option("not exist", false), libbash::interpreter_exception);
+  EXPECT_THROW(walker.get_additional_option("not exist"), libbash::interpreter_exception);
+
+  EXPECT_FALSE(walker.get_additional_option("extglob"));
+  walker.set_additional_option("extglob", true);
+  EXPECT_TRUE(walker.get_additional_option("extglob"));
+}
+
 TEST(interpreter, bash_option)
 {
   interpreter walker;
 
-  EXPECT_THROW(walker.set_option("not exist", false), libbash::interpreter_exception);
-  EXPECT_THROW(walker.get_option("not exist"), libbash::interpreter_exception);
-
-  EXPECT_FALSE(walker.get_option("extglob"));
-  walker.set_option("extglob", true);
-  EXPECT_TRUE(walker.get_option("extglob"));
+  EXPECT_STREQ("Bh", walker.resolve<std::string>("-").c_str());
 }

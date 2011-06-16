@@ -67,7 +67,11 @@ class interpreter: public boost::noncopyable
   std::istream* _in;
 
   // std::map is chosen for sorted output in shopt -p
-  std::map<std::string, bool> bash_options;
+  std::map<std::string, bool> additional_options;
+
+  // std::map is chosen for sorted output in $-. The order may not be the same
+  // as bash implementation.
+  std::map<char, bool> options;
 
   /// \brief calculate the correct offset when offset < 0 and check whether
   ///        the real offset is in legal range
@@ -453,27 +457,27 @@ public:
   /// \brief get the status of shell optional behavior
   /// \param the option name
   /// \return zero unless the name is not a valid shell option
-  bool get_option(const std::string& name) const;
+  bool get_additional_option(const std::string& name) const;
 
   /// \brief set the status of shell optional behavior
   /// \param the option name
   /// \param[in] true if option is enabled, false otherwise
   /// \return zero unless the name is not a valid shell option
-  void set_option(const std::string& name, bool value);
+  void set_additional_option(const std::string& name, bool value);
 
   /// \brief return an iterator referring to the first variable
   /// \return iterator referring to the first variable
-  option_iterator options_begin() const
+  option_iterator additional_options_begin() const
   {
-    return bash_options.begin();
+    return additional_options.begin();
   }
 
   /// \brief return an iterator referring to the next element after the
   ///        last variable
   /// \return iterator referring to he next element after the last variable
-  option_iterator options_end() const
+  option_iterator additional_options_end() const
   {
-    return bash_options.end();
+    return additional_options.end();
   }
 
   /// \brief evaluate arithmetic expression and return the result

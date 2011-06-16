@@ -47,10 +47,10 @@ TEST(shopt_builtin_test, disable_extglob)
   test_shopt_builtin("not exist is not a valid bash option", {"-u", "not exist"});
 
   interpreter walker;
-  walker.set_option("autocd", true);
+  walker.set_additional_option("autocd", true);
   EXPECT_EQ(0, cppbash_builtin::exec("shopt", {"-u", "autocd", "cdspell"}, std::cout, std::cerr, std::cin, walker));
-  EXPECT_FALSE(walker.get_option("autocd"));
-  EXPECT_FALSE(walker.get_option("cdspell"));
+  EXPECT_FALSE(walker.get_additional_option("autocd"));
+  EXPECT_FALSE(walker.get_additional_option("cdspell"));
 }
 
 TEST(shopt_builtin_test, enable_extglob)
@@ -59,8 +59,8 @@ TEST(shopt_builtin_test, enable_extglob)
 
   interpreter walker;
   EXPECT_EQ(0, cppbash_builtin::exec("shopt", {"-s", "autocd", "cdspell"}, std::cout, std::cerr, std::cin, walker));
-  EXPECT_TRUE(walker.get_option("autocd"));
-  EXPECT_TRUE(walker.get_option("cdspell"));
+  EXPECT_TRUE(walker.get_additional_option("autocd"));
+  EXPECT_TRUE(walker.get_additional_option("cdspell"));
 }
 
 TEST(shopt_builtin_test, invalid_argument)
