@@ -30,3 +30,4 @@ cond_expr:
 "[ a = b ]" -> (BUILTIN_TEST (= (STRING a) (STRING b)))
 "[ a == b ]" -> (BUILTIN_TEST (= (STRING a) (STRING b)))
 "[ a != b ]" -> (BUILTIN_TEST (NOT_EQUALS (STRING a) (STRING b)))
+"[[ \"${DISTUTILS_SRC_TEST}\" =~ ^(setup\.py|nosetests|py\.test|trial(\ .*)?)$ ]]" -> (KEYWORD_TEST (MATCH_REGULAR_EXPRESSION (STRING (DOUBLE_QUOTED_STRING (VAR_REF DISTUTILS_SRC_TEST))) (STRING ^ ( setup \ . py | nosetests | py \ . test | trial ( \   . * ) ? ) $)))

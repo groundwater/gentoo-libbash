@@ -69,6 +69,7 @@ tokens{
 	EXTENDED_MATCH_ANY;
 	EXTENDED_MATCH_AT_LEAST_ONE;
 	MATCH_PATTERN;
+	MATCH_REGULAR_EXPRESSION;
 	NOT_MATCH_PATTERN;
 	MATCH_ANY;
 	MATCH_ANY_EXCEPT;
@@ -345,7 +346,10 @@ cond_primary
 	|	keyword_cond_unary
 	|	fname;
 keyword_cond_binary
-	:	cond_part BLANK!* binary_str_op_keyword^ BLANK!? cond_part;
+	:	cond_part BLANK* EQUALS TILDE BLANK? bash_pattern_part -> ^(MATCH_REGULAR_EXPRESSION cond_part ^(STRING bash_pattern_part))
+	|	cond_part BLANK!* binary_str_op_keyword^ BLANK!? cond_part;
+bash_pattern_part
+	:( ESC BLANK |ESC RSQUARE |	(~(BLANK|RSQUARE)))+;
 keyword_cond_unary
 	:	uop^ BLANK!+ cond_part;
 builtin_cond_primary
