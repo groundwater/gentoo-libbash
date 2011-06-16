@@ -649,6 +649,10 @@ keyword_condition returns[bool status]
 	:^(LOGICOR l=keyword_condition r=keyword_condition) { $status= l || r; }
 	|^(LOGICAND l=keyword_condition r=keyword_condition) { $status= l && r; }
 	|^(NEGATION l=keyword_condition) { $status = !l; }
+	|^(MATCH_REGULAR_EXPRESSION left_str=string_expr right_str=string_expr) {
+		boost::xpressive::sregex re = boost::xpressive::sregex::compile(right_str.libbash_value);
+		$status = boost::xpressive::regex_match(left_str.libbash_value, re);
+	}
 	|s=common_condition { $status = s; };
 
 builtin_condition returns[bool status]

@@ -48,3 +48,5 @@ i=2
 [[ i++ -gt 2 ]] && echo wrong
 [[ i++ -gt 2 ]] && echo true16
 unset i
+[[ "setup.py" =~ ^(setup\.py|nosetests|py\.test|trial(\ .*)?)$ ]] && echo true17
+[[ "setup.py" =~ ^(setup\.p|nosetests|py\.test|trial(\ .*)?)$ ]] && echo false
