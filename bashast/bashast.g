@@ -35,6 +35,7 @@ options
 #endif
 }
 tokens{
+	ANSI_C_QUOTING;
 	ARG;
 	ARRAY;
 	ARRAY_SIZE;
@@ -524,7 +525,8 @@ nqstr_part
 	|	SINGLE_QUOTED_STRING_TOKEN -> ^(SINGLE_QUOTED_STRING SINGLE_QUOTED_STRING_TOKEN)
 	|	str_part
 	|	pattern_match_trigger
-	|	BANG;
+	|	BANG
+	|	DOLLAR SINGLE_QUOTED_STRING_TOKEN -> ^(ANSI_C_QUOTING SINGLE_QUOTED_STRING_TOKEN);
 //double quoted string rule, allows expansions
 dqstr	:	DQUOTE dqstr_part* DQUOTE -> ^(DOUBLE_QUOTED_STRING dqstr_part*);
 dqstr_part
