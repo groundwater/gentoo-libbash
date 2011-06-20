@@ -149,7 +149,11 @@ export_item
 	:var_def
 	|name ->;
 bash_command
-	:	fname_no_res_word (BLANK!+ fname)*;
+	:	fname_no_res_word (BLANK!+ bash_command_arguments)*;
+bash_command_arguments
+	: bash_command_arguments_atom+ -> ^(STRING bash_command_arguments_atom+);
+bash_command_arguments_atom
+	:	brace_expansion|LBRACE|RBRACE|fname_part;
 redirect:	(BLANK!* redirect_atom)*;
 redirect_atom:	here_string_op^ BLANK!* fname
 	|	here_doc_op^ BLANK!* fname EOL! heredoc
