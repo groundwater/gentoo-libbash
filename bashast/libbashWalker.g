@@ -972,7 +972,17 @@ arithmetics returns[int value]
 			$value = (arithmetics(ctx) != 0);
 		}
 	})
-	|^(LOGICAND l=arithmetics r=arithmetics) { $value = l && r; }
+	|^(LOGICAND l=arithmetics {
+		if(!l)
+		{
+			skip_next_token_or_tree(ctx);
+			$value = 0;
+		}
+		else
+		{
+			$value = (arithmetics(ctx) != 0);
+		}
+	})
 	|^(PIPE l=arithmetics r=arithmetics) { $value = l | r; }
 	|^(CARET l=arithmetics r=arithmetics) { $value = l ^ r; }
 	|^(AMP l=arithmetics r=arithmetics) { $value = l & r; }
