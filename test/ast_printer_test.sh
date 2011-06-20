@@ -10,6 +10,10 @@ error+=$?
     | diff -u $srcdir/bashast/features_script/features.sh.tokens -
 error+=$?
 
+./ast_printer -w libbashWalker.tokens -f $srcdir/bashast/features_script/features.sh\
+    | diff -u $srcdir/bashast/features_script/features.sh.walker.tokens -
+error+=$?
+
 ./ast_printer -f $srcdir/bashast/features_script/illegal_script.sh 2 > /dev/null
 if [[ $? == 0 ]]
 then

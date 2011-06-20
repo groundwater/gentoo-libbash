@@ -244,6 +244,7 @@ EXTRA_DIST = bashast/bashast.g \
 			 bashast/features_script/features.sh \
 			 bashast/features_script/features.sh.ast \
 			 bashast/features_script/features.sh.tokens \
+			 bashast/features_script/features.sh.walker.tokens \
 			 test/ast_printer_test.sh \
 			 test/verify_bashs_test.sh \
 			 test/verify_error_output_test.sh \

@@ -84,9 +84,9 @@ static bool build_token_map(std::unordered_map<ANTLR3_INT32, std::string>& token
   return qi::parse(first, last, line % qi::eol >> qi::eol, token_map) && first == last;
 }
 
-static void print_token(std::istream& input,
-                       const std::string& token_path,
-                       bool silent)
+static void print_parser_token(std::istream& input,
+                               const std::string& token_path,
+                               bool silent)
 {
   if(silent)
     return;
@@ -95,9 +95,28 @@ static void print_token(std::istream& input,
   std::unordered_map<ANTLR3_INT32, std::string> token_map;
 
   if(build_token_map(token_map, token_path))
-    std::cout << ast.get_tokens(std::bind(&token_mapper,
-                                          token_map,
-                                          std::placeholders::_1))
+    std::cout << ast.get_parser_tokens(std::bind(&token_mapper,
+                                                 token_map,
+                                                 std::placeholders::_1))
+    << std::endl;
+  else
+    std::cerr << "Building token map failed" << std::endl;
+}
+
+static void print_walker_token(std::istream& input,
+                               const std::string& token_path,
+                               bool silent)
+{
+  if(silent)
+    return;
+
+  bash_ast ast(input);
+  std::unordered_map<ANTLR3_INT32, std::string> token_map;
+
+  if(build_token_map(token_map, token_path))
+    std::cout << ast.get_walker_tokens(std::bind(&token_mapper,
+                                                 token_map,
+                                                 std::placeholders::_1))
     << std::endl;
   else
     std::cerr << "Building token map failed" << std::endl;
@@ -144,6 +163,8 @@ int main(int argc, char** argv)
     ("dot,d", "print graphviz doc file instead of tree string if -s is not specified")
     ("token,t", po::value<std::string>(), "Print all tokens instead of AST. "
                                           "The argument is the path to libbash.tokens")
+    ("walker-token,w", po::value<std::string>(), "Print all tokens received by the walker. "
+                                          "The argument is the path to libbashWalker.tokens")
     ("name,n", "When using files as input scripts, print out file names")
     ("silent,s", "do not print any AST")
   ;
@@ -160,9 +181,14 @@ int main(int argc, char** argv)
 
   std::function<void(std::istream&)> printer;
   if(vm.count("token"))
-    printer = std::bind(&print_token,
+    printer = std::bind(&print_parser_token,
                         std::placeholders::_1,
                         vm["token"].as<std::string>(),
+                        vm.count("silent"));
+  else if(vm.count("walker-token"))
+    printer = std::bind(&print_walker_token,
+                        std::placeholders::_1,
+                        vm["walker-token"].as<std::string>(),
                         vm.count("silent"));
   else
     printer = std::bind(&print_ast,

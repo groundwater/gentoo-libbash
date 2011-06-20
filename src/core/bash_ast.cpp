@@ -112,7 +112,7 @@ namespace
   }
 }
 
-std::string bash_ast::get_tokens(std::function<std::string(ANTLR3_UINT32)> token_map)
+std::string bash_ast::get_parser_tokens(std::function<std::string(ANTLR3_UINT32)> token_map)
 {
   std::stringstream result;
   int line_counter = 1;
@@ -147,6 +147,26 @@ std::string bash_ast::get_tokens(std::function<std::string(ANTLR3_UINT32)> token
       print_line_counter(result, token, line_counter, tokenName == "CONTINUE_LINE"? 1 : 0);
     }
   }
+  return result.str();
+}
+
+std::string bash_ast::get_walker_tokens(std::function<std::string(ANTLR3_UINT32)> token_map)
+{
+  std::stringstream result;
+  pANTLR3_INT_STREAM istream = nodes->tnstream->istream;
+  auto istream_size = istream->size(istream);
+
+  for(ANTLR3_UINT32 i = 1; i <= istream_size; ++i)
+  {
+    ANTLR3_UINT32 token = istream->_LA(istream, boost::numeric_cast<ANTLR3_INT32>(i));
+    if(token == 2)
+      result << "DOWN ";
+    else if(token == 3)
+      result << "UP ";
+    else
+      result << token_map(istream->_LA(istream, boost::numeric_cast<ANTLR3_INT32>(i))) << " ";
+  }
+  result << std::endl;
 
   return result.str();
 }
