@@ -39,23 +39,55 @@ public:
     runtime_error("return exception"){}
 };
 
-class continue_exception: public std::exception
+class loop_control_exception
 {
   int count;
+
+  virtual void rethrow() = 0;
+
+protected:
+  virtual ~loop_control_exception() {}
+
 public:
-  explicit continue_exception(int c): count(c)
-  {
-    if(c < 1)
-      throw libbash::interpreter_exception("continue: argument should be greater than or equal to 1");
-  }
+  explicit loop_control_exception(int c): count(c) {}
 
   void rethrow_unless_correct_frame()
   {
     if(count != 1)
     {
       --count;
-      throw *this;
+      rethrow();
     }
+  }
+};
+
+class continue_exception: public loop_control_exception
+{
+protected:
+  virtual void rethrow()
+  {
+    throw *this;
+  }
+
+public:
+  explicit continue_exception(int c): loop_control_exception(c) {
+    if(c < 1)
+      throw libbash::interpreter_exception("continue: argument should be greater than or equal to 1");
+  }
+};
+
+class break_exception: public loop_control_exception
+{
+protected:
+  virtual void rethrow()
+  {
+    throw *this;
+  }
+
+public:
+  explicit break_exception(int c): loop_control_exception(c) {
+    if(c < 1)
+      throw libbash::interpreter_exception("break: argument should be greater than or equal to 1");
   }
 };
 
