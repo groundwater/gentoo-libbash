@@ -71,7 +71,7 @@ options
 			index = value;
 		}
 
-		// seek to LT(2) and consume
+		// skip to next tree
 		void seek_to_next_tree(plibbashWalker ctx)
 		{
 			// Current depth of the tree we are traversing
@@ -93,6 +93,14 @@ options
 			// Seek to the correct offset and consume.
 			SEEK(INDEX() + index - 2);
 			CONSUME();
+		}
+
+		void skip_next_token_or_tree(plibbashWalker ctx)
+		{
+			if(LA(2) != DOWN)
+				SEEK(INDEX() + 1);
+			else
+				seek_to_next_tree(ctx);
 		}
 
 		// The method is used to append a pattern with another one. Because it's not allowed to append an empty pattern,
@@ -953,7 +961,17 @@ primary returns[std::string libbash_value, unsigned index]
 
 // shell arithmetic
 arithmetics returns[int value]
-	:^(LOGICOR l=arithmetics r=arithmetics) { $value = l || r; }
+	:^(LOGICOR l=arithmetics {
+		if(l)
+		{
+			skip_next_token_or_tree(ctx);
+			$value = 1;
+		}
+		else
+		{
+			$value = (arithmetics(ctx) != 0);
+		}
+	})
 	|^(LOGICAND l=arithmetics r=arithmetics) { $value = l && r; }
 	|^(PIPE l=arithmetics r=arithmetics) { $value = l | r; }
 	|^(CARET l=arithmetics r=arithmetics) { $value = l ^ r; }
