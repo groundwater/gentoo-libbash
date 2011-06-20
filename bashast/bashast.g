@@ -36,7 +36,6 @@ tokens{
 	CASE_COMMAND;
 	SUBSHELL;
 	CURRENT_SHELL;
-	COMPOUND_ARITH;
 	COMPOUND_COND;
 	CFOR;
 	FOR_INIT;
@@ -200,7 +199,7 @@ compound_command
 	|	case_expr
 	|	subshell
 	|	current_shell
-	|	arith_comparison
+	|	arithmetic_expression
 	|	cond_comparison;
 //Expressions allowed inside a compound command
 for_expr:	FOR BLANK+ name (wspace IN (BLANK+ fname)+)? semiel DO wspace* clist semiel DONE -> ^(FOR name (fname+)? clist)
@@ -233,9 +232,9 @@ subshell:	LPAREN wspace? clist (BLANK* SEMIC)? (BLANK* EOL)* BLANK* RPAREN -> ^(
 //A grouping of commands executed in the current shell
 current_shell
 	:	LBRACE wspace clist semiel wspace* RBRACE -> ^(CURRENT_SHELL clist);
-//comparison using arithmetic
-arith_comparison
-	:	LLPAREN wspace? arithmetic wspace? RPAREN RPAREN -> ^(COMPOUND_ARITH arithmetic);
+//Bash arithmetic expression (( expression ))
+arithmetic_expression
+	:	LLPAREN wspace? arithmetic wspace? RPAREN RPAREN -> ^(ARITHMETIC_EXPRESSION arithmetic);
 cond_comparison
 	:	cond_expr -> ^(COMPOUND_COND cond_expr);
 //Variables

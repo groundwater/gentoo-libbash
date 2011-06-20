@@ -20,8 +20,8 @@ gunit bashast;
 
 clist:
 "echo a{b,c,d}" -> (LIST (COMMAND (STRING echo) (STRING a (BRACE_EXP (STRING b) (STRING c) (STRING d)))))
-"((5+5))" -> (LIST (COMMAND (COMPOUND_ARITH (+ 5 5))))
-"(( 4 + asdf ))" -> (LIST (COMMAND (COMPOUND_ARITH (+ 4 (VAR_REF asdf)))))
+"((5+5))" -> (LIST (COMMAND (ARITHMETIC_EXPRESSION (+ 5 5))))
+"(( 4 + asdf ))" -> (LIST (COMMAND (ARITHMETIC_EXPRESSION (+ 4 (VAR_REF asdf)))))
 "[[ while=while ]] && echo true" -> (LIST (&& (COMMAND (COMPOUND_COND (KEYWORD_TEST (STRING while = while)))) (COMMAND (STRING echo) (STRING true))))
 "[[ while = while ]] && echo true" -> (LIST (&& (COMMAND (COMPOUND_COND (KEYWORD_TEST (= (STRING while) (STRING while))))) (COMMAND (STRING echo) (STRING true))))
 "for each in `ls |grep output`; do
