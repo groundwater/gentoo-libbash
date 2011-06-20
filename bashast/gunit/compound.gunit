@@ -123,6 +123,13 @@ elif echo yay4; then echo hurrah
 else echo darn
 fi" -> (IF_STATEMENT (if (LIST (COMMAND (STRING echo) (STRING yay2))) (LIST (COMMAND (STRING echo) (STRING yay)))) (if (LIST (COMMAND (STRING echo) (STRING yay3))) (LIST (COMMAND (STRING echo) (STRING boo)))) (if (LIST (COMMAND (STRING echo) (STRING yay4))) (LIST (COMMAND (STRING echo) (STRING hurrah)))) (else (LIST (COMMAND (STRING echo) (STRING darn)))))
 
+"if true; then
+        echo true
+        # comment
+    elif false; then
+        echo false
+    fi" -> (IF_STATEMENT (if (LIST (COMMAND (STRING true))) (LIST (COMMAND (STRING echo) (STRING true)))) (if (LIST (COMMAND (STRING false))) (LIST (COMMAND (STRING echo) (STRING false)))))
+
 while_expr:
 "while echo true; do
 echo \"file found\"
