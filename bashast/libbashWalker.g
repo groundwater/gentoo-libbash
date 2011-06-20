@@ -616,6 +616,7 @@ command_list: ^(LIST logic_command_list+);
 compound_command
 	: ^(CURRENT_SHELL command_list)
 	| ^(COMPOUND_COND cond_expr)
+	| ^(ARITHMETIC_EXPRESSION arithmetics)
 	| for_expr
 	| while_expr
 	| if_expr
