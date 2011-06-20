@@ -710,7 +710,6 @@ for_expr
 				commands_index = INDEX();
 				for(auto iter = splitted_values.begin(); iter != splitted_values.end(); ++iter)
 				{
-					SEEK(commands_index);
 					walker->set_value(libbash_string, *iter);
 					try
 					{
@@ -719,9 +718,10 @@ for_expr
 					catch(continue_exception& e)
 					{
 						e.rethrow_unless_correct_frame();
-						continue;
 					}
+					SEEK(commands_index);
 				}
+				seek_to_next_tree(ctx);
 			}
 		})
 	|^(CFOR {

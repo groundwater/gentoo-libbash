@@ -38,6 +38,14 @@ do
     echo $file
 done
 
+for file in foo bar
+do
+    if [[ $file == "bar" ]]; then
+        continue
+    fi
+    echo $file
+done
+
 for outer in 1 2 3
 do
     for file in foo bar
