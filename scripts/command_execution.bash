@@ -55,3 +55,4 @@ shopt -s extglob
 shopt -p
 printf "%s %s\n" abc def
 printf "%s %s\n" $FOO001, def
+echo "abc #av### ##" # for comment

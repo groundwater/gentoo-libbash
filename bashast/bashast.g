@@ -113,6 +113,15 @@ tokens{
 	NOT_EQUALS;
 }
 
+@lexer::members
+{
+#ifdef OUTPUT_C
+	bool double_quoted = false;
+#else
+	boolean double_quoted = false;
+#endif
+}
+
 #ifdef OUTPUT_C
 @includes {
 	C_INCLUDE #include <iostream>
@@ -650,7 +659,7 @@ esc_char:	ESC (DIGIT DIGIT? DIGIT?|LETTER ALPHANUM ALPHANUM?|.);
 //****************
 
 COMMENT
-	:	(BLANK|EOL) '#' ~('\n'|'\r')* {$channel=HIDDEN;}
+	:	{ !double_quoted }?=> (BLANK|EOL) '#' ~('\n'|'\r')* {$channel=HIDDEN;}
 	;
 //Bash "reserved words"
 BANG	:	'!';
@@ -713,7 +722,7 @@ SEMIC	:	';';
 DOUBLE_SEMIC
 	:	';;';
 PIPE	:	'|';
-DQUOTE	:	'"';
+DQUOTE	:	'"' { double_quoted = !double_quoted; };
 SQUOTE	:	'\'';
 COMMA	:	',';
 //Because bash isn't exactly whitespace dependent... need to explicitly handle blanks
