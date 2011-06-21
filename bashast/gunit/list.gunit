@@ -16,7 +16,7 @@
    You should have received a copy of the GNU General Public License
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
-gunit bashast;
+gunit java_libbash;
 
 start:
 "make" -> (LIST (COMMAND (STRING make)))

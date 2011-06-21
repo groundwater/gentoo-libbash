@@ -16,14 +16,23 @@
    You should have received a copy of the GNU General Public License
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
-grammar bashast;
+#ifdef OUTPUT_C
+grammar libbash;
+#else
+grammar java_libbash;
+#endif
 options
 {
 	backtrack	= true;
 	output	= AST;
+	memoize		= true;
+#ifdef OUTPUT_C
+	language  = C;
+	ASTLabelType  = pANTLR3_BASE_TREE;
+#else
 	language	= Java;
 	ASTLabelType	= CommonTree;
-	memoize		= true;
+#endif
 }
 tokens{
 	ARG;

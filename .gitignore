@@ -6,6 +6,8 @@
 *.lo
 *.log
 *.class
+*.java
+*.tokens
 .deps
 .libs
 .dirstamp
@@ -26,9 +28,8 @@ instruo
 long.sh
 massif.out
 libbash.g
-libbash.tokens
+java_libbash.g
 libbash.tokens.md5
-bashast.tokens
 bashast/.DS_Store
 bashast/*.ebuild
 bashast/c_runtime
@@ -42,7 +43,6 @@ libbashLexer.*
 libbashParser.*
 libbashWalker.h
 libbashWalker.cpp
-libbashWalker.tokens
 *.pdf
 *.aux
 config.*

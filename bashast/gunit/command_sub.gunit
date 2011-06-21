@@ -16,7 +16,7 @@
    You should have received a copy of the GNU General Public License
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
-gunit bashast;
+gunit java_libbash;
 
 command_sub:
 "$(echo \"foo\")" -> (COMMAND_SUB (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING foo)))))
