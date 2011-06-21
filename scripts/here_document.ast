@@ -1,0 +1,3 @@
+(LIST (COMMAND (STRING cat) (<< (STRING blah 
+ blah 
+) (REDIR > (STRING / dev / null)))) (COMMAND (STRING echo) (STRING hi)))

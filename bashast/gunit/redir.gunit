@@ -30,9 +30,9 @@ redirect:
 "2<&0" -> (REDIR 2 <& (FILE_DESCRIPTOR 0))
 "<< asdf
 asdf
-" -> (<< (STRING asdf) (STRING asdf))
+" -> (<< (STRING asdf))
 "<<< herestring" -> (<<< (STRING herestring))
 "<< blue
 red
 green
-" -> (<< (STRING blue) (STRING red) (STRING green))
+" -> (<< (STRING red green))
