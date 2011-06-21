@@ -281,6 +281,7 @@ EXTRA_DIST = bashast/bashast.g \
 			 scripts/source_true.sh \
 			 scripts/source_return.sh \
 			 scripts/illegal_script.sh \
+			 scripts/illegal_script.sh.tokens \
 			 scripts/foo.eclass \
 			 scripts/bar.eclass \
 			 utils/metadata_diff.sh \
@@ -299,7 +300,7 @@ EXTRA_DIST = bashast/bashast.g \
 coding_standard.pdf: coding_standard/coding_standard.tex
 	$(AM_V_GEN)@PDFLATEX@ coding_standard/coding_standard.tex 2&>1 > /dev/null
 
-ANTLR = @JAVA@ -classpath @antlr_cp@ org.antlr.Tool
+ANTLR = @JAVA@ -classpath @antlr_cp@ org.antlr.Tool -Xconversiontimeout 5000
 
 cgrammar.run: libbash.g
 	$(AM_V_at)touch $@.tmp

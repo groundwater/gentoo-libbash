@@ -1,0 +1,73 @@
+/*
+   Please use git log for copyright holder and year information
+
+   This file is part of libbash.
+
+   libbash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 2 of the License, or
+   (at your option) any later version.
+
+   libbash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with libbash.  If not, see <http://www.gnu.org/licenses/>.
+*/
+gunit java_libbash;
+
+fname:
+"+%Y%m%d" -> (STRING + % Y % m % d)
+"\"http://www.gnu.org/software/autoconf/autoconf.html\"" -> (STRING (DOUBLE_QUOTED_STRING http : / / www . gnu . org / software / autoconf / autoconf . html))
+"\"http://dev.gentoo.org/~mpagano/genpatches\"" -> (STRING (DOUBLE_QUOTED_STRING http : / / dev . gentoo . org / ~ mpagano / genpatches))
+"\"\"" -> (STRING DOUBLE_QUOTED_STRING)
+"\"For more info on this patchset, and how to report problems, see:\"" -> (STRING (DOUBLE_QUOTED_STRING For   more   info   on   this   patchset ,   and   how   to   report   problems ,   see :))
+"\"asdf;!\"" -> (STRING (DOUBLE_QUOTED_STRING asdf ; !))
+"\"$(whoami)\"" -> (STRING (DOUBLE_QUOTED_STRING (COMMAND_SUB (LIST (COMMAND (STRING whoami))))))
+"\"`whoami`\"" -> (STRING (DOUBLE_QUOTED_STRING (COMMAND_SUB (LIST (COMMAND (STRING whoami))))))
+"'`whoami`'" -> (STRING (SINGLE_QUOTED_STRING '`whoami`'))
+"'$(whoami)'" -> (STRING (SINGLE_QUOTED_STRING '$(whoami)'))
+"\"${P}\"" -> (STRING (DOUBLE_QUOTED_STRING (VAR_REF P)))
+"'${P}'" -> (STRING (SINGLE_QUOTED_STRING '${P}'))
+"asdf#" -> (STRING asdf #)
+"'asdf'" -> (STRING (SINGLE_QUOTED_STRING 'asdf'))
+"'asdf\"asdf'" -> (STRING (SINGLE_QUOTED_STRING 'asdf"asdf'))
+"\"asdf'asdf\"" -> (STRING (DOUBLE_QUOTED_STRING asdf ' asdf))
+"!/bin/bash" -> (STRING ! / bin / bash)
+"ab?(g|h)"-> (STRING ab (EXTENDED_MATCH_AT_MOST_ONE (STRING g) (STRING h)))
+"ab*(gh|i)" -> (STRING ab (EXTENDED_MATCH_ANY (STRING gh) (STRING i)))
+"ab+(gh|i)" -> (STRING ab (EXTENDED_MATCH_AT_LEAST_ONE (STRING gh) (STRING i)))
+"ab@(gh|i)" -> (STRING ab (EXTENDED_MATCH_EXACTLY_ONE (STRING gh) (STRING i)))
+"ab!(gh|i)" -> (STRING ab (EXTENDED_MATCH_NONE (STRING gh) (STRING i)))
+"\"abc\"\'\"\'\"def\"" -> (STRING (DOUBLE_QUOTED_STRING abc) (SINGLE_QUOTED_STRING '"') (DOUBLE_QUOTED_STRING def))
+"my\ name\ is" -> (STRING my \   name \   is)
+"octal\007" -> (STRING octal \ 007)
+"hex\xaF" -> (STRING hex \ xaF)
+"ctrlx\cx" -> (STRING ctrlx \ cx)
+"tab\\ttab" -> "(STRING tab \\ \t tab)"
+"abc[def]" -> (STRING abc (MATCH_ANY def))
+"abc[d${more}]" -> (STRING abc (MATCH_ANY d (VAR_REF more)))
+"abc[#d]" -> (STRING abc (MATCH_ANY # d))
+"abc[d#]" -> (STRING abc (MATCH_ANY d #))
+"a[]" -> (STRING a [ ])
+"ab[d-h]" -> (STRING ab (MATCH_ANY d - h))
+"ab[!d-h]" -> (STRING ab (MATCH_ANY_EXCEPT d - h))
+"ab[^d-h]" -> (STRING ab (MATCH_ANY_EXCEPT d - h))
+"ab[]c]" -> (STRING ab (MATCH_ANY ] c))
+"ab[]!]" -> (STRING ab (MATCH_ANY ] !))
+"ab[:alpha:]" -> (STRING ab (MATCH_ANY : alpha :))
+"ab[=c=]" -> (STRING ab (MATCH_ANY = c =))
+"ab[.c.]" -> (STRING ab (MATCH_ANY . c .))
+"ab[[:alpha:]]" -> (STRING ab (MATCH_ANY (CHARACTER_CLASS alpha)))
+"ab[[:alpha:][:digit:]]" -> (STRING ab (MATCH_ANY (CHARACTER_CLASS alpha) (CHARACTER_CLASS digit)))
+"ab[^[:alpha:]]" -> (STRING ab (MATCH_ANY_EXCEPT (CHARACTER_CLASS alpha)))
+"ab[[=c=]]" -> (STRING ab (MATCH_ANY (EQUIVALENCE_CLASS c)))
+"ab[[.backslash.]]" -> (STRING ab (MATCH_ANY (COLLATING_SYMBOL backslash)))
+"ab[12[:alpha:]]" -> (STRING ab (MATCH_ANY 12 (CHARACTER_CLASS alpha)))
+"\"'foo'\"" -> (STRING (DOUBLE_QUOTED_STRING ' foo '))
+"--preserve=timestamps,mode" -> (STRING - - preserve = timestamps , mode)
+
+dqstr:
+"\"\\\\\"\$\`\"" -> (DOUBLE_QUOTED_STRING \ " $ `)

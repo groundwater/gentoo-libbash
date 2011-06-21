@@ -1,0 +1,44 @@
+#############################################
+#Please use git log for copyright holder and year information
+#
+#This file is part of libbash.
+#
+#libbash is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, either version 2 of the License, or
+#(at your option) any later version.
+#
+#libbash is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#
+#You should have received a copy of the GNU General Public License
+#along with libbash.  If not, see <http://www.gnu.org/licenses/>.
+###############################################
+
+This is the README file for libbash
+
+Directory information:
+bashast/: Grammar file
+bashast/gunit: Grammar gunit tests
+src/: source directory for libbash library
+src/builtins: source directory for built in bash functionality classes
+src/builtins/tests: Unit tests for builtins
+coding_standard/: LaTeX coding standard for the project
+docs/: output folder for Doxygen generated documentation
+
+Build Instructions:
+
+./autogen.sh
+
+This will run ./configure for you so you are ready to build the thing.
+Now you can run make check to build the library and run tests. Other
+available targets:
+
+To build ANTLR C runtime libraries from grammar:
+	make grammar.run
+To generate the coding standard from the latex file (with pdflatex):
+	make coding_standard.pdf
+To generate the doxygen documentation:
+	make doxygen-doc

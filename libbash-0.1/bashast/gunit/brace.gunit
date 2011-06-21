@@ -1,0 +1,34 @@
+/*
+   Please use git log for copyright holder and year information
+
+   This file is part of libbash.
+
+   libbash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 2 of the License, or
+   (at your option) any later version.
+
+   libbash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with libbash.  If not, see <http://www.gnu.org/licenses/>.
+*/
+gunit java_libbash;
+
+brace_expansion:
+"{a,b}"-> (BRACE_EXP (STRING a) (STRING b))
+"{$a/$b,b}"-> (BRACE_EXP (STRING (VAR_REF a) / (VAR_REF b)) (STRING b))
+"{a,b,c}" -> (BRACE_EXP (STRING a) (STRING b) (STRING c))
+"{a..d}" -> (BRACE_EXP (.. a d))
+"{{a,b},c,d}" -> (BRACE_EXP (STRING (BRACE_EXP (STRING a) (STRING b))) (STRING c) (STRING d))
+"{.txt,,}" -> (BRACE_EXP (STRING . txt) STRING STRING)
+"{GNUmakefile,{M,m}akefile}" -> (BRACE_EXP (STRING GNUmakefile) (STRING (BRACE_EXP (STRING M) (STRING m)) akefile))
+
+fname:
+"a{b,c}" -> (STRING a (BRACE_EXP (STRING b) (STRING c)))
+"{c..d}f" -> (STRING (BRACE_EXP (.. c d)) f)
+"a{a,b}b{c,d}" -> (STRING a (BRACE_EXP (STRING a) (STRING b)) b (BRACE_EXP (STRING c) (STRING d)))
+"[{a,b}-c]*" -> (STRING (MATCH_ANY (BRACE_EXP (STRING a) (STRING b)) - c) MATCH_ALL)

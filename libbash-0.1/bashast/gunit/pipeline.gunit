@@ -1,0 +1,32 @@
+/*
+   Please use git log for copyright holder and year information
+
+   This file is part of libbash.
+
+   libbash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 2 of the License, or
+   (at your option) any later version.
+
+   libbash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with libbash.  If not, see <http://www.gnu.org/licenses/>.
+*/
+gunit java_libbash;
+
+pipeline:
+"cat asdf" -> (COMMAND (STRING cat) (STRING asdf))
+"export VAR=bar LAA=laa foo" -> (COMMAND (VARIABLE_DEFINITIONS (= VAR (STRING bar)) (= LAA (STRING laa))))
+"LOCAL1=a  LOCAL2=b export GLOBAL1=2  GLOBAL2 GLOBAL3" -> (COMMAND (STRING export) (STRING GLOBAL1 = 2) (STRING GLOBAL2) (STRING GLOBAL3) (= LOCAL1 (STRING a)) (= LOCAL2 (STRING b)))
+"time -p cat file" -> (COMMAND (STRING cat) (STRING file) (time p))
+"time cat file | grep search" -> (| (COMMAND (STRING cat) (STRING file) time) (COMMAND (STRING grep) (STRING search)))
+"time -p cat | grep asdf | a.out" -> (| (| (COMMAND (STRING cat) (time p)) (COMMAND (STRING grep) (STRING asdf))) (COMMAND (STRING a . out)))
+"time -p cat file |grep search >> log" -> (| (COMMAND (STRING cat) (STRING file) (time p)) (COMMAND (STRING grep) (STRING search) (REDIR >> (STRING log))))
+"if time cat; then
+echo \"three\"
+fi" -> (COMMAND (IF_STATEMENT (if (LIST (COMMAND (STRING cat) time)) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING three)))))))
+"i=1 j=2" -> (COMMAND (VARIABLE_DEFINITIONS (= i (STRING 1)) (= j (STRING 2))))

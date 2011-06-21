@@ -1,0 +1,53 @@
+/*
+   Please use git log for copyright holder and year information
+
+   This file is part of libbash.
+
+   libbash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 2 of the License, or
+   (at your option) any later version.
+
+   libbash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with libbash.  If not, see <http://www.gnu.org/licenses/>.
+*/
+gunit java_libbash;
+
+function:
+"function quit {
+	exit
+}" -> (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit)))))
+
+"function quit{ exit; }" FAIL
+"function quit { exit }" FAIL
+"function 'foo' { exit; }" FAIL
+"function quit { exit; }" -> (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit)))))
+"function foo()    { :; }" -> (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
+"function foo(){ :; }" -> (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
+"foo()   { :; }" -> (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
+"foo(){ :; }" -> (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
+
+"xorg-2_reconf_source() { :; }" -> (function (STRING xorg - 2 _reconf_source) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
+
+"function out() { function inner() { :; }; }" -> (function (STRING out) (CURRENT_SHELL (LIST (COMMAND (function (STRING inner) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))))))
+
+function_name:
+"xemacs-packages_src_unpack" OK
+"while" OK
+"aa'bb" FAIL
+"a\"" FAIL
+"333" FAIL
+"aa$aa" FAIL
+
+command:
+"function quit { exit; } > /dev/null" -> (COMMAND (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit))))) (REDIR > (STRING / dev / null)))
+"function quit {
+    # comment
+    exit; } > /dev/null" -> (COMMAND (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit))))) (REDIR > (STRING / dev / null)))
+"function help { echo hi; } 2> /dev/null" -> (COMMAND (function (STRING help) (CURRENT_SHELL (LIST (COMMAND (STRING echo) (STRING hi))))) (REDIR 2 > (STRING / dev / null)))
+"function help { echo 3; } 2> /dev/null > output" OK

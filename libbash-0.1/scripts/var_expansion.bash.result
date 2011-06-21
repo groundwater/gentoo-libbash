@@ -1,0 +1,110 @@
+5
+
+abcabc
+abcabc
+2 3 4 5
+2 3 4
+0
+abd acd
+aadef aadf abcdef abcdf
+aabdef aabdgh acddef acddgh
+ARRAY=1 2 3 4 5
+ARRAY2=hello
+EAPI=3
+EAPI4=4
+FOO001=3
+FOO002=hello
+FOO003=123
+FOO004=3
+FOO005=2
+FOO006=3
+FOO007=hello world
+FOO008=hello world
+FOO009=hello
+FOO010=
+FOO011=hello
+FOO012=llo
+FOO013=lo
+FOO014=
+FOO015=
+FOO016=hello
+FOO017=
+FOO018=he
+FOO019=ll
+FOO020=lo
+FOO021=llo
+FOO022=lo
+FOO023=
+FOO024=5
+FOO025=0
+FOO026=hi
+FOO028=hello
+FOO029=hello
+FOO030=hello
+FOO031=hi
+FOO032=
+FOO033=ello
+FOO034=ell
+FOO035=2
+FOO036=5
+FOO037=5
+FOO038=2
+FOO039=Hello World
+FOO040=Hello World
+FOO041=Helloworld
+FOO042=Helle Werld
+FOO043=hello World
+FOO044=Hello World
+FOO045=Hello WorlD
+FOO046=Hello World
+FOO047=Hellorld
+FOO048=Hell Wrld
+FOO049=llo World
+FOO050=Hello World
+FOO051=Hello Wo
+FOO052=Hello World
+FOO053=Hello World
+FOO054=Hello World
+FOO055=Hello World
+FOO056= World
+FOO057= World
+FOO058=Hello World
+FOO059=Hello World
+FOO060=Hello 
+FOO061=Hello 
+FOO062=lo World
+FOO063=
+FOO064=Hello Wo
+FOO065=
+FOO066=Herlo World
+FOO067=Herro Worrd
+FOO068=hello World
+FOO069=Hello World
+FOO070=Hello Word
+FOO071=Hello World
+FOO072=Heo World
+FOO073=Ho World
+FOO074=Hello World
+FOO075=Heo Word
+FOO076=Ho Word
+FOO077=Hello World
+FOO078=Heo Word
+FOO079=H Wrd
+FOO080=Helo World
+FOO081=Heo Word
+FOO082=abc
+FOO083=1 2 3 4 5
+FOO084=1 2 3 4 5
+FOO085=1 2 3 4 5
+FOO086=1 2
+FOO087=5
+FOO088=4 5
+FOO089=@srcdir@/scripts/var_expansion.bash 1 2 3 4 5
+FOO090=1 2 3 4 5
+FOO091=1 2 3 4 5
+FOO092=1 2 3 4 5
+FOO093=1 2
+FOO094=5
+FOO095=4 5
+FOO096=@srcdir@/scripts/var_expansion.bash 1 2 3 4 5
+target=abc*abc

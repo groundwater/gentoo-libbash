@@ -1,0 +1,38 @@
+/*
+   Please use git log for copyright holder and year information
+
+   This file is part of libbash.
+
+   libbash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 2 of the License, or
+   (at your option) any later version.
+
+   libbash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with libbash.  If not, see <http://www.gnu.org/licenses/>.
+*/
+gunit java_libbash;
+
+start:
+"echo \"finding file\"
+for each in `ls | grep output`; do
+echo \"I found a file\"
+done
+
+echo \"finding complete\"
+"-> (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING finding   file))) (COMMAND (for each (STRING (COMMAND_SUB (LIST (| (COMMAND (STRING ls)) (COMMAND (STRING grep) (STRING output)))))) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING I   found   a   file)))))) (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING finding   complete))))
+
+"function quit {
+  exit
+}
+hello () {
+  echo Hello!
+}
+hello
+quit
+echo foo" -> (LIST (COMMAND (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit)))))) (COMMAND (function (STRING hello) (CURRENT_SHELL (LIST (COMMAND (STRING echo) (STRING Hello !)))))) (COMMAND (STRING hello)) (COMMAND (STRING quit)) (COMMAND (STRING echo) (STRING foo)))

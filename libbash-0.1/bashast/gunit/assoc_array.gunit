@@ -1,0 +1,28 @@
+/*
+   Please use git log for copyright holder and year information
+
+   This file is part of libbash.
+
+   libbash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 2 of the License, or
+   (at your option) any later version.
+
+   libbash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with libbash.  If not, see <http://www.gnu.org/licenses/>.
+*/
+gunit java_libbash;
+
+var_def:
+"arr[foo]=\"asdf\"" -> (= (arr (VAR_REF foo)) (STRING (DOUBLE_QUOTED_STRING asdf)))
+"arr=(a b [4]=c)" -> (= arr (ARRAY (STRING a) (STRING b) (= 4 (STRING c))))
+"asdf[idx]=${var}" -> (= (asdf (VAR_REF idx)) (STRING (VAR_REF var)))
+"asdf[++i]=${var}" -> (= (asdf (PRE_INCR (VAR_REF i))) (STRING (VAR_REF var)))
+"asdf[++i,j]=${var}" -> (= (asdf (PRE_INCR (VAR_REF i)) (VAR_REF j)) (STRING (VAR_REF var)))
+"asdf[$((i))]=${var}" -> (= (asdf (VAR_REF i)) (STRING (VAR_REF var)))
+"asdf[1]=(a b c)" FAIL

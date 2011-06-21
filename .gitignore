@@ -43,7 +43,7 @@ bashastLexer.*
 bashastParser.*
 libbashLexer.*
 libbashParser.*
-libbashWalker.h
+libbashWalker.h*
 libbashWalker.cpp
 *.pdf
 *.aux

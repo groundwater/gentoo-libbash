@@ -1,0 +1,35 @@
+/*
+   Please use git log for copyright holder and year information
+
+   This file is part of libbash.
+
+   libbash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 2 of the License, or
+   (at your option) any later version.
+
+   libbash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with libbash.  If not, see <http://www.gnu.org/licenses/>.
+*/
+gunit java_libbash;
+
+cond_expr:
+"[[ -a this/is.afile ]]" -> (KEYWORD_TEST (a (STRING this / is . afile)))
+"[ -n \"yar53\" ]" -> (BUILTIN_TEST (n (STRING (DOUBLE_QUOTED_STRING yar53))))
+"test 5 -eq 6" -> (BUILTIN_TEST (eq (STRING 5) (STRING 6)))
+"[[ \"asdf\" != \"boo\" && -a filename ]]" -> (KEYWORD_TEST (&& (NOT_MATCH_PATTERN (STRING (DOUBLE_QUOTED_STRING asdf)) (STRING (DOUBLE_QUOTED_STRING boo))) (a (STRING filename))))
+"[[ a = b ]]" -> (KEYWORD_TEST (= (STRING a) (STRING b)))
+"[[ a == b ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING a) (STRING b)))
+"[[ true ]]" -> (KEYWORD_TEST (STRING true))
+"[[ true && (false || three) ]]" -> (KEYWORD_TEST (&& (STRING true) (|| (STRING false) (STRING three))))
+"[ a = b ]" -> (BUILTIN_TEST (= (STRING a) (STRING b)))
+"[ a == b ]" -> (BUILTIN_TEST (= (STRING a) (STRING b)))
+"[ a != b ]" -> (BUILTIN_TEST (NOT_EQUALS (STRING a) (STRING b)))
+"[[ \"${DISTUTILS_SRC_TEST}\" =~ ^(setup\.py|nosetests|py\.test|trial(\ .*)?)$ ]]" -> (KEYWORD_TEST (MATCH_REGULAR_EXPRESSION (STRING (DOUBLE_QUOTED_STRING (VAR_REF DISTUTILS_SRC_TEST))) (STRING ^ ( setup \ . py | nosetests | py \ . test | trial ( \   . * ) ? ) $)))
+"[ -n "$FROM_LANG" -a -n "$TO_LANG" ]" -> (BUILTIN_TEST (BUILTIN_LOGIC a (n (STRING (DOUBLE_QUOTED_STRING (VAR_REF FROM_LANG)))) (n (STRING (DOUBLE_QUOTED_STRING (VAR_REF TO_LANG))))))
+"[ -n "$FROM_LANG" -o -n "$TO_LANG" ]" -> (BUILTIN_TEST (BUILTIN_LOGIC o (n (STRING (DOUBLE_QUOTED_STRING (VAR_REF FROM_LANG)))) (n (STRING (DOUBLE_QUOTED_STRING (VAR_REF TO_LANG))))))

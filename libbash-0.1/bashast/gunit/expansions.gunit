@@ -1,0 +1,30 @@
+/*
+   Please use git log for copyright holder and year information
+
+   This file is part of libbash.
+
+   libbash is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 2 of the License, or
+   (at your option) any later version.
+
+   libbash is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with libbash.  If not, see <http://www.gnu.org/licenses/>.
+*/
+gunit java_libbash;
+
+clist:
+"echo a{b,c,d}" -> (LIST (COMMAND (STRING echo) (STRING a (BRACE_EXP (STRING b) (STRING c) (STRING d)))))
+"((5+5))" -> (LIST (COMMAND (ARITHMETIC_EXPRESSION (+ 5 5))))
+"(( 4 + asdf ))" -> (LIST (COMMAND (ARITHMETIC_EXPRESSION (+ 4 (VAR_REF asdf)))))
+"[[ while=while ]] && echo true" -> (LIST (&& (COMMAND (COMPOUND_COND (KEYWORD_TEST (STRING while = while)))) (COMMAND (STRING echo) (STRING true))))
+"[[ while = while ]] && echo true" -> (LIST (&& (COMMAND (COMPOUND_COND (KEYWORD_TEST (= (STRING while) (STRING while))))) (COMMAND (STRING echo) (STRING true))))
+"for each in `ls |grep output`; do
+echo $each
+done" -> (LIST (COMMAND (for each (STRING (COMMAND_SUB (LIST (| (COMMAND (STRING ls)) (COMMAND (STRING grep) (STRING output)))))) (LIST (COMMAND (STRING echo) (STRING (VAR_REF each)))))))
+"wc <(cat /usr/share/dict/linux.words)" -> (LIST (COMMAND (STRING wc) (PROCESS_SUBSTITUTION < (LIST (COMMAND (STRING cat) (STRING / usr / share / dict / linux . words))))))
