@@ -23,7 +23,7 @@ var_ref:
 "${asdf}" -> (VAR_REF asdf)
 "${asdf:-foo}" -> (VAR_REF (USE_DEFAULT_WHEN_UNSET_OR_NULL asdf (STRING foo)))
 "${asdf:-public_html}" -> (VAR_REF (USE_DEFAULT_WHEN_UNSET_OR_NULL asdf (STRING public_html)))
-"${asdf='foo'}" -> (VAR_REF (ASSIGN_DEFAULT_WHEN_UNSET asdf (STRING (SINGLE_QUOTED_STRING foo))))
+"${asdf='foo'}" -> (VAR_REF (ASSIGN_DEFAULT_WHEN_UNSET asdf (STRING (SINGLE_QUOTED_STRING 'foo'))))
 "${asdf:=}" -> (VAR_REF (ASSIGN_DEFAULT_WHEN_UNSET_OR_NULL asdf STRING))
 "${bar:7}" -> (VAR_REF (OFFSET bar 7))
 "${bar: -10}" -> (VAR_REF (OFFSET bar (MINUS_SIGN 10)))

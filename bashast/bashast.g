@@ -86,8 +86,8 @@ tokens{
 	CHARACTER_CLASS;
 	EQUIVALENCE_CLASS;
 	COLLATING_SYMBOL;
-	SINGLE_QUOTED_STRING;
 	DOUBLE_QUOTED_STRING;
+	SINGLE_QUOTED_STRING;
 	VARIABLE_DEFINITIONS;
 	// parameter expansion operators
 	USE_DEFAULT_WHEN_UNSET;
@@ -514,7 +514,7 @@ nqstr_part
 	|	arithmetic_expansion
 	|	brace_expansion
 	|	dqstr
-	|	sqstr
+	|	SINGLE_QUOTED_STRING_TOKEN -> ^(SINGLE_QUOTED_STRING SINGLE_QUOTED_STRING_TOKEN)
 	|	str_part
 	|	pattern_match_trigger
 	|	BANG;
@@ -528,10 +528,6 @@ dqstr_part
 	| 	ESC TICK -> TICK
 	| 	ESC DOLLAR -> DOLLAR
 	|	~(DOLLAR|TICK|DQUOTE);
-//single quoted string rule, no expansions
-sqstr_part
-	: ~SQUOTE*;
-sqstr	:	SQUOTE sqstr_part SQUOTE -> ^(SINGLE_QUOTED_STRING sqstr_part);
 //certain tokens that trigger pattern matching
 pattern_match_trigger
 	:	LSQUARE
@@ -647,7 +643,7 @@ function:	FUNCTION BLANK+ function_name ((BLANK* parens wspace*)|wspace) compoun
 //does not contain a dollar sign, nor is quoted in any way.  Nor
 //does it consist of all digits.
 function_name
-	:	(NUMBER|DIGIT)? ~(DOLLAR|SQUOTE|DQUOTE|LPAREN|RPAREN|BLANK|EOL|NUMBER|DIGIT) ~(DOLLAR|SQUOTE|DQUOTE|LPAREN|RPAREN|BLANK|EOL)*;
+	:	(NUMBER|DIGIT)? ~(DOLLAR|SQUOTE|DQUOTE|LPAREN|RPAREN|BLANK|EOL|NUMBER|DIGIT|SINGLE_QUOTED_STRING_TOKEN) ~(DOLLAR|SQUOTE|DQUOTE|LPAREN|RPAREN|BLANK|EOL)*;
 parens	:	LPAREN BLANK* RPAREN;
 name	:	NAME
 	|	LETTER
@@ -723,7 +719,8 @@ DOUBLE_SEMIC
 	:	';;';
 PIPE	:	'|';
 DQUOTE	:	'"' { double_quoted = !double_quoted; };
-SQUOTE	:	'\'';
+SQUOTE	:	{ double_quoted }? => '\'';
+SINGLE_QUOTED_STRING_TOKEN	:	{ !double_quoted }? => '\'' .* '\'';
 COMMA	:	',';
 //Because bash isn't exactly whitespace dependent... need to explicitly handle blanks
 BLANK	:	(' '|'\t')+;
