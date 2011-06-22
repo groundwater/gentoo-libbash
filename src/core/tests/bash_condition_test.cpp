@@ -30,8 +30,8 @@
 #include <gtest/gtest.h>
 
 #include "core/bash_condition.h"
+#include "core/exceptions.h"
 #include "core/interpreter.h"
-#include "core/interpreter_exception.h"
 
 namespace
 {

@@ -205,7 +205,14 @@ libcppbash_la_SOURCES = src/common.h \
 						src/builtins/builtin_exceptions.h \
 						$(GENERATED_PARSER_C) \
 						$(GENERATED_PARSER_H) \
+						src/core/divide_by_zero_error.h \
+						src/core/exceptions.h \
+						src/core/illegal_argument_exception.h \
 						src/core/interpreter_exception.h \
+						src/core/parse_exception.h \
+						src/core/readonly_exception.h \
+						src/core/runtime_exception.h \
+						src/core/unsupported_exception.h \
 						src/core/unset_exception.h \
 						src/core/interpreter.cpp \
 						src/core/interpreter.h \

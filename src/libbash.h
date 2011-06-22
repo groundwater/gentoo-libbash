@@ -30,7 +30,7 @@
 #include <vector>
 
 #include "common.h"
-#include "core/interpreter_exception.h"
+#include "core/exceptions.h"
 
 namespace libbash
 {

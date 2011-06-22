@@ -17,35 +17,31 @@
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
 ///
-/// \file continue_builtin.h
-/// \brief implementation for the continue builtin
+/// \file runtime_exception.h
+/// \brief implementation for runtime_exception
 ///
-#include "builtins/continue_builtin.h"
 
-#include <boost/lexical_cast.hpp>
+#ifndef LIBBASH_CORE_RUNTIME_EXCEPTION_H_
+#define LIBBASH_CORE_RUNTIME_EXCEPTION_H_
 
-#include "builtins/builtin_exceptions.h"
-#include "core/exceptions.h"
+#include <stdexcept>
+#include <string>
 
-int continue_builtin::exec(const std::vector<std::string>& bash_args)
+#include "common.h"
+#include "interpreter_exception.h"
+
+namespace libbash
 {
-  int nth = 1;
-
-  if(bash_args.size() > 1)
+  ///
+  /// \class runtime_exception
+  /// \brief exception for runtime errors
+  ///
+  class LIBBASH_API runtime_exception: public libbash::interpreter_exception
   {
-    throw libbash::interpreter_exception("continue: too many arguments");
-  }
-  else if(bash_args.size() == 1)
-  {
-    try
-    {
-      nth = boost::lexical_cast<int>(bash_args[0]);
-    }
-    catch(boost::bad_lexical_cast& e)
-    {
-      throw libbash::interpreter_exception("continue: argument should be an integer");
-    }
-  }
-
-  throw continue_exception(nth);
+  public:
+    explicit runtime_exception(const std::string& err_msg):
+      libbash::interpreter_exception(err_msg){}
+  };
 }
+
+#endif

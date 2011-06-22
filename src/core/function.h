@@ -24,7 +24,7 @@
 #ifndef LIBBASH_CORE_FUNCTION_H_
 #define LIBBASH_CORE_FUNCTION_H_
 
-#include "core/interpreter_exception.h"
+#include "core/exceptions.h"
 
 #include <antlr3.h>
 

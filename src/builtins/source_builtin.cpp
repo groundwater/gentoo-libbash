@@ -30,8 +30,8 @@
 
 #include "builtins/builtin_exceptions.h"
 #include "cppbash_builtin.h"
+#include "core/exceptions.h"
 #include "core/interpreter.h"
-#include "core/interpreter_exception.h"
 #include "core/bash_ast.h"
 
 int source_builtin::exec(const std::vector<std::string>& bash_args)

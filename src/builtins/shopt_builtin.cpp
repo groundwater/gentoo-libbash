@@ -23,8 +23,8 @@
 
 #include "builtins/shopt_builtin.h"
 
+#include "core/exceptions.h"
 #include "core/interpreter.h"
-#include "core/interpreter_exception.h"
 #include "cppbash_builtin.h"
 
 void shopt_builtin::set_opt(const std::vector<std::string>& bash_args, bool value)

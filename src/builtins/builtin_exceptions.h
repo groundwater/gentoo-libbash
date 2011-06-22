@@ -26,7 +26,7 @@
 
 #include <stdexcept>
 
-#include "core/interpreter_exception.h"
+#include "core/exceptions.h"
 
 ///
 /// \class return_exception

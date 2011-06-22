@@ -15,37 +15,21 @@
 
    You should have received a copy of the GNU General Public License
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
-*/
+   */
 ///
-/// \file continue_builtin.h
-/// \brief implementation for the continue builtin
+/// \file exceptions.h
+/// \author Mu Qiao
+/// \brief headers for all exceptions
 ///
-#include "builtins/continue_builtin.h"
+#ifndef LIBBASH_CORE_EXCEPTIOND_H_
+#define LIBBASH_CORE_EXCEPTIOND_H_
 
-#include <boost/lexical_cast.hpp>
+#include "core/divide_by_zero_error.h"
+#include "core/illegal_argument_exception.h"
+#include "core/interpreter_exception.h"
+#include "core/parse_exception.h"
+#include "core/readonly_exception.h"
+#include "core/runtime_exception.h"
+#include "core/unsupported_exception.h"
 
-#include "builtins/builtin_exceptions.h"
-#include "core/exceptions.h"
-
-int continue_builtin::exec(const std::vector<std::string>& bash_args)
-{
-  int nth = 1;
-
-  if(bash_args.size() > 1)
-  {
-    throw libbash::interpreter_exception("continue: too many arguments");
-  }
-  else if(bash_args.size() == 1)
-  {
-    try
-    {
-      nth = boost::lexical_cast<int>(bash_args[0]);
-    }
-    catch(boost::bad_lexical_cast& e)
-    {
-      throw libbash::interpreter_exception("continue: argument should be an integer");
-    }
-  }
-
-  throw continue_exception(nth);
-}
+#endif

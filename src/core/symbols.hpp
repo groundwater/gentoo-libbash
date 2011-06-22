@@ -34,7 +34,7 @@
 #include <boost/variant.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "core/interpreter_exception.h"
+#include "core/exceptions.h"
 
 ///
 /// \class converter

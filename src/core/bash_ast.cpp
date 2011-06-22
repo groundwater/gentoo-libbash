@@ -26,7 +26,7 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
-#include "core/interpreter_exception.h"
+#include "core/exceptions.h"
 #include "core/interpreter.h"
 #include "libbashLexer.h"
 #include "libbashParser.h"

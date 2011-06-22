@@ -34,7 +34,7 @@
 #include <boost/fusion/include/adapt_struct.hpp>
 
 #include "core/bash_ast.h"
-#include "core/interpreter_exception.h"
+#include "core/exceptions.h"
 #include "libbashParser.h"
 
 namespace po = boost::program_options;
