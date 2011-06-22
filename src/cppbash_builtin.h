@@ -104,6 +104,12 @@ class cppbash_builtin: public boost::noncopyable
       return builtin_map.find(builtin) != builtin_map.end();
     }
 
+    /// \brief transforms escapes in quoted string
+    /// \param string the target string
+    /// \param output the place to write
+    /// \param ansi_c whether to follow ANSI C standard
+    static void transform_escapes(const std::string &string, std::ostream& output, bool ansi_c);
+
   protected:
     ///
     /// \var *_out_stream
@@ -129,11 +135,6 @@ class cppbash_builtin: public boost::noncopyable
     /// holds factories for creating instances of child classes
     typedef std::map<std::string, boost::function< cppbash_builtin*(BUILTIN_ARGS) >> builtins_type;
     static builtins_type& builtins();
-
-    /// \brief transforms escapes in echo input
-    /// \param string the target string
-    /// \param output the place to write
-    void transform_escapes(const std::string &string, std::ostream& output) const;
 };
 
 /// shortcut for builtin constructor

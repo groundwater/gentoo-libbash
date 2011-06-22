@@ -61,7 +61,7 @@ int echo_builtin::exec(const std::vector<std::string>& bash_args)
         {
           try
           {
-            transform_escapes(*i, out_buffer());
+            cppbash_builtin::transform_escapes(*i, out_buffer(), false);
           }
           catch(suppress_output)
           {

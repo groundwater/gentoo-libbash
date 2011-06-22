@@ -31,6 +31,15 @@
 
 using namespace std;
 
+TEST(echo_builtin_test, escaped_characters)
+{
+  stringstream test_output1, test_output2;
+  interpreter walker;
+  cppbash_builtin::exec("echo",{"-e", "\\e"},test_output1,cerr,cin,walker);
+  cppbash_builtin::exec("echo",{"-e", "\\E"},test_output2,cerr,cin,walker);
+  ASSERT_STREQ(test_output1.str().c_str(), test_output2.str().c_str());
+}
+
 static void test_echo(const string& expected, std::initializer_list<string> args)
 {
   stringstream test_output;

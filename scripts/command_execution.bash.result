@@ -56,6 +56,10 @@ shopt -u xpg_echo
 abc def
 hello, def
 abc #av### ##
+abc	def
+xyz
+\'"	
+
 DEFAULTED=yes
 FOO001=hello
 FOO002=Hello World

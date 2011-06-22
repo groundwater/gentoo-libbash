@@ -39,7 +39,7 @@ int printf_builtin::exec(const std::vector<std::string>& bash_args)
     begin = bash_args.begin() + 2;
 
   std::stringstream format_string;
-  transform_escapes(*begin, format_string);
+  cppbash_builtin::transform_escapes(*begin, format_string, false);
   boost::format formatter(format_string.str());
   for(auto iter = begin + 1; iter != bash_args.end(); ++iter)
     formatter = formatter % *iter;

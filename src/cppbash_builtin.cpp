@@ -74,7 +74,8 @@ cppbash_builtin::builtins_type& cppbash_builtin::builtins() {
 }
 
 void cppbash_builtin::transform_escapes(const std::string &string,
-                                        std::ostream& output) const
+                                        std::ostream& output,
+                                        bool ansi_c)
 {
   using phoenix::val;
   using qi::lit;
@@ -87,11 +88,14 @@ void cppbash_builtin::transform_escapes(const std::string &string,
      lit('b')[output << val("\b")] |
      // \e is a GNU extension
      lit('e')[output << val("\033")] |
+     lit('E')[output << val("\033")] |
      lit('f')[output << val("\f")] |
      lit('n')[output << val("\n")] |
      lit('r')[output << val("\r")] |
      lit('t')[output << val("\t")] |
      lit('v')[output << val("\v")] |
+     lit('\'')[output << val(ansi_c ? "'" : "\\'")] |
+     lit('"')[output << val(ansi_c ? "\"" : "\\\"")] |
      lit('c')[phoenix::throw_(suppress_output())] |
      lit('\\')[output << val('\\')] |
      lit("0") >> qi::uint_parser<unsigned, 8, 1, 3>()[ output << phoenix::static_cast_<char>(qi::_1)] |

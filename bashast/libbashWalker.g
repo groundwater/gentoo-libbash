@@ -153,6 +153,13 @@ options
 							   boost::numeric_cast<unsigned>(token->stop - token->start + 1));
 		}
 
+		std::string get_single_quoted_string(pANTLR3_BASE_TREE node)
+		{
+			pANTLR3_COMMON_TOKEN token = node->getToken(node);
+			return std::string(reinterpret_cast<const char *>(token->start + 1),
+							   boost::numeric_cast<unsigned>(token->stop - token->start - 1));
+		}
+
 		char get_char(pANTLR3_BASE_TREE node)
 		{
 			return *reinterpret_cast<const char *>(node->getToken(node)->start);
@@ -267,9 +274,7 @@ string_part returns[std::string libbash_value, bool quoted, bool is_raw_string]
 									$quoted = true;
 								})*)
 	|(SINGLE_QUOTED_STRING) => ^(SINGLE_QUOTED_STRING node=SINGLE_QUOTED_STRING_TOKEN) {
-		pANTLR3_COMMON_TOKEN token = node->getToken(node);
-		$libbash_value = std::string(reinterpret_cast<const char *>(token->start + 1),
-									 boost::numeric_cast<unsigned>(token->stop - token->start - 1));
+		$libbash_value = get_single_quoted_string(node);
 	}
 	|(ARITHMETIC_EXPRESSION) =>
 		^(ARITHMETIC_EXPRESSION value=arithmetics {
@@ -283,6 +288,12 @@ string_part returns[std::string libbash_value, bool quoted, bool is_raw_string]
 	|libbash_string=command_substitution {
 		$libbash_value = libbash_string;
 		$is_raw_string = false;
+	}
+	|(ANSI_C_QUOTING) => ^(ANSI_C_QUOTING node=SINGLE_QUOTED_STRING_TOKEN) {
+		std::stringstream transformed;
+		cppbash_builtin::transform_escapes(get_single_quoted_string(node), transformed, true);
+		$libbash_value = transformed.str();
+		$quoted = true;
 	}
 	|(libbash_string=any_string {
 		$libbash_value = libbash_string;
