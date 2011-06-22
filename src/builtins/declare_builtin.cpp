@@ -25,24 +25,25 @@
 #include <algorithm>
 #include <iostream>
 
+#include "core/exceptions.h"
 #include "core/interpreter.h"
 
 int declare_builtin::exec(const std::vector<std::string>& bash_args)
 {
   if(bash_args.empty())
   {
-    *_err_stream << "Arguments required for declare" << std::endl;
+    throw libbash::illegal_argument_exception("Arguments required for declare");
     return 1;
   }
   else if(bash_args[0].size() != 2)
   {
-    *_err_stream << "Multiple arguments are not supported" << std::endl;
+    throw libbash::unsupported_exception("Multiple arguments are not supported");
     return 1;
   }
 
   if(bash_args[0][0] != '-' && bash_args[0][0] != '+')
   {
-    *_err_stream << "Invalid option for declare builtin" << std::endl;
+    throw libbash::illegal_argument_exception("Invalid option for declare builtin");
     return 1;
   }
 
@@ -104,10 +105,10 @@ int declare_builtin::exec(const std::vector<std::string>& bash_args)
     case 't':
     case 'u':
     case 'x':
-      *_err_stream << "declare " << bash_args[0] << " is not supported yet" << std::endl;
+      throw libbash::unsupported_exception("declare " + bash_args[0] + " is not supported yet");
       return 1;
     default:
-      *_err_stream << "Unrecognized option for declare: " << bash_args[0] << std::endl;
+      throw libbash::illegal_argument_exception("Unrecognized option for declare: " + bash_args[0]);
       return 1;
   }
 }

@@ -27,25 +27,37 @@
 #include <gtest/gtest.h>
 
 #include "core/bash_ast.h"
+#include "core/exceptions.h"
 #include "core/interpreter.h"
 #include "cppbash_builtin.h"
 
 using namespace std;
 
-static void test_declare(const string& expected, std::initializer_list<string> args)
+namespace
 {
-  stringstream test_output;
-  interpreter walker;
-  cppbash_builtin::exec("declare",args,cout,test_output,cin,walker);
-  EXPECT_EQ(expected, test_output.str());
+  template <typename T>
+  void test_declare(const string& expected, std::initializer_list<string> args)
+  {
+    stringstream test_output;
+    interpreter walker;
+    try
+    {
+      cppbash_builtin::exec("declare",args,cout,test_output,cin,walker);
+      FAIL();
+    }
+    catch(T& e)
+    {
+      EXPECT_EQ(expected, e.what());
+    }
+  }
 }
 
 TEST(declare_builtin_test, invalid_arguments)
 {
-  test_declare("Arguments required for declare\n", {});
-  test_declare("Multiple arguments are not supported\n", {"-ap"});
-  test_declare("Invalid option for declare builtin\n", {"_a"});
-  test_declare("Unrecognized option for declare: -L\n", {"-L"});
+  test_declare<libbash::illegal_argument_exception>("Arguments required for declare", {});
+  test_declare<libbash::unsupported_exception>("Multiple arguments are not supported", {"-ap"});
+  test_declare<libbash::illegal_argument_exception>("Invalid option for declare builtin", {"_a"});
+  test_declare<libbash::illegal_argument_exception>("Unrecognized option for declare: -L", {"-L"});
 }
 
 TEST(declare_builtin_test, _F)
@@ -87,23 +99,23 @@ TEST(declare_built_test, _p)
 }
 
 #define TEST_DECLARE(name, expected, ...) \
-	TEST(declare_builtin_test, name) { test_declare(expected, {__VA_ARGS__}); }
+	TEST(declare_builtin_test, name) { test_declare<libbash::unsupported_exception>(expected, {__VA_ARGS__}); }
 
-TEST_DECLARE(_a, "declare -a is not supported yet\n", "-a", "world")
-TEST_DECLARE(_A, "declare -A is not supported yet\n", "-A", "world")
-TEST_DECLARE(_f, "declare -f is not supported yet\n", "-f", "world")
-TEST_DECLARE(_i, "declare -i is not supported yet\n", "-i", "world")
-TEST_DECLARE(_l, "declare -l is not supported yet\n", "-l", "world")
-TEST_DECLARE(_r, "declare -r is not supported yet\n", "-r", "world")
-TEST_DECLARE(_t, "declare -t is not supported yet\n", "-t", "world")
-TEST_DECLARE(_u, "declare -u is not supported yet\n", "-u", "world")
-TEST_DECLARE(_x, "declare -x is not supported yet\n", "-x", "world")
-TEST_DECLARE(pa, "declare +a is not supported yet\n", "+a", "world")
-TEST_DECLARE(pA, "declare +A is not supported yet\n", "+A", "world")
-TEST_DECLARE(pf, "declare +f is not supported yet\n", "+f", "world")
-TEST_DECLARE(pi, "declare +i is not supported yet\n", "+i", "world")
-TEST_DECLARE(pl, "declare +l is not supported yet\n", "+l", "world")
-TEST_DECLARE(pr, "declare +r is not supported yet\n", "+r", "world")
-TEST_DECLARE(pt, "declare +t is not supported yet\n", "+t", "world")
-TEST_DECLARE(pu, "declare +u is not supported yet\n", "+u", "world")
-TEST_DECLARE(px, "declare +x is not supported yet\n", "+x", "world")
+TEST_DECLARE(_a, "declare -a is not supported yet", "-a", "world")
+TEST_DECLARE(_A, "declare -A is not supported yet", "-A", "world")
+TEST_DECLARE(_f, "declare -f is not supported yet", "-f", "world")
+TEST_DECLARE(_i, "declare -i is not supported yet", "-i", "world")
+TEST_DECLARE(_l, "declare -l is not supported yet", "-l", "world")
+TEST_DECLARE(_r, "declare -r is not supported yet", "-r", "world")
+TEST_DECLARE(_t, "declare -t is not supported yet", "-t", "world")
+TEST_DECLARE(_u, "declare -u is not supported yet", "-u", "world")
+TEST_DECLARE(_x, "declare -x is not supported yet", "-x", "world")
+TEST_DECLARE(pa, "declare +a is not supported yet", "+a", "world")
+TEST_DECLARE(pA, "declare +A is not supported yet", "+A", "world")
+TEST_DECLARE(pf, "declare +f is not supported yet", "+f", "world")
+TEST_DECLARE(pi, "declare +i is not supported yet", "+i", "world")
+TEST_DECLARE(pl, "declare +l is not supported yet", "+l", "world")
+TEST_DECLARE(pr, "declare +r is not supported yet", "+r", "world")
+TEST_DECLARE(pt, "declare +t is not supported yet", "+t", "world")
+TEST_DECLARE(pu, "declare +u is not supported yet", "+u", "world")
+TEST_DECLARE(px, "declare +x is not supported yet", "+x", "world")
