@@ -73,6 +73,10 @@ class interpreter: public boost::noncopyable
   // as bash implementation.
   std::map<char, bool> options;
 
+  /// \var private::status
+  /// \brief the return status of the last command
+  int status;
+
   /// \brief calculate the correct offset when offset < 0 and check whether
   ///        the real offset is in legal range
   /// \param[in,out] a value/result argument referring to offset
@@ -180,7 +184,7 @@ public:
     _out = &std::cout;
   }
 
-  /// \brief resolve string/int variable, local scope will be
+  /// \brief resolve string/long variable, local scope will be
   ///        checked first, then global scope
   /// \param variable name
   /// \param array index, use index=0 if it's not an array
@@ -245,17 +249,16 @@ public:
 
   /// \brief set the return status of the last command
   /// \param the value of the return status
-  void set_status(int status)
+  void set_status(int s)
   {
-    set_value("?", status);
+    status = s;
   }
 
   /// \brief get the return status of the last command
   /// \param the value of the return status
-  template <typename T=int>
-  T get_status(void) const
+  int get_status(void) const
   {
-    return resolve<T>("?");
+    return status;
   }
 
   /// \brief unset a variable
@@ -483,7 +486,7 @@ public:
   /// \brief evaluate arithmetic expression and return the result
   /// \param the arithmetic expression
   /// \return the evaluated result
-  int eval_arithmetic(const std::string& expression);
+  long eval_arithmetic(const std::string& expression);
 
   /// \brief perform expansion like ${var//foo/bar}
   /// \param the value to be expanded

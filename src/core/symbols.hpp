@@ -46,33 +46,33 @@ class converter: public boost::static_visitor<T>
 
 ///
 /// \class converter
-/// \brief specialized converter for int
+/// \brief specialized converter for long
 ///
 template<>
-class converter<int>: public boost::static_visitor<int>
+class converter<long>: public boost::static_visitor<long>
 {
 public:
-  /// \brief converter for int value
+  /// \brief converter for long value
   /// \param the value to be converted
-  /// \return the converted int
-  int operator() (const int value) const
+  /// \return the converted long
+  long operator() (const long value) const
   {
     return value;
   }
 
   /// \brief converter for string value
   /// \param the value to be converted
-  /// \return the converted int
-  int operator() (const std::string& value) const
+  /// \return the converted long
+  long operator() (const std::string& value) const
   {
-    int result = 0;
+    long result = 0;
     try
     {
-      result = boost::lexical_cast<int>(value);
+      result = boost::lexical_cast<long>(value);
     }
     catch(boost::bad_lexical_cast& e)
     {
-      std::cerr << "can't cast " << value << " to int" << std::endl;
+      std::cerr << "can't cast " << value << " to long" << std::endl;
     }
     return result;
   }
@@ -87,10 +87,10 @@ class converter<std::string>:
   public boost::static_visitor<std::string>
 {
 public:
-  /// \brief converter for int value
+  /// \brief converter for long value
   /// \param the value to be converted
   /// \return the converted string
-  std::string operator() (const int value) const
+  std::string operator() (const long value) const
   {
     return boost::lexical_cast<std::string>(value);
   }
@@ -115,17 +115,17 @@ class variable
   std::string name;
 
   /// \var private::value
-  /// \brief actual value of the variable. We put string in front of int
+  /// \brief actual value of the variable. We put string in front of long
   ///        because we want "" as default string value; Otherwise we
   ///        will get "0".
-  std::map<unsigned, boost::variant<std::string, int>> value;
+  std::map<unsigned, boost::variant<std::string, long>> value;
 
   /// \var private::readonly
   /// \brief whether the variable is readonly
   bool readonly;
 
 public:
-  typedef std::map<unsigned, boost::variant<std::string, int>>::size_type size_type;
+  typedef std::map<unsigned, boost::variant<std::string, long>>::size_type size_type;
 
   /// \brief retrieve variable name
   /// \return const string value of variable name

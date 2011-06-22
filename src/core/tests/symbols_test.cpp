@@ -32,14 +32,14 @@ TEST(symbol_test, int_variable)
   // readonly integer
   variable ro_integer("integer", 10, true);
   EXPECT_STREQ("integer", ro_integer.get_name().c_str());
-  EXPECT_EQ(10, ro_integer.get_value<int>());
+  EXPECT_EQ(10, ro_integer.get_value<long>());
   EXPECT_THROW(ro_integer.set_value(100), libbash::interpreter_exception);
-  EXPECT_EQ(10, ro_integer.get_value<int>());
+  EXPECT_EQ(10, ro_integer.get_value<long>());
 
   // normal only integer
   variable normal_integer("integer", 10);
   normal_integer.set_value(100);
-  EXPECT_EQ(100, normal_integer.get_value<int>());
+  EXPECT_EQ(100, normal_integer.get_value<long>());
 
   // get string value of an integer
   EXPECT_STREQ("100", normal_integer.get_value<string>().c_str());
@@ -61,9 +61,9 @@ TEST(symbol_test, string_variable)
 
   // string contains integer value
   variable int_string("string", "123");
-  EXPECT_EQ(123, int_string.get_value<int>());
+  EXPECT_EQ(123, int_string.get_value<long>());
   int_string.set_value("abc");
-  EXPECT_EQ(0, int_string.get_value<int>());
+  EXPECT_EQ(0, int_string.get_value<long>());
 }
 
 TEST(symbol_test, array_variable)
@@ -92,7 +92,7 @@ TEST(symbol_test, array_variable)
   EXPECT_STREQ("5", normal_array.get_value<string>(4).c_str());
 
   // get integer value
-  EXPECT_EQ(3, normal_array.get_value<int>(2));
+  EXPECT_EQ(3, normal_array.get_value<long>(2));
 }
 
 TEST(symbol_test, get_all_values)
@@ -114,7 +114,7 @@ TEST(symbol_test, get_all_values)
   EXPECT_STREQ("1", string_values[0].c_str());
 
   variable an_int("foo", 10);
-  vector<int> int_values;
+  vector<long> int_values;
   an_int.get_all_values(int_values);
   EXPECT_EQ(1, int_values.size());
   EXPECT_EQ(10, int_values[0]);

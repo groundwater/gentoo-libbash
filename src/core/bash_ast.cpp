@@ -176,7 +176,7 @@ void bash_ast::walker_start(plibbashWalker tree_parser)
   tree_parser->start(tree_parser);
 }
 
-int bash_ast::walker_arithmetics(plibbashWalker tree_parser)
+long bash_ast::walker_arithmetics(plibbashWalker tree_parser)
 {
   return tree_parser->arithmetics(tree_parser);
 }

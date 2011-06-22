@@ -75,7 +75,7 @@ public:
 
   static void walker_start(plibbashWalker tree_parser);
 
-  static int walker_arithmetics(plibbashWalker tree_parser);
+  static long walker_arithmetics(plibbashWalker tree_parser);
 
   static void call_function(plibbashWalker tree_parser,
                             ANTLR3_MARKER index);

@@ -118,7 +118,7 @@ interpreter::interpreter(): _out(&std::cout), _err(&std::cerr), _in(&std::cin), 
       {'P', false},
       {'T', false},
     }
-    )
+    ), status(0)
 {
   define("IFS", " \t\n");
   // We do not support the options set by the shell itself (such as the -i option)
@@ -430,7 +430,7 @@ void interpreter::set_additional_option(const std::string& name, bool value)
   iter->second = value;
 }
 
-int interpreter::eval_arithmetic(const std::string& expression)
+long interpreter::eval_arithmetic(const std::string& expression)
 {
   bash_ast ast(std::stringstream(expression), &bash_ast::parser_arithmetics);
   return ast.interpret_with(*this, &bash_ast::walker_arithmetics);

@@ -31,9 +31,9 @@ TEST(interpreter, define_resolve_int)
 {
   interpreter walker;
   walker.define("aint", 4);
-  EXPECT_EQ(4, walker.resolve<int>("aint"));
-  EXPECT_EQ(0, walker.resolve<int>("undefined"));
-  EXPECT_EQ(0, walker.resolve<int>(""));
+  EXPECT_EQ(4, walker.resolve<long>("aint"));
+  EXPECT_EQ(0, walker.resolve<long>("undefined"));
+  EXPECT_EQ(0, walker.resolve<long>(""));
 }
 
 TEST(interpreter, define_resolve_string)
@@ -57,7 +57,7 @@ TEST(interpreter, define_resolve_array)
 
   walker.define("partial", 10, false, 8);
   EXPECT_EQ(1, walker.get_array_length("partial"));
-  EXPECT_EQ(10, walker.resolve<int>("partial", 8));
+  EXPECT_EQ(10, walker.resolve<long>("partial", 8));
 
   EXPECT_EQ(0, walker.get_array_length("not exist"));
 }
@@ -91,14 +91,14 @@ TEST(interpreter, set_int_value)
   interpreter walker;
   walker.define("aint", 4);
   EXPECT_EQ(10, walker.set_value("aint", 10));
-  EXPECT_EQ(10, walker.resolve<int>("aint"));
+  EXPECT_EQ(10, walker.resolve<long>("aint"));
   EXPECT_EQ(10, walker.set_value("undefined", 10));
-  EXPECT_EQ(10, walker.resolve<int>("undefined"));
+  EXPECT_EQ(10, walker.resolve<long>("undefined"));
 
   walker.define("aint_ro", 4, true);
   EXPECT_THROW(walker.set_value("aint_ro", 10),
                libbash::readonly_exception);
-  EXPECT_EQ(4, walker.resolve<int>("aint_ro"));
+  EXPECT_EQ(4, walker.resolve<long>("aint_ro"));
 }
 
 TEST(interpreter, set_string_value)
@@ -138,7 +138,7 @@ TEST(interpreter, get_array_values)
   std::map<unsigned, std::string> values = {{0, "1"}, {1, "2"}, {2, "3"}};
   walker.define("array", values);
 
-  std::vector<int> array_values;
+  std::vector<long> array_values;
   EXPECT_TRUE(walker.resolve_array("array", array_values));
   EXPECT_EQ(1, array_values[0]);
   EXPECT_EQ(2, array_values[1]);

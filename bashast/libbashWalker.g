@@ -127,10 +127,10 @@ options
 		  return boost::xpressive::regex_match(target, pattern);
 		}
 
-		/// \brief parse the text value of a tree to integer
+		/// \brief parse the text value of a tree to long
 		/// \param the target tree
 		/// \return the parsed value
-		int parse_int(ANTLR3_BASE_TREE* tree)
+		long parse_integer(ANTLR3_BASE_TREE* tree)
 		{
 			return tree->getText(tree)->toInt32(tree->getText(tree));
 		}
@@ -524,7 +524,7 @@ var_ref [bool double_quoted] returns[std::string libbash_value]
 	}
 	|^(VAR_REF libbash_string=array_name) { walker->get_all_elements_IFS_joined(libbash_string, $libbash_value); }
 	|^(VAR_REF POUND) { $libbash_value = boost::lexical_cast<std::string>(walker->get_array_length("*")); }
-	|^(VAR_REF QMARK) { $libbash_value = walker->get_status<std::string>(); }
+	|^(VAR_REF QMARK) { $libbash_value = boost::lexical_cast<std::string>(walker->get_status()); }
 	|^(VAR_REF BANG) { std::cerr << "$! has not been implemented yet" << std::endl; }
 	|^(VAR_REF libbash_string=var_expansion) { $libbash_value = libbash_string; };
 
@@ -836,7 +836,7 @@ for_expr
 for_initilization
 	:^(FOR_INIT arithmetics);
 
-for_condition returns[int libbash_value]
+for_condition returns[long libbash_value]
 	:^(FOR_COND condition=arithmetics) { libbash_value = condition; };
 
 for_modification
@@ -1017,7 +1017,8 @@ primary returns[std::string libbash_value, unsigned index]
 	};
 
 // shell arithmetic
-arithmetics returns[int value]
+// http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_06_04
+arithmetics returns[long value]
 	:^(LOGICOR l=arithmetics {
 		if(l)
 		{
@@ -1073,23 +1074,23 @@ arithmetics returns[int value]
 	}
 	|^(PRE_INCR primary) {
 		$value = walker->set_value($primary.libbash_value,
-		                           walker->resolve<int>($primary.libbash_value, $primary.index) + 1,
+		                           walker->resolve<long>($primary.libbash_value, $primary.index) + 1,
 								   $primary.index);
 	}
 	|^(PRE_DECR primary) {
 		$value = walker->set_value($primary.libbash_value,
-		                           walker->resolve<int>($primary.libbash_value, $primary.index) - 1,
+		                           walker->resolve<long>($primary.libbash_value, $primary.index) - 1,
 								   $primary.index);
 	}
 	|^(POST_INCR primary) {
 		$value = walker->set_value($primary.libbash_value,
-		                           walker->resolve<int>($primary.libbash_value, $primary.index) + 1,
+		                           walker->resolve<long>($primary.libbash_value, $primary.index) + 1,
 								   $primary.index);
 		--$value;
 	}
 	|^(POST_DECR primary) {
 		$value = walker->set_value($primary.libbash_value,
-		                           walker->resolve<int>($primary.libbash_value, $primary.index) - 1,
+		                           walker->resolve<long>($primary.libbash_value, $primary.index) - 1,
 								   $primary.index);
 		++$value;
 	}
@@ -1098,55 +1099,55 @@ arithmetics returns[int value]
 	}
 	|^(MUL_ASSIGN primary l=arithmetics) {
 		$value = walker->set_value($primary.libbash_value,
-		                           walker->resolve<int>($primary.libbash_value, $primary.index) * l,
+		                           walker->resolve<long>($primary.libbash_value, $primary.index) * l,
 								   $primary.index);
 	}
 	|^(DIVIDE_ASSIGN primary l=arithmetics) {
 		$value = walker->set_value($primary.libbash_value,
-		                           walker->resolve<int>($primary.libbash_value, $primary.index) / l,
+		                           walker->resolve<long>($primary.libbash_value, $primary.index) / l,
 								   $primary.index);
 	}
 	|^(MOD_ASSIGN primary l=arithmetics) {
 		$value = walker->set_value($primary.libbash_value,
-		                           walker->resolve<int>($primary.libbash_value, $primary.index) \% l,
+		                           walker->resolve<long>($primary.libbash_value, $primary.index) \% l,
 								   $primary.index);
 	}
 	|^(PLUS_ASSIGN primary l=arithmetics) {
 		$value = walker->set_value($primary.libbash_value,
-		                           walker->resolve<int>($primary.libbash_value, $primary.index) + l,
+		                           walker->resolve<long>($primary.libbash_value, $primary.index) + l,
 								   $primary.index);
 	}
 	|^(MINUS_ASSIGN primary l=arithmetics) {
 		$value = walker->set_value($primary.libbash_value,
-		                           walker->resolve<int>($primary.libbash_value, $primary.index) - l,
+		                           walker->resolve<long>($primary.libbash_value, $primary.index) - l,
 								   $primary.index);
 	}
 	|^(LSHIFT_ASSIGN primary l=arithmetics) {
 		$value = walker->set_value($primary.libbash_value,
-		                           walker->resolve<int>($primary.libbash_value, $primary.index) << l,
+		                           walker->resolve<long>($primary.libbash_value, $primary.index) << l,
 								   $primary.index);
 	}
 	|^(RSHIFT_ASSIGN primary l=arithmetics) {
 		$value = walker->set_value($primary.libbash_value,
-		                           walker->resolve<int>($primary.libbash_value, $primary.index) >> l,
+		                           walker->resolve<long>($primary.libbash_value, $primary.index) >> l,
 								   $primary.index);
 	}
 	|^(AND_ASSIGN primary l=arithmetics) {
 		$value = walker->set_value($primary.libbash_value,
-		                           walker->resolve<int>($primary.libbash_value, $primary.index) & l,
+		                           walker->resolve<long>($primary.libbash_value, $primary.index) & l,
 								   $primary.index);
 	}
 	|^(XOR_ASSIGN primary l=arithmetics) {
 		$value = walker->set_value($primary.libbash_value,
-		                           walker->resolve<int>($primary.libbash_value, $primary.index) ^ l,
+		                           walker->resolve<long>($primary.libbash_value, $primary.index) ^ l,
 								   $primary.index);
 	}
 	|^(OR_ASSIGN primary l=arithmetics) {
 		$value = walker->set_value($primary.libbash_value,
-		                           walker->resolve<int>($primary.libbash_value, $primary.index) | l,
+		                           walker->resolve<long>($primary.libbash_value, $primary.index) | l,
 								   $primary.index);
 	}
-	| NUMBER { $value =parse_int($NUMBER);}
-	| DIGIT { $value = parse_int($DIGIT);}
-	| ^(VAR_REF libbash_string=var_expansion) { $value = boost::lexical_cast<int>(libbash_string); }
+	| NUMBER { $value = parse_integer($NUMBER);}
+	| DIGIT { $value = parse_integer($DIGIT);}
+	| ^(VAR_REF libbash_string = var_expansion) { $value = boost::lexical_cast<long>(libbash_string); }
 	;
