@@ -46,7 +46,7 @@ public:
   explicit continue_exception(int c): count(c)
   {
     if(c < 1)
-      throw libbash::interpreter_exception("continue: argument should be greater than or equal to 1");
+      throw libbash::illegal_argument_exception("continue: argument should be greater than or equal to 1");
   }
 
   void rethrow_unless_correct_frame()

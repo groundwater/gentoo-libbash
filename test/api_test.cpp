@@ -31,9 +31,9 @@ TEST(libbashapi, bad_path)
   std::unordered_map<std::string, std::vector<std::string>> variables;
   std::vector<std::string> functions;
   EXPECT_THROW(libbash::interpret("not exist", variables, functions),
-               libbash::interpreter_exception);
+               libbash::parse_exception);
   EXPECT_THROW(libbash::interpret("/scripts/source_true.sh", "not exist", variables, functions),
-               libbash::interpreter_exception);
+               libbash::parse_exception);
 }
 
 TEST(libbashapi, illegal_script)
@@ -41,7 +41,7 @@ TEST(libbashapi, illegal_script)
   std::unordered_map<std::string, std::vector<std::string>> variables;
   std::vector<std::string> functions;
   EXPECT_THROW(libbash::interpret(get_src_dir() + "/scripts/illegal_script.sh", variables, functions),
-               libbash::interpreter_exception);
+               libbash::parse_exception);
 }
 
 TEST(libbashapi, legal_script)
@@ -81,5 +81,5 @@ TEST(libbashapi, preload)
                                   get_src_dir() + std::string("/scripts/illegal_script.sh"),
                                   variables,
                                   functions),
-               libbash::interpreter_exception);
+               libbash::parse_exception);
 }

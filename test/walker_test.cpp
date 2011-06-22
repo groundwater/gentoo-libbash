@@ -66,12 +66,12 @@ TEST(array_index, out_of_bound)
   std::string script = "a[-1]=\"1\"";
   std::istringstream input(script);
   bash_ast ast(input);
-  EXPECT_THROW(ast.interpret_with(walker), libbash::interpreter_exception);
+  EXPECT_THROW(ast.interpret_with(walker), libbash::illegal_argument_exception);
 
   std::string script2 = "a=(1 2 [-5]=1)";
   std::istringstream input2(script2);
   bash_ast ast2(input2);
-  EXPECT_THROW(ast2.interpret_with(walker), libbash::interpreter_exception);
+  EXPECT_THROW(ast2.interpret_with(walker), libbash::illegal_argument_exception);
 }
 
 TEST(extglob, used_when_disabled)
@@ -85,7 +85,7 @@ TEST(extglob, used_when_disabled)
   {
     ast.interpret_with(walker);
   }
-  catch(libbash::interpreter_exception& e)
+  catch(libbash::unsupported_exception& e)
   {
     EXPECT_STREQ(e.what(), "Entered extended pattern matching with extglob disabled");
   }
@@ -98,5 +98,5 @@ TEST(brace_expansion, not_in_raw_string)
   std::string script = "echo $ab{c,d}e";
   std::istringstream input(script);
   bash_ast ast(input);
-  EXPECT_THROW(ast.interpret_with(walker), libbash::interpreter_exception);
+  EXPECT_THROW(ast.interpret_with(walker), libbash::unsupported_exception);
 }

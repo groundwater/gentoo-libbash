@@ -38,7 +38,6 @@
 #include <boost/range/algorithm/copy.hpp>
 
 #include "core/bash_ast.h"
-#include "core/unset_exception.h"
 
 namespace
 {
@@ -178,7 +177,7 @@ const std::string interpreter::do_substring_expansion(const std::string& name,
                                                       const unsigned index) const
 {
   if(length < 0)
-    throw libbash::interpreter_exception("length of substring expression should be greater or equal to zero");
+    throw libbash::illegal_argument_exception("length of substring expression should be greater or equal to zero");
 
   return get_substring(name, offset, boost::numeric_cast<unsigned>(length), index);
 }
@@ -226,7 +225,7 @@ const std::string interpreter::do_subarray_expansion(const std::string& name,
                                                      int length) const
 {
   if(length < 0)
-    throw libbash::interpreter_exception("length of substring expression should be greater or equal to zero");
+    throw libbash::illegal_argument_exception("length of substring expression should be greater or equal to zero");
 
   return get_subarray(name, offset, boost::numeric_cast<unsigned>(length));
 }
@@ -318,7 +317,7 @@ void interpreter::call(const std::string& name,
   if(iter != functions.end())
     iter->second.call(*this);
   else
-    throw libbash::interpreter_exception(name + " is not defined.");
+    throw libbash::runtime_exception(name + " is not defined.");
 }
 
 void interpreter::replace_all(std::string& value,
@@ -367,7 +366,7 @@ namespace
   {
     // Unsetting positional parameters is not allowed
     if(isdigit(name[0]))
-      throw unset_exception("unset: not a valid identifier");
+      throw libbash::runtime_exception("unset: not a valid identifier");
   }
 }
 
@@ -380,7 +379,7 @@ void interpreter::unset(const std::string& name)
     if(iter_local != frame.end())
     {
       if(iter_local->second->is_readonly())
-        throw unset_exception("unset a readonly variable");
+        throw libbash::readonly_exception("unset a readonly variable");
       frame.erase(iter_local);
       return true;
     }
@@ -408,7 +407,7 @@ void interpreter::unset(const std::string& name,
   if(var)
   {
     if(var->is_readonly())
-      throw unset_exception("unset a readonly variable");
+      throw libbash::readonly_exception("unset a readonly variable");
     var->unset_value(index);
   }
 }
@@ -417,7 +416,7 @@ bool interpreter::get_additional_option(const std::string& name) const
 {
   auto iter = additional_options.find(name);
   if(iter == additional_options.end())
-    throw libbash::interpreter_exception("Invalid bash option");
+    throw libbash::illegal_argument_exception("Invalid bash option");
 
   return iter->second;
 }
@@ -426,7 +425,7 @@ void interpreter::set_additional_option(const std::string& name, bool value)
 {
   auto iter = additional_options.find(name);
   if(iter == additional_options.end())
-    throw libbash::interpreter_exception(name + " is not a valid bash option");
+    throw libbash::illegal_argument_exception(name + " is not a valid bash option");
 
   iter->second = value;
 }

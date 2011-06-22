@@ -24,7 +24,6 @@
 #include <gtest/gtest.h>
 
 #include "core/interpreter.h"
-#include "core/unset_exception.h"
 
 using namespace std;
 
@@ -98,7 +97,7 @@ TEST(interpreter, set_int_value)
 
   walker.define("aint_ro", 4, true);
   EXPECT_THROW(walker.set_value("aint_ro", 10),
-               libbash::interpreter_exception);
+               libbash::readonly_exception);
   EXPECT_EQ(4, walker.resolve<int>("aint_ro"));
 }
 
@@ -113,7 +112,7 @@ TEST(interpreter, set_string_value)
 
   walker.define("astring_ro", "hi", true);
   EXPECT_THROW(walker.set_value<string>("astring_ro", "hello"),
-               libbash::interpreter_exception);
+               libbash::readonly_exception);
   EXPECT_STREQ("hi", walker.resolve<string>("astring_ro").c_str());
 }
 
@@ -129,7 +128,7 @@ TEST(interpreter, set_array_value)
 
   walker.define("ro_array", values, true);
   EXPECT_THROW(walker.set_value<string>("ro_array", "hello", 1),
-               libbash::interpreter_exception);
+               libbash::readonly_exception);
   EXPECT_STREQ("2", walker.resolve<string>("ro_array", 1).c_str());
 }
 
@@ -176,12 +175,12 @@ TEST(interpreter, unset_arrays)
   EXPECT_STREQ("", walker.resolve<string>("array", 2).c_str());
   walker.unset("array");
 
-  EXPECT_THROW(walker.unset("ro_array", 1), unset_exception);
-  EXPECT_THROW(walker.unset("ro_local_array", 1), unset_exception);
-  EXPECT_THROW(walker.unset("ro_array"), unset_exception);
-  EXPECT_THROW(walker.unset("ro_local_array"), unset_exception);
+  EXPECT_THROW(walker.unset("ro_array", 1), libbash::readonly_exception);
+  EXPECT_THROW(walker.unset("ro_local_array", 1), libbash::readonly_exception);
+  EXPECT_THROW(walker.unset("ro_array"), libbash::readonly_exception);
+  EXPECT_THROW(walker.unset("ro_local_array"), libbash::readonly_exception);
 
-  EXPECT_THROW(walker.unset("1", 1), libbash::interpreter_exception);
+  EXPECT_THROW(walker.unset("1", 1), libbash::runtime_exception);
 }
 
 TEST(interpreter, unset_variables)
@@ -200,9 +199,9 @@ TEST(interpreter, unset_variables)
   EXPECT_STREQ("", walker.resolve<string>("var").c_str());
   walker.unset("var");
 
-  EXPECT_THROW(walker.unset("ro_var"), unset_exception);
-  EXPECT_THROW(walker.unset("ro_local_var"), unset_exception);
-  EXPECT_THROW(walker.unset("1"), libbash::interpreter_exception);
+  EXPECT_THROW(walker.unset("ro_var"), libbash::readonly_exception);
+  EXPECT_THROW(walker.unset("ro_local_var"), libbash::readonly_exception);
+  EXPECT_THROW(walker.unset("1"), libbash::runtime_exception);
 }
 
 TEST(interpreter, unset_functions)
@@ -219,7 +218,7 @@ TEST(interperter, substring_expansion)
 {
   interpreter walker;
   EXPECT_STREQ("", walker.do_substring_expansion("@", 0, 1, 2).c_str());
-  EXPECT_THROW(walker.do_substring_expansion("", 0, -1, 0), libbash::interpreter_exception);
+  EXPECT_THROW(walker.do_substring_expansion("", 0, -1, 0), libbash::illegal_argument_exception);
 }
 
 TEST(interpreter, word_split)
@@ -240,8 +239,8 @@ TEST(interpreter, bash_additional_option)
 {
   interpreter walker;
 
-  EXPECT_THROW(walker.set_additional_option("not exist", false), libbash::interpreter_exception);
-  EXPECT_THROW(walker.get_additional_option("not exist"), libbash::interpreter_exception);
+  EXPECT_THROW(walker.set_additional_option("not exist", false), libbash::illegal_argument_exception);
+  EXPECT_THROW(walker.get_additional_option("not exist"), libbash::illegal_argument_exception);
 
   EXPECT_FALSE(walker.get_additional_option("extglob"));
   walker.set_additional_option("extglob", true);
@@ -253,4 +252,12 @@ TEST(interpreter, bash_option)
   interpreter walker;
 
   EXPECT_STREQ("Bh", walker.resolve<std::string>("-").c_str());
+}
+
+TEST(interpreter, undefined_function)
+{
+  interpreter walker;
+  interpreter::local_scope temp_scope(walker);
+
+  EXPECT_THROW(walker.call("undefined", {}), libbash::runtime_exception);
 }

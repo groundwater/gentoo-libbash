@@ -213,7 +213,6 @@ libcppbash_la_SOURCES = src/common.h \
 						src/core/readonly_exception.h \
 						src/core/runtime_exception.h \
 						src/core/unsupported_exception.h \
-						src/core/unset_exception.h \
 						src/core/interpreter.cpp \
 						src/core/interpreter.h \
 						src/core/symbols.hpp \

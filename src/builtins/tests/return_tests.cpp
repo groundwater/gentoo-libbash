@@ -33,7 +33,7 @@ TEST(return_builtin_test, bad_argument)
 {
   interpreter walker;
   EXPECT_THROW(cppbash_builtin::exec("return", {"abc"}, std::cout, std::cerr, std::cin, walker), boost::bad_lexical_cast);
-  EXPECT_THROW(cppbash_builtin::exec("return", {"abc", "def"}, std::cout, std::cerr, std::cin, walker), libbash::interpreter_exception);
+  EXPECT_THROW(cppbash_builtin::exec("return", {"abc", "def"}, std::cout, std::cerr, std::cin, walker), libbash::illegal_argument_exception);
 }
 
 TEST(return_builtin_test, bad_location)

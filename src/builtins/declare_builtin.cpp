@@ -92,7 +92,7 @@ int declare_builtin::exec(const std::vector<std::string>& bash_args)
       }
       else
       {
-        throw libbash::interpreter_exception("We do not support declare -p without arguments for now");
+        throw libbash::unsupported_exception("We do not support declare -p without arguments for now");
       }
       return result;
     case 'a':

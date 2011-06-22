@@ -23,28 +23,32 @@
 #include <gtest/gtest.h>
 
 #include "builtins/builtin_exceptions.h"
+#include "core/exceptions.h"
 #include "core/interpreter.h"
 #include "cppbash_builtin.h"
 
-static void test_shopt_builtin(const std::string& expected, const std::vector<std::string>& args)
+namespace
 {
-  std::stringstream output;
-  interpreter walker;
-  try
+  template <typename T>
+  void test_shopt_builtin(const std::string& expected, const std::vector<std::string>& args)
   {
-    cppbash_builtin::exec("shopt", args, std::cout, output, std::cin, walker);
-    FAIL();
-  }
-  catch(libbash::interpreter_exception& e)
-  {
-    EXPECT_STREQ(expected.c_str(), e.what());
+    std::stringstream output;
+    interpreter walker;
+    try
+    {
+      cppbash_builtin::exec("shopt", args, std::cout, output, std::cin, walker);
+      FAIL();
+    }
+    catch(T& e)
+    {
+      EXPECT_STREQ(expected.c_str(), e.what());
+    }
   }
 }
 
-
 TEST(shopt_builtin_test, disable_extglob)
 {
-  test_shopt_builtin("not exist is not a valid bash option", {"-u", "not exist"});
+  test_shopt_builtin<libbash::illegal_argument_exception>("not exist is not a valid bash option", {"-u", "not exist"});
 
   interpreter walker;
   walker.set_additional_option("autocd", true);
@@ -55,7 +59,7 @@ TEST(shopt_builtin_test, disable_extglob)
 
 TEST(shopt_builtin_test, enable_extglob)
 {
-  test_shopt_builtin("not exist is not a valid bash option", {"-s", "not exist"});
+  test_shopt_builtin<libbash::illegal_argument_exception>("not exist is not a valid bash option", {"-s", "not exist"});
 
   interpreter walker;
   EXPECT_EQ(0, cppbash_builtin::exec("shopt", {"-s", "autocd", "cdspell"}, std::cout, std::cerr, std::cin, walker));
@@ -65,8 +69,8 @@ TEST(shopt_builtin_test, enable_extglob)
 
 TEST(shopt_builtin_test, invalid_argument)
 {
-  test_shopt_builtin("Arguments required for shopt", {});
-  test_shopt_builtin("Multiple arguments are not supported", {"-so"});
-  test_shopt_builtin("shopt -q is not supported yet", {"-q"});
-  test_shopt_builtin("Unrecognized option for shopt: -d", {"-d"});
+  test_shopt_builtin<libbash::illegal_argument_exception>("Arguments required for shopt", {});
+  test_shopt_builtin<libbash::unsupported_exception>("Multiple arguments are not supported", {"-so"});
+  test_shopt_builtin<libbash::unsupported_exception>("shopt -q is not supported yet", {"-q"});
+  test_shopt_builtin<libbash::illegal_argument_exception>("Unrecognized option for shopt: -d", {"-d"});
 }

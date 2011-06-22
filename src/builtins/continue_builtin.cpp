@@ -33,7 +33,7 @@ int continue_builtin::exec(const std::vector<std::string>& bash_args)
 
   if(bash_args.size() > 1)
   {
-    throw libbash::interpreter_exception("continue: too many arguments");
+    throw libbash::illegal_argument_exception("continue: too many arguments");
   }
   else if(bash_args.size() == 1)
   {
@@ -43,7 +43,7 @@ int continue_builtin::exec(const std::vector<std::string>& bash_args)
     }
     catch(boost::bad_lexical_cast& e)
     {
-      throw libbash::interpreter_exception("continue: argument should be an integer");
+      throw libbash::illegal_argument_exception("continue: argument should be an integer");
     }
   }
 

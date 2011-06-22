@@ -85,7 +85,7 @@ namespace
       case 'N':
         return info.st_mtime >= info.st_atime;
       default:
-        throw libbash::interpreter_exception(std::string("Unrecognized test operator -") + op);
+        throw libbash::illegal_argument_exception(std::string("Unrecognized test operator -") + op);
     }
   }
 }
@@ -99,7 +99,7 @@ bool internal::test_unary(char op, const std::string& target)
     case 'n':
       return !target.empty();
     case 'o':
-      throw libbash::interpreter_exception("Shell option test is not supported");
+      throw libbash::unsupported_exception("Shell option test is not supported");
     case 't':
       try
       {
@@ -141,7 +141,7 @@ namespace
         /* -ef */
         return (lst.st_dev == rst.st_dev && lst.st_ino == rst.st_ino);
       default:
-        throw libbash::interpreter_exception(std::string("Unrecognized option for file test ") + op);
+        throw libbash::illegal_argument_exception(std::string("Unrecognized option for file test ") + op);
     }
   }
 }
@@ -152,7 +152,7 @@ bool internal::test_binary(const std::string& op,
                            interpreter& walker)
 {
   if(op.size() != 2)
-    throw libbash::interpreter_exception("Unrecognized operator " + op);
+    throw libbash::illegal_argument_exception("Unrecognized operator " + op);
 
   try
   {
@@ -177,7 +177,7 @@ bool internal::test_binary(const std::string& op,
     else if(op == "ge")
       return walker.eval_arithmetic(lhs) >= walker.eval_arithmetic(rhs);
     else
-      throw libbash::interpreter_exception("Unrecognized operator " + op);
+      throw libbash::illegal_argument_exception("Unrecognized operator " + op);
   }
   catch(boost::bad_lexical_cast& e)
   {

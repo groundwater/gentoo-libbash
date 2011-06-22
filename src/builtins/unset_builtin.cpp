@@ -25,7 +25,6 @@
 #include <functional>
 
 #include "core/interpreter.h"
-#include "core/unset_exception.h"
 
 int unset_builtin::exec(const std::vector<std::string>& bash_args)
 {

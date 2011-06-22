@@ -68,7 +68,7 @@ options
 		void set_index(const std::string& name, unsigned& index, int value)
 		{
 			if(value < 0)
-				throw libbash::interpreter_exception((boost::format("Array index is less than 0: \%s[\%d]") \% name \% value).str());
+				throw libbash::illegal_argument_exception((boost::format("Array index is less than 0: \%s[\%d]") \% name \% value).str());
 			index = value;
 		}
 
@@ -217,7 +217,7 @@ string_expr returns[std::string libbash_value, bool quoted]
 }
 @after {
 	if(!is_raw_string && brace_expansion_base.size() > 1)
-		throw libbash::interpreter_exception("We only support brace expansion in raw string for now");
+		throw libbash::unsupported_exception("We only support brace expansion in raw string for now");
 	$libbash_value = boost::algorithm::join(brace_expansion_base, " ");
 }
 	:^(STRING (
@@ -287,7 +287,7 @@ bash_pattern[boost::xpressive::sregex& pattern, bool greedy]
 	sregex pattern_list;
 	auto check_extglob = [&]() {
 		if(!walker->get_additional_option("extglob"))
-			throw libbash::interpreter_exception("Entered extended pattern matching with extglob disabled");
+			throw libbash::unsupported_exception("Entered extended pattern matching with extglob disabled");
 	};
 }
 	:^(STRING (
@@ -319,7 +319,7 @@ bash_pattern[boost::xpressive::sregex& pattern, bool greedy]
 		}
 		|(EXTENDED_MATCH_NONE) => ^(EXTENDED_MATCH_NONE composite_pattern[pattern_list, $greedy]) {
 			check_extglob();
-			throw libbash::interpreter_exception("!(blah) is not supported for now");
+			throw libbash::unsupported_exception("!(blah) is not supported for now");
 		}
 		|basic_pattern[$pattern, $greedy, do_append])+);
 
@@ -573,7 +573,7 @@ execute_command[const std::string& name, std::vector<std::string>& libbash_args]
 		else
 		{
 			walker->set_status(1);
-			throw libbash::interpreter_exception(name + " is not supported yet");
+			throw libbash::unsupported_exception(name + " is not supported yet");
 		}
 	}
 	(BANG { walker->set_status(!walker->get_status()); })?;
@@ -705,7 +705,7 @@ builtin_condition returns[bool status]
 		else if(op == 'o')
 			$status = l || r;
 		else
-			throw libbash::interpreter_exception(std::string("unrecognized operator in built-in test: ") + op);
+			throw libbash::parse_exception(std::string("unrecognized operator in built-in test: ") + op);
 	}
 	|s=builtin_condition_primary { $status = s; };
 
