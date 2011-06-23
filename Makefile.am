@@ -281,6 +281,7 @@ EXTRA_DIST = bashast/bashast.g \
 			 scripts/source_true.sh \
 			 scripts/source_return.sh \
 			 scripts/illegal_script.sh \
+			 scripts/illegal_script.sh.tokens \
 			 scripts/foo.eclass \
 			 scripts/bar.eclass \
 			 utils/metadata_diff.sh \

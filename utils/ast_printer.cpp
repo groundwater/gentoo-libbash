@@ -29,12 +29,15 @@
 #include <unordered_map>
 #include <vector>
 
+#include <antlr3.h>
+#include <boost/numeric/conversion/cast.hpp>
 #include <boost/program_options.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 
 #include "core/bash_ast.h"
 #include "core/exceptions.h"
+#include "libbashLexer.h"
 #include "libbashParser.h"
 
 namespace po = boost::program_options;
@@ -91,13 +94,32 @@ static void print_parser_token(std::istream& input,
   if(silent)
     return;
 
-  bash_ast ast(input);
+  std::stringstream script_stream;
+  script_stream << input.rdbuf();
+  std::string script(script_stream.str());
+  antlr_pointer<ANTLR3_INPUT_STREAM_struct> input_stream(antlr3NewAsciiStringInPlaceStream(
+    reinterpret_cast<pANTLR3_UINT8>(const_cast<char*>(script.c_str())),
+    boost::numeric_cast<ANTLR3_UINT32>(script.size()),
+    NULL));
+  if(!input)
+    throw libbash::interpreter_exception("Unable to open the file due to malloc() failure");
+
+  antlr_pointer<libbashLexer_Ctx_struct> lexer(libbashLexerNew(input_stream.get()));
+  if(!lexer)
+    throw libbash::interpreter_exception("Unable to create the lexer due to malloc() failure");
+
+  antlr_pointer<ANTLR3_COMMON_TOKEN_STREAM_struct> token_stream(
+    antlr3CommonTokenStreamSourceNew(ANTLR3_SIZE_HINT, lexer->pLexer->rec->state->tokSource));
+  if(!token_stream)
+    throw libbash::interpreter_exception("Out of memory trying to allocate token stream");
+
   std::unordered_map<ANTLR3_INT32, std::string> token_map;
 
   if(build_token_map(token_map, token_path))
-    std::cout << ast.get_parser_tokens(std::bind(&token_mapper,
-                                                 token_map,
-                                                 std::placeholders::_1))
+    std::cout << bash_ast::get_parser_tokens(token_stream,
+                                             std::bind(&token_mapper,
+                                                       token_map,
+                                                       std::placeholders::_1))
     << std::endl;
   else
     std::cerr << "Building token map failed" << std::endl;
