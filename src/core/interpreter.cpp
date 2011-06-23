@@ -435,3 +435,12 @@ long interpreter::eval_arithmetic(const std::string& expression)
   bash_ast ast(std::stringstream(expression), &bash_ast::parser_arithmetics);
   return ast.interpret_with(*this, &bash_ast::walker_arithmetics);
 }
+
+int interpreter::shift(int shift_number)
+{
+  auto parameters = resolve_variable("*");
+  if(shift_number < 0)
+    return 1;
+
+  return parameters->shift(static_cast<unsigned>(shift_number));
+}

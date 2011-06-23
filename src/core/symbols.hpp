@@ -33,6 +33,7 @@
 
 #include <boost/variant.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
 #include "core/exceptions.h"
 
@@ -233,6 +234,34 @@ public:
   bool is_readonly() const
   {
     return readonly;
+  }
+
+  int shift(unsigned shift_number)
+  {
+    assert(!readonly&&"readonly variables shouldn't be shifted");
+    // Remove this cast after making arithmetic expansion follow POSIX
+    unsigned size = boost::numeric_cast<unsigned>(value.size());
+
+    if(shift_number > size) 
+    {
+      return 1;
+    }
+    else if(shift_number == size)
+    {
+      value.clear();
+    }
+    else
+    {
+      // copy elements
+      for(unsigned i = shift_number + 1; i <= size; ++i)
+        value[i - shift_number] = value[i]; 
+
+      // remove tail elements
+      for(unsigned i = size - shift_number + 1; i <= size; ++i)
+        value.erase(i); 
+    }
+
+    return 0;
   }
 };
 

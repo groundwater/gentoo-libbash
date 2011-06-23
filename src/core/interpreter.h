@@ -508,6 +508,11 @@ public:
   /// \return the evaluated result
   long eval_arithmetic(const std::string& expression);
 
+  /// \brief shift the positional parameters to the left by n.
+  /// \param the number to be shifted
+  /// \return zero unless n is greater than $# or less than zero, non-zero otherwise.
+  int shift(int shift_number);
+
   /// \brief perform expansion like ${var//foo/bar}
   /// \param value the value to be expanded
   /// \param pattern the pattern used to match the value

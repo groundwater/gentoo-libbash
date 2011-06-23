@@ -38,6 +38,7 @@
 #include "builtins/let_builtin.h"
 #include "builtins/return_builtin.h"
 #include "builtins/printf_builtin.h"
+#include "builtins/shift_builtin.h"
 #include "builtins/shopt_builtin.h"
 #include "builtins/source_builtin.h"
 #include "builtins/unset_builtin.h"
@@ -58,6 +59,7 @@ cppbash_builtin::builtins_type& cppbash_builtin::builtins() {
       {"eval", boost::factory<eval_builtin*>()},
       {"declare", boost::factory<declare_builtin*>()},
       {"source", boost::factory<source_builtin*>()},
+      {"shift", boost::factory<shift_builtin*>()},
       {"shopt", boost::factory<shopt_builtin*>()},
       {"inherit", boost::factory<inherit_builtin*>()},
       {":", boost::factory<true_builtin*>()},
