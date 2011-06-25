@@ -744,7 +744,6 @@ for_expr
 				commands_index = INDEX();
 				for(auto iter = splitted_values.begin(); iter != splitted_values.end(); ++iter)
 				{
-					SEEK(commands_index);
 					walker->set_value(libbash_string, *iter);
 					try
 					{
@@ -753,9 +752,16 @@ for_expr
 					catch(continue_exception& e)
 					{
 						e.rethrow_unless_correct_frame();
-						continue;
 					}
+					catch(break_exception& e)
+					{
+						e.rethrow_unless_correct_frame();
+						SEEK(commands_index);
+						break;
+					}
+					SEEK(commands_index);
 				}
+				seek_to_next_tree(ctx);
 			}
 		})
 	|^(CFOR {
@@ -777,8 +783,10 @@ for_expr
 
 		SEEK(condition_index);
 
+		ANTLR3_MARKER command_index;
 		while(!has_condition || for_condition(ctx))
 		{
+			command_index = INDEX();
 			try
 			{
 				command_list(ctx);
@@ -792,9 +800,14 @@ for_expr
 					SEEK(modification_index);
 					for_modification(ctx);
 				}
-
 				SEEK(condition_index);
 				continue;
+			}
+			catch(break_exception& e)
+			{
+				e.rethrow_unless_correct_frame();
+				SEEK(command_index);
+				break;
 			}
 			if(has_modification)
 				for_modification(ctx);
@@ -823,6 +836,7 @@ for_modification
 while_expr
 @declarations {
 	ANTLR3_MARKER condition_index;
+	ANTLR3_MARKER command_index;
 	bool negate;
 }
 	:^((WHILE { negate = false; } | UNTIL { negate = true; }) {
@@ -835,6 +849,8 @@ while_expr
 			command_list(ctx);
 			if(walker->get_status() == (negate? 0 : 1))
 				break;
+
+			command_index = INDEX();
 			try
 			{
 				command_list(ctx);
@@ -844,6 +860,12 @@ while_expr
 				e.rethrow_unless_correct_frame();
 				SEEK(condition_index);
 				continue;
+			}
+			catch(break_exception& e)
+			{
+				e.rethrow_unless_correct_frame();
+				SEEK(command_index);
+				break;
 			}
 			SEEK(condition_index);
 		}

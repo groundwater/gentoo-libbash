@@ -12,6 +12,8 @@ ghi
 9
 10
 bar
+foo
+foo
 2 foo
 2 bar
 3 foo
@@ -51,9 +53,9 @@ case end
 a=1
 b=2
 bar=
-file=bar
+file=foo
 foo=ghi
-i=4
-j=2
-outer=3
+i=1
+j=1
+outer=1
 target=_

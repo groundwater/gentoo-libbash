@@ -38,12 +38,47 @@ do
     echo $file
 done
 
+for file in foo bar
+do
+    if [[ $file == "bar" ]]; then
+        continue
+    fi
+    echo $file
+done
+
+for file in foo bar
+do
+    if [[ $file == "foo" ]]; then
+        break
+    fi
+    echo $file
+done
+
+for file in foo bar
+do
+    if [[ $file == "bar" ]]; then
+        break
+    fi
+    echo $file
+done
+
 for outer in 1 2 3
 do
     for file in foo bar
     do
         if [[ $file == "foo" && $outer == 1 ]]; then
             continue 2
+        fi
+        echo "$outer $file"
+    done
+done
+
+for outer in 1 2 3
+do
+    for file in foo bar
+    do
+        if [[ $file == "foo" && $outer == 1 ]]; then
+            break 2
         fi
         echo "$outer $file"
     done
@@ -72,6 +107,16 @@ do
 done
 
 i=0
+while [ $i != 4 ]
+do
+    i=$(( i + 1 ))
+    if [[ $i == 1 ]]; then
+        break
+    fi
+    echo $i
+done
+
+i=0
 j=1
 while [ $i != 4 ]
 do
@@ -81,6 +126,22 @@ do
     do
         if [[ $i == 1 ]]; then
             continue 2
+        fi
+        echo $i
+        let ++j
+    done
+done
+
+i=0
+j=1
+while [ $i != 4 ]
+do
+    i=$(( i + 1 ))
+    
+    while [ $j == 1 ]
+    do
+        if [[ $i == 1 ]]; then
+            break 2
         fi
         echo $i
         let ++j
@@ -110,6 +171,16 @@ do
 done
 
 i=0
+until [ $i == 4 ]
+do
+    i=$(( i + 1 ))
+    if [[ $i == 1 ]]; then
+        break
+    fi
+    echo $i
+done
+
+i=0
 j=1
 until [ $i == 4 ]
 do
@@ -119,6 +190,22 @@ do
     do
         if [[ $i == 1 ]]; then
             continue 2
+        fi
+        echo $i
+        let ++j
+    done
+done
+
+i=0
+j=1
+until [ $i == 4 ]
+do
+    i=$(( i + 1 ))
+    
+    while [ $j == 1 ]
+    do
+        if [[ $i == 1 ]]; then
+            break 2
         fi
         echo $i
         let ++j
