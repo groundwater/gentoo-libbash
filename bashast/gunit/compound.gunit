@@ -28,9 +28,9 @@ cond_comparison:
 "[[ asdf > qwert ]]" -> (COMPOUND_COND (KEYWORD_TEST (> (STRING asdf) (STRING qwert))))
 "[ asdf \> qwert ]" -> (COMPOUND_COND (BUILTIN_TEST (\> (STRING asdf) (STRING qwert))))
 
-arith_comparison:
-"((5+3))" -> (COMPOUND_ARITH (+ 5 3))
-"(( 5+3 ))" -> (COMPOUND_ARITH (+ 5 3))
+arithmetic_expression:
+"((5+3))" -> (ARITHMETIC_EXPRESSION (+ 5 3))
+"(( 5+3 ))" -> (ARITHMETIC_EXPRESSION (+ 5 3))
 
 current_shell:
 "{ time cat; }" -> (CURRENT_SHELL (LIST (COMMAND (STRING cat) time)))
@@ -135,7 +135,7 @@ while_expr:
 echo \"file found\"
 done" -> (while (LIST (COMMAND (STRING echo) (STRING true))) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found)))))
 "while echo true; do echo \"file found\"; done" -> (while (LIST (COMMAND (STRING echo) (STRING true))) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found)))))
-"while(( 1>0 )); do echo ok; done" -> (while (LIST (COMMAND (COMPOUND_ARITH (> 1 0)))) (LIST (COMMAND (STRING echo) (STRING ok))))
+"while(( 1>0 )); do echo ok; done" -> (while (LIST (COMMAND (ARITHMETIC_EXPRESSION (> 1 0)))) (LIST (COMMAND (STRING echo) (STRING ok))))
 "while echo true`; do echo file done" FAIL
 "while [[ -n \"$ver_str\" ]] ; do
 		echo true
@@ -179,7 +179,7 @@ esac" -> (case (STRING (DOUBLE_QUOTED_STRING (VAR_REF 1))) (CASE_PATTERN (STRING
 
 command:
 "[[ asdf > qwert ]] > /dev/null" -> (COMMAND (COMPOUND_COND (KEYWORD_TEST (> (STRING asdf) (STRING qwert)))) (REDIR > (STRING / dev / null)))
-"(( 5+3 )) > /dev/null" -> (COMMAND (COMPOUND_ARITH (+ 5 3)) (REDIR > (STRING / dev / null)))
+"(( 5+3 )) > /dev/null" -> (COMMAND (ARITHMETIC_EXPRESSION (+ 5 3)) (REDIR > (STRING / dev / null)))
 "{ time cat; } > /dev/null" -> (COMMAND (CURRENT_SHELL (LIST (COMMAND (STRING cat) time))) (REDIR > (STRING / dev / null)))
 "(time cat) > /dev/null" -> (COMMAND (SUBSHELL (LIST (COMMAND (STRING cat) time))) (REDIR > (STRING / dev / null)))
 "case a in esac >/dev/null" -> (COMMAND (case (STRING a)) (REDIR > (STRING / dev / null)))

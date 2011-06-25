@@ -105,7 +105,9 @@ public:
 
   std::string get_string_tree();
 
-  std::string get_tokens(std::function<std::string(ANTLR3_UINT32)>);
+  std::string get_parser_tokens(std::function<std::string(ANTLR3_UINT32)>);
+
+  std::string get_walker_tokens(std::function<std::string(ANTLR3_UINT32)>);
 };
 
 #endif
