@@ -16,7 +16,7 @@
    You should have received a copy of the GNU General Public License
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
-gunit bashast;
+gunit java_libbash;
 
 simple_command:
 "./command" -> (STRING . / command)
@@ -29,6 +29,7 @@ simple_command:
 "dodir ${foo}/${bar}" -> (STRING dodir) (STRING (VAR_REF foo) / (VAR_REF bar))
 "local a=123 b=(1 2 3) c" -> (VARIABLE_DEFINITIONS local (= a (STRING 123)) (= b (ARRAY (STRING 1) (STRING 2) (STRING 3))) (EQUALS c))
 "echo {}{}}{{{}}{{}" -> (STRING echo) (STRING { } { } } { { { } } { { })
+"echo \"ab#af ###\" #abc" -> (STRING echo) (STRING (DOUBLE_QUOTED_STRING ab # af   ## #))
 
 command:
 "asdf=5 cat out.log > result" -> (COMMAND (STRING cat) (STRING out . log) (= asdf (STRING 5)) (REDIR > (STRING result)))

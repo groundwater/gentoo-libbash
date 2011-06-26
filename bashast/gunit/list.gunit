@@ -16,7 +16,7 @@
    You should have received a copy of the GNU General Public License
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
-gunit bashast;
+gunit java_libbash;
 
 start:
 "make" -> (LIST (COMMAND (STRING make)))
@@ -38,7 +38,7 @@ cp arch/x86_64/boot/bzImage /boot/kernel" -> (LIST (COMMAND (STRING make)) (COMM
 b=three
 echo \"a b\"" -> (LIST (COMMAND (VARIABLE_DEFINITIONS (= a (STRING asdf)))) (COMMAND (VARIABLE_DEFINITIONS (= b (STRING three)))) (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING a   b))))
 "echo one && (echo two || echo three)" -> (LIST (&& (COMMAND (STRING echo) (STRING one)) (COMMAND (SUBSHELL (LIST (|| (COMMAND (STRING echo) (STRING two)) (COMMAND (STRING echo) (STRING three))))))))
-"FOO='bar' ;" -> (LIST (COMMAND (VARIABLE_DEFINITIONS (= FOO (STRING (SINGLE_QUOTED_STRING bar))))))
+"FOO='bar' ;" -> (LIST (COMMAND (VARIABLE_DEFINITIONS (= FOO (STRING (SINGLE_QUOTED_STRING 'bar'))))))
 "true;
 true" -> (LIST (COMMAND (STRING true)) (COMMAND (STRING true)))
 "(echo hi > /dev/null) >> 1" -> (LIST (COMMAND (SUBSHELL (LIST (COMMAND (STRING echo) (STRING hi) (REDIR > (STRING / dev / null))))) (REDIR >> (FILE_DESCRIPTOR 1))))

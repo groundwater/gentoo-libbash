@@ -16,7 +16,7 @@
    You should have received a copy of the GNU General Public License
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
-gunit bashast;
+gunit java_libbash;
 
 redirect:
 ">output_file" -> (REDIR > (STRING output_file))
@@ -30,9 +30,9 @@ redirect:
 "2<&0" -> (REDIR 2 <& (FILE_DESCRIPTOR 0))
 "<< asdf
 asdf
-" -> (<< (STRING asdf) (STRING asdf))
+" -> (<< (STRING asdf))
 "<<< herestring" -> (<<< (STRING herestring))
 "<< blue
 red
 green
-" -> (<< (STRING blue) (STRING red) (STRING green))
+" -> (<< (STRING red green))

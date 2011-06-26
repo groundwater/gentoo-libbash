@@ -56,3 +56,4 @@ shopt -p
 printf "%s %s\n" abc def
 printf "%s %s\n" $FOO001, def
 ((FOO010=1))
+echo "abc #av### ##" # for comment

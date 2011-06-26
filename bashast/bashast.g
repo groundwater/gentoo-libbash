@@ -16,14 +16,23 @@
    You should have received a copy of the GNU General Public License
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
-grammar bashast;
+#ifdef OUTPUT_C
+grammar libbash;
+#else
+grammar java_libbash;
+#endif
 options
 {
 	backtrack	= true;
 	output	= AST;
+	memoize		= true;
+#ifdef OUTPUT_C
+	language  = C;
+	ASTLabelType  = pANTLR3_BASE_TREE;
+#else
 	language	= Java;
 	ASTLabelType	= CommonTree;
-	memoize		= true;
+#endif
 }
 tokens{
 	ARG;
@@ -76,8 +85,8 @@ tokens{
 	CHARACTER_CLASS;
 	EQUIVALENCE_CLASS;
 	COLLATING_SYMBOL;
-	SINGLE_QUOTED_STRING;
 	DOUBLE_QUOTED_STRING;
+	SINGLE_QUOTED_STRING;
 	VARIABLE_DEFINITIONS;
 	// parameter expansion operators
 	USE_DEFAULT_WHEN_UNSET;
@@ -103,6 +112,50 @@ tokens{
 	NOT_EQUALS;
 	BUILTIN_LOGIC;
 }
+
+@lexer::members
+{
+#ifdef OUTPUT_C
+	bool double_quoted = false;
+#else
+	boolean double_quoted = false;
+#endif
+}
+
+#ifdef OUTPUT_C
+@includes {
+	C_INCLUDE #include <iostream>
+	C_INCLUDE #include <string>
+
+	C_INCLUDE #include <boost/numeric/conversion/cast.hpp>
+}
+@members
+{
+	static std::string get_string(pANTLR3_COMMON_TOKEN token)
+	{
+		if(!token || !token->start)
+			return "";
+		// Use reinterpret_cast here because we have to cast C code.
+		// The real type here is int64_t which is used as a pointer.
+		// token->stop - token->start + 1 should be bigger than 0.
+		return std::string(reinterpret_cast<const char *>(token->start),
+				boost::numeric_cast<unsigned>(token->stop - token->start + 1));
+	}
+
+	static bool is_here_end(plibbashParser ctx, const std::string& here_doc_word, int number_of_tokens_in_word)
+	{
+		std::string word;
+		for(int i = 1; i <= number_of_tokens_in_word; ++i)
+			word += get_string(LT(i));
+		return (word == here_doc_word);
+	}
+
+	static void free_redirect_atom(plibbashParser_redirect_atom_SCOPE scope)
+	{
+		(&(scope->here_doc_word))->std::string::~string();
+	}
+}
+#endif
 
 start	:	(flcomment)? EOL* clist BLANK* (SEMIC|AMP|EOL)? EOF -> clist;
 //Because the comment token doesn't handle the first comment in a file if it's on the first line, have a parser rule for it
@@ -153,19 +206,49 @@ bash_command_arguments
 bash_command_arguments_atom
 	:	brace_expansion|LBRACE|RBRACE|fname_part;
 redirect:	(BLANK!* redirect_atom)*;
-redirect_atom:	here_string_op^ BLANK!* fname
-	|	here_doc_op^ BLANK!* fname EOL! heredoc
+redirect_atom
+#ifdef OUTPUT_C
+scope {
+	std::string here_doc_word;
+	int number_of_tokens_in_word;
+}
+@init {
+	// http://antlr.1301665.n2.nabble.com/C-target-initialization-of-return-scope-structures-td5078478.html
+	new (&($redirect_atom::here_doc_word)) std::string;
+	$redirect_atom::number_of_tokens_in_word = 0;
+	ctx->plibbashParser_redirect_atomTop->free = &free_redirect_atom;
+}
+#endif
+	:	HERE_STRING_OP^ BLANK!* fname
+#ifdef OUTPUT_C
+	|	here_doc_op BLANK* here_doc_begin redirect?
+#else
+	|	here_doc_op BLANK* n=NAME redirect?
+#endif
+	EOL heredoc ->  ^(here_doc_op ^(STRING heredoc) redirect?)
 	|	redir_op BLANK* redir_dest -> ^(REDIR redir_op redir_dest)
 	|	process_substitution;
+#ifdef OUTPUT_C
+here_doc_begin
+	:( {
+		if(LA(1) != BLANK && LA(1) != EOL)
+		{
+			$redirect_atom::here_doc_word += get_string(LT(1));
+			++$redirect_atom::number_of_tokens_in_word;
+		}
+	} (~(EOL|BLANK)))+;
+here_doc_end
+	: ({ ($redirect_atom::number_of_tokens_in_word) != 0 }? => .{ ($redirect_atom::number_of_tokens_in_word)--; })+;
+heredoc	:	({ !is_here_end(ctx, $redirect_atom::here_doc_word, $redirect_atom::number_of_tokens_in_word) }? => .)+ here_doc_end!;
+#else
+heredoc	:   (fname_part EOL!)*;
+#endif
 redir_dest
 	:	file_desc_as_file //handles file descriptors
 	|	fname; //path to a file
 file_desc_as_file
 	:	DIGIT -> ^(FILE_DESCRIPTOR DIGIT)
 	|	DIGIT MINUS -> ^(FILE_DESCRIPTOR_MOVE DIGIT);
-heredoc	:	(fname EOL!)*;
-here_string_op
-	:	HERE_STRING_OP;
 here_doc_op
 	:	LSHIFT MINUS -> OP["<<-"]
 	|	LSHIFT -> OP["<<"];
@@ -438,7 +521,7 @@ nqstr_part
 	|	arithmetic_expansion
 	|	brace_expansion
 	|	dqstr
-	|	sqstr
+	|	SINGLE_QUOTED_STRING_TOKEN -> ^(SINGLE_QUOTED_STRING SINGLE_QUOTED_STRING_TOKEN)
 	|	str_part
 	|	pattern_match_trigger
 	|	BANG;
@@ -452,10 +535,6 @@ dqstr_part
 	| 	ESC TICK -> TICK
 	| 	ESC DOLLAR -> DOLLAR
 	|	~(DOLLAR|TICK|DQUOTE);
-//single quoted string rule, no expansions
-sqstr_part
-	: ~SQUOTE*;
-sqstr	:	SQUOTE sqstr_part SQUOTE -> ^(SINGLE_QUOTED_STRING sqstr_part);
 //certain tokens that trigger pattern matching
 pattern_match_trigger
 	:	LSQUARE
@@ -571,7 +650,7 @@ function:	FUNCTION BLANK+ function_name ((BLANK* parens wspace*)|wspace) compoun
 //does not contain a dollar sign, nor is quoted in any way.  Nor
 //does it consist of all digits.
 function_name
-	:	(NUMBER|DIGIT)? ~(DOLLAR|SQUOTE|DQUOTE|LPAREN|RPAREN|BLANK|EOL|NUMBER|DIGIT) ~(DOLLAR|SQUOTE|DQUOTE|LPAREN|RPAREN|BLANK|EOL)*;
+	:	(NUMBER|DIGIT)? ~(DOLLAR|SQUOTE|DQUOTE|LPAREN|RPAREN|BLANK|EOL|NUMBER|DIGIT|SINGLE_QUOTED_STRING_TOKEN) ~(DOLLAR|SQUOTE|DQUOTE|LPAREN|RPAREN|BLANK|EOL)*;
 parens	:	LPAREN BLANK* RPAREN;
 name	:	NAME
 	|	LETTER
@@ -583,7 +662,7 @@ esc_char:	ESC (DIGIT DIGIT? DIGIT?|LETTER ALPHANUM ALPHANUM?|.);
 //****************
 
 COMMENT
-	:	(BLANK|EOL) '#' ~('\n'|'\r')* {$channel=HIDDEN;}
+	:	{ !double_quoted }?=> (BLANK|EOL) '#' ~('\n'|'\r')* {$channel=HIDDEN;}
 	;
 //Bash "reserved words"
 BANG	:	'!';
@@ -646,8 +725,9 @@ SEMIC	:	';';
 DOUBLE_SEMIC
 	:	';;';
 PIPE	:	'|';
-DQUOTE	:	'"';
-SQUOTE	:	'\'';
+DQUOTE	:	'"' { double_quoted = !double_quoted; };
+SQUOTE	:	{ double_quoted }? => '\'';
+SINGLE_QUOTED_STRING_TOKEN	:	{ !double_quoted }? => '\'' .* '\'';
 COMMA	:	',';
 //Because bash isn't exactly whitespace dependent... need to explicitly handle blanks
 BLANK	:	(' '|'\t')+;

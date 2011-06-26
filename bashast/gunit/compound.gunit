@@ -16,7 +16,7 @@
    You should have received a copy of the GNU General Public License
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
-gunit bashast;
+gunit java_libbash;
 
 cond_comparison:
 "[[ -a this/is.afile ]]" -> (COMPOUND_COND (KEYWORD_TEST (a (STRING this / is . afile))))
@@ -85,7 +85,7 @@ for_expr:
 	echo \"file found\"
 done" -> (for each (STRING (COMMAND_SUB (LIST (| (COMMAND (STRING ls)) (COMMAND (STRING grep) (STRING log)))))) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found)))))
 "for each in `ls |grep log`; do echo \"file found\"; done" -> (for each (STRING (COMMAND_SUB (LIST (| (COMMAND (STRING ls)) (COMMAND (STRING grep) (STRING log)))))) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found)))))
-"for i in 'foo' 'bar'; do echo $i; done" -> (for i (STRING (SINGLE_QUOTED_STRING foo)) (STRING (SINGLE_QUOTED_STRING bar)) (LIST (COMMAND (STRING echo) (STRING (VAR_REF i)))))
+"for i in 'foo' 'bar'; do echo $i; done" -> (for i (STRING (SINGLE_QUOTED_STRING 'foo')) (STRING (SINGLE_QUOTED_STRING 'bar')) (LIST (COMMAND (STRING echo) (STRING (VAR_REF i)))))
 "for i in foo$var bar; do echo $i; done" -> (for i (STRING foo (VAR_REF var)) (STRING bar) (LIST (COMMAND (STRING echo) (STRING (VAR_REF i)))))
 "for each in `ls |grep log`; do echo file done" FAIL
 

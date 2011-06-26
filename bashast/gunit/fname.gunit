@@ -16,7 +16,7 @@
    You should have received a copy of the GNU General Public License
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
-gunit bashast;
+gunit java_libbash;
 
 fname:
 "+%Y%m%d" -> (STRING + % Y % m % d)
@@ -27,13 +27,13 @@ fname:
 "\"asdf;!\"" -> (STRING (DOUBLE_QUOTED_STRING asdf ; !))
 "\"$(whoami)\"" -> (STRING (DOUBLE_QUOTED_STRING (COMMAND_SUB (LIST (COMMAND (STRING whoami))))))
 "\"`whoami`\"" -> (STRING (DOUBLE_QUOTED_STRING (COMMAND_SUB (LIST (COMMAND (STRING whoami))))))
-"'`whoami`'" -> (STRING (SINGLE_QUOTED_STRING ` whoami `))
-"'$(whoami)'" -> (STRING (SINGLE_QUOTED_STRING $ ( whoami )))
+"'`whoami`'" -> (STRING (SINGLE_QUOTED_STRING '`whoami`'))
+"'$(whoami)'" -> (STRING (SINGLE_QUOTED_STRING '$(whoami)'))
 "\"${P}\"" -> (STRING (DOUBLE_QUOTED_STRING (VAR_REF P)))
-"'${P}'" -> (STRING (SINGLE_QUOTED_STRING $ { P }))
+"'${P}'" -> (STRING (SINGLE_QUOTED_STRING '${P}'))
 "asdf#" -> (STRING asdf #)
-"'asdf'" -> (STRING (SINGLE_QUOTED_STRING asdf))
-"'asdf\"asdf'" -> (STRING (SINGLE_QUOTED_STRING asdf " asdf))
+"'asdf'" -> (STRING (SINGLE_QUOTED_STRING 'asdf'))
+"'asdf\"asdf'" -> (STRING (SINGLE_QUOTED_STRING 'asdf"asdf'))
 "\"asdf'asdf\"" -> (STRING (DOUBLE_QUOTED_STRING asdf ' asdf))
 "!/bin/bash" -> (STRING ! / bin / bash)
 "ab?(g|h)"-> (STRING ab (EXTENDED_MATCH_AT_MOST_ONE (STRING g) (STRING h)))
@@ -41,7 +41,7 @@ fname:
 "ab+(gh|i)" -> (STRING ab (EXTENDED_MATCH_AT_LEAST_ONE (STRING gh) (STRING i)))
 "ab@(gh|i)" -> (STRING ab (EXTENDED_MATCH_EXACTLY_ONE (STRING gh) (STRING i)))
 "ab!(gh|i)" -> (STRING ab (EXTENDED_MATCH_NONE (STRING gh) (STRING i)))
-"\"abc\"\'\"\'\"def\"" -> (STRING (DOUBLE_QUOTED_STRING abc) (SINGLE_QUOTED_STRING ") (DOUBLE_QUOTED_STRING def))
+"\"abc\"\'\"\'\"def\"" -> (STRING (DOUBLE_QUOTED_STRING abc) (SINGLE_QUOTED_STRING '"') (DOUBLE_QUOTED_STRING def))
 "my\ name\ is" -> (STRING my \   name \   is)
 "octal\007" -> (STRING octal \ 007)
 "hex\xaF" -> (STRING hex \ xaF)

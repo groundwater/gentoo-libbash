@@ -16,11 +16,11 @@
    You should have received a copy of the GNU General Public License
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
-gunit bashast;
+gunit java_libbash;
 
 command_sub:
 "$(echo \"foo\")" -> (COMMAND_SUB (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING foo)))))
 "$(ls |grep file)" -> (COMMAND_SUB (LIST (| (COMMAND (STRING ls)) (COMMAND (STRING grep) (STRING file)))))
 "$(CONTROL= command arg )" -> (COMMAND_SUB (LIST (COMMAND (STRING command) (STRING arg) (= CONTROL))))
 "`cat output.log |grep error|cut`" -> (COMMAND_SUB (LIST (| (| (COMMAND (STRING cat) (STRING output . log)) (COMMAND (STRING grep) (STRING error))) (COMMAND (STRING cut)))))
-"$(function foo() { echo 'hello'; }; foo)" -> (COMMAND_SUB (LIST (COMMAND (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING echo) (STRING (SINGLE_QUOTED_STRING hello))))))) (COMMAND (STRING foo))))
+"$(function foo() { echo 'hello'; }; foo)" -> (COMMAND_SUB (LIST (COMMAND (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING echo) (STRING (SINGLE_QUOTED_STRING 'hello'))))))) (COMMAND (STRING foo))))

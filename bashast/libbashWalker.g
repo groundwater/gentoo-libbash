@@ -266,11 +266,11 @@ string_part returns[std::string libbash_value, bool quoted, bool is_raw_string]
 									$libbash_value += libbash_string;
 									$quoted = true;
 								})*)
-	|(SINGLE_QUOTED_STRING) =>
-		^(SINGLE_QUOTED_STRING (libbash_string=any_string {
-									$libbash_value += libbash_string;
-									$quoted = true;
-								})*)
+	|(SINGLE_QUOTED_STRING) => ^(SINGLE_QUOTED_STRING node=SINGLE_QUOTED_STRING_TOKEN) {
+		pANTLR3_COMMON_TOKEN token = node->getToken(node);
+		$libbash_value = std::string(reinterpret_cast<const char *>(token->start + 1),
+									 boost::numeric_cast<unsigned>(token->stop - token->start - 1));
+	}
 	|(ARITHMETIC_EXPRESSION) =>
 		^(ARITHMETIC_EXPRESSION value=arithmetics {
 			$libbash_value = boost::lexical_cast<std::string>(value);
