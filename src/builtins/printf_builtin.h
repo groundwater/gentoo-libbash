@@ -20,8 +20,8 @@
 /// \file printf_builtin.h
 /// \brief implementation for the printf builtin
 ///
-#ifndef LIBBASH_BUILTINS_printf_BUILTIN_H_
-#define LIBBASH_BUILTINS_printf_BUILTIN_H_
+#ifndef LIBBASH_BUILTINS_PRINTF_BUILTIN_H_
+#define LIBBASH_BUILTINS_PRINTF_BUILTIN_H_
 
 #include "cppbash_builtin.h"
 

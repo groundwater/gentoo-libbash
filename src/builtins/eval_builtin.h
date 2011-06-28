@@ -21,8 +21,8 @@
 /// \brief class that implements the eval builtin
 ///
 
-#ifndef LIBBASH_BUILTINS_eval_BUILTIN_H_
-#define LIBBASH_BUILTINS_eval_BUILTIN_H_
+#ifndef LIBBASH_BUILTINS_EVAL_BUILTIN_H_
+#define LIBBASH_BUILTINS_EVAL_BUILTIN_H_
 
 #include "cppbash_builtin.h"
 
