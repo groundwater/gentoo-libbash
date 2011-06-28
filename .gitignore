@@ -24,6 +24,7 @@ Makefile
 autom4te.cache
 cppunittests
 variable_printer
+bash
 metadata_generator
 ast_printer
 instruo

@@ -1,0 +1,8 @@
+# The following tests may generate different results depending on the version of bash
+FOO039="Hello World"
+shopt -s extglob
+echo ${FOO039//*(l)}
+echo ${FOO039//*(l|e)}
+echo ${FOO039//?(l)}
+echo ${FOO039//?(l|e|o)}
+shopt -p

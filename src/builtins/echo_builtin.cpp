@@ -91,7 +91,7 @@ bool echo_builtin::determine_options(const std::string &string, bool &suppress_n
 
   bool n_matched = false, e_matched = false, E_matched = false;
 
-  auto options = '-' >
+  auto options = '-' >>
     +(
       char_('n')[ref(n_matched) = true] |
       char_('e')[ref(e_matched) = true, ref(E_matched) = false] |

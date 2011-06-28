@@ -46,7 +46,7 @@ GUNIT_TESTS = bashast/gunit/arith_main.gunit \
 			  bashast/gunit/simp_command.gunit \
 			  bashast/gunit/simp_prog.gunit
 
-BASH_LOG_COMPILER = $(srcdir)/test/script_compiler.sh
+BASH_LOG_COMPILER = $(srcdir)/test/bash_compiler.sh
 BASH_TESTS = scripts/var_def.bash \
 			 scripts/var_expansion.bash \
 			 scripts/command_execution.bash \
@@ -56,15 +56,6 @@ BASH_TESTS = scripts/var_def.bash \
 			 scripts/compound_command.bash \
 			 scripts/test_expr.bash \
 			 scripts/binary_arithmetic.bash
-BASH_RESULT = scripts/var_def.bash.result \
-			  scripts/var_expansion.bash.result \
-			  scripts/command_execution.bash.result \
-			  scripts/function_def.bash.result \
-			  scripts/arithmetic_assignment.bash.result \
-			  scripts/isolated_functions.bash.result \
-			  scripts/compound_command.bash.result \
-			  scripts/test_expr.bash.result \
-			  scripts/binary_arithmetic.bash.result
 
 EBUILD_LOG_COMPILER = $(srcdir)/test/ebuild_compiler.sh
 EBUILD_TESTS = scripts/sunpinyin-2.0.3-r1.ebuild
@@ -95,7 +86,8 @@ if HAVE_GTEST
 TESTS += cppunittests \
 		 test/ast_printer_test.sh \
 		 test/verify_bashs_test.sh \
-		 test/verify_error_output_test.sh
+		 test/verify_error_output_test.sh \
+		 test/bash_result_tests.sh
 check_PROGRAMS = cppunittests
 
 cppunittests_SOURCES =  test/run_tests.cpp \
@@ -132,10 +124,14 @@ noinst_LIBRARIES = libmetadata.a
 libmetadata_a_SOURCES = utils/metadata.h utils/metadata.cpp
 libmetadata_a_CPPFLAGS = $(AM_CPPFLAGS) -Iutils
 
-noinst_PROGRAMS = variable_printer metadata_generator ast_printer instruo
+noinst_PROGRAMS = variable_printer metadata_generator ast_printer instruo bash
 
 variable_printer_SOURCES = utils/variable_printer.cpp
 variable_printer_LDADD = libcppbash.la
+
+bash_SOURCES = utils/bash.cpp test/test.h  test/test.cpp
+bash_LDADD = libcppbash.la
+bash_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_srcdir)/test/
 
 metadata_generator_SOURCES = utils/metadata_generator.cpp
 metadata_generator_LDADD = libcppbash.la libmetadata.a
@@ -280,6 +276,9 @@ EXTRA_DIST = bashast/bashast.g \
 			 test/ast_printer_test.sh \
 			 test/verify_bashs_test.sh \
 			 test/verify_error_output_test.sh \
+			 test/bash_result_tests.sh \
+			 scripts/naughty_tests \
+			 scripts/naughty_tests.result \
 			 scripts/source_false.sh \
 			 scripts/source_true.sh \
 			 scripts/source_return.sh \
@@ -292,7 +291,6 @@ EXTRA_DIST = bashast/bashast.g \
 			 test_coverage.sh \
 			 autogen.sh \
 			 $(BASH_TESTS) \
-			 $(BASH_RESULT) \
 			 $(EBUILD_TESTS) \
 			 $(EBUILD_RESULT) \
 			 $(GUNIT_TESTS) \

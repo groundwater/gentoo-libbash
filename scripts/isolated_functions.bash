@@ -1,3 +1,4 @@
+source $srcdir/utils/isolated-functions.sh
 die "something wrong"
 has 123 456 123 456 && echo true
 has 123 456 13 456 && echo false

@@ -1,19 +1,21 @@
 value="$((100))"
-FOO001="$((value*=10))"
-FOO002="$((value/=10))"
-FOO003="$((value%=9))"
-FOO004="$((value+=10))"
-FOO005="$((value-=10))"
-FOO006="$((value<<=2))"
-FOO007="$((value>>=2))"
-FOO008="$((value&=10))"
-FOO009="$((value^=5))"
-FOO010="$((value|=10))"
+echo "$((value*=10))"
+echo "$((value/=10))"
+echo "$((value%=9))"
+echo "$((value+=10))"
+echo "$((value-=10))"
+echo "$((value<<=2))"
+echo "$((value>>=2))"
+echo "$((value&=10))"
+echo "$((value^=5))"
+echo "$((value|=10))"
 FOO011=("CREATED" 2)
-FOO012="$((${FOO011[0]}=10))"
-FOO013="$((3!=5))"
+echo "$((${FOO011[0]}=10))"
+echo "$((3!=5))"
 value=100
+echo $value
 let "value=${value}"
+echo $value
 a=c
 b=d
 c=1

@@ -7,7 +7,9 @@ echo hello world
 true
 false
 FOO001=$(echo hello)
+echo $FOO001
 FOO002=$(hi)
+echo $FOO002
 true && 
     echo "right"
 false && echo "wrong"
@@ -19,8 +21,9 @@ echo "end"
 : ${DEFAULTED:="yes"}
 FOO="abc" echo "command environment"
 export FOO003=1 FOO004=abc FOO005=(1 2 3) FOO002
+echo $FOO003 $FOO004 $FOO005 $FOO002
 export foo
-abc=1 export foo
+echo $foo
 echo "hi" > /dev/null
 
 function unset_inner()
@@ -49,13 +52,15 @@ declare -F unset_outer
 echo '$FOO006 "abc" $(( 1 + 2 )) $(echo hi) ...'
 echo "abc $(echo def) ghi"
 FOO008="abc $(echo def) ghi"
+echo $FOO008
 eval "FOO009=10"
+echo $FOO009
 eval "echo abc" "def" "xyz"
 shopt -s extglob
-shopt -p
 printf "%s %s\n" abc def
 printf "%s %s\n" $FOO001, def
 ((FOO010=1))
+echo $FOO010
 echo "abc #av### ##" # for comment
 echo $'abc\tdef\nxyz'
 echo -e "\'\"\t\n"

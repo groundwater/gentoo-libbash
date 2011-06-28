@@ -638,10 +638,13 @@ redirect_destination_input[std::unique_ptr<std::istream>& in]
 
 argument[std::vector<std::string>& args]
 	: string_expr {
-		if($string_expr.quoted)
-			args.push_back($string_expr.libbash_value);
-		else
-			walker->split_word($string_expr.libbash_value, args);
+		if(!$string_expr.libbash_value.empty())
+		{
+			if($string_expr.quoted)
+				args.push_back($string_expr.libbash_value);
+			else
+				walker->split_word($string_expr.libbash_value, args);
+		}
 	};
 
 logic_command_list
