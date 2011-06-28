@@ -9,6 +9,7 @@
 *.class
 *.java
 *.tokens
+libbash-*
 .deps
 .libs
 .dirstamp

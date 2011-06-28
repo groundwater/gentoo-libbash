@@ -1,5 +1,0 @@
-IUSE="abc def"
-REQUIRED_USE="abc"
-DEPEND="dev-util/pkgconfig"
-RDEPEND="foo/bar"
-PDEPEND="foo/bar"
