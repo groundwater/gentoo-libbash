@@ -58,13 +58,13 @@ class bash_ast: public boost::noncopyable
   antlr_pointer<ANTLR3_COMMON_TOKEN_STREAM_struct> token_stream;
   antlr_pointer<libbashParser_Ctx_struct> parser;
   pANTLR3_BASE_TREE ast;
-  antlr_pointer<ANTLR3_COMMON_TREE_NODE_STREAM_struct> nodes;
   std::function<pANTLR3_BASE_TREE(libbashParser_Ctx_struct*)> parse;
 
   typedef std::unique_ptr<libbashWalker_Ctx_struct, std::function<void(plibbashWalker)>> walker_pointer;
 
   void init_parser(const std::string& script, const std::string& script_path);
-  walker_pointer create_walker(interpreter& walker);
+  walker_pointer create_walker(interpreter& walker,
+                               antlr_pointer<ANTLR3_COMMON_TREE_NODE_STREAM_struct>& nodes);
 
 public:
   bash_ast(const std::istream& source,
@@ -92,7 +92,9 @@ public:
   typename std::result_of<Functor(plibbashWalker)>::type
   interpret_with(interpreter& walker, Functor walk)
   {
-    walker_pointer p_tree_parser = create_walker(walker);
+    antlr_pointer<ANTLR3_COMMON_TREE_NODE_STREAM_struct> nodes(
+      antlr3CommonTreeNodeStreamNewTree(ast, ANTLR3_SIZE_HINT));
+    walker_pointer p_tree_parser = create_walker(walker, nodes);
     return walk(p_tree_parser.get());
   }
 

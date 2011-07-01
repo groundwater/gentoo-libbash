@@ -23,6 +23,8 @@
 #include "core/bash_ast.h"
 
 #include <fstream>
+#include <sstream>
+#include <thread>
 
 #include <boost/numeric/conversion/cast.hpp>
 
@@ -54,6 +56,28 @@ bash_ast::bash_ast(const std::string& script_path,
   init_parser(script, script_path);
 }
 
+namespace
+{
+  std::mutex string_mutex;
+
+  pANTLR3_STRING locked_newRaw8(pANTLR3_STRING_FACTORY factory)
+  {
+    std::lock_guard<std::mutex> l(string_mutex);
+    pANTLR3_STRING_FACTORY pristine = antlr3StringFactoryNew();
+    pANTLR3_STRING result = pristine->newRaw(factory);
+    pristine->close(pristine);
+    return result;
+  }
+
+  void locked_destroy(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING string)
+  {
+    std::lock_guard<std::mutex> l(string_mutex);
+    pANTLR3_STRING_FACTORY pristine = antlr3StringFactoryNew();
+    pristine->destroy(factory, string);
+    pristine->close(pristine);
+  }
+}
+
 void bash_ast::init_parser(const std::string& script, const std::string& script_path)
 {
   input.reset(antlr3NewAsciiStringInPlaceStream(
@@ -83,13 +107,16 @@ void bash_ast::init_parser(const std::string& script, const std::string& script_
     throw libbash::parse_exception("Out of memory trying to allocate parser");
 
   ast = parse(parser.get());
+  ast->strFactory->newRaw = &locked_newRaw8;
+  ast->strFactory->destroy = &locked_destroy;
   if(parser->pParser->rec->getNumberOfSyntaxErrors(parser->pParser->rec))
     throw libbash::parse_exception("Something wrong happened while parsing");
-  nodes.reset(antlr3CommonTreeNodeStreamNewTree(ast, ANTLR3_SIZE_HINT));
 }
 
 std::string bash_ast::get_dot_graph()
 {
+  antlr_pointer<ANTLR3_COMMON_TREE_NODE_STREAM_struct> nodes(
+    antlr3CommonTreeNodeStreamNewTree(ast, ANTLR3_SIZE_HINT));
   pANTLR3_STRING graph = nodes->adaptor->makeDot(nodes->adaptor, ast);
   return std::string(reinterpret_cast<char*>(graph->chars));
 }
@@ -154,6 +181,8 @@ std::string bash_ast::get_parser_tokens(antlr_pointer<ANTLR3_COMMON_TOKEN_STREAM
 std::string bash_ast::get_walker_tokens(std::function<std::string(ANTLR3_UINT32)> token_map)
 {
   std::stringstream result;
+  antlr_pointer<ANTLR3_COMMON_TREE_NODE_STREAM_struct> nodes(
+    antlr3CommonTreeNodeStreamNewTree(ast, ANTLR3_SIZE_HINT));
   pANTLR3_INT_STREAM istream = nodes->tnstream->istream;
   auto istream_size = istream->size(istream);
 
@@ -196,6 +225,11 @@ void bash_ast::call_function(plibbashWalker ctx,
                              ANTLR3_MARKER index)
 {
   auto INPUT = ctx->pTreeParser->ctnstream;
+
+  // Initialize the input stream
+  auto ISTREAM = ctx->pTreeParser->ctnstream->tnstream->istream;
+  ISTREAM->size(ISTREAM);
+
   // Push function index into INPUT
   // The actual type of ANTLR3_MARKER is ANTLR3_INT32
   INPUT->push(INPUT, boost::numeric_cast<ANTLR3_INT32>(index));
@@ -203,7 +237,8 @@ void bash_ast::call_function(plibbashWalker ctx,
   ctx->compound_command(ctx);
 }
 
-bash_ast::walker_pointer bash_ast::create_walker(interpreter& walker)
+bash_ast::walker_pointer bash_ast::create_walker(interpreter& walker,
+                                                 antlr_pointer<ANTLR3_COMMON_TREE_NODE_STREAM_struct>& nodes)
 {
     set_interpreter(&walker);
     walker.push_current_ast(this);
