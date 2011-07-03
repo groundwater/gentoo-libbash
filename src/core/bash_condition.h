@@ -29,8 +29,16 @@ class interpreter;
 
 namespace internal
 {
+  /// \brief implementation for built-in test unary operation
+  /// \param the operator
+  /// \param the operand
   bool test_unary(char op, const std::string& target);
 
+  /// \brief implementation for built-in test binary operation
+  /// \param the operator
+  /// \param the first operand
+  /// \param the second operand
+  /// \param a reference to the interpreter object
   bool test_binary(const std::string& op,
                    const std::string& lhs,
                    const std::string& rhs,

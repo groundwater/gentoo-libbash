@@ -39,6 +39,8 @@ namespace libbash
   class LIBBASH_API unsupported_exception: public libbash::interpreter_exception
   {
   public:
+    /// \brief the constructor
+    /// \param err_msg the error message
     explicit unsupported_exception(const std::string& err_msg):
       libbash::interpreter_exception(err_msg){}
   };

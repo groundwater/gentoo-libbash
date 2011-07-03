@@ -36,6 +36,7 @@
 #include "core/symbols.hpp"
 #include "cppbash_builtin.h"
 
+/// \brief symbol table implementation
 typedef std::unordered_map<std::string, std::shared_ptr<variable>> scope;
 
 ///
@@ -45,17 +46,14 @@ typedef std::unordered_map<std::string, std::shared_ptr<variable>> scope;
 class interpreter: public boost::noncopyable
 {
 
-  /// \var private::members
   /// \brief global symbol table for variables
   scope members;
 
-  /// \var private::function_definitions
   /// \brief global symbol table for functions
   std::unordered_map<std::string, function> functions;
 
   std::stack<bash_ast*> ast_stack;
 
-  /// \var private::local_members
   /// \brief local scope for function arguments, execution environment and
   ///        local variables
   std::vector<scope> local_members;
@@ -73,7 +71,6 @@ class interpreter: public boost::noncopyable
   // as bash implementation.
   std::map<char, bool> options;
 
-  /// \var private::status
   /// \brief the return status of the last command
   int status;
 
@@ -107,6 +104,7 @@ class interpreter: public boost::noncopyable
                            unsigned length) const;
 public:
 
+  /// bash option iterator
   typedef std::map<std::string, bool>::const_iterator option_iterator;
 
   ///
@@ -118,17 +116,21 @@ public:
     interpreter& walker;
 
   public:
+    /// \brief construtor
+    /// \param w the reference to the interpreter object
     local_scope(interpreter& w): walker(w)
     {
       walker.local_members.push_back(scope());
     }
 
+    /// \brief the destructor
     ~local_scope()
     {
       walker.local_members.pop_back();
     }
   };
 
+  /// \brief construtor
   interpreter();
 
   ///
@@ -174,11 +176,14 @@ public:
     return members.end();
   }
 
+  /// \brief set current output stream
+  /// \param stream the pointer to the output stream
   void set_output_stream(std::ostream* stream)
   {
     _out = stream;
   }
 
+  /// \brief restore the current output stream to standard output stream
   void restore_output_stream()
   {
     _out = &std::cout;
@@ -186,8 +191,8 @@ public:
 
   /// \brief resolve string/long variable, local scope will be
   ///        checked first, then global scope
-  /// \param variable name
-  /// \param array index, use index=0 if it's not an array
+  /// \param name variable name
+  /// \param index array index, use index=0 if it's not an array
   /// \return the value of the variable, call default constructor if
   ///         it's undefined
   template <typename T>
@@ -201,8 +206,8 @@ public:
   }
 
   /// \brief resolve array variable
-  /// \param variable name
-  /// \param[out] vector that stores all array values
+  /// \param name variable name
+  /// \param[out] values vector that stores all array values
   template <typename T>
   bool resolve_array(const std::string& name, std::vector<T>& values) const
   {
@@ -216,12 +221,13 @@ public:
 
   /// \brief check whether the value of the variable is null, return true
   ///        if the variable is undefined
-  /// \param variable name
+  /// \param name variable name
+  /// \param index array index, use index=0 if it's not an array
   /// \return whether the value of the variable is null
   bool is_unset_or_null(const std::string& name, const unsigned index) const;
 
   /// \brief check whether the value of the variable is unset
-  /// \param variable name
+  /// \param name variable name
   /// \return whether the value of the variable is unset
   bool is_unset(const std::string& name) const
   {
@@ -230,9 +236,9 @@ public:
 
   /// \brief update the variable value, raise libbash::interpreter_exception if
   ///        it's readonly, will define the variable if it doesn't exist
-  /// \param variable name
-  /// \param new value
-  /// \param array index, use index=0 if it's not an array
+  /// \param name variable name
+  /// \param new_value new value
+  /// \param index array index, use index=0 if it's not an array
   /// \return the new value of the variable
   template <typename T>
   const T& set_value(const std::string& name,
@@ -248,37 +254,36 @@ public:
   }
 
   /// \brief set the return status of the last command
-  /// \param the value of the return status
+  /// \param s the value of the return status
   void set_status(int s)
   {
     status = s;
   }
 
   /// \brief get the return status of the last command
-  /// \param the value of the return status
   int get_status(void) const
   {
     return status;
   }
 
   /// \brief unset a variable
-  /// \param the name of the variable
+  /// \param name the name of the variable
   void unset(const std::string& name);
 
   /// \brief unset a function
-  /// \param the name of the function
+  /// \param name the name of the function
   void unset_function(const std::string& name);
 
   /// \brief unset a array member
-  /// \param the name of the array
-  /// \param the index of the member
+  /// \param name the name of the array
+  /// \param index the index of the member
   void unset(const std::string& name, const unsigned index);
 
   /// \brief define a new global variable
-  /// \param the name of the variable
-  /// \param the value of the variable
-  /// \param whether it's readonly, default is false
-  /// \param whether it's null, default is false
+  /// \param name the name of the variable
+  /// \param value the value of the variable
+  /// \param readonly whether it's readonly, default is false
+  /// \param index whether it's null, default is false
   template <typename T>
   void define(const std::string& name,
               const T& value,
@@ -289,10 +294,10 @@ public:
   }
 
   /// \brief define a new local variable
-  /// \param the name of the variable
-  /// \param the value of the variable
-  /// \param whether it's readonly, default is false
-  /// \param whether it's null, default is false
+  /// \param name the name of the variable
+  /// \param value the value of the variable
+  /// \param readonly whether it's readonly, default is false
+  /// \param index whether it's null, default is false
   template <typename T>
   void define_local(const std::string& name,
                     const T& value,
@@ -303,8 +308,8 @@ public:
   }
 
   /// \brief define a new function
-  /// \param the name of the function
-  /// \param the body index of the function
+  /// \param name the name of the function
+  /// \param body_index the body index of the function
   void define_function(const std::string& name,
                        ANTLR3_MARKER body_index)
   {
@@ -312,7 +317,7 @@ public:
   }
 
   /// \brief push current AST, used for function definition
-  /// \param current ast
+  /// \param ast the pointer to the current ast
   void push_current_ast(bash_ast* ast)
   {
     ast_stack.push(ast);
@@ -325,24 +330,29 @@ public:
   }
 
   /// \brief make function call
-  /// \param function name
-  /// \param function arguments
+  /// \param name function name
+  /// \param arguments function arguments
   void call(const std::string& name,
             const std::vector<std::string>& arguments);
 
   /// \brief check if we have 'name' defined as a function
-  /// \param function name
+  /// \param name function name
   /// \return whether 'name' is a function
   bool has_function(const std::string& name) const
   {
     return functions.find(name) != functions.end();
   }
 
+  /// \brief get all defined function names
+  /// \param[out] function_names the place to store the function names
   void get_all_function_names(std::vector<std::string>& function_names) const;
 
   /// \brief execute builtin
-  /// \param builtin name
-  /// \param builtin arguments
+  /// \param name builtin name
+  /// \param args builtin arguments
+  /// \param output the output stream
+  /// \param error the error stream
+  /// \param input the input stream
   /// \return the return value of the builtin
   int execute_builtin(const std::string& name,
                       const std::vector<std::string>& args,
@@ -359,8 +369,9 @@ public:
   }
 
   /// \brief perform ${parameter:−word} expansion
-  /// \param the name of the parameter
-  /// \param the value of the word
+  /// \param name the name of the parameter
+  /// \param value the value of the word
+  /// \param index the index of the paramter
   /// \return the expansion result
   const std::string do_default_expansion(const std::string& name,
                                          const std::string& value,
@@ -371,8 +382,9 @@ public:
   }
 
   /// \brief perform ${parameter:=word} expansion
-  /// \param the name of the parameter
-  /// \param the value of the word
+  /// \param name the name of the parameter
+  /// \param value the value of the word
+  /// \param index the index of the paramter
   /// \return the expansion result
   const std::string do_assign_expansion(const std::string& name,
                                         const std::string& value,
@@ -383,8 +395,9 @@ public:
   }
 
   /// \brief perform ${parameter:+word} expansion
-  /// \param the name of the parameter
-  /// \param the value of the word
+  /// \param name the name of the parameter
+  /// \param value the value of the word
+  /// \param index the index of the paramter
   /// \return the expansion result
   const std::string do_alternate_expansion(const std::string& name,
                                            const std::string& value,
@@ -394,15 +407,19 @@ public:
   }
 
   /// \brief perform substring expansion
-  /// \param the offset of the substring
+  /// \param name the name of the parameter
+  /// \param offset the offset of the substring
+  /// \param index the index of the paramter
   /// \return the expansion result
   const std::string do_substring_expansion(const std::string& name,
                                            long long offset,
                                            const unsigned index) const;
 
   /// \brief perform substring expansion
-  /// \param the offset of the substring
-  /// \param the length of the substring
+  /// \param name the name of the parameter
+  /// \param offset the offset of the substring
+  /// \param length the length of the substring
+  /// \param index the index of the paramter
   /// \return the expansion result
   const std::string do_substring_expansion(const std::string& name,
                                            long long offset,
@@ -410,61 +427,64 @@ public:
                                            const unsigned index) const;
 
   /// \brief perform subarray expansion
-  /// \param the offset of the subarray
+  /// \param name the name of the parameter
+  /// \param offset the offset of the subarray
   /// \return the expansion result
   const std::string do_subarray_expansion(const std::string& name,
                                           long long offset) const;
 
   /// \brief perform subarray expansion
-  /// \param the offset of the subarray
-  /// \param the length of the subarray
+  /// \param name the name of the parameter
+  /// \param offset the offset of the subarray
+  /// \param length the length of the subarray
   /// \return the expansion result
   const std::string do_subarray_expansion(const std::string& name,
                                           long long offset,
                                           int length) const;
 
   /// \brief perform replacement expansion
-  /// \param the name of the varaible that needs to be expanded
-  /// \param the function object used to perform expansion
-  /// \param array index, use index=0 if it's not an array
+  /// \param name the name of the varaible that needs to be expanded
+  /// \param replacer the function object used to perform expansion
+  /// \param index array index, use index=0 if it's not an array
   /// \return the expanded value
   std::string do_replace_expansion(const std::string& name,
                                    std::function<void(std::string&)> replacer,
                                    const unsigned index) const;
 
   /// \brief get the length of a string variable
-  /// \param the name of the variable
+  /// \param name the name of the variable
+  /// \param index the index of the variable
   /// \return the length
   std::string::size_type get_length(const std::string& name, const unsigned index=0) const;
 
   /// \brief get the length of an array
-  /// \param the name of the array
+  /// \param name the name of the array
   /// \return the length of the array
   variable::size_type get_array_length(const std::string& name) const;
 
   /// \brief get all array elements concatenated by space
-  /// \param the name of the array
-  /// \param[out] the concatenated string
-  void get_all_elements(const std::string&, std::string&) const;
+  /// \param name the name of the array
+  /// \param[out] result the concatenated string
+  void get_all_elements(const std::string& name, std::string& result) const;
 
   /// \brief get all array elements concatenated by the first character of IFS
-  /// \param the name of the array
-  /// \param[out] the concatenated string
-  void get_all_elements_IFS_joined(const std::string&, std::string&) const;
+  /// \param name the name of the array
+  /// \param[out] result the concatenated string
+  void get_all_elements_IFS_joined(const std::string& name, std::string& result) const;
 
   /// \brief implementation of word splitting
-  /// \param the value of the word
-  //. \param[out] the splitted result will be appended to output
+  /// \param word the value of the word
+  //. \param[out] output the splitted result will be appended to output
   void split_word(const std::string& word, std::vector<std::string>& output) const;
 
   /// \brief get the status of shell optional behavior
-  /// \param the option name
+  /// \param name the option name
   /// \return zero unless the name is not a valid shell option
   bool get_additional_option(const std::string& name) const;
 
   /// \brief set the status of shell optional behavior
-  /// \param the option name
-  /// \param[in] true if option is enabled, false otherwise
+  /// \param name the option name
+  /// \param[in] value true if option is enabled, false otherwise
   /// \return zero unless the name is not a valid shell option
   void set_additional_option(const std::string& name, bool value);
 
@@ -484,34 +504,34 @@ public:
   }
 
   /// \brief evaluate arithmetic expression and return the result
-  /// \param the arithmetic expression
+  /// \param expression the arithmetic expression
   /// \return the evaluated result
   long eval_arithmetic(const std::string& expression);
 
   /// \brief perform expansion like ${var//foo/bar}
-  /// \param the value to be expanded
-  /// \param the pattern used to match the value
-  /// \param the replacement string
+  /// \param value the value to be expanded
+  /// \param pattern the pattern used to match the value
+  /// \param replacement the replacement string
   static void replace_all(std::string& value,
                           const boost::xpressive::sregex& pattern,
                           const std::string& replacement);
 
   /// \brief perform expansion like ${var%foo}
-  /// \param the value to be expanded
-  /// \param the pattern used to match the value
+  /// \param value the value to be expanded
+  /// \param pattern the pattern used to match the value
   static void lazy_remove_at_end(std::string& value,
                                  const boost::xpressive::sregex& pattern);
 
   /// \brief perform expansion like ${var/foo/bar}
-  /// \param the value to be expanded
-  /// \param the pattern used to match the value
-  /// \param the replacement string
+  /// \param value the value to be expanded
+  /// \param pattern the pattern used to match the value
+  /// \param replacement the replacement string
   static void replace_first(std::string& value,
                             const boost::xpressive::sregex& pattern,
                             const std::string& replacement);
 
   /// \brief remove trailing EOLs from the value
-  /// \param[in, out] the target
+  /// \param[in, out] value the target
   static void trim_trailing_eols(std::string& value);
 };
 #endif

@@ -38,6 +38,8 @@ namespace libbash
   class LIBBASH_API interpreter_exception: public std::runtime_error
   {
   public:
+    /// \brief the constructor
+    /// \param err_msg the error message
     explicit interpreter_exception(const std::string& err_msg):
       runtime_error(err_msg){}
   };

@@ -17,7 +17,7 @@
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
 ///
-/// \file boolean_builtins.cpp
+/// \file boolean_builtins.h
 /// \brief implementations for the true and false builtins
 ///
 #ifndef LIBBASH_BUILTINS_BOOLEAN_BUILTINS_H_

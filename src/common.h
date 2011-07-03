@@ -24,7 +24,9 @@
 #ifndef LIBBASH_COMMON_H_
 #define LIBBASH_COMMON_H_
 
+/// compiler hint for public symbols
 #define LIBBASH_API __attribute__((visibility("default")))
+/// compiler hint for hidden symbols
 #define LIBBASH_LOCAL __attribute__((visibility("hidden")))
 
 #endif

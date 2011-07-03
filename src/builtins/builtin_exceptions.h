@@ -49,8 +49,11 @@ protected:
   virtual ~loop_control_exception() {}
 
 public:
+  /// \brief the construtor
+  /// \param c the nested block counter
   explicit loop_control_exception(int c): count(c) {}
 
+  /// \brief rethrow the exception if the counter is greater than 1
   void rethrow_unless_correct_frame()
   {
     if(count != 1)
@@ -64,12 +67,15 @@ public:
 class continue_exception: public loop_control_exception
 {
 protected:
+  /// \brief rethrow the exception itself
   virtual void rethrow()
   {
     throw *this;
   }
 
 public:
+  /// \brief the constructor of the exception
+  /// \param c the nested block counter
   explicit continue_exception(int c): loop_control_exception(c) {
     if(c < 1)
       throw libbash::illegal_argument_exception("continue: argument should be greater than or equal to 1");
@@ -79,12 +85,15 @@ public:
 class break_exception: public loop_control_exception
 {
 protected:
+  /// \brief rethrow the exception itself
   virtual void rethrow()
   {
     throw *this;
   }
 
 public:
+  /// \brief the constructor of the exception
+  /// \param c the nested block counter
   explicit break_exception(int c): loop_control_exception(c) {
     if(c < 1)
       throw libbash::illegal_argument_exception("break: argument should be greater than or equal to 1");

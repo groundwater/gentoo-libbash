@@ -39,6 +39,8 @@ namespace libbash
   class LIBBASH_API divide_by_zero_error: public libbash::interpreter_exception
   {
   public:
+    /// \brief the constructor
+    /// \param err_msg the error message
     explicit divide_by_zero_error(const std::string& err_msg):
       libbash::interpreter_exception(err_msg){}
   };

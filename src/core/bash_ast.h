@@ -37,14 +37,19 @@
 struct libbashLexer_Ctx_struct;
 struct libbashParser_Ctx_struct;
 struct libbashWalker_Ctx_struct;
-typedef libbashWalker_Ctx_struct* plibbashWalker;
 class interpreter;
 
+/// \class bash_ast
+/// \brief customized unique_ptr for antlr objects.
 template<typename T>
 class antlr_pointer: public std::unique_ptr<T, std::function<void(T*)>>
 {
+  /// the constructor of base class
   typedef std::unique_ptr<T, std::function<void(T*)>> parent;
 public:
+  /// \brief constructor of antlr_pointer
+  /// \param p the pointer to the antlr objects, it should provide a method called 'free'
+  ///          to free the memory
   antlr_pointer(T* p = 0) : parent(p, [](T* to_delete) { to_delete->free(to_delete); }) {};
 };
 
@@ -61,54 +66,86 @@ class bash_ast: public boost::noncopyable
   antlr_pointer<ANTLR3_COMMON_TREE_NODE_STREAM_struct> nodes;
   std::function<pANTLR3_BASE_TREE(libbashParser_Ctx_struct*)> parse;
 
-  typedef std::unique_ptr<libbashWalker_Ctx_struct, std::function<void(plibbashWalker)>> walker_pointer;
+  typedef std::unique_ptr<libbashWalker_Ctx_struct, std::function<void(libbashWalker_Ctx_struct*)>> walker_pointer;
 
   void init_parser(const std::string& script, const std::string& script_path);
   walker_pointer create_walker(interpreter& walker);
 
 public:
+  /// \brief build AST from istream
+  /// \param source input source
+  /// \param p the parser rule for building the AST
   bash_ast(const std::istream& source,
            std::function<pANTLR3_BASE_TREE(libbashParser_Ctx_struct*)> p=parser_start);
 
+  /// \brief build AST from string
+  /// \param script_path input source
+  /// \param p the parser rule for building the AST
   bash_ast(const std::string& script_path,
            std::function<pANTLR3_BASE_TREE(libbashParser_Ctx_struct*)> p=parser_start);
 
-  static void walker_start(plibbashWalker tree_parser);
+  /// \brief the functor for walker start rule
+  /// \param tree_parser the pointer to the tree_parser
+  static void walker_start(libbashWalker_Ctx_struct* tree_parser);
 
-  static long walker_arithmetics(plibbashWalker tree_parser);
+  /// \brief the functor for walker arithmetics rule
+  /// \param tree_parser the pointer to the tree_parser
+  static long walker_arithmetics(libbashWalker_Ctx_struct* tree_parser);
 
-  static void call_function(plibbashWalker tree_parser,
+  /// \brief call a function that is defined in the AST
+  /// \param tree_parser the pointer to the tree_parser
+  /// \param index the function index
+  static void call_function(libbashWalker_Ctx_struct* tree_parser,
                             ANTLR3_MARKER index);
 
+  /// \brief the functor for parser start rule
+  /// \param parser the pointer to the parser
   static pANTLR3_BASE_TREE parser_start(libbashParser_Ctx_struct* parser);
 
+  /// \brief the functor for parser arithmetics rule
+  /// \param parser the pointer to the parser
   static pANTLR3_BASE_TREE parser_arithmetics(libbashParser_Ctx_struct* parser);
 
   ///
   /// \brief interpret the script with a given interpreter
-  /// \param the interpreter object
+  /// \param walker the interpreter object
+  /// \param walk the walker rule to evaluate the AST
   /// \return the interpreted result
   template<typename Functor>
-  typename std::result_of<Functor(plibbashWalker)>::type
+  typename std::result_of<Functor(libbashWalker_Ctx_struct*)>::type
   interpret_with(interpreter& walker, Functor walk)
   {
     walker_pointer p_tree_parser = create_walker(walker);
     return walk(p_tree_parser.get());
   }
 
+  ///
+  /// \brief use the start rule to interpret the script with a given interpreter
+  /// \param walker the interpreter object
   void interpret_with(interpreter& walker)
   {
     interpret_with(walker, walker_start);
   }
 
+  /// \brief get the dot graph for the AST
+  /// \return the dot graph
   std::string get_dot_graph();
 
+  /// \brief get the string tree for the AST
+  /// \return the string tree
   std::string get_string_tree();
 
+  /// \brief get parser tokens from a token stream
+  /// \param token_stream the token stream
+  /// \param token_mapper function that translates token numbers to token names
+  /// \return the parser tokens
   static std::string get_parser_tokens(antlr_pointer<ANTLR3_COMMON_TOKEN_STREAM_struct>& token_stream,
-                                       std::function<std::string(ANTLR3_UINT32)>);
+                                       std::function<std::string(ANTLR3_UINT32)> token_mapper);
 
-  std::string get_walker_tokens(std::function<std::string(ANTLR3_UINT32)>);
+  /// \brief get walker tokens from current AST
+  /// \param token_mapper function that translates token numbers to token names
+  /// \return the walker tokens
+  std::string get_walker_tokens(std::function<std::string(ANTLR3_UINT32)> token_mapper);
 };
 
 #endif

@@ -53,7 +53,7 @@ class converter<long>: public boost::static_visitor<long>
 {
 public:
   /// \brief converter for long value
-  /// \param the value to be converted
+  /// \param value the value to be converted
   /// \return the converted long
   long operator() (const long value) const
   {
@@ -61,7 +61,7 @@ public:
   }
 
   /// \brief converter for string value
-  /// \param the value to be converted
+  /// \param value the value to be converted
   /// \return the converted long
   long operator() (const std::string& value) const
   {
@@ -88,7 +88,7 @@ class converter<std::string>:
 {
 public:
   /// \brief converter for long value
-  /// \param the value to be converted
+  /// \param value the value to be converted
   /// \return the converted string
   std::string operator() (const long value) const
   {
@@ -96,7 +96,7 @@ public:
   }
 
   /// \brief converter for string value
-  /// \param the value to be converted
+  /// \param value the value to be converted
   /// \return the converted string
   std::string operator() (const std::string& value) const
   {
@@ -110,21 +110,19 @@ public:
 ///
 class variable
 {
-  /// \var private::name
   /// \brief variable name
   std::string name;
 
-  /// \var private::value
   /// \brief actual value of the variable. We put string in front of long
   ///        because we want "" as default string value; Otherwise we
   ///        will get "0".
   std::map<unsigned, boost::variant<std::string, long>> value;
 
-  /// \var private::readonly
   /// \brief whether the variable is readonly
   bool readonly;
 
 public:
+  /// size_type for array length
   typedef std::map<unsigned, boost::variant<std::string, long>>::size_type size_type;
 
   /// \brief retrieve variable name
@@ -134,6 +132,11 @@ public:
     return name;
   }
 
+  /// \brief constructor
+  /// \param name the name of the variable
+  /// \param v the value of the variable
+  /// \param ro whether the variable is readonly
+  /// \param index the index of the variable, use 0 if it's not an array
   template <typename T>
   variable(const std::string& name,
            const T& v,
@@ -146,6 +149,7 @@ public:
 
   /// \brief retrieve actual value of the variable, if index is out of bound,
   ///        will return the default value of type T
+  /// \param index the index of the variable, use 0 if it's not an array
   /// \return the value of the variable
   template<typename T>
   T get_value(const unsigned index=0) const
@@ -160,7 +164,7 @@ public:
   }
 
   /// \brief retrieve all values of the array
-  /// \param[out] vector that stores all array values
+  /// \param[out] all_values vector that stores all array values
   template<typename T>
   void get_all_values(std::vector<T>& all_values) const
   {
@@ -173,9 +177,8 @@ public:
 
 
   /// \brief set the value of the variable, raise exception if it's readonly
-  /// \param the new value to be set
-  /// \param array index, use index=0 if it's not an array
-  /// \param whether to set the variable to null value, default is false
+  /// \param new_value the new value to be set
+  /// \param index array index, use index=0 if it's not an array
   template <typename T>
   void set_value(const T& new_value,
                  const unsigned index=0)
@@ -187,7 +190,7 @@ public:
   }
 
   /// \brief unset the variable, only used for array variable
-  /// \param the index to be unset
+  /// \param index the index to be unset
   void unset_value(const unsigned index)
   {
     if(readonly)
@@ -197,7 +200,7 @@ public:
   }
 
   /// \brief get the length of a variable
-  /// \param the index of the variable, use 0 if it's not an array
+  /// \param index the index of the variable, use 0 if it's not an array
   /// \return the length of the variable
   std::string::size_type get_length(const unsigned index=0) const
   {
@@ -233,7 +236,10 @@ public:
   }
 };
 
-// specialization for arrays
+/// \brief the specialized constructor for arrays
+/// \param name the variable name
+/// \param value the variable value
+/// \param ro whether the variable readonly
 template <>
 inline variable::variable<>(const std::string& name,
                             const std::map<unsigned, std::string>& v,

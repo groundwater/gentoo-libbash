@@ -34,6 +34,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/utility.hpp>
 
+/// shortcut for the arguments of the constructor
 #define BUILTIN_ARGS std::ostream &out, std::ostream &err, std::istream &in, interpreter &walker
 
 class interpreter;
@@ -46,9 +47,10 @@ class cppbash_builtin: public boost::noncopyable
   public:
     ///
     /// \brief Default constructor, sets default streams
-    /// \param outstream where to send standard output.  Default: cout
-    /// \param errstream where to send standard error.  Default: cerr
-    /// \param instream where to get standard input from.  Default: stdin
+    /// \param out where to send standard output.  Default: cout
+    /// \param err where to send standard error.  Default: cerr
+    /// \param in where to get standard input from.  Default: stdin
+    /// \param walker the interpreter object
     ///
     explicit cppbash_builtin(BUILTIN_ARGS);
 
@@ -75,6 +77,14 @@ class cppbash_builtin: public boost::noncopyable
     ///
     std::istream& input_buffer() {return *_inp_stream;}
 
+    /// \brief execute the given builtin
+    /// \param builtin the builtin name
+    /// \param args the arguments
+    /// \param out where to send standard output.  Default: cout
+    /// \param err where to send standard error.  Default: cerr
+    /// \param in where to get standard input from.  Default: stdin
+    /// \param walker the interpreter object
+    /// \return the return status of the builtin
     static int exec(const std::string& builtin,
                     const std::vector<std::string>& args,
                     BUILTIN_ARGS)
@@ -85,8 +95,8 @@ class cppbash_builtin: public boost::noncopyable
 
     ///
     /// \brief check existence of the builtin
-    /// \param builtin name
-    /// \param whether it is a builtin
+    /// \param builtin builtin name
+    /// \return whether it is a builtin
     ///
     static bool is_builtin(const std::string& builtin)
     {
@@ -111,21 +121,22 @@ class cppbash_builtin: public boost::noncopyable
     ///
     std::istream *_inp_stream;
 
+    ///
+    /// \var _walker
+    /// \brief reference to the interpreter object
     interpreter& _walker;
 
-    ///
-    /// \var builtins
-    /// \brief holds factories for creating instances of child classes
-    ///
+    /// holds factories for creating instances of child classes
     typedef std::map<std::string, boost::function< cppbash_builtin*(BUILTIN_ARGS) >> builtins_type;
     static builtins_type& builtins();
 
     /// \brief transforms escapes in echo input
-    /// \param the target string
-    /// \param the place to write
+    /// \param string the target string
+    /// \param output the place to write
     void transform_escapes(const std::string &string, std::ostream& output) const;
 };
 
+/// shortcut for builtin constructor
 #define BUILTIN_CONSTRUCTOR(name) \
   name ## _builtin(BUILTIN_ARGS) : cppbash_builtin(out, err, in, walker) {}
 

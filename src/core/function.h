@@ -17,7 +17,7 @@
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
 ///
-/// \file function.hpp
+/// \file function.h
 /// \brief implementation for function
 ///
 
@@ -31,13 +31,20 @@
 class bash_ast;
 class interpreter;
 
+/// \class function
+/// \brief bash function implementation
 class function
 {
   bash_ast& ast;
   ANTLR3_MARKER index;
 public:
+  /// \brief the constructor
+  /// \param ast_ the reference to the AST
+  /// \param i the function index
   function(bash_ast& ast_, ANTLR3_MARKER i): ast(ast_), index(i){}
 
+  /// \brief call the function
+  /// \param walker the reference to the interpreter object
   void call(interpreter& walker);
 };
 
