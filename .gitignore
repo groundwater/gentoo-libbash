@@ -63,3 +63,4 @@ libtool
 ltmain.sh
 INSTALL
 test_coverage/
+docs/
