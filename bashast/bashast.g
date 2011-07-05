@@ -183,17 +183,35 @@ command
 	: command_atom redirect? -> ^(COMMAND command_atom redirect?);
 command_atom
 	:	compound_command
-	|	function
-	|	simple_command;
-//Simple bash commands
-simple_command
-	:	variable_definitions BLANK+ bash_command -> bash_command variable_definitions
+	|	FUNCTION BLANK+ fname_no_res_word ((BLANK* parens wspace*)|wspace) compound_command
+			-> ^(FUNCTION fname_no_res_word compound_command)
+	|	variable_definitions BLANK+ bash_command -> bash_command variable_definitions
 	|	variable_definitions -> ^(VARIABLE_DEFINITIONS variable_definitions)
-	|	bash_command;
+	|	fname_no_res_word (
+			BLANK* parens wspace* compound_command -> ^(FUNCTION["function"] fname_no_res_word compound_command)
+			|	(BLANK+ bash_command_arguments)* -> fname_no_res_word bash_command_arguments*
+		);
+
+parens	:	LPAREN BLANK* RPAREN;
+
+name	:	NAME
+	|	LETTER
+	|	UNDERSCORE;
+
+//the biggie: functions
+//Simple bash commands
 variable_definitions
 	:	var_def (BLANK!+ var_def)*
 	|	LOCAL BLANK!+ local_item (BLANK!+ local_item)*
 	|	EXPORT! (BLANK!+ export_item)+;
+//Variables
+//Defining a variable
+//It's not legal to do FOO[1]=(a b c)
+var_def
+	:	name LSQUARE BLANK? explicit_arithmetic BLANK* RSQUARE EQUALS fname? -> ^(EQUALS ^(name explicit_arithmetic) fname?)
+	|	name EQUALS^ value?
+	|	name PLUS_ASSIGN array_value -> ^(PLUS_ASSIGN name array_value)
+	|	name PLUS_ASSIGN fname_part? -> ^(EQUALS name ^(STRING ^(VAR_REF name) fname_part?));
 local_item
 	:var_def
 	|name -> ^(EQUALS name);
@@ -324,14 +342,6 @@ arithmetic_expression
 	:	LLPAREN wspace? arithmetic wspace? RPAREN RPAREN -> ^(ARITHMETIC_EXPRESSION arithmetic);
 cond_comparison
 	:	cond_expr -> ^(COMPOUND_COND cond_expr);
-//Variables
-//Defining a variable
-//It's not legal to do FOO[1]=(a b c)
-var_def
-	:	name LSQUARE BLANK? explicit_arithmetic BLANK* RSQUARE EQUALS fname? -> ^(EQUALS ^(name explicit_arithmetic) fname?)
-	|	name EQUALS^ value?
-	|	name PLUS_ASSIGN array_value -> ^(PLUS_ASSIGN name array_value)
-	|	name PLUS_ASSIGN fname_part? -> ^(EQUALS name ^(STRING ^(VAR_REF name) fname_part?));
 //Possible values of a variable
 value	:	fname
 	|	array_value;
@@ -643,20 +653,6 @@ arithmetic_expansion
 
 process_substitution
 	:	(dir=LESS_THAN|dir=GREATER_THAN)LPAREN clist BLANK* RPAREN -> ^(PROCESS_SUBSTITUTION $dir clist);
-//the biggie: functions
-function:	FUNCTION BLANK+ function_name ((BLANK* parens wspace*)|wspace) compound_command -> ^(FUNCTION ^(STRING function_name) compound_command)
-	|	function_name BLANK* parens wspace* compound_command -> ^(FUNCTION["function"] ^(STRING function_name) compound_command);
-//http://article.gmane.org/gmane.comp.shells.bash.bugs/16424
-//the rules from bash 3.2 general.c:
-//Make sure that WORD is a valid shell identifier, i.e.
-//does not contain a dollar sign, nor is quoted in any way.  Nor
-//does it consist of all digits.
-function_name
-	:	(NUMBER|DIGIT)? ~(DOLLAR|SQUOTE|DQUOTE|LPAREN|RPAREN|BLANK|EOL|NUMBER|DIGIT|SINGLE_QUOTED_STRING_TOKEN) ~(DOLLAR|SQUOTE|DQUOTE|LPAREN|RPAREN|BLANK|EOL)*;
-parens	:	LPAREN BLANK* RPAREN;
-name	:	NAME
-	|	LETTER
-	|	UNDERSCORE;
 esc_char:	ESC (DIGIT DIGIT? DIGIT?|LETTER ALPHANUM ALPHANUM?|.);
 
 //****************

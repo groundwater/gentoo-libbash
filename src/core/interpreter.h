@@ -311,10 +311,7 @@ public:
   /// \param name the name of the function
   /// \param body_index the body index of the function
   void define_function(const std::string& name,
-                       ANTLR3_MARKER body_index)
-  {
-    functions.insert(make_pair(name, function(*ast_stack.top(), body_index)));
-  }
+                       ANTLR3_MARKER body_index);
 
   /// \brief push current AST, used for function definition
   /// \param ast the pointer to the current ast

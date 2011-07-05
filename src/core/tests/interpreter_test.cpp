@@ -261,3 +261,27 @@ TEST(interpreter, undefined_function)
 
   EXPECT_THROW(walker.call("undefined", {}), libbash::runtime_exception);
 }
+
+TEST(interpreter, illegal_function_names)
+{
+  interpreter walker;
+  walker.push_current_ast(0);
+  EXPECT_THROW(walker.define_function("aa'bb", 0), libbash::parse_exception);
+  EXPECT_THROW(walker.define_function("aa\"", 0), libbash::parse_exception);
+  EXPECT_THROW(walker.define_function("333", 0), libbash::parse_exception);
+  EXPECT_THROW(walker.define_function("aa$aa", 0), libbash::parse_exception);
+  EXPECT_THROW(walker.define_function("aa(aa", 0), libbash::parse_exception);
+  EXPECT_THROW(walker.define_function("aa)aa", 0), libbash::parse_exception);
+  EXPECT_THROW(walker.define_function("aa aa", 0), libbash::parse_exception);
+  EXPECT_THROW(walker.define_function("aa\naa", 0), libbash::parse_exception);
+  EXPECT_THROW(walker.define_function("aa\raa", 0), libbash::parse_exception);
+}
+
+TEST(interpreter, legal_function_names)
+{
+  interpreter walker;
+  walker.push_current_ast(0);
+  EXPECT_NO_THROW(walker.define_function("aabb", 0));
+  EXPECT_NO_THROW(walker.define_function("1abb", 0));
+  EXPECT_NO_THROW(walker.define_function("a-b", 0));
+}

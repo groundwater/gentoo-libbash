@@ -18,7 +18,7 @@
 */
 gunit java_libbash;
 
-simple_command:
+command_atom:
 "./command" -> (STRING . / command)
 "asdf=5 cat" -> (STRING cat) (= asdf (STRING 5))
 "i=3 g=4 h=18 grep asdf" -> (STRING grep) (STRING asdf) (= i (STRING 3)) (= g (STRING 4)) (= h (STRING 18))

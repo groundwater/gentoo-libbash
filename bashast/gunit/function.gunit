@@ -18,14 +18,13 @@
 */
 gunit java_libbash;
 
-function:
+command_atom:
 "function quit {
 	exit
 }" -> (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit)))))
 
 "function quit{ exit; }" FAIL
 "function quit { exit }" FAIL
-"function 'foo' { exit; }" FAIL
 "function quit { exit; }" -> (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit)))))
 "function foo()    { :; }" -> (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
 "function foo(){ :; }" -> (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
@@ -35,14 +34,6 @@ function:
 "xorg-2_reconf_source() { :; }" -> (function (STRING xorg - 2 _reconf_source) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
 
 "function out() { function inner() { :; }; }" -> (function (STRING out) (CURRENT_SHELL (LIST (COMMAND (function (STRING inner) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))))))
-
-function_name:
-"xemacs-packages_src_unpack" OK
-"while" OK
-"aa'bb" FAIL
-"a\"" FAIL
-"333" FAIL
-"aa$aa" FAIL
 
 command:
 "function quit { exit; } > /dev/null" -> (COMMAND (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit))))) (REDIR > (STRING / dev / null)))

@@ -310,6 +310,27 @@ void interpreter::define_function_arguments(scope& current_stack,
   current_stack["*"].reset(new variable("*", positional_args, true));
 }
 
+namespace
+{
+  bool check_function_name(const std::string& name)
+  {
+    using namespace boost::xpressive;
+    sregex bash_name_pattern =
+      !digit >>
+      ~(set[range('0', '9') | (set= '$', '\'', '"', '(', ')', ' ', '\n', '\r')]) >>
+      *(~(set= '$', '\'', '"', '(', ')', ' ', '\n', '\r'));
+    return regex_match(name, bash_name_pattern);
+  }
+}
+
+void interpreter::define_function(const std::string& name,
+                                  ANTLR3_MARKER body_index)
+{
+  if(!check_function_name(name))
+    throw libbash::parse_exception("illegal function name: " + name);
+  functions.insert(make_pair(name, function(*ast_stack.top(), body_index)));
+}
+
 void interpreter::call(const std::string& name,
                        const std::vector<std::string>& arguments)
 {
