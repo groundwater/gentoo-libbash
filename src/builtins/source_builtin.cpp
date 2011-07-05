@@ -27,6 +27,7 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <thread>
 
 #include "builtins/builtin_exceptions.h"
 #include "cppbash_builtin.h"
@@ -34,35 +35,43 @@
 #include "core/interpreter.h"
 #include "core/bash_ast.h"
 
+namespace {
+  std::mutex parse_mutex;
+
+  std::shared_ptr<bash_ast>& parse(const std::string& path)
+  {
+    static std::unordered_map<std::string, std::shared_ptr<bash_ast>> ast_cache;
+
+    std::lock_guard<std::mutex> parse_lock(parse_mutex);
+
+    auto stored_ast = ast_cache.find(path);
+    if(stored_ast == ast_cache.end())
+    {
+      // ensure the path is cached
+      auto iter = ast_cache.insert(make_pair(path, std::shared_ptr<bash_ast>()));
+      // this may throw exception
+      iter.first->second.reset(new bash_ast(path));
+      stored_ast = iter.first;
+    }
+    else if(!(stored_ast->second))
+    {
+      throw libbash::parse_exception(path + " cannot be fully parsed");
+    }
+
+    return stored_ast->second;
+  }
+}
+
 int source_builtin::exec(const std::vector<std::string>& bash_args)
 {
-  static std::unordered_map<std::string, std::shared_ptr<bash_ast>> ast_cache;
-
   if(bash_args.size() == 0)
     throw libbash::illegal_argument_exception("should provide one argument for source builtin");
 
-  // we need fix this to pass extra arguments as positional parameters
-  const std::string& path = bash_args[0];
-
-  auto stored_ast = ast_cache.find(path);
-  if(stored_ast == ast_cache.end())
-  {
-    // ensure the path is cached
-    auto iter = ast_cache.insert(make_pair(path, std::shared_ptr<bash_ast>()));
-    // this may throw exception
-    iter.first->second.reset(new bash_ast(path));
-    stored_ast = iter.first;
-  }
-  else if(!(stored_ast->second))
-  {
-    throw libbash::parse_exception(path + " cannot be fully parsed");
-  }
-
   const std::string& original_path = _walker.resolve<std::string>("0");
+  _walker.define("0", bash_args.front(), true);
   try
   {
-    _walker.define("0", path, true);
-    stored_ast->second->interpret_with(_walker);
+    parse(bash_args.front())->interpret_with(_walker);
   }
   catch(return_exception& e) {}
 

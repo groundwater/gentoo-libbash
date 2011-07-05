@@ -53,7 +53,7 @@
 #include <paludis/package_database.hh>
 #include <paludis/metadata_key.hh>
 
-#include "builtins/builtin_exceptions.h"
+#include "core/exceptions.h"
 #include "command_line.h"
 #include "libbash.h"
 #include "utils/metadata.h"
@@ -65,71 +65,63 @@ using std::endl;
 
 void worker(const std::shared_ptr<PackageIDSequence> &ids)
 {
-  std::unordered_map<std::string, std::vector<std::string>> variables;
-
-  std::shared_ptr<const PackageID> id;
   unsigned total(0);
   CategoryNamePart old_cat("OLDCAT");
-  while(!ids->empty())
+  #pragma omp parallel
   {
-    id = *ids->begin();
-    ids->pop_front();
-    if (id->name().category() != old_cat)
+    #pragma omp single nowait
+    while(!ids->empty())
     {
-      std::cout << "Processing " << stringify(id->name().category()) << "..." << std::endl;
-      old_cat = id->name().category();
-      FSPath(CommandLine::get_instance()->a_output_directory.argument() + "/" +
-          stringify(id->name().category())).mkdir(0755,  {fspmkdo_ok_if_exists});
-      ++total;
-    }
+      std::shared_ptr<const PackageID> id = *ids->begin();
+      ids->pop_front();
+      if (id->name().category() != old_cat)
+      {
+        std::cout << "Processing " << stringify(id->name().category()) << "..." << std::endl;
+        old_cat = id->name().category();
+        FSPath(CommandLine::get_instance()->a_output_directory.argument() + "/" +
+            stringify(id->name().category())).mkdir(0755,  {fspmkdo_ok_if_exists});
+        ++total;
+      }
 
-    Context i_context("When generating metadata for ID '" + stringify(*id) + "':");
+      #pragma omp task
+      {
+        Context i_context("When generating metadata for ID '" + stringify(*id) + "':");
 
-    variables.clear();
-    variables["PN"].push_back(stringify(id->name().package()));
-    variables["PV"].push_back(stringify(id->version().remove_revision()));
-    variables["P"].push_back(stringify(id->name().package()) + "-" +
-                             stringify(id->version().remove_revision()));
-    variables["PR"].push_back(id->version().revision_only());
-    variables["PVR"].push_back(stringify(id->version()));
-    variables["PF"].push_back(stringify(id->name().package()) + "-" + stringify(id->version()));
-    variables["CATEGORY"].push_back(stringify(id->name().category()));
-    std::vector<std::string> functions;
+        std::unordered_map<std::string, std::vector<std::string>> variables;
+        variables["PN"].push_back(stringify(id->name().package()));
+        variables["PV"].push_back(stringify(id->version().remove_revision()));
+        variables["P"].push_back(stringify(id->name().package()) + "-" +
+                                 stringify(id->version().remove_revision()));
+        variables["PR"].push_back(id->version().revision_only());
+        variables["PVR"].push_back(stringify(id->version()));
+        variables["PF"].push_back(stringify(id->name().package()) + "-" + stringify(id->version()));
+        variables["CATEGORY"].push_back(stringify(id->name().category()));
+        std::vector<std::string> functions;
 
-    std::string ebuild_path(CommandLine::get_instance()->a_repository_directory.argument() +
-                            variables["CATEGORY"][0] + "/" +
-                            variables["PN"][0] + "/" +
-                            variables["PN"][0] + "-" +
-                            variables["PVR"][0] + ".ebuild");
-    try
-    {
-      libbash::interpret(ebuild_path, "utils/isolated-functions.sh", variables, functions);
-    }
-    catch(const libbash::interpreter_exception& e)
-    {
-      cerr << "Exception occurred while interpreting " << ebuild_path << ". The error message is:\n"
-        << e.what() << endl;
-      continue;
-    }
-    catch(const return_exception& e)
-    {
-      cerr << "Unhandled return exception in " << ebuild_path << ". The error message is:\n"
-        << e.what() << endl;
-      continue;
-    }
-    catch (...)
-    {
-      cerr << "Unhandled exception in " << ebuild_path << endl;
-      continue;
-    }
+        std::string ebuild_path(CommandLine::get_instance()->a_repository_directory.argument() +
+                                variables["CATEGORY"][0] + "/" +
+                                variables["PN"][0] + "/" +
+                                variables["PN"][0] + "-" +
+                                variables["PVR"][0] + ".ebuild");
+        try
+        {
+          libbash::interpret(ebuild_path, variables, functions);
 
-    std::string output_path(CommandLine::get_instance()->a_output_directory.argument() + "/" +
-                            variables["CATEGORY"][0] + "/" +
-                            variables["PN"][0] + "-" +
-                            variables["PVR"][0]);
-    FSPath(output_path).dirname().mkdir(0755, {fspmkdo_ok_if_exists});
-    std::ofstream output(output_path, std::ofstream::out | std::ofstream::trunc);
-    write_metadata(output, variables, functions);
+          std::string output_path(CommandLine::get_instance()->a_output_directory.argument() + "/" +
+                                  variables["CATEGORY"][0] + "/" +
+                                  variables["PN"][0] + "-" +
+                                  variables["PVR"][0]);
+          FSPath(output_path).dirname().mkdir(0755, {fspmkdo_ok_if_exists});
+          std::ofstream output(output_path, std::ofstream::out | std::ofstream::trunc);
+          write_metadata(output, variables, functions);
+        }
+        catch(const libbash::interpreter_exception& e)
+        {
+          cerr << "Exception occurred while interpreting " << ebuild_path << ". The error message is:\n"
+            << e.what() << endl;
+        }
+      }
+    }
   }
 }
 
