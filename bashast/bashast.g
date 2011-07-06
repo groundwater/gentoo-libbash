@@ -546,7 +546,7 @@ dqstr_part
 	| 	ESC DQUOTE -> DQUOTE
 	| 	ESC TICK -> TICK
 	| 	ESC DOLLAR -> DOLLAR
-	|	~(DOLLAR|TICK|DQUOTE);
+	|	~(TICK|DQUOTE);
 //certain tokens that trigger pattern matching
 pattern_match_trigger
 	:	LSQUARE
