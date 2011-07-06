@@ -164,11 +164,11 @@ tokens{
 }
 #endif
 
-start	:	(flcomment)? EOL* clist BLANK* (SEMIC|AMP|EOL)? EOF -> clist;
+start	:	(flcomment)? EOL* BLANK* command_list BLANK* (SEMIC|AMP|EOL)? EOF -> command_list;
 //Because the comment token doesn't handle the first comment in a file if it's on the first line, have a parser rule for it
 flcomment
 	:	POUND ~(EOL)* EOL;
-clist
+command_list
 	:	list_level_2 -> ^(LIST list_level_2);
 list_level_1
 	:	pipeline (BLANK!*(LOGICAND^|LOGICOR^)(BLANK!|EOL!)* pipeline)*;
@@ -180,7 +180,7 @@ command_separator
 	|	AMP^
 	|	EOL!;
 pipeline
-	:	BLANK!* time? ((BANG) => (BANG BLANK!+))? command^ (BLANK!* PIPE^ BLANK!* command)*;
+	:	time? ((BANG) => (BANG BLANK!+))? command^ (BLANK!* PIPE^ BLANK!* command)*;
 time	:	TIME^ BLANK!+ ((time_posix) => time_posix)?;
 time_posix
 	:	MINUS! LETTER BLANK!+;
@@ -313,22 +313,23 @@ compound_command
 	|	arithmetic_expression
 	|	cond_comparison;
 //Expressions allowed inside a compound command
-for_expr:	FOR BLANK+ name (wspace IN (BLANK+ fname)+)? semiel DO wspace* clist semiel DONE -> ^(FOR name (fname+)? clist)
-	|	FOR BLANK* LLPAREN EOL? (BLANK* init=arithmetic BLANK*|BLANK+)? (SEMIC (BLANK? fcond=arithmetic BLANK*|BLANK+)? SEMIC|DOUBLE_SEMIC) (BLANK* mod=arithmetic)? wspace* RPAREN RPAREN semiel DO wspace clist semiel DONE
-		-> ^(CFOR ^(FOR_INIT $init)? ^(FOR_COND $fcond)? clist ^(FOR_MOD $mod)?)
+for_expr:	FOR BLANK+ name (wspace IN (BLANK+ fname)+)? semiel DO wspace* command_list semiel DONE
+				-> ^(FOR name (fname+)? command_list)
+	|	FOR BLANK* LLPAREN EOL? (BLANK* init=arithmetic BLANK*|BLANK+)? (SEMIC (BLANK? fcond=arithmetic BLANK*|BLANK+)? SEMIC|DOUBLE_SEMIC) (BLANK* mod=arithmetic)? wspace* RPAREN RPAREN semiel DO wspace* command_list semiel DONE
+		-> ^(CFOR ^(FOR_INIT $init)? ^(FOR_COND $fcond)? command_list ^(FOR_MOD $mod)?)
 	;
-sel_expr:	SELECT BLANK+ name (wspace IN BLANK+ fname)? semiel DO wspace* clist semiel DONE -> ^(SELECT name fname? clist)
+sel_expr:	SELECT BLANK+ name (wspace IN BLANK+ fname)? semiel DO wspace* command_list semiel DONE -> ^(SELECT name fname? command_list)
 	;
-if_expr	:	IF wspace+ ag=clist semiel THEN wspace+ iflist=clist semiel wspace* (elif_expr)* (ELSE wspace+ else_list=clist semiel EOL*)? FI
+if_expr	:	IF wspace+ ag=command_list semiel THEN wspace+ iflist=command_list semiel wspace* (elif_expr)* (ELSE wspace+ else_list=command_list semiel EOL*)? FI
 		-> ^(IF_STATEMENT ^(IF $ag $iflist) (elif_expr)* ^(ELSE $else_list)?)
 	;
 elif_expr
-	:	ELIF BLANK+ ag=clist semiel THEN wspace+ iflist=clist semiel -> ^(IF["if"] $ag $iflist);
+	:	ELIF BLANK+ ag=command_list semiel THEN wspace+ iflist=command_list semiel -> ^(IF["if"] $ag $iflist);
 while_expr
-	:	WHILE wspace? istrue=clist semiel DO wspace dothis=clist semiel DONE -> ^(WHILE $istrue $dothis)
+	:	WHILE wspace* istrue=command_list semiel DO wspace* dothis=command_list semiel DONE -> ^(WHILE $istrue $dothis)
 	;
 until_expr
-	:	UNTIL wspace? istrue=clist semiel DO wspace dothis=clist semiel DONE -> ^(UNTIL $istrue $dothis)
+	:	UNTIL wspace* istrue=command_list semiel DO wspace* dothis=command_list semiel DONE -> ^(UNTIL $istrue $dothis)
 	;
 // double semicolon is optional for the last alternative
 case_expr
@@ -336,13 +337,13 @@ case_expr
 case_body
 	:	case_stmt (wspace* DOUBLE_SEMIC case_stmt)* wspace* DOUBLE_SEMIC? wspace* -> case_stmt*;
 case_stmt
-	:	wspace* (LPAREN BLANK*)? fname (BLANK* PIPE BLANK? fname)* BLANK* RPAREN (wspace* clist)?
-		-> ^(CASE_PATTERN fname+ (CASE_COMMAND clist)?);
+	:	wspace* (LPAREN BLANK*)? fname (BLANK* PIPE BLANK? fname)* BLANK* RPAREN (wspace* command_list)?
+		-> ^(CASE_PATTERN fname+ (CASE_COMMAND command_list)?);
 //A grouping of commands executed in a subshell
-subshell:	LPAREN wspace? clist (BLANK* SEMIC)? (BLANK* EOL)* BLANK* RPAREN -> ^(SUBSHELL clist );
+subshell:	LPAREN wspace* command_list (BLANK* SEMIC)? (BLANK* EOL)* BLANK* RPAREN -> ^(SUBSHELL command_list);
 //A grouping of commands executed in the current shell
 current_shell
-	:	LBRACE wspace clist semiel wspace* RBRACE -> ^(CURRENT_SHELL clist);
+	:	LBRACE wspace* command_list semiel wspace* RBRACE -> ^(CURRENT_SHELL command_list);
 //Bash arithmetic expression (( expression ))
 arithmetic_expression
 	:	LLPAREN wspace? arithmetic wspace? RPAREN RPAREN -> ^(ARITHMETIC_EXPRESSION arithmetic);
@@ -658,7 +659,7 @@ arithmetic_expansion
 	|	DOLLAR LSQUARE BLANK* arithmetics BLANK* RSQUARE -> ^(ARITHMETIC_EXPRESSION arithmetics);
 
 process_substitution
-	:	(dir=LESS_THAN|dir=GREATER_THAN)LPAREN clist BLANK* RPAREN -> ^(PROCESS_SUBSTITUTION $dir clist);
+	:	(dir=LESS_THAN|dir=GREATER_THAN)LPAREN BLANK* command_list BLANK* RPAREN -> ^(PROCESS_SUBSTITUTION $dir command_list);
 esc_char:	ESC (DIGIT DIGIT? DIGIT?|LETTER ALPHANUM ALPHANUM?|.);
 
 //****************

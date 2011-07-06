@@ -18,7 +18,7 @@
 */
 gunit java_libbash;
 
-clist:
+command_list:
 "echo a{b,c,d}" -> (LIST (COMMAND (STRING echo) (STRING a (BRACE_EXP (STRING b) (STRING c) (STRING d)))))
 "((5+5))" -> (LIST (COMMAND (ARITHMETIC_EXPRESSION (+ 5 5))))
 "(( 4 + asdf ))" -> (LIST (COMMAND (ARITHMETIC_EXPRESSION (+ 4 (VAR_REF asdf)))))
