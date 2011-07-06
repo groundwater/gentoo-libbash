@@ -26,5 +26,5 @@ clist:
 "[[ while = while ]] && echo true" -> (LIST (&& (COMMAND (COMPOUND_COND (KEYWORD_TEST (= (STRING while) (STRING while))))) (COMMAND (STRING echo) (STRING true))))
 "for each in `ls |grep output`; do
 echo $each
-done" -> (LIST (COMMAND (for each (STRING (COMMAND_SUB (LIST (| (COMMAND (STRING ls)) (COMMAND (STRING grep) (STRING output)))))) (LIST (COMMAND (STRING echo) (STRING (VAR_REF each)))))))
+done" -> (LIST (COMMAND (for each (STRING (COMMAND_SUB `ls |grep output`)) (LIST (COMMAND (STRING echo) (STRING (VAR_REF each)))))))
 "wc <(cat /usr/share/dict/linux.words)" -> (LIST (COMMAND (STRING wc) (PROCESS_SUBSTITUTION < (LIST (COMMAND (STRING cat) (STRING / usr / share / dict / linux . words))))))

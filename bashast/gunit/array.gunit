@@ -20,9 +20,9 @@ gunit java_libbash;
 
 var_def:
 "asdf=(a b c d)"->(= asdf (ARRAY (STRING a) (STRING b) (STRING c) (STRING d)))
-"asdf=(`echo 6` b c d)"-> (= asdf (ARRAY (STRING (COMMAND_SUB (LIST (COMMAND (STRING echo) (STRING 6))))) (STRING b) (STRING c) (STRING d)))
+"asdf=(`echo 6` b c d)"-> (= asdf (ARRAY (STRING (COMMAND_SUB `echo 6`)) (STRING b) (STRING c) (STRING d)))
 "asdf=(${P} b c d)"->(= asdf (ARRAY (STRING (VAR_REF P)) (STRING b) (STRING c) (STRING d)))
-"asdf=($(echo a))" -> (= asdf (ARRAY (STRING (COMMAND_SUB (LIST (COMMAND (STRING echo) (STRING a)))))))
+"asdf=($(echo a))" -> (= asdf (ARRAY (STRING (COMMAND_SUB $(echo a)))))
 "asdf=(
 		--disable-dependency-tracking
 		${VAR}

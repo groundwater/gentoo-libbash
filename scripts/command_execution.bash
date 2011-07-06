@@ -65,3 +65,7 @@ echo "abc #av### ##" # for comment
 echo $'abc\tdef\nxyz'
 echo -e "\'\"\t\n"
 echo 'quotes should be handled correctly'
+echo "$(echo 'hi')"
+echo "`echo 'hi'`"
+array=(`echo 1` `echo 2` 3)
+echo ${array[@]}

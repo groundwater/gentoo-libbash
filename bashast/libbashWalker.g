@@ -48,6 +48,7 @@ options
 	#include <boost/algorithm/string/join.hpp>
 
 	#include "builtins/builtin_exceptions.h"
+	#include "core/bash_ast.h"
 	#include "core/bash_condition.h"
 	#include "core/interpreter.h"
 	#include "cppbash_builtin.h"
@@ -285,7 +286,7 @@ string_part returns[std::string libbash_value, bool quoted, bool is_raw_string]
 		$libbash_value = libbash_string;
 		$is_raw_string = false;
 	}
-	|libbash_string=command_substitution {
+	|(COMMAND_SUB) => libbash_string=command_substitution {
 		$libbash_value = libbash_string;
 		$is_raw_string = false;
 	}
@@ -409,7 +410,7 @@ double_quoted_string returns[std::string libbash_value]
 	|(ARITHMETIC_EXPRESSION) => ^(ARITHMETIC_EXPRESSION value=arithmetics) {
 		$libbash_value = boost::lexical_cast<std::string>(value);
 	}
-	|libbash_string=command_substitution {
+	|(COMMAND_SUB) => libbash_string=command_substitution {
 		$libbash_value = libbash_string;
 	}
 	|libbash_string=any_string { $libbash_value = libbash_string; };
@@ -994,9 +995,14 @@ case_clause[const std::string& target] returns[bool matched]
 
 command_substitution returns[std::string libbash_value]
 @declarations {
+	std::string subscript;
 	std::stringstream out;
 }
-	:^(COMMAND_SUB{ walker->set_output_stream(&out); } command_list) {
+	:^(COMMAND_SUB { walker->set_output_stream(&out); } (libbash_string=any_string { subscript += libbash_string; })+) {
+		if(subscript[0] == '`')
+			bash_ast(std::stringstream(subscript.substr(1, subscript.size() - 2))).interpret_with(*walker);
+		else
+			bash_ast(std::stringstream(subscript.substr(2, subscript.size() - 3))).interpret_with(*walker);
 		walker->restore_output_stream();
 		$libbash_value = out.str();
 		walker->trim_trailing_eols($libbash_value);

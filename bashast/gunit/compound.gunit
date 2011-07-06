@@ -54,7 +54,7 @@ subshell:
 case_expr:
 "case a in esac" -> (case (STRING a))
 "case `echo asdf` in
-esac" -> (case (STRING (COMMAND_SUB (LIST (COMMAND (STRING echo) (STRING asdf))))))
+esac" -> (case (STRING (COMMAND_SUB `echo asdf`)))
 
 "case `echo asdf` in
 gz)
@@ -65,7 +65,7 @@ echo three
 ;;
 *) echo woo
 ;;
-esac" -> (case (STRING (COMMAND_SUB (LIST (COMMAND (STRING echo) (STRING asdf))))) (CASE_PATTERN (STRING gz) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING yay)))) (CASE_PATTERN (STRING bzip) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING three)))) (CASE_PATTERN (STRING MATCH_ALL) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING woo)))))
+esac" -> (case (STRING (COMMAND_SUB `echo asdf`)) (CASE_PATTERN (STRING gz) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING yay)))) (CASE_PATTERN (STRING bzip) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING three)))) (CASE_PATTERN (STRING MATCH_ALL) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING woo)))))
 
 "case asdf in
 	gz)
@@ -83,8 +83,8 @@ esac" -> (case (STRING asdf) (CASE_PATTERN (STRING gz) CASE_COMMAND (LIST (COMMA
 for_expr:
 "for each in `ls |grep log`; do
 	echo \"file found\"
-done" -> (for each (STRING (COMMAND_SUB (LIST (| (COMMAND (STRING ls)) (COMMAND (STRING grep) (STRING log)))))) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found)))))
-"for each in `ls |grep log`; do echo \"file found\"; done" -> (for each (STRING (COMMAND_SUB (LIST (| (COMMAND (STRING ls)) (COMMAND (STRING grep) (STRING log)))))) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found)))))
+done" -> (for each (STRING (COMMAND_SUB `ls |grep log`)) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found)))))
+"for each in `ls |grep log`; do echo \"file found\"; done" -> (for each (STRING (COMMAND_SUB `ls |grep log`)) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found)))))
 "for i in 'foo' 'bar'; do echo $i; done" -> (for i (STRING (SINGLE_QUOTED_STRING 'foo')) (STRING (SINGLE_QUOTED_STRING 'bar')) (LIST (COMMAND (STRING echo) (STRING (VAR_REF i)))))
 "for i in foo$var bar; do echo $i; done" -> (for i (STRING foo (VAR_REF var)) (STRING bar) (LIST (COMMAND (STRING echo) (STRING (VAR_REF i)))))
 "for each in `ls |grep log`; do echo file done" FAIL
@@ -97,8 +97,8 @@ done" -> (for each (STRING (COMMAND_SUB (LIST (| (COMMAND (STRING ls)) (COMMAND 
 sel_expr:
 "select each in `ls |grep log`; do
   echo \"file found\"
-	done" -> (select each (STRING (COMMAND_SUB (LIST (| (COMMAND (STRING ls)) (COMMAND (STRING grep) (STRING log)))))) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found)))))
-"select each in `ls |grep log`; do echo \"file found\"; done" -> (select each (STRING (COMMAND_SUB (LIST (| (COMMAND (STRING ls)) (COMMAND (STRING grep) (STRING log)))))) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found)))))
+	done" -> (select each (STRING (COMMAND_SUB `ls |grep log`)) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found)))))
+"select each in `ls |grep log`; do echo \"file found\"; done" -> (select each (STRING (COMMAND_SUB `ls |grep log`)) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found)))))
 "select each in `ls |grep log`; do echo file done" FAIL
 
 if_expr:
@@ -185,7 +185,7 @@ command:
 "case a in esac >/dev/null" -> (COMMAND (case (STRING a)) (REDIR > (STRING / dev / null)))
 "for i in foo$var bar; do echo $i; done >/dev/null" -> (COMMAND (for i (STRING foo (VAR_REF var)) (STRING bar) (LIST (COMMAND (STRING echo) (STRING (VAR_REF i))))) (REDIR > (STRING / dev / null)))
 "for ((5+3;;5+3)); do echo yay; done >/dev/null" -> (COMMAND (CFOR (FOR_INIT (+ 5 3)) (LIST (COMMAND (STRING echo) (STRING yay))) (FOR_MOD (+ 5 3))) (REDIR > (STRING / dev / null)))
-"select each in `ls |grep log`; do echo \"file found\"; done >/dev/null" -> (COMMAND (select each (STRING (COMMAND_SUB (LIST (| (COMMAND (STRING ls)) (COMMAND (STRING grep) (STRING log)))))) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found))))) (REDIR > (STRING / dev / null)))
+"select each in `ls |grep log`; do echo \"file found\"; done >/dev/null" -> (COMMAND (select each (STRING (COMMAND_SUB `ls |grep log`)) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found))))) (REDIR > (STRING / dev / null)))
 
 "if echo yay2;
 then

@@ -126,6 +126,7 @@ tokens{
 		return input.LA(index);
 	}
 #endif
+	int paren_level = 0;
 }
 
 #ifdef OUTPUT_C
@@ -297,8 +298,8 @@ brace_expansion_part
 	|	-> ^(STRING);
 commasep:	brace_expansion_part(COMMA! brace_expansion_part)+;
 command_sub
-	:	DOLLAR LPAREN clist BLANK? RPAREN -> ^(COMMAND_SUB clist)
-	|	TICK clist BLANK? TICK -> ^(COMMAND_SUB clist) ;
+	:	COMMAND_SUBSTITUTION_PAREN -> ^(COMMAND_SUB COMMAND_SUBSTITUTION_PAREN)
+	|	COMMAND_SUBSTITUTION_TICK -> ^(COMMAND_SUB COMMAND_SUBSTITUTION_TICK);
 //compound commands
 compound_command
 	:	for_expr
@@ -767,6 +768,33 @@ ESC_RPAREN
 	:	ESC RPAREN;
 ESC_LPAREN
 	:	ESC LPAREN;
+ESC_DOLLAR
+	:	ESC DOLLAR;
+ESC_TICK
+	:	ESC TICK;
+COMMAND_SUBSTITUTION_PAREN
+	:
+		{LA(1) == '$' && LA(2) == '(' && LA(3) != '('}?
+		=> (DOLLAR LPAREN ({ paren_level = 1; }
+			(
+				ESC_LPAREN
+				|ESC_RPAREN
+				|LPAREN { ++paren_level; }
+				|RPAREN { if(--paren_level == 0) {
+#ifdef OUTPUT_C
+						LEXSTATE->type = _type;
+#else
+						state.type = _type;
+						state.channel = _channel;
+#endif
+						return;
+					}
+				}
+				|.
+			)+
+		));
+COMMAND_SUBSTITUTION_TICK
+	:	TICK (~(TICK))+ TICK;
 ESC_LT	:	ESC'<';
 ESC_GT	:	ESC'>';
 //Handle ANSI C escaped characters: escaped octal, escaped hex, escaped ctrl+ chars, then all others
