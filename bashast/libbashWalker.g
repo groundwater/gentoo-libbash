@@ -40,6 +40,7 @@ options
 
 @postinclude{
 
+	#include <cctype>
 	#include <fstream>
 	#include <iostream>
 	#include <sstream>
@@ -164,6 +165,11 @@ options
 		char get_char(pANTLR3_BASE_TREE node)
 		{
 			return *reinterpret_cast<const char *>(node->getToken(node)->start);
+		}
+
+		bool is_number(const std::string& target)
+		{
+			return isdigit(target[0]);
 		}
 	}
 }
@@ -350,7 +356,7 @@ composite_pattern[boost::xpressive::sregex& pattern_list, bool greedy]
 	bool do_sub_append = false;
 	sregex sub_pattern;
 }
-	:(^(STRING
+	:(^(BRANCH
 		(basic_pattern[sub_pattern, $greedy, do_sub_append]{
 			if(do_append)
 			{
@@ -991,7 +997,8 @@ case_clause[const std::string& target] returns[bool matched]
 		}
 		if(!$matched)
 			seek_to_next_tree(ctx);
-	});
+	})
+	|CASE_PATTERN;
 
 command_substitution returns[std::string libbash_value]
 @declarations {
@@ -1093,26 +1100,40 @@ arithmetics returns[long value]
 		$value = (primary_value.empty() ? 0 : walker->eval_arithmetic(primary_value));
 	}
 	|^(PRE_INCR primary) {
-		$value = walker->set_value($primary.libbash_value,
-		                           walker->resolve<long>($primary.libbash_value, $primary.index) + 1,
-								   $primary.index);
+		std::string primary_value(walker->resolve<std::string>($primary.libbash_value, $primary.index));
+		if(is_number(primary_value))
+			$value = walker->set_value($primary.libbash_value,
+									   walker->resolve<long>($primary.libbash_value, $primary.index) + 1,
+									   $primary.index);
+		else
+			$value = (primary_value.empty() ? 0 : walker->eval_arithmetic("++" + primary_value));
 	}
 	|^(PRE_DECR primary) {
-		$value = walker->set_value($primary.libbash_value,
-		                           walker->resolve<long>($primary.libbash_value, $primary.index) - 1,
-								   $primary.index);
+		std::string primary_value(walker->resolve<std::string>($primary.libbash_value, $primary.index));
+		if(is_number(primary_value))
+			$value = walker->set_value($primary.libbash_value,
+									   walker->resolve<long>($primary.libbash_value, $primary.index) - 1,
+									   $primary.index);
+		else
+			$value = (primary_value.empty() ? 0 : walker->eval_arithmetic("--" + primary_value));
 	}
 	|^(POST_INCR primary) {
-		$value = walker->set_value($primary.libbash_value,
-		                           walker->resolve<long>($primary.libbash_value, $primary.index) + 1,
-								   $primary.index);
-		--$value;
+		std::string primary_value(walker->resolve<std::string>($primary.libbash_value, $primary.index));
+		if(is_number(primary_value))
+			$value = walker->set_value($primary.libbash_value,
+									   walker->resolve<long>($primary.libbash_value, $primary.index) + 1,
+									   $primary.index) - 1;
+		else
+			$value = (primary_value.empty() ? 0 : walker->eval_arithmetic(primary_value + "++"));
 	}
 	|^(POST_DECR primary) {
-		$value = walker->set_value($primary.libbash_value,
-		                           walker->resolve<long>($primary.libbash_value, $primary.index) - 1,
-								   $primary.index);
-		++$value;
+		std::string primary_value(walker->resolve<std::string>($primary.libbash_value, $primary.index));
+		if(is_number(primary_value))
+			$value = walker->set_value($primary.libbash_value,
+									   walker->resolve<long>($primary.libbash_value, $primary.index) - 1,
+									   $primary.index) + 1;
+		else
+			$value = (primary_value.empty() ? 0 : walker->eval_arithmetic(primary_value + "--"));
 	}
 	|^(EQUALS primary l=arithmetics) {
 		$value = walker->set_value($primary.libbash_value, l, $primary.index);

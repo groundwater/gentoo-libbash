@@ -18,7 +18,7 @@
 */
 gunit java_libbash;
 
-command_sub:
+command_substitution:
 "$(echo \"foo\")" -> (COMMAND_SUB $(echo "foo"))
 "$(ls |grep file)" -> (COMMAND_SUB $(ls |grep file))
 "$(CONTROL= command arg )" -> (COMMAND_SUB $(CONTROL= command arg ))

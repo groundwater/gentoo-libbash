@@ -18,7 +18,7 @@
 */
 gunit java_libbash;
 
-var_def:
+variable_definition_atom:
 "arr[foo]=\"asdf\"" -> (= (arr (VAR_REF foo)) (STRING (DOUBLE_QUOTED_STRING asdf)))
 "arr=(a b [4]=c)" -> (= arr (ARRAY (STRING a) (STRING b) (= 4 (STRING c))))
 "asdf[idx]=${var}" -> (= (asdf (VAR_REF idx)) (STRING (VAR_REF var)))

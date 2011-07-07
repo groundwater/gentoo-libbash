@@ -48,13 +48,9 @@ GUNIT_TESTS = bashast/gunit/arith_main.gunit \
 
 BASH_LOG_COMPILER = $(srcdir)/test/bash_compiler.sh
 BASH_TESTS = scripts/var_def.bash \
-			 scripts/var_expansion.bash \
 			 scripts/command_execution.bash \
 			 scripts/function_def.bash \
 			 scripts/arithmetic_assignment.bash \
-			 scripts/isolated_functions.bash \
-			 scripts/compound_command.bash \
-			 scripts/test_expr.bash \
 			 scripts/binary_arithmetic.bash
 
 EBUILD_LOG_COMPILER = $(srcdir)/test/ebuild_compiler.sh
@@ -84,8 +80,6 @@ endif
 
 if HAVE_GTEST
 TESTS += cppunittests \
-		 test/ast_printer_test.sh \
-		 test/verify_bashs_test.sh \
 		 test/verify_error_output_test.sh \
 		 test/bash_result_tests.sh
 check_PROGRAMS = cppunittests

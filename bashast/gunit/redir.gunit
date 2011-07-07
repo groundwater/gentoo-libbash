@@ -18,21 +18,32 @@
 */
 gunit java_libbash;
 
-redirect:
+redirection:
 ">output_file" -> (REDIR > (STRING output_file))
-"1>output.file" -> (REDIR 1 > (STRING output . file))
-"2>&1" -> (REDIR 2 >& (FILE_DESCRIPTOR 1))
-"2>&1-" -> (REDIR 2 >& (FILE_DESCRIPTOR_MOVE 1))
+" 1>output.file" -> (REDIR 1 > (STRING output . file))
+" 2>&1" -> (REDIR 2 >& (FILE_DESCRIPTOR 1))
+" 2>&1-" -> (REDIR 2 >& (FILE_DESCRIPTOR_MOVE 1))
 ">> /this/is/append" -> (REDIR >> (STRING / this / is / append))
 "&> allout" -> (REDIR &> (STRING allout))
 "< this.is.1input" -> (REDIR < (STRING this . is . 1 input))
-"3< \"input from file\"" -> (REDIR 3 < (STRING (DOUBLE_QUOTED_STRING input   from   file)))
-"2<&0" -> (REDIR 2 <& (FILE_DESCRIPTOR 0))
-"<< asdf
-asdf
-" -> (<< (STRING asdf))
+" 3< \"input from file\"" -> (REDIR 3 < (STRING (DOUBLE_QUOTED_STRING input   from   file)))
+" 2<&0" -> (REDIR 2 <& (FILE_DESCRIPTOR 0))
+
+here_string:
 "<<< herestring" -> (<<< (STRING herestring))
-"<< blue
+
+start:
+"cat<<- asdf
+asdf
+" -> (LIST (COMMAND (STRING cat) (<<- STRING)))
+"cat<< blue
 red
 green
-" -> (<< (STRING red green))
+" FAIL
+"cat << _EOF_.abc >/dev/null
+blah
+blah
+_EOF_.abc
+" -> (LIST (COMMAND (STRING cat) (<< (STRING blah 
+ blah 
+) (REDIR > (STRING / dev / null)))))

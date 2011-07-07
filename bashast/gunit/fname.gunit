@@ -18,7 +18,7 @@
 */
 gunit java_libbash;
 
-fname:
+string_expr:
 "+%Y%m%d" -> (STRING + % Y % m % d)
 "\"http://www.gnu.org/software/autoconf/autoconf.html\"" -> (STRING (DOUBLE_QUOTED_STRING http : / / www . gnu . org / software / autoconf / autoconf . html))
 "\"http://dev.gentoo.org/~mpagano/genpatches\"" -> (STRING (DOUBLE_QUOTED_STRING http : / / dev . gentoo . org / ~ mpagano / genpatches))
@@ -36,40 +36,45 @@ fname:
 "'asdf\"asdf'" -> (STRING (SINGLE_QUOTED_STRING 'asdf"asdf'))
 "\"asdf'asdf\"" -> (STRING (DOUBLE_QUOTED_STRING asdf ' asdf))
 "!/bin/bash" -> (STRING ! / bin / bash)
-"ab?(g|h)"-> (STRING ab (EXTENDED_MATCH_AT_MOST_ONE (STRING g) (STRING h)))
-"ab*(gh|i)" -> (STRING ab (EXTENDED_MATCH_ANY (STRING gh) (STRING i)))
-"ab+(gh|i)" -> (STRING ab (EXTENDED_MATCH_AT_LEAST_ONE (STRING gh) (STRING i)))
-"ab@(gh|i)" -> (STRING ab (EXTENDED_MATCH_EXACTLY_ONE (STRING gh) (STRING i)))
-"ab!(gh|i)" -> (STRING ab (EXTENDED_MATCH_NONE (STRING gh) (STRING i)))
 "\"abc\"\'\"\'\"def\"" -> (STRING (DOUBLE_QUOTED_STRING abc) (SINGLE_QUOTED_STRING '"') (DOUBLE_QUOTED_STRING def))
 "my\ name\ is" -> (STRING my \   name \   is)
 "octal\007" -> (STRING octal \ 007)
 "hex\xaF" -> (STRING hex \ xaF)
 "ctrlx\cx" -> (STRING ctrlx \ cx)
 "tab\\ttab" -> "(STRING tab \\ \t tab)"
-"abc[def]" -> (STRING abc (MATCH_ANY def))
-"abc[d${more}]" -> (STRING abc (MATCH_ANY d (VAR_REF more)))
-"abc[#d]" -> (STRING abc (MATCH_ANY # d))
-"abc[d#]" -> (STRING abc (MATCH_ANY d #))
 "a[]" -> (STRING a [ ])
-"ab[d-h]" -> (STRING ab (MATCH_ANY d - h))
-"ab[!d-h]" -> (STRING ab (MATCH_ANY_EXCEPT d - h))
-"ab[^d-h]" -> (STRING ab (MATCH_ANY_EXCEPT d - h))
-"ab[]c]" -> (STRING ab (MATCH_ANY ] c))
-"ab[]!]" -> (STRING ab (MATCH_ANY ] !))
-"ab[:alpha:]" -> (STRING ab (MATCH_ANY : alpha :))
-"ab[=c=]" -> (STRING ab (MATCH_ANY = c =))
-"ab[.c.]" -> (STRING ab (MATCH_ANY . c .))
-"ab[[:alpha:]]" -> (STRING ab (MATCH_ANY (CHARACTER_CLASS alpha)))
-"ab[[:alpha:][:digit:]]" -> (STRING ab (MATCH_ANY (CHARACTER_CLASS alpha) (CHARACTER_CLASS digit)))
-"ab[^[:alpha:]]" -> (STRING ab (MATCH_ANY_EXCEPT (CHARACTER_CLASS alpha)))
-"ab[[=c=]]" -> (STRING ab (MATCH_ANY (EQUIVALENCE_CLASS c)))
-"ab[[.backslash.]]" -> (STRING ab (MATCH_ANY (COLLATING_SYMBOL backslash)))
-"ab[12[:alpha:]]" -> (STRING ab (MATCH_ANY 12 (CHARACTER_CLASS alpha)))
 "\"'foo'\"" -> (STRING (DOUBLE_QUOTED_STRING ' foo '))
 "--preserve=timestamps,mode" -> (STRING - - preserve = timestamps , mode)
 "$'asdf'" -> (STRING (ANSI_C_QUOTING 'asdf'))
 "\"abc#$/\"" -> (STRING (DOUBLE_QUOTED_STRING abc # $ /))
 
-dqstr:
+condition_expr:
+// bracket patterns
+"[[ x == abc[def] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) abc (MATCH_ANY def)))
+"[[ x == abc[d${more}] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) abc (MATCH_ANY d (VAR_REF more))))
+"[[ x==abc[#d] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) abc (MATCH_ANY # d)))
+"[[ x==abc[d#] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) abc (MATCH_ANY d #)))
+"[[ x==ab[d-h] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) ab (MATCH_ANY d - h)))
+"[[ x==ab[!d-h] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) ab (MATCH_ANY_EXCEPT d - h)))
+"[[ x==ab[^d-h] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) ab (MATCH_ANY_EXCEPT d - h)))
+//"ab[]c]" -> (STRING ab (MATCH_ANY ] c))
+//"ab[]!]" -> (STRING ab (MATCH_ANY ] !))
+"[[ x==ab[:alpha:] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) ab (MATCH_ANY : alpha :)))
+"[[ x==ab[=c=] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) ab (MATCH_ANY = c =)))
+"[[ x==ab[.c.] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) ab (MATCH_ANY . c .)))
+"[[ x==ab[[:alpha:]] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) ab (MATCH_ANY (CHARACTER_CLASS alpha))))
+"[[ x==ab[[:alpha:][:digit:]] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) ab (MATCH_ANY (CHARACTER_CLASS alpha) (CHARACTER_CLASS digit))))
+"[[ x==ab[^[:alpha:]] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) ab (MATCH_ANY_EXCEPT (CHARACTER_CLASS alpha))))
+"[[ x==ab[[=c=]] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) ab (MATCH_ANY (EQUIVALENCE_CLASS c))))
+"[[ x==ab[[.backslash.]] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) ab (MATCH_ANY (COLLATING_SYMBOL backslash))))
+"[[ x==ab[12[:alpha:]] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) ab (MATCH_ANY 12 (CHARACTER_CLASS alpha))))
+
+// extended patterns
+"[[ x==ab?(g|h) ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) ab (EXTENDED_MATCH_AT_MOST_ONE (BRANCH g) (BRANCH h))))
+"[[ x==ab*(gh|i) ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) ab (EXTENDED_MATCH_ANY (BRANCH gh) (BRANCH i))))
+"[[ x==ab+(gh|i) ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) ab (EXTENDED_MATCH_AT_LEAST_ONE (BRANCH gh) (BRANCH i))))
+"[[ x==ab@(gh|i) ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) ab (EXTENDED_MATCH_EXACTLY_ONE (BRANCH gh) (BRANCH i))))
+"[[ x==ab!(gh|i) ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) ab (EXTENDED_MATCH_NONE (BRANCH gh) (BRANCH i))))
+
+double_quoted_string:
 "\"\\\\\"\$\`\"" -> (DOUBLE_QUOTED_STRING \ " \$ \`)

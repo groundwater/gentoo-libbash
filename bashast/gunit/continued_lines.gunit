@@ -18,6 +18,7 @@
 */
 gunit java_libbash;
 
+/*
 start:
 
 "ech\
@@ -28,3 +29,4 @@ o Hello\
 	-e 's/three/\
   four/'" -> (LIST (COMMAND (STRING sed) (STRING - i) (STRING - e) (STRING (SINGLE_QUOTED_STRING 's/three/\
   four/'))))
+*/

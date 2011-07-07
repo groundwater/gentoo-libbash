@@ -27,8 +27,8 @@ brace_expansion:
 "{.txt,,}" -> (BRACE_EXP (STRING . txt) STRING STRING)
 "{GNUmakefile,{M,m}akefile}" -> (BRACE_EXP (STRING GNUmakefile) (STRING (BRACE_EXP (STRING M) (STRING m)) akefile))
 
-fname:
+string_expr:
 "a{b,c}" -> (STRING a (BRACE_EXP (STRING b) (STRING c)))
 "{c..d}f" -> (STRING (BRACE_EXP (.. c d)) f)
 "a{a,b}b{c,d}" -> (STRING a (BRACE_EXP (STRING a) (STRING b)) b (BRACE_EXP (STRING c) (STRING d)))
-"[{a,b}-c]*" -> (STRING (MATCH_ANY (BRACE_EXP (STRING a) (STRING b)) - c) MATCH_ALL)
+//"[{a,b}-c]*" -> (STRING (MATCH_ANY (BRACE_EXP (STRING a) (STRING b)) - c) MATCH_ALL)

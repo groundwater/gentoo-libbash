@@ -18,6 +18,7 @@
 */
 gunit java_libbash;
 
+/*
 cond_expr:
 "[[ -a this/is.afile ]]" -> (KEYWORD_TEST (a (STRING this / is . afile)))
 "[ -n \"yar53\" ]" -> (BUILTIN_TEST (n (STRING (DOUBLE_QUOTED_STRING yar53))))
@@ -33,3 +34,4 @@ cond_expr:
 "[[ \"${DISTUTILS_SRC_TEST}\" =~ ^(setup\.py|nosetests|py\.test|trial(\ .*)?)$ ]]" -> (KEYWORD_TEST (MATCH_REGULAR_EXPRESSION (STRING (DOUBLE_QUOTED_STRING (VAR_REF DISTUTILS_SRC_TEST))) (STRING ^ ( setup \ . py | nosetests | py \ . test | trial ( \   . * ) ? ) $)))
 "[ -n "$FROM_LANG" -a -n "$TO_LANG" ]" -> (BUILTIN_TEST (BUILTIN_LOGIC a (n (STRING (DOUBLE_QUOTED_STRING (VAR_REF FROM_LANG)))) (n (STRING (DOUBLE_QUOTED_STRING (VAR_REF TO_LANG))))))
 "[ -n "$FROM_LANG" -o -n "$TO_LANG" ]" -> (BUILTIN_TEST (BUILTIN_LOGIC o (n (STRING (DOUBLE_QUOTED_STRING (VAR_REF FROM_LANG)))) (n (STRING (DOUBLE_QUOTED_STRING (VAR_REF TO_LANG))))))
+*/
