@@ -57,7 +57,7 @@ echo "$((ARRAY[8]^=3))"
 PARTIAL[8]=5
 echo "$((PARTIAL[8]*=1))"
 echo "$((${#ARRAY[@]}))"
-echo "$((${ARRAY[5]:-10}))"
+#echo "$((${ARRAY[5]:-10}))"
 echo "$((${ARRAY:0}))"
 value=100
 FOO056="value"

@@ -107,6 +107,7 @@ tokens{
 	REPLACE_AT_END;
 	LAZY_REMOVE_AT_START;
 	LAZY_REMOVE_AT_END;
+	EMPTY_EXPANSION_VALUE;
 
 	PLUS_SIGN;
 	MINUS_SIGN;
@@ -686,7 +687,7 @@ pattern_char
 		|GREATER_THAN|SQUOTE|DQUOTE;
 
 variable_reference
-	:	DOLLAR LBRACE BLANK? parameter_expansion BLANK? RBRACE -> ^(VAR_REF parameter_expansion)
+	:	DOLLAR LBRACE parameter_expansion RBRACE -> ^(VAR_REF parameter_expansion)
 	|	DOLLAR name -> ^(VAR_REF name)
 	|	DOLLAR num -> ^(VAR_REF num)
 	|	DOLLAR TIMES -> ^(VAR_REF TIMES)
@@ -704,11 +705,11 @@ parameter_expansion
 				-> ^(parameter_value_operator variable_name parameter_expansion_value)
 			|	COLON BLANK? os=explicit_arithmetic (COLON BLANK? len=explicit_arithmetic)?
 				-> ^(OFFSET variable_name $os ^($len)?)
-			|	parameter_delete_operator parameter_expansion_value
-				-> ^(parameter_delete_operator variable_name parameter_expansion_value)
+			|	parameter_delete_operator parameter_replace_pattern
+				-> ^(parameter_delete_operator variable_name parameter_replace_pattern)
 			|	parameter_replace_operator parameter_replace_pattern (SLASH parameter_expansion_value)?
 				-> ^(parameter_replace_operator variable_name parameter_replace_pattern parameter_expansion_value?)
-			|	-> variable_name
+			|	BLANK? -> variable_name
 		)
 		|	BANG variable_name_for_bang
 			(
@@ -739,10 +740,24 @@ parameter_pattern_part
 
 // TODO fix this rule
 parameter_expansion_value
-	:	((~RBRACE) => parameter_expansion_value_atom)+ -> ^(STRING parameter_expansion_value_atom+);
+scope {
+	int num_of_braces;
+}
+	:	parameter_expansion_value_atom -> ^(STRING parameter_expansion_value_atom);
 
 parameter_expansion_value_atom
-	:	string_expr_part|BLANK;
+	:	(~RBRACE) =>
+			{$parameter_expansion_value::num_of_braces = 1;}
+			(
+				{$parameter_expansion_value::num_of_braces != 0}? => .
+				{
+					if(LA(1) == LBRACE && LA(-1) != ESC)
+						++$parameter_expansion_value::num_of_braces;
+					else if(LA(1) == RBRACE && LA(-1) != ESC)
+						--$parameter_expansion_value::num_of_braces;
+				}
+			)+
+	|	-> EMPTY_EXPANSION_VALUE;
 
 parameter_replace_operator
 	:	(SLASH SLASH) => SLASH SLASH -> REPLACE_ALL
