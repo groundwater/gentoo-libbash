@@ -619,6 +619,13 @@ double_quoted_string_part
 	|	(ESC DOLLAR) => ESC DOLLAR -> DOLLAR
 	|	~(TICK|DQUOTE);
 
+// Perform all kinds of expansions
+all_expansions
+	:	expansion_atom+ -> ^(STRING expansion_atom+);
+expansion_atom
+	:	(DQUOTE) => double_quoted_string
+	|	double_quoted_string_part;
+
 string_part
 	:	ns_string_part
 	|	SLASH;
