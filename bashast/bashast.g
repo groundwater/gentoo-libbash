@@ -214,7 +214,7 @@ redirection
 	:	redirection_atom+;
 redirection_atom
 	:	redirection_operator BLANK? redirection_destination -> ^(REDIR redirection_operator redirection_destination)
-	|	BLANK? process_substitution;
+	|	BLANK!? process_substitution;
 
 process_substitution
 	:	(dir=LESS_THAN|dir=GREATER_THAN)LPAREN BLANK* command_list BLANK* RPAREN
@@ -511,28 +511,37 @@ keyword_negation_primary
 	:	BANG BLANK keyword_condition_primary -> ^(NEGATION keyword_condition_primary);
 keyword_condition_primary
 	:	LPAREN! BLANK!? keyword_condition BLANK!? RPAREN!
-	|	keyword_condition_binary
-	|	(unary_operator) => keyword_condition_unary;
+	|	(unary_operator) => keyword_condition_unary
+	|	keyword_condition_binary;
 keyword_condition_unary
 	:	unary_operator^ BLANK! condition_part;
 keyword_condition_binary
 	:	condition_part
 		(
-			(BLANK? EQUALS TILDE) => BLANK? EQUALS TILDE BLANK? bash_pattern_part
+			(BLANK EQUALS TILDE) => BLANK EQUALS TILDE BLANK bash_pattern_part
 				-> ^(MATCH_REGULAR_EXPRESSION condition_part ^(STRING bash_pattern_part))
-			|	BLANK? keyword_binary_string_operator BLANK? right=condition_part
+			|	BLANK keyword_binary_string_operator BLANK right=condition_part
 					-> ^(keyword_binary_string_operator condition_part $right)
-			|	BLANK? (BANG EQUALS) BLANK? extended_pattern_match+
-					-> ^(NOT_MATCH_PATTERN condition_part extended_pattern_match+)
-			|	BLANK? (EQUALS EQUALS) BLANK? extended_pattern_match+
-					-> ^(MATCH_PATTERN condition_part extended_pattern_match+)
-		)?;
+			|	BLANK (BANG EQUALS) BLANK extended_pattern_match+
+					-> ^(NOT_MATCH_PATTERN condition_part ^(STRING extended_pattern_match+))
+			|	BLANK (EQUALS EQUALS) BLANK extended_pattern_match+
+					-> ^(MATCH_PATTERN condition_part ^(STRING extended_pattern_match+))
+			|	-> condition_part
+		);
 //TODO improve this rule
 bash_pattern_part
+scope {
+	int parens;
+}
+@init {
+	$bash_pattern_part::parens = 0;
+}
 	:(
 		(ESC BLANK) => ESC BLANK
 		|	(ESC RSQUARE) => ESC RSQUARE
-		|	~(BLANK|RSQUARE|EOL|LOGICAND|LOGICOR|RPAREN)
+		|	LPAREN { if(LA(-2) != ESC) $bash_pattern_part::parens++; }
+		|	{$bash_pattern_part::parens != 0}? => RPAREN { if(LA(-2) != ESC) $bash_pattern_part::parens--; }
+		|	~(BLANK|RSQUARE|EOL|LOGICAND|LOGICOR|LPAREN|RPAREN)
 	 )+;
 keyword_binary_string_operator
 	:	binary_operator
@@ -542,17 +551,17 @@ keyword_binary_string_operator
 
 builtin_condition
 	:	((BANG) => builtin_negation_primary|builtin_keyword_condition_primary)
-		(BLANK!? builtin_logic_operator^ BLANK!? builtin_condition)?;
+		(BLANK! builtin_logic_operator^ BLANK! builtin_condition)?;
 builtin_negation_primary
 	:	BANG BLANK builtin_keyword_condition_primary -> ^(NEGATION builtin_keyword_condition_primary);
 builtin_keyword_condition_primary
 	:	LPAREN! BLANK!? builtin_condition BLANK!? RPAREN!
-	|	builtin_condition_binary
-	|	builtin_condition_unary;
+	|	(unary_operator) => builtin_condition_unary
+	|	builtin_condition_binary;
 builtin_condition_unary
 	:	unary_operator^ BLANK! condition_part;
 builtin_condition_binary
-	:	condition_part (BLANK!? builtin_binary_string_operator^ BLANK!? condition_part)?;
+	:	condition_part (BLANK! builtin_binary_string_operator^ BLANK! condition_part)?;
 builtin_binary_string_operator
 	:	binary_operator
 	|	(EQUALS EQUALS) => EQUALS EQUALS -> EQUALS
@@ -570,7 +579,7 @@ unary_operator
 
 // TODO support brace expansion
 condition_part
-	:	name -> ^(STRING name);
+	:	string_expr;
 
 name
 	:	NAME |	LETTER | UNDERSCORE;

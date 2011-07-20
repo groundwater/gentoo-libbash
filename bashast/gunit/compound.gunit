@@ -19,18 +19,18 @@
 gunit java_libbash;
 
 condition_comparison:
-//"[[ -a this/is.afile ]]" -> (COMPOUND_COND (KEYWORD_TEST (a (STRING this / is . afile))))
-//"[[ -a this/is.afile]]" FAIL
-//"[[-a this/is.afile ]]" FAIL
-//"[[
-//-a this/is.afile ]]" -> (COMPOUND_COND (KEYWORD_TEST (a (STRING this / is . afile))))
-//"test ! -a this/is.afile" -> (COMPOUND_COND (BUILTIN_TEST (NEGATION (a (STRING this / is . afile)))))
+"[[ -a this/is.afile ]]" -> (COMPOUND_COND (KEYWORD_TEST (a (STRING this / is . afile))))
+"[[ -a this/is.afile]]" FAIL
+"[[-a this/is.afile ]]" FAIL
+"[[
+-a this/is.afile ]]" -> (COMPOUND_COND (KEYWORD_TEST (a (STRING this / is . afile))))
+"test ! -a this/is.afile" -> (COMPOUND_COND (BUILTIN_TEST (NEGATION (a (STRING this / is . afile)))))
 "[[ -a afile ]]" -> (COMPOUND_COND (KEYWORD_TEST (a (STRING afile))))
 "[[ -a afile]]" FAIL
 "[[-a afile ]]" FAIL
 "[[
 -a afile ]]" -> (COMPOUND_COND (KEYWORD_TEST (a (STRING afile))))
-//"test ! -a this/is.afile" -> (COMPOUND_COND (BUILTIN_TEST (NEGATION (a (STRING this / is . afile)))))
+"test ! -a this/is.afile" -> (COMPOUND_COND (BUILTIN_TEST (NEGATION (a (STRING this / is . afile)))))
 "[[ asdf > qwert ]]" -> (COMPOUND_COND (KEYWORD_TEST (> (STRING asdf) (STRING qwert))))
 "[ asdf \> qwert ]" -> (COMPOUND_COND (BUILTIN_TEST (\> (STRING asdf) (STRING qwert))))
 

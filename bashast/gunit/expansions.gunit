@@ -18,7 +18,6 @@
 */
 gunit java_libbash;
 
-/*
 command_list:
 "echo a{b,c,d}" -> (LIST (COMMAND (STRING echo) (STRING a (BRACE_EXP (STRING b) (STRING c) (STRING d)))))
 "((5+5))" -> (LIST (COMMAND (ARITHMETIC_EXPRESSION (+ 5 5))))
@@ -29,7 +28,6 @@ command_list:
 echo $each
 done" -> (LIST (COMMAND (for each (STRING (COMMAND_SUB `ls |grep output`)) (LIST (COMMAND (STRING echo) (STRING (VAR_REF each)))))))
 "wc <(cat /usr/share/dict/linux.words)" -> (LIST (COMMAND (STRING wc) (PROCESS_SUBSTITUTION < (LIST (COMMAND (STRING cat) (STRING / usr / share / dict / linux . words))))))
-*/
 
 all_expansions:
 "abc $(ab) ${ab} $((ab)) `ab` \"ab\" 'ab'" -> (STRING abc   (COMMAND_SUB $(ab))   (VAR_REF ab)   (ARITHMETIC_EXPRESSION (VAR_REF ab))   (COMMAND_SUB `ab`)   (DOUBLE_QUOTED_STRING ab)   'ab')
