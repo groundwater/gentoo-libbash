@@ -711,8 +711,8 @@ parameter_expansion
 				-> ^(parameter_value_operator variable_name parameter_expansion_value)
 			|	COLON BLANK? os=explicit_arithmetic (COLON BLANK? len=explicit_arithmetic)?
 				-> ^(OFFSET variable_name $os ^($len)?)
-			|	parameter_delete_operator parameter_replace_pattern
-				-> ^(parameter_delete_operator variable_name parameter_replace_pattern)
+			|	parameter_delete_operator parameter_delete_pattern
+				-> ^(parameter_delete_operator variable_name parameter_delete_pattern)
 			|	parameter_replace_operator parameter_replace_pattern (SLASH parameter_expansion_value)?
 				-> ^(parameter_replace_operator variable_name parameter_replace_pattern parameter_expansion_value?)
 			|	BLANK? -> variable_name
@@ -741,6 +741,8 @@ parameter_value_operator
 	|	PLUS -> USE_ALTERNATE_WHEN_UNSET;
 parameter_replace_pattern
 	:	((~SLASH) => parameter_pattern_part)+ -> ^(STRING parameter_pattern_part+);
+parameter_delete_pattern
+	:	parameter_pattern_part+ -> ^(STRING parameter_pattern_part+);
 parameter_pattern_part
 	:	extended_pattern_match|BLANK|SEMIC;
 

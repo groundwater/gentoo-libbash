@@ -42,7 +42,7 @@ variable_reference:
 "${foo%bar}" -> (VAR_REF (LAZY_REMOVE_AT_END foo (STRING bar)))
 "${foo%%bar}" -> (VAR_REF (REPLACE_AT_END foo (STRING bar)))
 "${foo%; *}" -> (VAR_REF (LAZY_REMOVE_AT_END foo (STRING ;   MATCH_ALL)))
-//"${foo%/}" -> (VAR_REF (LAZY_REMOVE_AT_END foo (STRING /)))
+"${foo%/}" -> (VAR_REF (LAZY_REMOVE_AT_END foo (STRING /)))
 "${this/is/pattern}"->(VAR_REF (REPLACE_FIRST this (STRING is) (STRING pattern)))
 //Test positional/special parameters
 "$1" -> (VAR_REF 1)
