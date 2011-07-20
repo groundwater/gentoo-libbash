@@ -120,6 +120,11 @@ tokens{
 	bool double_quoted = false;
 #else
 	boolean double_quoted = false;
+
+	int LA(int index)
+	{
+		return input.LA(index);
+	}
 #endif
 }
 
@@ -723,7 +728,7 @@ SEMIC	:	';';
 DOUBLE_SEMIC
 	:	';;';
 PIPE	:	'|';
-DQUOTE	:	'"' { double_quoted = !double_quoted; };
+DQUOTE	:	'"' { if(LA(-1) != '\\') double_quoted = !double_quoted; };
 SQUOTE	:	{ double_quoted }? => '\'';
 SINGLE_QUOTED_STRING_TOKEN	:	{ !double_quoted }? => '\'' .* '\'';
 COMMA	:	',';

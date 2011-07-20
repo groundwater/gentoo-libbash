@@ -64,3 +64,4 @@ echo $FOO010
 echo "abc #av### ##" # for comment
 echo $'abc\tdef\nxyz'
 echo -e "\'\"\t\n"
+echo 'quotes should be handled correctly'
