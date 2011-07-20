@@ -611,13 +611,12 @@ quoted_string
 double_quoted_string
 	:	DQUOTE double_quoted_string_part* DQUOTE -> ^(DOUBLE_QUOTED_STRING double_quoted_string_part*);
 double_quoted_string_part
-options{ backtrack = true; memoize = true; }
-	:	variable_reference
-	|	command_substitution
-	|	arithmetic_expansion
-	|	ESC DQUOTE -> DQUOTE
-	|	ESC TICK -> TICK
-	|	ESC DOLLAR -> DOLLAR
+	:	(DOLLAR (LBRACE|name|num|TIMES|AT|POUND|QMARK|MINUS|DOLLAR|BANG)) => variable_reference
+	|	(command_substitution) => command_substitution
+	|	(DOLLAR (LLPAREN|LSQUARE)) => arithmetic_expansion
+	|	(ESC DQUOTE) => ESC DQUOTE -> DQUOTE
+	|	(ESC TICK) => ESC TICK -> TICK
+	|	(ESC DOLLAR) => ESC DOLLAR -> DOLLAR
 	|	~(TICK|DQUOTE);
 
 string_part
