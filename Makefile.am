@@ -51,6 +51,7 @@ BASH_TESTS = scripts/var_def.bash \
 			 scripts/command_execution.bash \
 			 scripts/function_def.bash \
 			 scripts/arithmetic_assignment.bash \
+			 scripts/var_expansion.bash \
 			 scripts/binary_arithmetic.bash
 
 EBUILD_LOG_COMPILER = $(srcdir)/test/ebuild_compiler.sh

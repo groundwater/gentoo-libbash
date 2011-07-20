@@ -450,19 +450,30 @@ array_name returns[std::string libbash_value]
 	|TIMES { $libbash_value = "*"; }
 	|AT { $libbash_value = "*"; };
 
+// Now the rule will call back to parser and perform the expansions
+raw_string returns[std::string libbash_value]
+@declarations {
+	std::string str;
+}
+	:(^(STRING EMPTY_EXPANSION_VALUE)) => ^(STRING EMPTY_EXPANSION_VALUE)
+	|^(STRING (libbash_string=any_string { str += libbash_string; })+) {
+		bash_ast ast(std::stringstream(str), &bash_ast::parser_all_expansions);
+		libbash_value = ast.interpret_with(*walker, &bash_ast::walker_string_expr);
+	};
+
 var_expansion returns[std::string libbash_value]
 @declarations {
 	using namespace boost::xpressive;
 	sregex replace_pattern;
 	bool greedy;
 }
-	:^(USE_DEFAULT_WHEN_UNSET_OR_NULL var_name libbash_word=word) {
+	:^(USE_DEFAULT_WHEN_UNSET_OR_NULL var_name libbash_word=raw_string) {
 		libbash_value = walker->do_default_expansion($var_name.libbash_value, libbash_word, $var_name.index);
 	}
-	|^(ASSIGN_DEFAULT_WHEN_UNSET_OR_NULL var_name libbash_word=word) {
+	|^(ASSIGN_DEFAULT_WHEN_UNSET_OR_NULL var_name libbash_word=raw_string) {
 		libbash_value = walker->do_assign_expansion($var_name.libbash_value, libbash_word, $var_name.index);
 	}
-	|^(USE_ALTERNATE_WHEN_UNSET_OR_NULL var_name libbash_word=word) {
+	|^(USE_ALTERNATE_WHEN_UNSET_OR_NULL var_name libbash_word=raw_string) {
 		libbash_value = walker->do_alternate_expansion($var_name.libbash_value, libbash_word, $var_name.index);
 	}
 	|(^(OFFSET array_name arithmetics arithmetics)) => ^(OFFSET libbash_name=array_name offset=arithmetics length=arithmetics) {
@@ -485,24 +496,24 @@ var_expansion returns[std::string libbash_value]
 			libbash_value = boost::lexical_cast<std::string>(walker->get_array_length(libbash_name));
 		}
 	))
-	|^(REPLACE_ALL var_name bash_pattern[replace_pattern, true] (replacement=string_expr)?) {
+	|^(REPLACE_ALL var_name bash_pattern[replace_pattern, true] (libbash_word=raw_string)?) {
 		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
 													 std::bind(&interpreter::replace_all,
 															   std::placeholders::_1,
 															   replace_pattern,
-															   replacement.libbash_value),
+															   libbash_word),
 													 $var_name.index);
 	}
-	|^(REPLACE_AT_END var_name bash_pattern[replace_pattern, true] (replacement=string_expr)?) {
+	|^(REPLACE_AT_END var_name bash_pattern[replace_pattern, true] (libbash_word=raw_string)?) {
 		replace_pattern = sregex(replace_pattern >> eos);
 		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
 													 std::bind(&interpreter::replace_all,
 															   std::placeholders::_1,
 															   replace_pattern,
-															   replacement.libbash_value),
+															   libbash_word),
 													 $var_name.index);
 	}
-	|^(LAZY_REMOVE_AT_END var_name bash_pattern[replace_pattern, false] (replacement=string_expr)?) {
+	|^(LAZY_REMOVE_AT_END var_name bash_pattern[replace_pattern, false] (libbash_word=raw_string)?) {
 		replace_pattern = sregex(bos >> (s1=*_) >> replace_pattern >> eos);
 		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
 													 std::bind(&interpreter::lazy_remove_at_end,
@@ -511,21 +522,21 @@ var_expansion returns[std::string libbash_value]
 													 $var_name.index);
 	}
 	|^((REPLACE_AT_START { greedy = true; }|LAZY_REMOVE_AT_START { greedy = false; })
-		var_name bash_pattern[replace_pattern, greedy] (replacement=string_expr)?) {
+		var_name bash_pattern[replace_pattern, greedy] (libbash_word=raw_string)?) {
 		replace_pattern = sregex(bos >> replace_pattern);
 		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
 													 std::bind(&interpreter::replace_all,
 															   std::placeholders::_1,
 															   replace_pattern,
-															   replacement.libbash_value),
+															   libbash_word),
 													 $var_name.index);
 	}
-	|^(REPLACE_FIRST var_name bash_pattern[replace_pattern, true] (replacement=string_expr)?) {
+	|^(REPLACE_FIRST var_name bash_pattern[replace_pattern, true] (libbash_word=raw_string)?) {
 		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
 													 std::bind(&interpreter::replace_first,
 															   std::placeholders::_1,
 															   replace_pattern,
-															   replacement.libbash_value),
+															   libbash_word),
 													 $var_name.index);
 	};
 

@@ -92,6 +92,10 @@ public:
   /// \param tree_parser the pointer to the tree_parser
   static long walker_arithmetics(libbashWalker_Ctx_struct* tree_parser);
 
+  /// \brief the functor for walker string_expr rule
+  /// \param tree_parser the pointer to the tree_parser
+  static std::string walker_string_expr(libbashWalker_Ctx_struct* tree_parser);
+
   /// \brief call a function that is defined in the AST
   /// \param tree_parser the pointer to the tree_parser
   /// \param index the function index
@@ -105,6 +109,10 @@ public:
   /// \brief the functor for parser arithmetics rule
   /// \param parser the pointer to the parser
   static pANTLR3_BASE_TREE parser_arithmetics(libbashParser_Ctx_struct* parser);
+
+  /// \brief the functor for parser all_expansions rule
+  /// \param parser the pointer to the parser
+  static pANTLR3_BASE_TREE parser_all_expansions(libbashParser_Ctx_struct* parser);
 
   ///
   /// \brief interpret the script with a given interpreter

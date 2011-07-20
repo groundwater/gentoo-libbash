@@ -211,6 +211,11 @@ long bash_ast::walker_arithmetics(plibbashWalker tree_parser)
   return tree_parser->arithmetics(tree_parser);
 }
 
+std::string bash_ast::walker_string_expr(libbashWalker_Ctx_struct* tree_parser)
+{
+  return tree_parser->string_expr(tree_parser).libbash_value;
+}
+
 pANTLR3_BASE_TREE bash_ast::parser_start(plibbashParser parser)
 {
   return parser->start(parser).tree;
@@ -219,6 +224,11 @@ pANTLR3_BASE_TREE bash_ast::parser_start(plibbashParser parser)
 pANTLR3_BASE_TREE bash_ast::parser_arithmetics(plibbashParser parser)
 {
   return parser->arithmetics(parser).tree;
+}
+
+pANTLR3_BASE_TREE bash_ast::parser_all_expansions(libbashParser_Ctx_struct* parser)
+{
+  return parser->all_expansions(parser).tree;
 }
 
 void bash_ast::call_function(plibbashWalker ctx,
