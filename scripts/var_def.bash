@@ -82,3 +82,5 @@ function foo() {
     echo ${bar[@]}
 }
 foo
+bar=@
+echo $bar
