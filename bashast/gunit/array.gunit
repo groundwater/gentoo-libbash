@@ -31,6 +31,9 @@ variable_definition_atom:
 "asdf+=()" -> (PLUS_ASSIGN asdf ARRAY)
 "asdf+=(a)" -> (PLUS_ASSIGN asdf (ARRAY (STRING a)))
 
+builtin_variable_definitions:
+"asdf=(a b c d) ade acd=bde" -> (LIST (COMMAND (VARIABLE_DEFINITIONS (= asdf (ARRAY (STRING a) (STRING b) (STRING c) (STRING d))) (= acd (STRING bde)))))
+
 variable_reference:
 "$asdf" -> (VAR_REF asdf)
 "${asdf[0]:-default}" -> (VAR_REF (USE_DEFAULT_WHEN_UNSET_OR_NULL (asdf 0) (STRING default)))

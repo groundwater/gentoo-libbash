@@ -237,6 +237,11 @@ pANTLR3_BASE_TREE bash_ast::parser_all_expansions(libbashParser_Ctx_struct* pars
   return parser->all_expansions(parser).tree;
 }
 
+pANTLR3_BASE_TREE bash_ast::parser_builtin_variable_definitions(libbashParser_Ctx_struct* parser)
+{
+  return parser->builtin_variable_definitions(parser).tree;
+}
+
 void bash_ast::call_function(plibbashWalker ctx,
                              ANTLR3_MARKER index)
 {

@@ -313,11 +313,12 @@ command_atom
 	:	(FOR|SELECT|IF|WHILE|UNTIL|CASE|LPAREN|LBRACE|LLPAREN|LSQUARE|TEST_EXPR) => compound_command
 	|	FUNCTION BLANK string_expr_no_reserved_word ((BLANK? parens wspace?)|wspace) compound_command
 			-> ^(FUNCTION string_expr_no_reserved_word compound_command)
-	|	(name (LSQUARE|EQUALS|PLUS EQUALS)|LOCAL|EXPORT) => variable_definitions
+	|	(name (LSQUARE|EQUALS|PLUS EQUALS)|LOCAL) => variable_definitions
 			(
 				(BLANK bash_command) => BLANK bash_command -> bash_command variable_definitions
 				|	-> ^(VARIABLE_DEFINITIONS variable_definitions)
 			)
+	|	(EXPORT) => EXPORT BLANK export_item -> ^(STRING EXPORT) ^(STRING ^(DOUBLE_QUOTED_STRING export_item))
 	|	string_expr_no_reserved_word
 		(
 			(BLANK? parens) => BLANK? parens wspace? compound_command
@@ -355,7 +356,6 @@ variable_definitions
 	:	(
 			variable_definition_atom ((BLANK name (LSQUARE|EQUALS|PLUS EQUALS)) => BLANK! variable_definition_atom)*
 			|	(LOCAL) => LOCAL BLANK! local_item ((BLANK name) => BLANK! local_item)*
-			|	(EXPORT) => EXPORT! ((BLANK name) => BLANK! export_item)+
 		);
 
 variable_definition_atom
@@ -406,6 +406,13 @@ local_item
 #endif
 	} ->;
 export_item
+	:	((~EOL) => (string_expr_part|BLANK|LPAREN|RPAREN))+;
+
+builtin_variable_definitions
+	:	(builtin_variable_definition_atom) (BLANK builtin_variable_definition_atom)*
+			-> ^(LIST ^(COMMAND ^(VARIABLE_DEFINITIONS builtin_variable_definition_atom +)));
+
+builtin_variable_definition_atom
 	:	variable_definition_atom
 	|	name ->;
 

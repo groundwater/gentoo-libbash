@@ -115,6 +115,10 @@ public:
   /// \param parser the pointer to the parser
   static pANTLR3_BASE_TREE parser_all_expansions(libbashParser_Ctx_struct* parser);
 
+  /// \brief the functor for parser builtin_variable_definitions rule
+  /// \param parser the pointer to the parser
+  static pANTLR3_BASE_TREE parser_builtin_variable_definitions(libbashParser_Ctx_struct* parser);
+
   ///
   /// \brief interpret the script with a given interpreter
   /// \param walker the interpreter object

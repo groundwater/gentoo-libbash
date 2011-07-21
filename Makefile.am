@@ -196,6 +196,8 @@ libcppbash_la_SOURCES = src/common.h \
 						src/builtins/echo_builtin.h \
 						src/builtins/eval_builtin.cpp \
 						src/builtins/eval_builtin.h \
+						src/builtins/export_builtin.cpp \
+						src/builtins/export_builtin.h \
 						src/builtins/declare_builtin.cpp \
 						src/builtins/declare_builtin.h \
 						src/builtins/boolean_builtins.h \

@@ -34,6 +34,7 @@
 #include "builtins/declare_builtin.h"
 #include "builtins/echo_builtin.h"
 #include "builtins/eval_builtin.h"
+#include "builtins/export_builtin.h"
 #include "builtins/inherit_builtin.h"
 #include "builtins/let_builtin.h"
 #include "builtins/return_builtin.h"
@@ -57,6 +58,7 @@ cppbash_builtin::builtins_type& cppbash_builtin::builtins() {
       {"continue", boost::factory<continue_builtin*>()},
       {"echo", boost::factory<echo_builtin*>()},
       {"eval", boost::factory<eval_builtin*>()},
+      {"export", boost::factory<export_builtin*>()},
       {"declare", boost::factory<declare_builtin*>()},
       {"source", boost::factory<source_builtin*>()},
       {"shift", boost::factory<shift_builtin*>()},
