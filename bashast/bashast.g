@@ -136,6 +136,8 @@ tokens{
 	C_INCLUDE #include <string>
 
 	C_INCLUDE #include <boost/numeric/conversion/cast.hpp>
+
+	C_INCLUDE #include "core/exceptions.h"
 }
 @members
 {
@@ -393,7 +395,14 @@ array_atom
 
 local_item
 	:	variable_definition_atom
-	|	name -> ^(EQUALS name);
+	|	name -> ^(EQUALS name)
+	|	MINUS op=LETTER {
+#ifdef OUTPUT_C
+		std::string option = get_string(op);
+		if(option != "i" && option != "a")
+			throw libbash::unsupported_exception("We do not support -" + option + " for local");
+#endif
+	} ->;
 export_item
 	:	variable_definition_atom
 	|	name ->;
