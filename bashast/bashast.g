@@ -446,7 +446,7 @@ for_expr
 		(
 			name wspace
 			(
-				IN for_each_value* (SEMIC|EOL) wspace?
+				IN for_each_value* BLANK? (SEMIC|EOL) wspace?
 				|SEMIC wspace?
 				|
 			) DO wspace command_list semiel DONE -> ^(FOR name for_each_value* command_list)
