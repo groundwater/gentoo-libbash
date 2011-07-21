@@ -113,6 +113,7 @@ tokens{
 	MINUS_SIGN;
 
 	NOT_EQUALS;
+	EQUALS_TO;
 	BUILTIN_LOGIC;
 }
 
@@ -864,7 +865,17 @@ arithmetic
 		);
 
 arithmetic_assignment_operator
-	:	EQUALS|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN|OR_ASSIGN;
+	:	{LA(1) == EQUALS && LA(2) != EQUALS}? => EQUALS
+	|	MUL_ASSIGN
+	|	DIVIDE_ASSIGN
+	|	MOD_ASSIGN
+	|	PLUS_ASSIGN
+	|	MINUS_ASSIGN
+	|	LSHIFT_ASSIGN
+	|	RSHIFT_ASSIGN
+	|	AND_ASSIGN
+	|	XOR_ASSIGN
+	|	OR_ASSIGN;
 
 arithmetic_variable_reference
 	:	variable_reference -> ^(VAR_REF variable_reference);
@@ -910,6 +921,7 @@ compare_operator
 	|	GEQ
 	|	LESS_THAN
 	|	GREATER_THAN
+	|	EQUALS EQUALS -> EQUALS_TO
 	|	BANG EQUALS -> NOT_EQUALS;
 bitwiseand
 	:	compare (AMP^ BLANK!? compare)*;

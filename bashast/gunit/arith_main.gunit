@@ -80,6 +80,7 @@ arithmetics_test:
 "17" ->"17"
 "19<20" -> (< 19 20)
 "19!=20" -> (NOT_EQUALS 19 20)
+"19==20" -> (EQUALS_TO 19 20)
 
 //bitwiseand:
 "17" -> "17"
