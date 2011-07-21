@@ -57,8 +57,6 @@ condition_expr:
 "[[ x == ab[d-h] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) (STRING ab (MATCH_ANY d - h))))
 "[[ x == ab[!d-h] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) (STRING ab (MATCH_ANY_EXCEPT d - h))))
 "[[ x == ab[^d-h] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) (STRING ab (MATCH_ANY_EXCEPT d - h))))
-//"ab[]c]" -> (STRING ab (MATCH_ANY ] c))
-//"ab[]!]" -> (STRING ab (MATCH_ANY ] !))
 "[[ x == ab[:alpha:] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) (STRING ab (MATCH_ANY : alpha :))))
 "[[ x == ab[=c=] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) (STRING ab (MATCH_ANY = c =))))
 "[[ x == ab[.c.] ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) (STRING ab (MATCH_ANY . c .))))

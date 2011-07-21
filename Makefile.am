@@ -85,6 +85,8 @@ endif
 if HAVE_GTEST
 TESTS += cppunittests \
 		 test/verify_error_output_test.sh \
+		 test/ast_printer_test.sh \
+		 test/verify_bashs_test.sh \
 		 test/bash_result_tests.sh
 check_PROGRAMS = cppunittests
 
