@@ -724,8 +724,13 @@ parameter_expansion
 		(
 			(parameter_value_operator) => parameter_value_operator parameter_expansion_value
 				-> ^(parameter_value_operator variable_name parameter_expansion_value)
-			|	COLON BLANK? os=explicit_arithmetic (COLON BLANK? len=explicit_arithmetic)?
-				-> ^(OFFSET variable_name $os ^($len)?)
+			|	COLON BLANK?
+				(
+					os=explicit_arithmetic (COLON BLANK? len=explicit_arithmetic)?
+						-> ^(OFFSET variable_name $os ^($len)?)
+					|	COLON BLANK? len=explicit_arithmetic
+						-> ^(OFFSET variable_name NUMBER["0"] ^($len)?)
+				)
 			|	parameter_delete_operator parameter_delete_pattern
 				-> ^(parameter_delete_operator variable_name parameter_delete_pattern)
 			|	parameter_replace_operator parameter_replace_pattern (SLASH parameter_expansion_value)?
