@@ -1084,6 +1084,7 @@ arithmetics returns[long value]
 	|^(LESS_THAN l=arithmetics r=arithmetics) { $value = l < r; }
 	|^(GREATER_THAN l=arithmetics r=arithmetics) { $value = l > r; }
 	|^(NOT_EQUALS l=arithmetics r=arithmetics) { $value = l != r; }
+	|^(EQUALS_TO l=arithmetics r=arithmetics) { $value = l == r; }
 	|^(LSHIFT l=arithmetics r=arithmetics) { $value = l << r; }
 	|^(RSHIFT l=arithmetics r=arithmetics) { $value = l >> r; }
 	|^(PLUS l=arithmetics r=arithmetics) { $value = l + r; }
