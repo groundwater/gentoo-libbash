@@ -357,7 +357,7 @@ composite_pattern[boost::xpressive::sregex& pattern_list, bool greedy]
 	sregex sub_pattern;
 }
 	:(^(BRANCH
-		(basic_pattern[sub_pattern, $greedy, do_sub_append]{
+		(basic_pattern[sub_pattern, $greedy, do_sub_append])+ {
 			if(do_append)
 			{
 				$pattern_list = sregex($pattern_list | sub_pattern);
@@ -368,7 +368,7 @@ composite_pattern[boost::xpressive::sregex& pattern_list, bool greedy]
 				do_append = true;
 			}
 			do_sub_append = false;
-		})+
+		}
 	))+;
 
 basic_pattern[boost::xpressive::sregex& pattern, bool greedy, bool& do_append]
@@ -987,27 +987,24 @@ case_expr
 
 case_clause[const std::string& target] returns[bool matched]
 @declarations {
-	std::vector<boost::xpressive::sregex> patterns;
+	boost::xpressive::sregex pattern;
 }
-	:^(CASE_PATTERN ( { patterns.push_back(boost::xpressive::sregex()); } bash_pattern[patterns.back(), true])+ {
-		$matched = false;
-
-		for(auto iter = patterns.begin(); iter != patterns.end(); ++iter)
+	:^(CASE_PATTERN composite_pattern[pattern, true] {
+		if(match(target, pattern))
 		{
-			if(match(target, *iter))
+			if(LA(1) == CASE_COMMAND)
 			{
-				if(LA(1) == CASE_COMMAND)
-				{
-					// omit CASE_COMMAND
-					SEEK(INDEX() + 1);
-					command_list(ctx);
-				}
-				$matched = true;
-				break;
+				// omit CASE_COMMAND
+				SEEK(INDEX() + 1);
+				command_list(ctx);
 			}
+			$matched = true;
 		}
-		if(!$matched)
+		else
+		{
+			$matched = false;
 			seek_to_next_tree(ctx);
+		}
 	})
 	|CASE_PATTERN;
 
