@@ -28,8 +28,8 @@ variable_definition_atom:
 		${VAR}
 )" -> (= asdf (ARRAY (STRING - - disable - dependency - tracking) (STRING (VAR_REF VAR))))
 "asdf=()" -> (= asdf ARRAY)
-"asdf+=()" -> (+= asdf ARRAY)
-"asdf+=(a)" -> (+= asdf (ARRAY (STRING a)))
+"asdf+=()" -> (PLUS_ASSIGN asdf ARRAY)
+"asdf+=(a)" -> (PLUS_ASSIGN asdf (ARRAY (STRING a)))
 
 variable_reference:
 "$asdf" -> (VAR_REF asdf)

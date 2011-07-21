@@ -111,6 +111,8 @@ tokens{
 
 	PLUS_SIGN;
 	MINUS_SIGN;
+	PLUS_ASSIGN;
+	MINUS_ASSIGN;
 
 	NOT_EQUALS;
 	EQUALS_TO;
@@ -311,7 +313,7 @@ command_atom
 	:	(FOR|SELECT|IF|WHILE|UNTIL|CASE|LPAREN|LBRACE|LLPAREN|LSQUARE|TEST_EXPR) => compound_command
 	|	FUNCTION BLANK string_expr_no_reserved_word ((BLANK? parens wspace?)|wspace) compound_command
 			-> ^(FUNCTION string_expr_no_reserved_word compound_command)
-	|	(name (LSQUARE|EQUALS|PLUS_ASSIGN)|LOCAL|EXPORT) => variable_definitions
+	|	(name (LSQUARE|EQUALS|PLUS EQUALS)|LOCAL|EXPORT) => variable_definitions
 			(
 				(BLANK bash_command) => BLANK bash_command -> bash_command variable_definitions
 				|	-> ^(VARIABLE_DEFINITIONS variable_definitions)
@@ -351,7 +353,7 @@ command_atom
 
 variable_definitions
 	:	(
-			variable_definition_atom ((BLANK name (LSQUARE|EQUALS|PLUS_ASSIGN)) => BLANK! variable_definition_atom)*
+			variable_definition_atom ((BLANK name (LSQUARE|EQUALS|PLUS EQUALS)) => BLANK! variable_definition_atom)*
 			|	(LOCAL) => LOCAL BLANK! local_item ((BLANK name) => BLANK! local_item)*
 			|	(EXPORT) => EXPORT! ((BLANK name) => BLANK! export_item)+
 		);
@@ -360,8 +362,8 @@ variable_definition_atom
 	:	name LSQUARE BLANK? explicit_arithmetic BLANK? RSQUARE EQUALS string_expr?
 			-> ^(EQUALS ^(name explicit_arithmetic) string_expr?)
 	|	name EQUALS value? -> ^(EQUALS name value?)
-	|	name PLUS_ASSIGN array_value -> ^(PLUS_ASSIGN name array_value)
-	|	name PLUS_ASSIGN string_expr_part?
+	|	name PLUS EQUALS array_value -> ^(PLUS_ASSIGN name array_value)
+	|	name PLUS EQUALS string_expr_part?
 			-> ^(EQUALS name ^(STRING ^(VAR_REF name) string_expr_part?));
 value
 	:	string_expr
@@ -658,7 +660,7 @@ string_part
 ns_string_part
 	:	num|name|escaped_character
 	|OTHER|EQUALS|PCT|PCTPCT|PLUS|MINUS|DOT|DOTDOT|COLON|TEST_EXPR
-	|TILDE|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN|PLUS_ASSIGN|MINUS_ASSIGN
+	|TILDE|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN
 	|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN|LSQUARE|RSQUARE
 	|OR_ASSIGN|CARET|POUND|POUNDPOUND|COMMA|EXPORT|LOCAL|AT;
 
@@ -878,8 +880,8 @@ arithmetic_assignment_operator
 	|	MUL_ASSIGN
 	|	DIVIDE_ASSIGN
 	|	MOD_ASSIGN
-	|	PLUS_ASSIGN
-	|	MINUS_ASSIGN
+	|	PLUS EQUALS -> PLUS_ASSIGN
+	|	MINUS EQUALS -> MINUS_ASSIGN
 	|	LSHIFT_ASSIGN
 	|	RSHIFT_ASSIGN
 	|	AND_ASSIGN
@@ -993,8 +995,6 @@ RSHIFT	:	'>>';
 MUL_ASSIGN	:	'*=';
 DIVIDE_ASSIGN	:	'/=';
 MOD_ASSIGN	:	'%=';
-PLUS_ASSIGN	:	'+=';
-MINUS_ASSIGN	:	'-=';
 LSHIFT_ASSIGN	:	'<<=';
 RSHIFT_ASSIGN	:	'>>=';
 AND_ASSIGN	:	'&=';
