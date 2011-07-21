@@ -100,3 +100,20 @@ TEST(brace_expansion, not_in_raw_string)
   bash_ast ast(input);
   EXPECT_THROW(ast.interpret_with(walker), libbash::unsupported_exception);
 }
+
+TEST(local_builtin, outside_function)
+{
+  interpreter walker;
+
+  std::string script = "local a";
+  std::istringstream input(script);
+  bash_ast ast(input);
+  try
+  {
+    ast.interpret_with(walker);
+  }
+  catch(libbash::runtime_exception& e)
+  {
+    EXPECT_STREQ(e.what(), "Define local variables outside function scope");
+  }
+}

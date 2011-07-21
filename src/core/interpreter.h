@@ -304,6 +304,8 @@ public:
                     bool readonly=false,
                     const unsigned index=0)
   {
+    if(local_members.empty())
+      throw libbash::runtime_exception("Define local variables outside function scope");
     local_members.back()[name].reset(new variable(name, value, readonly, index));
   }
 
