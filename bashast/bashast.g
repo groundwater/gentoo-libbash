@@ -404,7 +404,13 @@ bash_command_arguments
 	:	bash_command_argument_atom+ -> ^(STRING bash_command_argument_atom+);
 // TODO support brace expansion and braces
 bash_command_argument_atom
-	:	string_expr_part;
+	:	(LBRACE) =>
+		(
+			(brace_expansion) => brace_expansion
+			|LBRACE
+		)
+	|	RBRACE
+	|	string_expr_part;
 
 parens
 	:	LPAREN BLANK? RPAREN;
