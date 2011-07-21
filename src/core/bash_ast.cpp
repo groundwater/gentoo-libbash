@@ -26,6 +26,7 @@
 #include <sstream>
 #include <thread>
 
+#include <boost/algorithm/string/erase.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 #include "core/exceptions.h"
@@ -34,13 +35,19 @@
 #include "libbashParser.h"
 #include "libbashWalker.h"
 
-bash_ast::bash_ast(const std::istream& source,
-                   std::function<pANTLR3_BASE_TREE(plibbashParser)> p): parse(p)
+void bash_ast::read_script(const std::istream& source)
 {
   std::stringstream stream;
   stream << source.rdbuf();
   script = stream.str();
-  init_parser(script, "unknown source");
+  boost::algorithm::erase_all(script, "\\\n");
+}
+
+bash_ast::bash_ast(const std::istream& source,
+                   std::function<pANTLR3_BASE_TREE(plibbashParser)> p): parse(p)
+{
+  read_script(source);
+  init_parser("unknown source");
 }
 
 bash_ast::bash_ast(const std::string& script_path,
@@ -51,9 +58,8 @@ bash_ast::bash_ast(const std::string& script_path,
   if(!file_stream)
     throw libbash::parse_exception(script_path + " can't be read");
 
-  stream << file_stream.rdbuf();
-  script = stream.str();
-  init_parser(script, script_path);
+  read_script(file_stream);
+  init_parser(script_path);
 }
 
 namespace
@@ -78,7 +84,7 @@ namespace
   }
 }
 
-void bash_ast::init_parser(const std::string& script, const std::string& script_path)
+void bash_ast::init_parser(const std::string& script_path)
 {
   input.reset(antlr3NewAsciiStringInPlaceStream(
     reinterpret_cast<pANTLR3_UINT8>(const_cast<char*>(script.c_str())),

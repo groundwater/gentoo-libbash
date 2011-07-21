@@ -67,7 +67,8 @@ class bash_ast: public boost::noncopyable
 
   typedef std::unique_ptr<libbashWalker_Ctx_struct, std::function<void(libbashWalker_Ctx_struct*)>> walker_pointer;
 
-  void init_parser(const std::string& script, const std::string& script_path);
+  void read_script(const std::istream& source);
+  void init_parser(const std::string& script_path);
   walker_pointer create_walker(interpreter& walker,
                                antlr_pointer<ANTLR3_COMMON_TREE_NODE_STREAM_struct>& nodes);
 

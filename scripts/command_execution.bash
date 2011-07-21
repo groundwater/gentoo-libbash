@@ -69,3 +69,6 @@ echo "$(echo 'hi')"
 echo "`echo 'hi'`"
 array=(`echo 1` `echo 2` 3)
 echo ${array[@]}
+ech\
+o Hello\
+ world
