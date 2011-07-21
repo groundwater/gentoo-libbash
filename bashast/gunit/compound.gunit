@@ -166,8 +166,7 @@ esac" ->  (case (STRING (DOUBLE_QUOTED_STRING (VAR_REF 1))) (CASE_PATTERN (BRANC
 
 "case $asdf in
 a)
-echo \"yay\"
-;;
+echo \"yay\";;
 esac" -> (case (STRING (VAR_REF asdf)) (CASE_PATTERN (BRANCH a) CASE_COMMAND (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING yay))))))
 "case asdf in
 asdf)

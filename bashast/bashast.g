@@ -498,10 +498,10 @@ scope {
 		);
 case_statement
 	:	wspace? (LPAREN BLANK?)? extended_pattern (BLANK? PIPE BLANK? extended_pattern)* BLANK? RPAREN
-		wspace
+		(wspace command_list)?
 		(
-			command_list wspace)? ( (DOUBLE_SEMIC ((wspace ESAC) => wspace ESAC {$case_body::case_end = true;})?)
-			|(ESAC) => ESAC {$case_body::case_end = true;}
+			wspace? DOUBLE_SEMIC ((wspace ESAC) => wspace ESAC {$case_body::case_end = true;})?
+			|wspace ESAC {$case_body::case_end = true;}
 		)
 			-> ^(CASE_PATTERN extended_pattern+ (CASE_COMMAND command_list)?);
 
