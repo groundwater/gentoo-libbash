@@ -842,7 +842,7 @@ variable_name
 	|	POUND;
 
 variable_name_no_digit
-	:	name LSQUARE explicit_arithmetic RSQUARE -> ^(name explicit_arithmetic)
+	:	name LSQUARE BLANK? explicit_arithmetic BLANK? RSQUARE -> ^(name explicit_arithmetic)
 	|	name;
 
 variable_name_for_bang

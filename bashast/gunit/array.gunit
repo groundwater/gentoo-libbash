@@ -46,6 +46,7 @@ variable_reference:
 "${asdf[4]//pattern}" -> (VAR_REF (REPLACE_ALL (asdf 4) (STRING pattern)))
 "${asdf}" -> (VAR_REF asdf)
 "${#asdf[0]}" -> (VAR_REF (# (asdf 0)))
+"${#asdf[ $i ]}" -> (VAR_REF (# (asdf (VAR_REF i))))
 "${asdf[@]}" -> (VAR_REF (ARRAY asdf @))
 "${asdf[*]}" -> (VAR_REF (ARRAY asdf *))
 "${#asdf[@]}" -> (VAR_REF (# (asdf ARRAY_SIZE)))
