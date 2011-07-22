@@ -685,6 +685,8 @@ ns_string_part
 	:	num|name|escaped_character
 	|OTHER|EQUALS|PCT|PCTPCT|PLUS|MINUS|DOT|DOTDOT|COLON|TEST_EXPR
 	|TILDE|LSQUARE|RSQUARE|CARET|POUND|COMMA|EXPORT|LOCAL|AT
+	// Escaped characters
+	|ESC_RPAREN|ESC_LPAREN|ESC_DOLLAR|ESC_GT|ESC_LT|ESC_TICK
 	// The following is for filename expansion
 	|TIMES|QMARK;
 

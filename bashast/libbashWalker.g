@@ -422,10 +422,17 @@ double_quoted_string returns[std::string libbash_value]
 	|libbash_string=any_string { $libbash_value = libbash_string; };
 
 any_string returns[std::string libbash_value]
+options {backtrack = true;}
 @declarations {
 	pANTLR3_BASE_TREE any_token;
 }
-	:any_token=. { $libbash_value = get_string(any_token); };
+	:ESC_RPAREN { $libbash_value = ")"; }
+	|ESC_LPAREN { $libbash_value = "("; }
+	|ESC_DOLLAR { $libbash_value = "$"; }
+	|ESC_GT { $libbash_value = ">"; }
+	|ESC_LT { $libbash_value = "<"; }
+	|ESC_TICK { $libbash_value = "`"; }
+	|any_token=. { $libbash_value = get_string(any_token); };
 
 //Allowable variable names in the variable expansion
 var_name returns[std::string libbash_value, unsigned index]

@@ -72,3 +72,4 @@ echo ${array[@]}
 ech\
 o Hello\
  world
+echo \`\(\)\$\>\<\`

@@ -48,6 +48,7 @@ string_expr:
 "--preserve=timestamps,mode" -> (STRING - - preserve = timestamps , mode)
 "$'asdf'" -> (STRING (ANSI_C_QUOTING 'asdf'))
 "\"abc#$/\"" -> (STRING (DOUBLE_QUOTED_STRING abc # $ /))
+"\`\(\)\$\>\<" -> (STRING \` \( \) \$ \> \<)
 
 condition_expr:
 // bracket patterns
