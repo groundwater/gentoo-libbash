@@ -83,6 +83,8 @@ variable_reference:
 "${#*}" -> (VAR_REF (# *))
 "${##}" -> (VAR_REF (# #))
 "${#$}" -> (VAR_REF (# $))
+"${a/=}" -> (VAR_REF (REPLACE_FIRST a (STRING =)))
+"${a%=}" -> (VAR_REF (LAZY_REMOVE_AT_END a (STRING =)))
 
 variable_definition_atom:
 "MY_PN=${PN/asterisk-}" -> (= MY_PN (STRING (VAR_REF (REPLACE_FIRST PN (STRING asterisk -)))))
