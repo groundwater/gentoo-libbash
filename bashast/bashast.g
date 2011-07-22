@@ -563,10 +563,9 @@ scope {
 }
 	:(
 		(ESC BLANK) => ESC BLANK
-		|	(ESC RSQUARE) => ESC RSQUARE
 		|	LPAREN { if(LA(-2) != ESC) $bash_pattern_part::parens++; }
 		|	{$bash_pattern_part::parens != 0}? => RPAREN { if(LA(-2) != ESC) $bash_pattern_part::parens--; }
-		|	~(BLANK|RSQUARE|EOL|LOGICAND|LOGICOR|LPAREN|RPAREN)
+		|	~(BLANK|EOL|LOGICAND|LOGICOR|LPAREN|RPAREN)
 	 )+;
 keyword_binary_string_operator
 	:	binary_operator
