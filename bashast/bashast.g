@@ -546,7 +546,7 @@ condition_comparison
 condition_expr
 	:	LSQUARE LSQUARE wspace keyword_condition wspace RSQUARE RSQUARE -> ^(KEYWORD_TEST keyword_condition)
 	|	LSQUARE wspace builtin_condition wspace RSQUARE -> ^(BUILTIN_TEST builtin_condition)
-	|	TEST_EXPR wspace builtin_condition-> ^(BUILTIN_TEST builtin_condition);
+	|	TEST_EXPR wspace? builtin_condition-> ^(BUILTIN_TEST builtin_condition);
 
 keyword_condition
 	:	((BANG) => keyword_negation_primary|keyword_condition_primary) (BLANK!? (LOGICOR^|LOGICAND^) BLANK!? keyword_condition)?;
@@ -1044,7 +1044,7 @@ SLASH	:	'/';
 COLON	:	':';
 QMARK	:	'?';
 
-TEST_EXPR	:	'test';
+TEST_EXPR	:	'test ';
 LOCAL	:	'local';
 EXPORT	:	'export';
 LOGICAND	:	'&&';
