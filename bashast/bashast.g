@@ -255,7 +255,8 @@ redirection
 	:	redirection_atom+;
 redirection_atom
 	:	redirection_operator BLANK? redirection_destination -> ^(REDIR redirection_operator redirection_destination)
-	|	BLANK!? process_substitution;
+	|	BLANK!? process_substitution
+	|	here_string;
 
 process_substitution
 	:	(dir=LESS_THAN|dir=GREATER_THAN)LPAREN BLANK* command_list BLANK* RPAREN
@@ -339,9 +340,8 @@ redirection_operator
 command
 	:	command_atom
 		(
-			redirection -> ^(COMMAND command_atom redirection)
+			redirection here_document? -> ^(COMMAND command_atom redirection here_document?)
 			|	here_document -> ^(COMMAND command_atom here_document)
-			|	here_string -> ^(COMMAND command_atom here_string)
 			|	-> ^(COMMAND command_atom)
 		);
 

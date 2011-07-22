@@ -28,6 +28,7 @@ redirection:
 "< this.is.1input" -> (REDIR < (STRING this . is . 1 input))
 " 3< \"input from file\"" -> (REDIR 3 < (STRING (DOUBLE_QUOTED_STRING input   from   file)))
 " 2<&0" -> (REDIR 2 <& (FILE_DESCRIPTOR 0))
+"<<<\"#include <pthread.h>\" >& /dev/null" -> (<<< (STRING (DOUBLE_QUOTED_STRING # include   < pthread . h >))) (REDIR >& (STRING / dev / null))
 
 here_string:
 "<<< herestring" -> (<<< (STRING herestring))
@@ -47,3 +48,7 @@ _EOF_.abc
 " -> (LIST (COMMAND (STRING cat) (<< (STRING blah 
  blah 
 ) (REDIR > (STRING / dev / null)))))
+"cat > /dev/null <<-END_LDSCRIPT
+GNU...
+END_LDSCRIPT" -> (LIST (COMMAND (STRING cat) (REDIR > (STRING / dev / null)) (<<- (STRING GNU .. . 
+))))
