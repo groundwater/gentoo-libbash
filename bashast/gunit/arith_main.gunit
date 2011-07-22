@@ -130,6 +130,7 @@ arithmetics_test:
 arithmetic_expansion:
 "$((5+4, 3+2, a*b))" -> (ARITHMETIC_EXPRESSION (+ 5 4) (+ 3 2) (* (VAR_REF a) (VAR_REF b)))
 "$[1]" -> (ARITHMETIC_EXPRESSION 1)
+"$(($((1))))" -> (ARITHMETIC_EXPRESSION (ARITHMETIC_EXPRESSION 1))
 
 start:
 "echo $(( 3 + 2 ))" -> (LIST (COMMAND (STRING echo) (STRING (ARITHMETIC_EXPRESSION (+ 3 2)))))

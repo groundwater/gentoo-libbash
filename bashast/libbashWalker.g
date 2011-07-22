@@ -1201,5 +1201,6 @@ arithmetics returns[long value]
 	}
 	| NUMBER { $value = parse_integer($NUMBER);}
 	| DIGIT { $value = parse_integer($DIGIT);}
+	|^(ARITHMETIC_EXPRESSION l=arithmetics) { $value = l; }
 	| ^(VAR_REF libbash_string = var_expansion) { $value = boost::lexical_cast<long>(libbash_string); }
 	;

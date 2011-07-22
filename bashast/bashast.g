@@ -874,7 +874,7 @@ commasep
 	:	brace_expansion_part (COMMA! brace_expansion_part)+;
 
 explicit_arithmetic
-	:	arithmetic_part
+	:	(DOLLAR (LLPAREN|LSQUARE)) => arithmetic_part // (the predicate resolves the conflict with the primary rule)
 	|	arithmetics;
 
 arithmetic_expansion
@@ -921,6 +921,7 @@ primary
 	|	command_substitution
 	|	variable_name_no_digit -> ^(VAR_REF variable_name_no_digit)
 	|	variable_reference
+	|	arithmetic_expansion
 	|	LPAREN! (arithmetics) RPAREN!;
 pre_post_primary
 	:	primary;
