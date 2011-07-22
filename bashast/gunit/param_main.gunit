@@ -57,6 +57,7 @@ variable_reference:
 "$*" -> (VAR_REF *)
 "${@}" -> (VAR_REF @)
 "${#}" -> (VAR_REF #)
+"$#" -> (VAR_REF #)
 "${!foo}" -> (VAR_REF (VAR_REF foo))
 "${!#}" -> (VAR_REF (VAR_REF #))
 "${3}" -> (VAR_REF 3)
@@ -75,6 +76,13 @@ variable_reference:
 "${PN/wrong#/#correct}" -> (VAR_REF (REPLACE_FIRST PN (STRING wrong #) (STRING # correct)))
 "${a/b/\}c}" -> (VAR_REF (REPLACE_FIRST a (STRING b) (STRING \ } c)))
 "${a/b/a\}c}" -> (VAR_REF (REPLACE_FIRST a (STRING b) (STRING a \ } c)))
+"${#var}" -> (VAR_REF (# var))
+"${#var[@]}" -> (VAR_REF (# (var ARRAY_SIZE)))
+"${#var[*]}" -> (VAR_REF (# (var ARRAY_SIZE)))
+"${#@}" -> (VAR_REF (# @))
+"${#*}" -> (VAR_REF (# *))
+"${##}" -> (VAR_REF (# #))
+"${#$}" -> (VAR_REF (# $))
 
 variable_definition_atom:
 "MY_PN=${PN/asterisk-}" -> (= MY_PN (STRING (VAR_REF (REPLACE_FIRST PN (STRING asterisk -)))))

@@ -678,7 +678,7 @@ ns_string_part
 	|OTHER|EQUALS|PCT|PCTPCT|PLUS|MINUS|DOT|DOTDOT|COLON|TEST_EXPR
 	|TILDE|MUL_ASSIGN|DIVIDE_ASSIGN|MOD_ASSIGN
 	|LSHIFT_ASSIGN|RSHIFT_ASSIGN|AND_ASSIGN|XOR_ASSIGN|LSQUARE|RSQUARE
-	|OR_ASSIGN|CARET|POUND|POUNDPOUND|COMMA|EXPORT|LOCAL|AT
+	|OR_ASSIGN|CARET|POUND|COMMA|EXPORT|LOCAL|AT
 	// The following is for filename expansion
 	|TIMES|QMARK;
 
@@ -774,10 +774,10 @@ parameter_expansion
 				|	LSQUARE (op=TIMES|op=AT) RSQUARE -> ^(LIST_EXPAND variable_name_for_bang $op)
 				|	-> ^(VAR_REF variable_name_for_bang)
 			)
-		|	variable_size_ref;
+		|	{LA(1) == POUND && LA(2) != RBRACE }? => variable_size_ref;
 parameter_delete_operator
-	:	POUND -> LAZY_REMOVE_AT_START
-	|	POUNDPOUND -> REPLACE_AT_START
+	:	(POUND POUND) => POUND POUND -> REPLACE_AT_START
+	|	POUND -> LAZY_REMOVE_AT_START
 	|	PCT -> LAZY_REMOVE_AT_END
 	|	PCTPCT -> REPLACE_AT_END;
 parameter_value_operator
@@ -840,8 +840,8 @@ variable_name_no_digit
 variable_name_for_bang
 	:	num|name|POUND;
 variable_size_ref
-	:	POUND name LSQUARE array_size_index RSQUARE -> ^(POUND ^(name array_size_index))
-	|	POUND^ name;
+	:	(POUND name LSQUARE) => POUND name LSQUARE array_size_index RSQUARE -> ^(POUND ^(name array_size_index))
+	|	POUND^ variable_name;
 array_size_index
 	:	DIGIT+
 	|	(AT|TIMES) -> ARRAY_SIZE;
@@ -1038,7 +1038,6 @@ ALPHANUM	:	(DIGIT|LETTER);
 TILDE	:	'~';
 HERE_STRING_OP	:	'<<<';
 POUND	:	'#';
-POUNDPOUND	:	'##';
 PCT		:	'%';
 PCTPCT	:	'%%';
 SLASH	:	'/';
