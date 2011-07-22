@@ -141,8 +141,10 @@ tokens{
 
 	C_INCLUDE #include "core/exceptions.h"
 }
+#endif
 @members
 {
+#ifdef OUTPUT_C
 	static std::string get_string(pANTLR3_COMMON_TOKEN token)
 	{
 		if(!token || !token->start)
@@ -166,10 +168,7 @@ tokens{
 	{
 		(&(scope->here_document_word))->std::string::~string();
 	}
-}
 #else
-@members
-{
 	boolean is_here_end(String here_document_word, int number_of_tokens) {
 		String word = "";
 		for(int i = 1; i <= number_of_tokens; ++i)
@@ -188,8 +187,37 @@ tokens{
 	int LA(int index) {
 		return input.LA(index);
 	}
-}
 #endif
+#ifdef OUTPUT_C
+	bool is_special_token(int token)
+#else
+	boolean is_special_token(int token)
+#endif
+	{
+		return token == AMP
+		||token == BLANK
+		// for bash redirection
+		||token == LESS_THAN
+		||token == GREATER_THAN
+		||token == RSHIFT
+		// for end of command
+		||token == SEMIC
+		||token == EOL
+		// for sub shell
+		||token == LPAREN
+		||token == RPAREN
+		// for case statement
+		||token == DOUBLE_SEMIC
+		// for logical operator
+		||token == LOGICAND
+		||token == LOGICOR
+		// for pipeline
+		||token == PIPE
+		// for document and here string
+		||token == HERE_STRING_OP
+		||token == LSHIFT;
+	}
+}
 
 start
 	:	((POUND) =>first_line_comment)? EOL* BLANK? command_list BLANK? (SEMIC|AMP|EOL)? EOF -> command_list;
@@ -326,28 +354,10 @@ command_atom
 			|	(
 					{LA(1) == BLANK &&
 					(
-						LA(2) != AMP
-						// Resolve conflicts with bash redirection
-						&&LA(2) != LESS_THAN
-						&&LA(2) != GREATER_THAN
-						&&LA(2) != RSHIFT
+						!is_special_token(LA(2))
+						// redirection
 						&&(LA(2) != DIGIT || (LA(3) != AMP && LA(3) != LESS_THAN
 											  && LA(3) != GREATER_THAN && LA(3) != RSHIFT))
-						// Resolve conflicts with end of command
-						&&LA(2) != SEMIC
-						&&LA(2) != EOL
-						// Resolve conflict with sub shell
-						&&LA(2) != RPAREN
-						// Resolve conflict with case statement
-						&&LA(2) != DOUBLE_SEMIC
-						// Resolve conflicts with logical operator
-						&&LA(2) != LOGICAND
-						&&LA(2) != LOGICOR
-						// Resolve conflict with pipeline
-						&&LA(2) != PIPE
-						// Resolve conflicts with here document and here string
-						&&LA(2) != HERE_STRING_OP
-						&&LA(2) != LSHIFT
 					)}? => BLANK bash_command_arguments
 				)* -> string_expr_no_reserved_word bash_command_arguments*
 		);
@@ -784,7 +794,7 @@ parameter_replace_pattern
 parameter_delete_pattern
 	:	parameter_pattern_part+ -> ^(STRING parameter_pattern_part+);
 parameter_pattern_part
-	:	extended_pattern_match|BLANK|SEMIC;
+	:	extended_pattern_match|{is_special_token(LA(1))}? => .;
 
 // TODO fix this rule
 parameter_expansion_value
