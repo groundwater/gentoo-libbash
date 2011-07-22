@@ -1076,6 +1076,7 @@ COMMAND_SUBSTITUTION_PAREN
 								return;
 							}
 						}
+					|	SINGLE_QUOTED_STRING_TOKEN
 					|	.
 				)+
 			));

@@ -24,3 +24,4 @@ command_substitution:
 "$(CONTROL= command arg )" -> (COMMAND_SUB $(CONTROL= command arg ))
 "`cat output.log |grep error|cut`" -> (COMMAND_SUB `cat output.log |grep error|cut`)
 "$(function foo() { echo 'hello'; }; foo)" -> (COMMAND_SUB $(function foo() { echo 'hello'; }; foo))
+"$(sed -n 's/^OUTPUT_FORMAT(\"\([^\"]*\)\",.*/\1/p')" OK
