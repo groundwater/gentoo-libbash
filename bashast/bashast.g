@@ -309,8 +309,11 @@ here_document_begin
 	:	(
 			token=~(EOL|BLANK|LESS_THAN|HERE_STRING_OP|AMP|GREATER_THAN|RSHIFT)
 			{
-				$here_document::here_document_word += get_string($token);
-				$here_document::number_of_tokens++;
+				if(LA(-1) != DQUOTE && LA(-1) != ESC)
+				{
+					$here_document::here_document_word += get_string($token);
+					$here_document::number_of_tokens++;
+				}
 			}
 		)+;
 here_document_end

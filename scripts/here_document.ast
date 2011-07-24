@@ -1,3 +1,7 @@
 (LIST (COMMAND (STRING cat) (<< (STRING blah 
  blah 
-) (REDIR > (STRING / dev / null)))) (COMMAND (STRING echo) (STRING hi)))
+) (REDIR > (STRING / dev / null)))) (COMMAND (STRING echo) (STRING hi)) (COMMAND (STRING cat) (REDIR > (STRING (DOUBLE_QUOTED_STRING / dev / null))) (<<- (STRING 
+      java   - Dtijmp . jar = " $(java-config -p tijmp) "   - agentlib : tijmp   " $ { @ } " 
+))) (COMMAND (STRING cat) (REDIR > (STRING (DOUBLE_QUOTED_STRING / dev / null))) (<<- (STRING 
+      java   - Dtijmp . jar = " $(java-config -p tijmp) "   - agentlib : tijmp   " $ { @ } " 
+))))

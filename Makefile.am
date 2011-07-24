@@ -87,6 +87,7 @@ TESTS += cppunittests \
 		 test/verify_error_output_test.sh \
 		 test/ast_printer_test.sh \
 		 test/verify_bashs_test.sh \
+		 test/verify_here_document.sh \
 		 test/bash_result_tests.sh
 check_PROGRAMS = cppunittests
 
@@ -278,9 +279,12 @@ EXTRA_DIST = bashast/bashast.g \
 			 test/ast_printer_test.sh \
 			 test/verify_bashs_test.sh \
 			 test/verify_error_output_test.sh \
+			 test/verify_here_document.sh \
 			 test/bash_result_tests.sh \
 			 scripts/naughty_tests \
 			 scripts/naughty_tests.result \
+			 scripts/here_document.ast \
+			 scripts/here_document.sh \
 			 scripts/source_false.sh \
 			 scripts/source_true.sh \
 			 scripts/source_return.sh \
