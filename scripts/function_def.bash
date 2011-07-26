@@ -87,3 +87,10 @@ if false; then
     }
 fi
 function_in_compound_statement
+
+function shift_test() {
+    shift
+    echo $1
+}
+
+shift_test 1 2

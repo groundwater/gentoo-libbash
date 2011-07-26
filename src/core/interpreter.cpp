@@ -309,7 +309,7 @@ void interpreter::define_function_arguments(scope& current_stack,
   for(auto i = 1u; i <= arguments.size(); ++i)
     positional_args[i] = arguments[i - 1];
 
-  current_stack["*"].reset(new variable("*", positional_args, true));
+  current_stack["*"].reset(new variable("*", positional_args));
 }
 
 namespace
