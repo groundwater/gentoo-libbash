@@ -127,18 +127,31 @@ tokens{
 	BUILTIN_LOGIC;
 }
 
-@lexer::members
+@lexer::context
 {
 #ifdef OUTPUT_C
-	bool double_quoted = false;
-#else
-	boolean double_quoted = false;
+	bool double_quoted;
+	int paren_level;
+#endif
+}
 
+@lexer::apifuncs
+{
+#ifdef OUTPUT_C
+	ctx->double_quoted = false;
+	ctx->paren_level = 0;
+#endif
+}
+
+@lexer::members
+{
+#ifndef OUTPUT_C
+	boolean double_quoted = false;
+	int paren_level = 0;
 	int LA(int index) {
 		return input.LA(index);
 	}
 #endif
-	int paren_level = 0;
 }
 #ifdef OUTPUT_C
 @includes {
@@ -148,6 +161,10 @@ tokens{
 	C_INCLUDE #include <boost/numeric/conversion/cast.hpp>
 
 	C_INCLUDE #include "core/exceptions.h"
+}
+@lexer::postinclude {
+	#define double_quoted ctx->double_quoted
+	#define paren_level ctx->paren_level
 }
 #endif
 @members
