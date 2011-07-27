@@ -445,7 +445,7 @@ local_item
 #endif
 	} ->;
 export_item
-	:	((~EOL) => (string_expr_part|BLANK|LPAREN|RPAREN))+;
+	:	((~EOL) => expansion_base)+;
 
 builtin_variable_definitions
 	:	(builtin_variable_definition_atom) (BLANK builtin_variable_definition_atom)*
@@ -681,22 +681,23 @@ quoted_string
 	|	SINGLE_QUOTED_STRING_TOKEN -> ^(SINGLE_QUOTED_STRING SINGLE_QUOTED_STRING_TOKEN);
 
 double_quoted_string
-	:	DQUOTE double_quoted_string_part* DQUOTE -> ^(DOUBLE_QUOTED_STRING double_quoted_string_part*);
-double_quoted_string_part
+	:	DQUOTE ((~DQUOTE) => expansion_base)* DQUOTE -> ^(DOUBLE_QUOTED_STRING expansion_base*);
+
+// Perform all kinds of expansions
+expansion_base
 	:	(DOLLAR (LBRACE|name|num|TIMES|AT|POUND|QMARK|MINUS|DOLLAR|BANG)) => variable_reference
 	|	(command_substitution) => command_substitution
 	|	(DOLLAR (LLPAREN|LSQUARE)) => arithmetic_expansion
 	|	(ESC DQUOTE) => ESC DQUOTE -> DQUOTE
 	|	(ESC TICK) => ESC TICK -> TICK
 	|	(ESC DOLLAR) => ESC DOLLAR -> DOLLAR
-	|	~(TICK|DQUOTE);
+	|	.;
 
-// Perform all kinds of expansions
 all_expansions
 	:	expansion_atom+ -> ^(STRING expansion_atom+);
 expansion_atom
 	:	(DQUOTE) => double_quoted_string
-	|	double_quoted_string_part;
+	|	expansion_base;
 
 string_part
 	:	ns_string_part
