@@ -373,12 +373,15 @@ command_atom
 	:	(FOR|SELECT|IF|WHILE|UNTIL|CASE|LPAREN|LBRACE|LLPAREN|LSQUARE|TEST_EXPR) => compound_command
 	|	FUNCTION BLANK string_expr_no_reserved_word ((BLANK? parens wspace?)|wspace) compound_command
 			-> ^(FUNCTION string_expr_no_reserved_word compound_command)
-	|	(name (LSQUARE|EQUALS|PLUS EQUALS)|LOCAL) => variable_definitions
+	|	(name (LSQUARE|EQUALS|PLUS EQUALS)) => variable_definitions
 			(
 				(BLANK bash_command) => BLANK bash_command -> bash_command variable_definitions
 				|	-> ^(VARIABLE_DEFINITIONS variable_definitions)
 			)
-	|	(EXPORT) => EXPORT BLANK export_item -> ^(STRING EXPORT) ^(STRING ^(DOUBLE_QUOTED_STRING export_item))
+	|	(EXPORT) => EXPORT BLANK builtin_variable_definition_item
+			-> ^(STRING EXPORT) ^(STRING ^(DOUBLE_QUOTED_STRING builtin_variable_definition_item))
+	|	(LOCAL) => LOCAL BLANK builtin_variable_definition_item
+			-> ^(STRING LOCAL) ^(STRING ^(DOUBLE_QUOTED_STRING builtin_variable_definition_item))
 	|	command_name
 		(
 			(BLANK? parens) => BLANK? parens wspace? compound_command
@@ -403,10 +406,7 @@ command_name
 	|	{LA(1) == GREATER_THAN}? => redirection_atom -> ^(STRING NAME) redirection_atom;
 
 variable_definitions
-	:	(
-			variable_definition_atom ((BLANK name (LSQUARE|EQUALS|PLUS EQUALS)) => BLANK! variable_definition_atom)*
-			|	(LOCAL) => LOCAL BLANK! local_item ((BLANK name) => BLANK! local_item)*
-		);
+	:	variable_definition_atom ((BLANK name (LSQUARE|EQUALS|PLUS EQUALS)) => BLANK! variable_definition_atom)* ;
 
 variable_definition_atom
 	:	name LSQUARE BLANK? explicit_arithmetic BLANK? RSQUARE EQUALS string_expr?
@@ -445,26 +445,26 @@ array_atom
 			|
 		);
 
-local_item
-	:	variable_definition_atom
-	|	name -> ^(EQUALS name)
-	|	MINUS op=LETTER {
-#ifdef OUTPUT_C
-		std::string option = get_string(op);
-		if(option != "i" && option != "a")
-			throw libbash::unsupported_exception("We do not support -" + option + " for local");
-#endif
-	} ->;
-export_item
+builtin_variable_definition_item
 	:	((~EOL) => expansion_base)+;
 
+#ifdef OUTPUT_C
+builtin_variable_definitions[bool local]
+	:	{$local}? => (builtin_variable_definition_atom) (BLANK builtin_variable_definition_atom)*
+			-> ^(LIST ^(COMMAND ^(VARIABLE_DEFINITIONS LOCAL builtin_variable_definition_atom+)))
+	|	{!$local}? => (builtin_variable_definition_atom) (BLANK builtin_variable_definition_atom)*
+			-> ^(LIST ^(COMMAND ^(VARIABLE_DEFINITIONS builtin_variable_definition_atom+)));
+#else
 builtin_variable_definitions
 	:	(builtin_variable_definition_atom) (BLANK builtin_variable_definition_atom)*
-			-> ^(LIST ^(COMMAND ^(VARIABLE_DEFINITIONS builtin_variable_definition_atom +)));
+			-> ^(LIST ^(COMMAND ^(VARIABLE_DEFINITIONS builtin_variable_definition_atom+)));
+#endif
 
 builtin_variable_definition_atom
 	:	variable_definition_atom
-	|	name ->;
+	// We completely ignore the options for export, local and readonly for now
+	|	(MINUS LETTER BLANK) => MINUS LETTER ->
+	|	name -> ^(EQUALS name ^(STRING ^(VAR_REF name)));
 
 bash_command
 	:	string_expr_no_reserved_word ((BLANK bash_command_arguments) => BLANK! bash_command_arguments)*;
@@ -702,6 +702,7 @@ expansion_base
 	|	(ESC DQUOTE) => ESC DQUOTE -> DQUOTE
 	|	(ESC TICK) => ESC TICK -> TICK
 	|	(ESC DOLLAR) => ESC DOLLAR -> DOLLAR
+	|	(brace_expansion) => brace_expansion
 	|	.;
 
 all_expansions

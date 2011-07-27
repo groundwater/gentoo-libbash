@@ -34,9 +34,11 @@ function unset_inner()
 function unset_outer()
 {
     local FOO006=1 FOO007=2
+    local gjl_${FOO006}="${FOO007}"
     unset_inner
     echo "FOO006=$FOO006 in unset_outer"
     echo "FOO007=$FOO007 in unset_outer"
+    echo "gjl_1=${gjl_1}"
     unset FOO006
     echo "FOO006=$FOO006 in unset_outer"
 }

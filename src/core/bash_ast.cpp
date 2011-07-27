@@ -27,6 +27,7 @@
 #include <thread>
 
 #include <boost/algorithm/string/erase.hpp>
+#include <boost/algorithm/string/trim.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
 #include "core/exceptions.h"
@@ -41,6 +42,7 @@ void bash_ast::read_script(const std::istream& source)
   stream << source.rdbuf();
   script = stream.str();
   boost::algorithm::erase_all(script, "\\\n");
+  boost::trim_if(script, boost::is_any_of(" \t\n"));
 }
 
 bash_ast::bash_ast(const std::istream& source,
@@ -237,9 +239,9 @@ pANTLR3_BASE_TREE bash_ast::parser_all_expansions(libbashParser_Ctx_struct* pars
   return parser->all_expansions(parser).tree;
 }
 
-pANTLR3_BASE_TREE bash_ast::parser_builtin_variable_definitions(libbashParser_Ctx_struct* parser)
+pANTLR3_BASE_TREE bash_ast::parser_builtin_variable_definitions(libbashParser_Ctx_struct* parser, bool local)
 {
-  return parser->builtin_variable_definitions(parser).tree;
+  return parser->builtin_variable_definitions(parser, local).tree;
 }
 
 void bash_ast::call_function(plibbashWalker ctx,

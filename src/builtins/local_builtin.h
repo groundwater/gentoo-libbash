@@ -17,27 +17,30 @@
    along with libbash.  If not, see <http://www.gnu.org/licenses/>.
 */
 ///
-/// \file export_builtin.h
-/// \brief class that implements the export builtin
+/// \file local_builtin.h
+/// \brief class that implements the local builtin
 ///
 
-#include "builtins/export_builtin.h"
+#ifndef LIBBASH_BUILTINS_local_BUILTIN_H_
+#define LIBBASH_BUILTINS_local_BUILTIN_H_
 
-#include <functional>
+#include "cppbash_builtin.h"
 
-#include <sstream>
-
-#include "core/bash_ast.h"
-#include "core/interpreter.h"
-
-int export_builtin::exec(const std::vector<std::string>& bash_args)
+///
+/// \class local_builtin
+/// \brief the local builtin for bash
+///
+class local_builtin: public virtual cppbash_builtin
 {
-  std::stringstream script;
-  for(auto iter = bash_args.begin(); iter != bash_args.end(); ++iter)
-      script << *iter;
+  public:
+    BUILTIN_CONSTRUCTOR(local)
 
-  bash_ast ast(script, std::bind(&bash_ast::parser_builtin_variable_definitions, std::placeholders::_1, false));
-  ast.interpret_with(_walker);
+    ///
+    /// \brief runs the local builtin on the supplied arguments
+    /// \param bash_args the arguments to the local builtin
+    /// \return exit status of local
+    ///
+    virtual int exec(const std::vector<std::string>& bash_args);
+};
 
-  return 0;
-}
+#endif

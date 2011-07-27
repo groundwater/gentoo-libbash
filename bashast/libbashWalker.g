@@ -581,11 +581,15 @@ simple_command
 
 execute_command[std::string& name, std::vector<std::string>& libbash_args]
 @declarations {
-	interpreter::local_scope current_scope(*walker);
+	std::unique_ptr<interpreter::local_scope> current_scope;
 	std::unique_ptr<std::ostream> out;
 	std::unique_ptr<std::ostream> err;
 	std::unique_ptr<std::istream> in;
 	bool redirection = false;
+}
+@init {
+	if(name != "local")
+		current_scope.reset(new interpreter::local_scope(*walker));
 }
 	:var_def[true]* (redirect[out, err, in]{ redirection = true; })* {
 		// Empty command, still need to run bash redirection

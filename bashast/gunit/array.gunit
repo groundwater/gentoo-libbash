@@ -32,7 +32,7 @@ variable_definition_atom:
 "asdf+=(a)" -> (PLUS_ASSIGN asdf (ARRAY (STRING a)))
 
 builtin_variable_definitions:
-"asdf=(a b c d) ade acd=bde" -> (LIST (COMMAND (VARIABLE_DEFINITIONS (= asdf (ARRAY (STRING a) (STRING b) (STRING c) (STRING d))) (= acd (STRING bde)))))
+"asdf=(a b c d) ade acd=bde" -> (LIST (COMMAND (VARIABLE_DEFINITIONS (= asdf (ARRAY (STRING a) (STRING b) (STRING c) (STRING d))) (EQUALS ade (STRING (VAR_REF ade))) (= acd (STRING bde)))))
 
 variable_reference:
 "$asdf" -> (VAR_REF asdf)

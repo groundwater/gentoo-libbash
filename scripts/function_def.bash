@@ -47,8 +47,7 @@ func_nested1() {
     echo $foo_nested ${bar_nested[0]} $localbar
 }
 func_nested2() {
-    local foo_nested=hi bar_nested=(1 2
-    3) localbar
+    local foo_nested=hi bar_nested=(1 2 3) localbar
     localbar=1
     echo ${bar_nested[@]}
     echo ${not_exist[@]}
