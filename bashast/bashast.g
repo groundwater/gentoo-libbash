@@ -157,7 +157,8 @@ tokens{
 @includes {
 	C_INCLUDE #include <iostream>
 	C_INCLUDE #include <string>
-
+}
+@postinclude {
 	C_INCLUDE #include <boost/numeric/conversion/cast.hpp>
 
 	C_INCLUDE #include "core/exceptions.h"
