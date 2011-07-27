@@ -74,3 +74,4 @@ o Hello\
  world
 echo \`\(\)\$\>\<\`
 export SRC_URI="${SRC_URI} http://www.oracle.com/technology/products/berkeley-db/db/update/${MY_PV}/patch.${MY_PV}.${i}"
+> /dev/null

@@ -579,7 +579,7 @@ simple_command
 }
 	:string_expr (argument[libbash_args])* execute_command[$string_expr.libbash_value, libbash_args];
 
-execute_command[const std::string& name, std::vector<std::string>& libbash_args]
+execute_command[std::string& name, std::vector<std::string>& libbash_args]
 @declarations {
 	interpreter::local_scope current_scope(*walker);
 	std::unique_ptr<std::ostream> out;
@@ -588,6 +588,10 @@ execute_command[const std::string& name, std::vector<std::string>& libbash_args]
 	bool redirection = false;
 }
 	:var_def[true]* (redirect[out, err, in]{ redirection = true; })* {
+		// Empty command, still need to run bash redirection
+		if(name.empty())
+			name = ":";
+
 		if(walker->has_function(name))
 		{
 			if(redirection)

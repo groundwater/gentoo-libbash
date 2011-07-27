@@ -226,6 +226,9 @@ tokens{
 		||token == LESS_THAN
 		||token == GREATER_THAN
 		||token == RSHIFT
+		||token == AMP_LESS_THAN
+		||token == AMP_GREATER_THAN
+		||token == AMP_RSHIFT
 		// for end of command
 		||token == SEMIC
 		||token == EOL
@@ -325,7 +328,7 @@ here_document_operator
 
 here_document_begin
 	:	(
-			token=~(EOL|BLANK|LESS_THAN|HERE_STRING_OP|AMP|GREATER_THAN|RSHIFT)
+			token=~(EOL|BLANK|LESS_THAN|HERE_STRING_OP|GREATER_THAN|RSHIFT|AMP_LESS_THAN|AMP_GREATER_THAN|AMP_RSHIFT)
 			{
 				if(LA(-1) != DQUOTE && LA(-1) != ESC)
 				{
@@ -347,13 +350,13 @@ redirection_operator
 	:	BLANK! DIGIT redirection_operator
 	|	BLANK?
 		(
-			AMP LESS_THAN -> OP["&<"]
+			AMP_LESS_THAN -> OP["&<"]
 			|	GREATER_THAN AMP -> OP[">&"]
 			|	LESS_THAN AMP -> OP["<&"]
 			|	LESS_THAN GREATER_THAN -> OP["<>"]
 			|	RSHIFT -> OP[">>"]
-			|	AMP GREATER_THAN -> OP["&>"]
-			|	AMP RSHIFT -> OP ["&>>"]
+			|	AMP_GREATER_THAN -> OP["&>"]
+			|	AMP_RSHIFT -> OP ["&>>"]
 			|	LESS_THAN -> LESS_THAN
 			|	GREATER_THAN -> GREATER_THAN
 		);
@@ -376,20 +379,28 @@ command_atom
 				|	-> ^(VARIABLE_DEFINITIONS variable_definitions)
 			)
 	|	(EXPORT) => EXPORT BLANK export_item -> ^(STRING EXPORT) ^(STRING ^(DOUBLE_QUOTED_STRING export_item))
-	|	string_expr_no_reserved_word
+	|	command_name
 		(
 			(BLANK? parens) => BLANK? parens wspace? compound_command
-				-> ^(FUNCTION["function"] string_expr_no_reserved_word compound_command)
+				-> ^(FUNCTION["function"] command_name compound_command)
 			|	(
 					{LA(1) == BLANK &&
 					(
 						!is_special_token(LA(2))
 						// redirection
-						&&(LA(2) != DIGIT || (LA(3) != AMP && LA(3) != LESS_THAN
-											  && LA(3) != GREATER_THAN && LA(3) != RSHIFT))
+						&&(LA(2) != DIGIT || (LA(3) != AMP_LESS_THAN &&
+											  LA(3) != AMP_GREATER_THAN &&
+											  LA(3) != AMP_RSHIFT &&
+											  LA(3) != GREATER_THAN &&
+											  LA(3) != LESS_THAN &&
+											  LA(3) != RSHIFT))
 					)}? => BLANK bash_command_arguments
-				)* -> string_expr_no_reserved_word bash_command_arguments*
+				)* -> command_name bash_command_arguments*
 		);
+
+command_name
+	:	string_expr_no_reserved_word
+	|	{LA(1) == GREATER_THAN}? => redirection_atom -> ^(STRING NAME) redirection_atom;
 
 variable_definitions
 	:	(
@@ -765,7 +776,7 @@ pattern_char
 	:	LETTER|DIGIT|OTHER|QMARK|COLON|AT|SEMIC|POUND|SLASH
 		|BANG|TIMES|COMMA|PIPE|AMP|MINUS|PLUS|PCT|LSQUARE|RSQUARE
 		|RPAREN|LPAREN|RBRACE|LBRACE|DOLLAR|TICK|DOT|LESS_THAN
-		|GREATER_THAN|SQUOTE|DQUOTE;
+		|GREATER_THAN|SQUOTE|DQUOTE|AMP_LESS_THAN|AMP_GREATER_THAN|AMP_RSHIFT;
 
 variable_reference
 	:	DOLLAR LBRACE parameter_expansion RBRACE -> ^(VAR_REF parameter_expansion)
@@ -1041,6 +1052,9 @@ LESS_THAN	:	'<';
 GREATER_THAN	:	'>';
 LSHIFT	:	'<<';
 RSHIFT	:	'>>';
+AMP_LESS_THAN	:	'&<';
+AMP_GREATER_THAN	:	'&>';
+AMP_RSHIFT	:	'&>>';
 
 SEMIC	:	';';
 DOUBLE_SEMIC	:	';;';
