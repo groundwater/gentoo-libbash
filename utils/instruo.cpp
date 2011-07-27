@@ -56,6 +56,7 @@
 #include "core/exceptions.h"
 #include "command_line.h"
 #include "libbash.h"
+#include "test.h"
 #include "utils/metadata.h"
 
 using namespace paludis;
@@ -105,7 +106,7 @@ void worker(const std::shared_ptr<PackageIDSequence> &ids)
                                 variables["PVR"][0] + ".ebuild");
         try
         {
-          libbash::interpret(ebuild_path, variables, functions);
+          libbash::interpret(ebuild_path, get_src_dir() + "/utils/isolated-functions.sh", variables, functions);
 
           std::string output_path(CommandLine::get_instance()->a_output_directory.argument() + "/" +
                                   variables["CATEGORY"][0] + "/" +

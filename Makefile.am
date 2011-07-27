@@ -138,9 +138,13 @@ metadata_generator_SOURCES = utils/metadata_generator.cpp
 metadata_generator_LDADD = libcppbash.la libmetadata.a
 metadata_generator_CPPFLAGS = $(AM_CPPFLAGS) -Iutils
 
-instruo_SOURCES = utils/instruo.cpp utils/command_line.cpp utils/command_line.h
+instruo_SOURCES = utils/instruo.cpp \
+				  utils/command_line.cpp \
+				  utils/command_line.h \
+				  test/test.h \
+				  test/test.cpp
 instruo_LDADD = libcppbash.la @PALUDIS_LIBS@ libmetadata.a
-instruo_CPPFLAGS = $(AM_CPPFLAGS) @PALUDIS_CFLAGS@ -Iutils
+instruo_CPPFLAGS = $(AM_CPPFLAGS) @PALUDIS_CFLAGS@ -Iutils -I$(top_srcdir)/test/
 instruo_CXXFLAGS = $(AM_CXXFLAGS) -Wno-extra -fopenmp
 
 ast_printer_SOURCES = utils/ast_printer.cpp
