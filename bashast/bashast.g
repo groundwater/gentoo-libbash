@@ -373,7 +373,13 @@ command
 		);
 
 command_atom
-	:	(FOR|SELECT|IF|WHILE|UNTIL|CASE|LPAREN|LBRACE|LLPAREN|LSQUARE|TEST_EXPR) => compound_command
+	:	{LA(1) == FOR|| LA(1) == SELECT|| LA(1) == IF|| LA(1) == WHILE|| LA(1) == UNTIL||
+		 LA(1) == CASE|| LA(1) == LPAREN|| LA(1) == LBRACE|| LA(1) == LLPAREN|| LA(1) == LSQUARE||
+#ifdef OUTPUT_C
+		(LA(1) == NAME && LA(2) == BLANK && "test" == get_string(LT(1)))}? => compound_command
+#else
+		(LA(1) == NAME && LA(2) == BLANK && "test".equals(get_string(LT(1))))}? => compound_command
+#endif
 	|	FUNCTION BLANK string_expr_no_reserved_word ((BLANK? parens wspace?)|wspace) compound_command
 			-> ^(FUNCTION string_expr_no_reserved_word compound_command)
 	|	(name (LSQUARE|EQUALS|PLUS EQUALS)) => variable_definitions
@@ -581,7 +587,11 @@ condition_comparison
 condition_expr
 	:	LSQUARE LSQUARE wspace keyword_condition wspace RSQUARE RSQUARE -> ^(KEYWORD_TEST keyword_condition)
 	|	LSQUARE wspace builtin_condition wspace RSQUARE -> ^(BUILTIN_TEST builtin_condition)
-	|	TEST_EXPR wspace? builtin_condition-> ^(BUILTIN_TEST builtin_condition);
+#ifdef OUTPUT_C
+	|	{LA(1) == NAME && LA(2) == BLANK && get_string(LT(1)) == "test"}? => NAME wspace? builtin_condition-> ^(BUILTIN_TEST builtin_condition);
+#else
+	|	{LA(1) == NAME && LA(2) == BLANK && "test".equals(get_string(LT(1)))}? => NAME wspace? builtin_condition-> ^(BUILTIN_TEST builtin_condition);
+#endif
 
 keyword_condition
 	:	((BANG) => keyword_negation_primary|keyword_condition_primary) (BLANK!? (LOGICOR^|LOGICAND^) BLANK!? keyword_condition)?;
@@ -720,7 +730,7 @@ string_part
 
 ns_string_part
 	:	num|name|escaped_character
-	|OTHER|EQUALS|PCT|PCTPCT|PLUS|MINUS|DOT|DOTDOT|COLON|TEST_EXPR
+	|OTHER|EQUALS|PCT|PCTPCT|PLUS|MINUS|DOT|DOTDOT|COLON
 	|TILDE|LSQUARE|RSQUARE|CARET|POUND|COMMA|EXPORT|LOCAL|AT
 	// Escaped characters
 	|ESC_RPAREN|ESC_LPAREN|ESC_DOLLAR|ESC_GT|ESC_LT|ESC_TICK
@@ -1084,7 +1094,6 @@ SLASH	:	'/';
 COLON	:	':';
 QMARK	:	'?';
 
-TEST_EXPR	:	'test ';
 LOCAL	:	'local';
 EXPORT	:	'export';
 LOGICAND	:	'&&';

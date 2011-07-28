@@ -74,6 +74,7 @@ func_positional_args() {
     echo $*
 }
 func_positional_args 1 2 3
+IFS=" \t\n"
 
 if true; then
     function_in_compound_statement() {
@@ -93,3 +94,5 @@ function shift_test() {
 }
 
 shift_test 1 2
+test-flag-CC() { echo "CC" "$1"; }
+test-flag-CC abc

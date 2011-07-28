@@ -36,3 +36,4 @@ condition_expr:
 "[[ \"${element}\" =~ (^[^[:space:]]+\ .) ]]" -> (KEYWORD_TEST (MATCH_REGULAR_EXPRESSION (STRING (DOUBLE_QUOTED_STRING (VAR_REF element))) (STRING ( ^ [ ^ [ : space : ] ] + \   . ))))
 "[[ a<b ]]" -> (KEYWORD_TEST (< (STRING a) (STRING b)))
 "[[ a>b ]]" -> (KEYWORD_TEST (> (STRING a) (STRING b)))
+"[[ ${VIRTUALX_REQUIRED} == always || ${VIRTUALX_REQUIRED} == test ]]" -> (KEYWORD_TEST (|| (MATCH_PATTERN (STRING (VAR_REF VIRTUALX_REQUIRED)) (STRING always)) (MATCH_PATTERN (STRING (VAR_REF VIRTUALX_REQUIRED)) (STRING test))))
