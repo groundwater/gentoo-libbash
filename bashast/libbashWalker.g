@@ -576,8 +576,10 @@ command_atom
 simple_command
 @declarations {
 	std::vector<std::string> libbash_args;
+	bool split;
 }
-	:string_expr (argument[libbash_args])* execute_command[$string_expr.libbash_value, libbash_args];
+	:string_expr{ split = ($string_expr.libbash_value != "local" && $string_expr.libbash_value != "export"); }
+	(argument[libbash_args, split])* execute_command[$string_expr.libbash_value, libbash_args];
 
 execute_command[std::string& name, std::vector<std::string>& libbash_args]
 @declarations {
@@ -664,11 +666,11 @@ redirect_destination_input[std::unique_ptr<std::istream>& in]
 		std::cerr << "FILE_DESCRIPTOR_MOVE redirection is not supported yet" << std::endl;
 	};
 
-argument[std::vector<std::string>& args]
+argument[std::vector<std::string>& args, bool split]
 	: string_expr {
 		if(!$string_expr.libbash_value.empty())
 		{
-			if($string_expr.quoted)
+			if($string_expr.quoted || !split)
 				args.push_back($string_expr.libbash_value);
 			else
 				walker->split_word($string_expr.libbash_value, args);

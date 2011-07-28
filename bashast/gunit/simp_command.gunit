@@ -27,7 +27,7 @@ command_atom:
 "./foobär" -> (STRING . / foob ä r)
 "cat ~/Documents/todo.txt" -> (STRING cat) (STRING ~ / Documents / todo . txt)
 "dodir ${foo}/${bar}" -> (STRING dodir) (STRING (VAR_REF foo) / (VAR_REF bar))
-"local a=123 b=(1 2 3) c" -> (STRING local) (STRING (DOUBLE_QUOTED_STRING a = 123   b = ( 1   2   3 )   c))
+"local a=123 b=(1 2 3) c" -> (STRING local) (STRING a = 123   b = ( 1   2   3 )   c)
 "echo {}{}}{{{}}{{}" -> (STRING echo) (STRING { } { } } { { { } } { { })
 "echo \"ab#af ###\" #abc" -> (STRING echo) (STRING (DOUBLE_QUOTED_STRING ab # af   # # #))
 

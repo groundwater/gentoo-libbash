@@ -35,6 +35,7 @@ function unset_outer()
 {
     local FOO006=1 FOO007=2
     local gjl_${FOO006}="${FOO007}"
+    local f version install{{site,vendor}{arch,lib},archlib}
     unset_inner
     echo "FOO006=$FOO006 in unset_outer"
     echo "FOO007=$FOO007 in unset_outer"

@@ -20,7 +20,7 @@ gunit java_libbash;
 
 pipeline:
 "cat asdf" -> (COMMAND (STRING cat) (STRING asdf))
-"export VAR=bar LAA=(1 2 3) foo" -> (COMMAND (STRING export) (STRING (DOUBLE_QUOTED_STRING VAR = bar   LAA = ( 1   2   3 )   foo)))
+"export VAR=bar LAA=(1 2 3) foo" -> (COMMAND (STRING export) (STRING VAR = bar   LAA = ( 1   2   3 )   foo))
 "LOCAL1=a  LOCAL2=b export GLOBAL1=2  GLOBAL2 GLOBAL3" -> (COMMAND (STRING export) (STRING GLOBAL1 = 2) (STRING GLOBAL2) (STRING GLOBAL3) (= LOCAL1 (STRING a)) (= LOCAL2 (STRING b)))
 "time -p cat file" -> (COMMAND (STRING cat) (STRING file) (time p))
 "time cat file | grep search" -> (| (COMMAND (STRING cat) (STRING file) time) (COMMAND (STRING grep) (STRING search)))

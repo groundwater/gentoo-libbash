@@ -379,9 +379,9 @@ command_atom
 				|	-> ^(VARIABLE_DEFINITIONS variable_definitions)
 			)
 	|	(EXPORT) => EXPORT BLANK builtin_variable_definition_item
-			-> ^(STRING EXPORT) ^(STRING ^(DOUBLE_QUOTED_STRING builtin_variable_definition_item))
+			-> ^(STRING EXPORT) ^(STRING builtin_variable_definition_item)
 	|	(LOCAL) => LOCAL BLANK builtin_variable_definition_item
-			-> ^(STRING LOCAL) ^(STRING ^(DOUBLE_QUOTED_STRING builtin_variable_definition_item))
+			-> ^(STRING LOCAL) ^(STRING builtin_variable_definition_item)
 	|	command_name
 		(
 			(BLANK? parens) => BLANK? parens wspace? compound_command
