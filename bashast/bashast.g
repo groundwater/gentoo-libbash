@@ -121,6 +121,8 @@ tokens{
 	AND_ASSIGN;
 	XOR_ASSIGN;
 	OR_ASSIGN;
+	LEQ;
+	GEQ;
 
 	NOT_EQUALS;
 	EQUALS_TO;
@@ -991,8 +993,8 @@ shifts
 compare
 	:	shifts (compare_operator^ BLANK!? shifts)?;
 compare_operator
-	:	LEQ
-	|	GEQ
+	:	LESS_THAN EQUALS -> LEQ
+	|	GREATER_THAN EQUALS -> GEQ
 	|	LESS_THAN
 	|	GREATER_THAN
 	|	EQUALS EQUALS -> EQUALS_TO
@@ -1048,8 +1050,6 @@ MINUS	:	'-';
 PLUS	:	'+';
 EXP		:	'**';
 AMP		:	'&';
-LEQ		:	'<=';
-GEQ		:	'>=';
 CARET	:	'^';
 LESS_THAN	:	'<';
 GREATER_THAN	:	'>';
