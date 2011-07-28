@@ -109,3 +109,21 @@ echo $#
 echo a{b,c}d
 echo a{a,bc}d{e,}f
 echo a{ab,cd}d{ef,gh}
+foo=
+unset bar
+echo ${foo-abc}
+foo=
+unset bar
+echo ${foo+abc}
+foo=
+unset bar
+echo ${foo=abc}
+foo=
+unset bar
+echo ${bar-abc}
+foo=
+unset bar
+echo ${bar+abc}
+foo=
+unset bar
+echo ${bar=abc}

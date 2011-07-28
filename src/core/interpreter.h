@@ -372,12 +372,12 @@ public:
   /// \param value the value of the word
   /// \param index the index of the paramter
   /// \return the expansion result
-  const std::string do_default_expansion(const std::string& name,
+  const std::string do_default_expansion(bool cond,
+                                         const std::string& name,
                                          const std::string& value,
                                          const unsigned index) const
   {
-    return (is_unset_or_null(name, index)?
-        value : resolve<std::string>(name, index));
+    return (cond ? value : resolve<std::string>(name, index));
   }
 
   /// \brief perform ${parameter:=word} expansion
@@ -385,12 +385,12 @@ public:
   /// \param value the value of the word
   /// \param index the index of the paramter
   /// \return the expansion result
-  const std::string do_assign_expansion(const std::string& name,
+  const std::string do_assign_expansion(bool cond,
+                                        const std::string& name,
                                         const std::string& value,
                                         const unsigned index)
   {
-    return (is_unset_or_null(name, index)?
-        set_value(name, value, index) : resolve<std::string>(name, index));
+    return (cond ? set_value(name, value, index) : resolve<std::string>(name, index));
   }
 
   /// \brief perform ${parameter:+word} expansion
@@ -398,11 +398,10 @@ public:
   /// \param value the value of the word
   /// \param index the index of the paramter
   /// \return the expansion result
-  const std::string do_alternate_expansion(const std::string& name,
-                                           const std::string& value,
-                                           const unsigned index) const
+  const std::string do_alternate_expansion(bool cond,
+                                           const std::string& value) const
   {
-    return (is_unset_or_null(name, index)? "" : value);
+    return (cond ? "" : value);
   }
 
   /// \brief perform substring expansion

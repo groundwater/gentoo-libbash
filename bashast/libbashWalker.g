@@ -475,13 +475,36 @@ var_expansion returns[std::string libbash_value]
 	bool greedy;
 }
 	:^(USE_DEFAULT_WHEN_UNSET_OR_NULL var_name libbash_word=raw_string) {
-		libbash_value = walker->do_default_expansion($var_name.libbash_value, libbash_word, $var_name.index);
+		libbash_value = walker->do_default_expansion(walker->is_unset_or_null($var_name.libbash_value, $var_name.index),
+													 $var_name.libbash_value,
+													 libbash_word,
+													 $var_name.index);
+	}
+	|^(USE_DEFAULT_WHEN_UNSET var_name libbash_word=raw_string) {
+		libbash_value = walker->do_default_expansion(walker->is_unset($var_name.libbash_value),
+													 $var_name.libbash_value,
+													 libbash_word,
+													 $var_name.index);
 	}
 	|^(ASSIGN_DEFAULT_WHEN_UNSET_OR_NULL var_name libbash_word=raw_string) {
-		libbash_value = walker->do_assign_expansion($var_name.libbash_value, libbash_word, $var_name.index);
+		libbash_value = walker->do_assign_expansion(walker->is_unset_or_null($var_name.libbash_value, $var_name.index),
+													$var_name.libbash_value,
+													libbash_word,
+													$var_name.index);
+	}
+	|^(ASSIGN_DEFAULT_WHEN_UNSET var_name libbash_word=raw_string) {
+		libbash_value = walker->do_assign_expansion(walker->is_unset($var_name.libbash_value),
+													$var_name.libbash_value,
+													libbash_word,
+													$var_name.index);
 	}
 	|^(USE_ALTERNATE_WHEN_UNSET_OR_NULL var_name libbash_word=raw_string) {
-		libbash_value = walker->do_alternate_expansion($var_name.libbash_value, libbash_word, $var_name.index);
+		libbash_value = walker->do_alternate_expansion(walker->is_unset_or_null($var_name.libbash_value, $var_name.index),
+		                                               libbash_word);
+	}
+	|^(USE_ALTERNATE_WHEN_UNSET var_name libbash_word=raw_string) {
+		libbash_value = walker->do_alternate_expansion(walker->is_unset($var_name.libbash_value),
+		                                               libbash_word);
 	}
 	|(^(OFFSET array_name arithmetics arithmetics)) => ^(OFFSET libbash_name=array_name offset=arithmetics length=arithmetics) {
 		libbash_value = walker->do_subarray_expansion(libbash_name, offset, length);
