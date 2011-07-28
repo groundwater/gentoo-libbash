@@ -57,6 +57,7 @@ variable_reference:
 "$*" -> (VAR_REF *)
 "${@}" -> (VAR_REF @)
 "${#}" -> (VAR_REF #)
+"${?}" -> (VAR_REF ?)
 "$#" -> (VAR_REF #)
 "${!foo}" -> (VAR_REF (VAR_REF foo))
 "${!#}" -> (VAR_REF (VAR_REF #))

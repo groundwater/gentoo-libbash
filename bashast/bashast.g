@@ -874,6 +874,7 @@ variable_name
 	|	DOLLAR
 	|	TIMES
 	|	AT
+	|	QMARK
 	|	POUND;
 
 variable_name_no_digit
