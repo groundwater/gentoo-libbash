@@ -275,8 +275,8 @@ time_posix
 redirection
 	:	redirection_atom+;
 redirection_atom
-	:	redirection_operator BLANK? redirection_destination -> ^(REDIR redirection_operator redirection_destination)
-	|	BLANK!? process_substitution
+	:	redirection_operator redirection_destination -> ^(REDIR redirection_operator redirection_destination)
+	|	BLANK! process_substitution
 	|	here_string;
 
 process_substitution
@@ -284,8 +284,9 @@ process_substitution
 			-> ^(PROCESS_SUBSTITUTION $dir command_list);
 
 redirection_destination
-	:	(file_descriptor) => file_descriptor
-	|	string_expr;
+	:	(BLANK? file_descriptor) => BLANK!? file_descriptor
+	|	BLANK! process_substitution
+	|	BLANK!? string_expr;
 file_descriptor
 	:	DIGIT -> ^(FILE_DESCRIPTOR DIGIT)
 	|	DIGIT MINUS -> ^(FILE_DESCRIPTOR_MOVE DIGIT);

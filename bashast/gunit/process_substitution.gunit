@@ -21,3 +21,9 @@ gunit java_libbash;
 process_substitution:
 "<( true )" -> (PROCESS_SUBSTITUTION < (LIST (COMMAND (STRING true))))
 ">(false)" -> (PROCESS_SUBSTITUTION > (LIST (COMMAND (STRING false))))
+
+command:
+"while read -d $'\0' -r nspkg_pth_file; do                                       
+    nspkg_pth_files+=(\"${nspkg_pth_file}\")
+done < <(find \"${ED}\" -name \"*-nspkg.pth\" -type f -print0)" -> (COMMAND (while (LIST (COMMAND (STRING read) (STRING - d) (STRING (ANSI_C_QUOTING '\0')) (STRING - r) (STRING nspkg_pth_file))) (LIST (COMMAND (VARIABLE_DEFINITIONS (PLUS_ASSIGN nspkg_pth_files (ARRAY (STRING (DOUBLE_QUOTED_STRING (VAR_REF nspkg_pth_file))))))))) (REDIR < (PROCESS_SUBSTITUTION < (LIST (COMMAND (STRING find) (STRING (DOUBLE_QUOTED_STRING (VAR_REF ED))) (STRING - name) (STRING (DOUBLE_QUOTED_STRING * - nspkg . pth)) (STRING - type) (STRING f) (STRING - print0))))))
+"echo<(cat)" FAIL
