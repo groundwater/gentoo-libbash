@@ -596,7 +596,7 @@ keyword_condition_binary
 		(
 			(BLANK EQUALS TILDE) => BLANK EQUALS TILDE BLANK bash_pattern_part
 				-> ^(MATCH_REGULAR_EXPRESSION condition_part ^(STRING bash_pattern_part))
-			|	BLANK keyword_binary_string_operator BLANK right=condition_part
+			|	keyword_binary_string_operator right=condition_part
 					-> ^(keyword_binary_string_operator condition_part $right)
 			|	BLANK (BANG EQUALS) BLANK extended_pattern_match+
 					-> ^(NOT_MATCH_PATTERN condition_part ^(STRING extended_pattern_match+))
@@ -619,10 +619,10 @@ scope {
 		|	~(BLANK|EOL|LOGICAND|LOGICOR|LPAREN|RPAREN)
 	 )+;
 keyword_binary_string_operator
-	:	binary_operator
-	|	EQUALS
-	|	LESS_THAN
-	|	GREATER_THAN;
+	:	BLANK! binary_operator BLANK!
+	|	BLANK! EQUALS BLANK!
+	|	BLANK!? LESS_THAN BLANK!?
+	|	BLANK!? GREATER_THAN BLANK!?;
 
 builtin_condition
 	:	((BANG) => builtin_negation_primary|builtin_keyword_condition_primary)
