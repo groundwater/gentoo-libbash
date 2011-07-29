@@ -620,19 +620,27 @@ keyword_condition_binary
 					-> ^(MATCH_PATTERN condition_part ^(STRING extended_pattern_match+))
 			|	-> condition_part
 		);
-//TODO improve this rule
 bash_pattern_part
 scope {
 	int parens;
+#ifdef OUTPUT_C
+	bool quoted;
+#else
+	boolean quoted;
+#endif
 }
 @init {
 	$bash_pattern_part::parens = 0;
+	$bash_pattern_part::quoted = false;
 }
 	:(
-		(ESC BLANK) => ESC BLANK
+		DQUOTE! { $bash_pattern_part::quoted = !$bash_pattern_part::quoted; }
+		|	{$bash_pattern_part::quoted}? => ~DQUOTE
+		|	(ESC BLANK) => ESC BLANK
 		|	LPAREN { if(LA(-2) != ESC) $bash_pattern_part::parens++; }
+		|	LLPAREN { if(LA(-2) != ESC) $bash_pattern_part::parens += 2; }
 		|	{$bash_pattern_part::parens != 0}? => RPAREN { if(LA(-2) != ESC) $bash_pattern_part::parens--; }
-		|	~(BLANK|EOL|LOGICAND|LOGICOR|LPAREN|RPAREN)
+		|	~(BLANK|EOL|LOGICAND|LOGICOR|LPAREN|RPAREN|DQUOTE|LLPAREN)
 	 )+;
 keyword_binary_string_operator
 	:	BLANK! binary_operator BLANK!
