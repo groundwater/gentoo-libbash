@@ -21,24 +21,24 @@ gunit java_libbash;
 command_atom:
 "function quit {
 	exit
-}" -> (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit)))))
+}" -> (FUNCTION (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit)))))
 
 "function quit{ exit; }" FAIL
 "function quit { exit }" FAIL
-"function quit { exit; }" -> (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit)))))
-"function foo()    { :; }" -> (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
-"function foo(){ :; }" -> (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
-"foo()   { :; }" -> (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
-"foo(){ :; }" -> (function (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
+"function quit { exit; }" -> (FUNCTION (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit)))))
+"function foo()    { :; }" -> (FUNCTION (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
+"function foo(){ :; }" -> (FUNCTION (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
+"foo()   { :; }" -> (FUNCTION (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
+"foo(){ :; }" -> (FUNCTION (STRING foo) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
 
-"xorg-2_reconf_source() { :; }" -> (function (STRING xorg - 2 _reconf_source) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
+"xorg-2_reconf_source() { :; }" -> (FUNCTION (STRING xorg - 2 _reconf_source) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))
 
-"function out() { function inner() { :; }; }" -> (function (STRING out) (CURRENT_SHELL (LIST (COMMAND (function (STRING inner) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))))))
+"function out() { function inner() { :; }; }" -> (FUNCTION (STRING out) (CURRENT_SHELL (LIST (COMMAND (FUNCTION (STRING inner) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))))))
 
 command:
-"function quit { exit; } > /dev/null" -> (COMMAND (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit))))) (REDIR > (STRING / dev / null)))
+"function quit { exit; } > /dev/null" -> (COMMAND (FUNCTION (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit))))) (REDIR > (STRING / dev / null)))
 "function quit {
     # comment
-    exit; } > /dev/null" -> (COMMAND (function (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit))))) (REDIR > (STRING / dev / null)))
-"function help { echo hi; } 2> /dev/null" -> (COMMAND (function (STRING help) (CURRENT_SHELL (LIST (COMMAND (STRING echo) (STRING hi))))) (REDIR 2 > (STRING / dev / null)))
+    exit; } > /dev/null" -> (COMMAND (FUNCTION (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit))))) (REDIR > (STRING / dev / null)))
+"function help { echo hi; } 2> /dev/null" -> (COMMAND (FUNCTION (STRING help) (CURRENT_SHELL (LIST (COMMAND (STRING echo) (STRING hi))))) (REDIR 2 > (STRING / dev / null)))
 "function help { echo 3; } 2> /dev/null > output" OK

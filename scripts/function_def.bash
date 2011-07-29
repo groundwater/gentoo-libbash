@@ -94,5 +94,9 @@ function shift_test() {
 }
 
 shift_test 1 2
-test-flag-CC() { echo "CC" "$1"; }
+test-flag-CC() {
+    function="$1"
+    echo "'${function}' function is not defined"
+    echo "CC" "$1";
+}
 test-flag-CC abc

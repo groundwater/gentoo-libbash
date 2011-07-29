@@ -127,6 +127,8 @@ tokens{
 	NOT_EQUALS;
 	EQUALS_TO;
 	BUILTIN_LOGIC;
+
+	FUNCTION;
 }
 
 @lexer::context
@@ -377,10 +379,12 @@ command_atom
 		 LA(1) == CASE|| LA(1) == LPAREN|| LA(1) == LBRACE|| LA(1) == LLPAREN|| LA(1) == LSQUARE||
 #ifdef OUTPUT_C
 		(LA(1) == NAME && LA(2) == BLANK && "test" == get_string(LT(1)))}? => compound_command
+	|	{LA(1) == NAME && LA(2) == BLANK && "function" == get_string(LT(1))}? =>
 #else
 		(LA(1) == NAME && LA(2) == BLANK && "test".equals(get_string(LT(1))))}? => compound_command
+	|	{LA(1) == NAME && LA(2) == BLANK && "function".equals(get_string(LT(1)))}? =>
 #endif
-	|	FUNCTION BLANK string_expr_no_reserved_word ((BLANK? parens wspace?)|wspace) compound_command
+			NAME BLANK string_expr_no_reserved_word ((BLANK? parens wspace?)|wspace) compound_command
 			-> ^(FUNCTION string_expr_no_reserved_word compound_command)
 	|	(name (LSQUARE|EQUALS|PLUS EQUALS)) => variable_definitions
 			(
@@ -394,7 +398,7 @@ command_atom
 	|	command_name
 		(
 			(BLANK? parens) => BLANK? parens wspace? compound_command
-				-> ^(FUNCTION["function"] command_name compound_command)
+				-> ^(FUNCTION command_name compound_command)
 			|	(
 					{LA(1) == BLANK &&
 					(
@@ -689,7 +693,7 @@ string_expr_no_reserved_word
 			);
 
 reserved_word
-	:	CASE|DO|DONE|ELIF|ELSE|ESAC|FI|FOR|FUNCTION|IF|IN|SELECT|THEN|UNTIL|WHILE|TIME;
+	:	CASE|DO|DONE|ELIF|ELSE|ESAC|FI|FOR|IF|IN|SELECT|THEN|UNTIL|WHILE|TIME;
 
 non_quoted_string
 	:	string_part
@@ -1033,7 +1037,6 @@ ELSE	:	'else';
 ESAC	:	'esac';
 FI		:	'fi';
 FOR		:	'for';
-FUNCTION:	'function';
 IF		:	'if';
 IN		:	'in';
 SELECT	:	'select';
