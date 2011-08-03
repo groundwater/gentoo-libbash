@@ -111,7 +111,7 @@ cppunittests_SOURCES =  test/run_tests.cpp \
 						test/post_check.cpp \
 						test/api_test.cpp \
 						test/walker_test.cpp
-cppunittests_LDADD = libcppbash.la \
+cppunittests_LDADD = libbash.la \
 					 $(GTEST_LIBS) \
 					 $(BOOST_SYSTEM_LIB) \
 					 $(BOOST_FILESYSTEM_LIB)
@@ -128,14 +128,14 @@ libmetadata_a_CPPFLAGS = $(AM_CPPFLAGS) -Iutils
 noinst_PROGRAMS = variable_printer metadata_generator ast_printer instruo bash
 
 variable_printer_SOURCES = utils/variable_printer.cpp
-variable_printer_LDADD = libcppbash.la
+variable_printer_LDADD = libbash.la
 
 bash_SOURCES = utils/bash.cpp test/test.h  test/test.cpp
-bash_LDADD = libcppbash.la
+bash_LDADD = libbash.la
 bash_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_srcdir)/test/
 
 metadata_generator_SOURCES = utils/metadata_generator.cpp
-metadata_generator_LDADD = libcppbash.la libmetadata.a
+metadata_generator_LDADD = libbash.la libmetadata.a
 metadata_generator_CPPFLAGS = $(AM_CPPFLAGS) -Iutils
 
 instruo_SOURCES = utils/instruo.cpp \
@@ -143,12 +143,12 @@ instruo_SOURCES = utils/instruo.cpp \
 				  utils/command_line.h \
 				  test/test.h \
 				  test/test.cpp
-instruo_LDADD = libcppbash.la @PALUDIS_LIBS@ libmetadata.a
+instruo_LDADD = libbash.la @PALUDIS_LIBS@ libmetadata.a
 instruo_CPPFLAGS = $(AM_CPPFLAGS) @PALUDIS_CFLAGS@ -Iutils -I$(top_srcdir)/test/
 instruo_CXXFLAGS = $(AM_CXXFLAGS) -Wno-extra -fopenmp
 
 ast_printer_SOURCES = utils/ast_printer.cpp
-ast_printer_LDADD = libcppbash.la $(BOOST_PROGRAM_OPTIONS_LIB)
+ast_printer_LDADD = libbash.la $(BOOST_PROGRAM_OPTIONS_LIB)
 ast_printer_LDFLAGS = -static
 # boost is probably compiled without debug STL so if that is used
 # linking will fail
@@ -199,63 +199,63 @@ libbash_include_HEADERS = include/libbash.h \
                           include/unsupported_exception.h \
                           include/exceptions.h
 
-lib_LTLIBRARIES = libcppbash.la
-libcppbash_la_SOURCES = include/common.h \
-						include/libbash.h \
-						src/libbash.cpp \
-						src/cppbash_builtin.cpp \
-						src/cppbash_builtin.h \
-						src/builtins/continue_builtin.cpp \
-						src/builtins/continue_builtin.h \
-						src/builtins/break_builtin.cpp \
-						src/builtins/break_builtin.h \
-						src/builtins/echo_builtin.cpp \
-						src/builtins/echo_builtin.h \
-						src/builtins/eval_builtin.cpp \
-						src/builtins/eval_builtin.h \
-						src/builtins/export_builtin.cpp \
-						src/builtins/export_builtin.h \
-						src/builtins/local_builtin.cpp \
-						src/builtins/local_builtin.h \
-						src/builtins/declare_builtin.cpp \
-						src/builtins/declare_builtin.h \
-						src/builtins/boolean_builtins.h \
-						src/builtins/source_builtin.h \
-						src/builtins/source_builtin.cpp \
-						src/builtins/shift_builtin.h \
-						src/builtins/shift_builtin.cpp \
-						src/builtins/shopt_builtin.h \
-						src/builtins/shopt_builtin.cpp \
-						src/builtins/return_builtin.h \
-						src/builtins/return_builtin.cpp \
-						src/builtins/printf_builtin.h \
-						src/builtins/printf_builtin.cpp \
-						src/builtins/let_builtin.h \
-						src/builtins/let_builtin.cpp \
-						src/builtins/inherit_builtin.h \
-						src/builtins/inherit_builtin.cpp \
-						src/builtins/unset_builtin.h \
-						src/builtins/unset_builtin.cpp \
-						src/builtins/builtin_exceptions.h \
-						$(GENERATED_PARSER_C) \
-						$(GENERATED_PARSER_H) \
-						include/divide_by_zero_error.h \
-						include/exceptions.h \
-						include/illegal_argument_exception.h \
-						include/interpreter_exception.h \
-						include/parse_exception.h \
-						include/readonly_exception.h \
-						include/runtime_exception.h \
-						include/unsupported_exception.h \
-						src/core/interpreter.cpp \
-						src/core/interpreter.h \
-						src/core/symbols.hpp \
-						src/core/function.h \
-						src/core/function.cpp \
-						src/core/bash_condition.h \
-						src/core/bash_condition.cpp \
-						src/core/bash_ast.cpp \
-						src/core/bash_ast.h
+lib_LTLIBRARIES = libbash.la
+libbash_la_SOURCES = include/common.h \
+					 include/libbash.h \
+					 src/libbash.cpp \
+					 src/cppbash_builtin.cpp \
+					 src/cppbash_builtin.h \
+					 src/builtins/continue_builtin.cpp \
+					 src/builtins/continue_builtin.h \
+					 src/builtins/break_builtin.cpp \
+					 src/builtins/break_builtin.h \
+					 src/builtins/echo_builtin.cpp \
+					 src/builtins/echo_builtin.h \
+					 src/builtins/eval_builtin.cpp \
+					 src/builtins/eval_builtin.h \
+					 src/builtins/export_builtin.cpp \
+					 src/builtins/export_builtin.h \
+					 src/builtins/local_builtin.cpp \
+					 src/builtins/local_builtin.h \
+					 src/builtins/declare_builtin.cpp \
+					 src/builtins/declare_builtin.h \
+					 src/builtins/boolean_builtins.h \
+					 src/builtins/source_builtin.h \
+					 src/builtins/source_builtin.cpp \
+					 src/builtins/shift_builtin.h \
+					 src/builtins/shift_builtin.cpp \
+					 src/builtins/shopt_builtin.h \
+					 src/builtins/shopt_builtin.cpp \
+					 src/builtins/return_builtin.h \
+					 src/builtins/return_builtin.cpp \
+					 src/builtins/printf_builtin.h \
+					 src/builtins/printf_builtin.cpp \
+					 src/builtins/let_builtin.h \
+					 src/builtins/let_builtin.cpp \
+					 src/builtins/inherit_builtin.h \
+					 src/builtins/inherit_builtin.cpp \
+					 src/builtins/unset_builtin.h \
+					 src/builtins/unset_builtin.cpp \
+					 src/builtins/builtin_exceptions.h \
+					 $(GENERATED_PARSER_C) \
+					 $(GENERATED_PARSER_H) \
+					 include/divide_by_zero_error.h \
+					 include/exceptions.h \
+					 include/illegal_argument_exception.h \
+					 include/interpreter_exception.h \
+					 include/parse_exception.h \
+					 include/readonly_exception.h \
+					 include/runtime_exception.h \
+					 include/unsupported_exception.h \
+					 src/core/interpreter.cpp \
+					 src/core/interpreter.h \
+					 src/core/symbols.hpp \
+					 src/core/function.h \
+					 src/core/function.cpp \
+					 src/core/bash_condition.h \
+					 src/core/bash_condition.cpp \
+					 src/core/bash_ast.cpp \
+					 src/core/bash_ast.h
 
 # separate library because we need per file CXXFLAGS
 # as antlr generated code does not pass our strict developer
@@ -277,16 +277,16 @@ libwalker_la_CXXFLAGS = -std=c++0x \
 						-fvisibility=hidden \
 						-fvisibility-inlines-hidden
 
-libcppbash_la_CXXFLAGS = $(AM_CXXFLAGS) \
+libbash_la_CXXFLAGS = $(AM_CXXFLAGS) \
 						 -fvisibility=hidden \
 						 -fvisibility-inlines-hidden
 if DEVELOPER_MODE
 # Paludis cannot get compiled with these flags.
 # So we only turn them on for our library.
-libcppbash_la_CXXFLAGS += -Wconversion -Wsign-conversion
+libbash_la_CXXFLAGS += -Wconversion -Wsign-conversion
 endif
-libcppbash_la_CFLAGS = $(AM_CFLAGS) -fvisibility=hidden
-libcppbash_la_LIBADD = libparser.la libwalker.la
+libbash_la_CFLAGS = $(AM_CFLAGS) -fvisibility=hidden
+libbash_la_LIBADD = libparser.la libwalker.la
 
 EXTRA_DIST = bashast/bashast.g \
 			 bashast/libbashWalker.g \
