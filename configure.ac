@@ -60,7 +60,7 @@ if test "$PDFLATEX" = "no"; then
 fi
 
 AC_CHECK_LIB([antlr3c],[antlr3AsciiFileStreamNew],[],[AC_MSG_ERROR(libasntlr3c not found.  Have you installed the C antlr runtime?)])
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile libbash.pc])
 DX_HTML_FEATURE(ON)
 DX_MAN_FEATURE(OFF)
 DX_CHM_FEATURE(OFF)

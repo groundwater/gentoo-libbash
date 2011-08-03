@@ -9,6 +9,7 @@
 *.class
 *.java
 *.tokens
+*.pc
 libbash-*
 .deps
 .libs

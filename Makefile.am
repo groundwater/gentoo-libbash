@@ -187,7 +187,7 @@ CLEANFILES = $(GENERATED_PARSER_CPP) \
 			 massif.out \
 			 callgrind.out
 
-libbash_includedir = $(includedir)/libbash-0.1/libbash
+libbash_includedir = $(includedir)/libbash-@PACKAGE_VERSION@/libbash
 libbash_include_HEADERS = include/libbash.h \
                           include/common.h \
                           include/divide_by_zero_error.h \
@@ -321,6 +321,9 @@ EXTRA_DIST = bashast/bashast.g \
 			 $(GUNIT_LOG_COMPILER) \
 			 $(BASH_LOG_COMPILER) \
 			 $(EBUILD_LOG_COMPILER)
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libbash.pc
 
 coding_standard.pdf: coding_standard/coding_standard.tex
 	$(AM_V_GEN)@PDFLATEX@ coding_standard/coding_standard.tex 2&>1 > /dev/null
