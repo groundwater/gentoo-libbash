@@ -287,6 +287,7 @@ libbash_la_CXXFLAGS += -Wconversion -Wsign-conversion
 endif
 libbash_la_CFLAGS = $(AM_CFLAGS) -fvisibility=hidden
 libbash_la_LIBADD = libparser.la libwalker.la
+libbash_la_LDFLAGS = -version-info $(LIBBASH_SO_VERSION)
 
 EXTRA_DIST = bashast/bashast.g \
 			 bashast/libbashWalker.g \

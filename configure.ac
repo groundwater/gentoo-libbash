@@ -24,6 +24,7 @@ AM_INIT_AUTOMAKE([foreign parallel-tests color-tests subdir-objects 1.11])
 AM_SILENT_RULES([yes])
 AC_PROG_CXX
 LT_INIT
+AC_SUBST([LIBBASH_SO_VERSION], [0:0:0])
 
 AC_ARG_ENABLE([developer],
 			  [AS_HELP_STRING([--enable-developer],[enables various QA checks])])
