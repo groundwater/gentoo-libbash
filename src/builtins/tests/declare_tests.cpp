@@ -27,9 +27,9 @@
 #include <gtest/gtest.h>
 
 #include "core/bash_ast.h"
-#include "core/exceptions.h"
 #include "core/interpreter.h"
 #include "cppbash_builtin.h"
+#include "exceptions.h"
 
 using namespace std;
 

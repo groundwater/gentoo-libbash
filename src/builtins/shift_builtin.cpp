@@ -25,8 +25,8 @@
 #include <boost/lexical_cast.hpp>
 
 #include "builtins/builtin_exceptions.h"
-#include "core/exceptions.h"
 #include "core/interpreter.h"
+#include "exceptions.h"
 
 int shift_builtin::exec(const std::vector<std::string>& bash_args)
 {

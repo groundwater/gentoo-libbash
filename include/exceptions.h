@@ -24,12 +24,12 @@
 #ifndef LIBBASH_CORE_EXCEPTIOND_H_
 #define LIBBASH_CORE_EXCEPTIOND_H_
 
-#include "core/divide_by_zero_error.h"
-#include "core/illegal_argument_exception.h"
-#include "core/interpreter_exception.h"
-#include "core/parse_exception.h"
-#include "core/readonly_exception.h"
-#include "core/runtime_exception.h"
-#include "core/unsupported_exception.h"
+#include "divide_by_zero_error.h"
+#include "illegal_argument_exception.h"
+#include "interpreter_exception.h"
+#include "parse_exception.h"
+#include "readonly_exception.h"
+#include "runtime_exception.h"
+#include "unsupported_exception.h"
 
 #endif

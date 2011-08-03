@@ -165,7 +165,7 @@ tokens{
 @postinclude {
 	C_INCLUDE #include <boost/numeric/conversion/cast.hpp>
 
-	C_INCLUDE #include "core/exceptions.h"
+	C_INCLUDE #include "exceptions.h"
 }
 @lexer::postinclude {
 	#define double_quoted ctx->double_quoted

@@ -24,9 +24,9 @@
 #ifndef LIBBASH_CORE_FUNCTION_H_
 #define LIBBASH_CORE_FUNCTION_H_
 
-#include "core/exceptions.h"
-
 #include <antlr3.h>
+
+#include "exceptions.h"
 
 class bash_ast;
 class interpreter;

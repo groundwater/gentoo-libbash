@@ -67,7 +67,7 @@ check_JAVA = bashast/java_libbashLexer.java bashast/java_libbashParser.java
 AM_JAVACFLAGS = -source 1.4 -classpath @antlr_cp@
 
 AM_CXXFLAGS = -std=c++0x
-AM_CPPFLAGS = -I$(top_srcdir)/src
+AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/include
 
 if DEVELOPER_MODE
 # -Weffc++ seems to be giving false positives on protected non
@@ -187,9 +187,21 @@ CLEANFILES = $(GENERATED_PARSER_CPP) \
 			 massif.out \
 			 callgrind.out
 
+libbash_includedir = $(includedir)/libbash-0.1/libbash
+libbash_include_HEADERS = include/libbash.h \
+                          include/common.h \
+                          include/divide_by_zero_error.h \
+                          include/illegal_argument_exception.h \
+                          include/interpreter_exception.h \
+                          include/parse_exception.h \
+                          include/readonly_exception.h \
+                          include/runtime_exception.h \
+                          include/unsupported_exception.h \
+                          include/exceptions.h
+
 lib_LTLIBRARIES = libcppbash.la
-libcppbash_la_SOURCES = src/common.h \
-						src/libbash.h \
+libcppbash_la_SOURCES = include/common.h \
+						include/libbash.h \
 						src/libbash.cpp \
 						src/cppbash_builtin.cpp \
 						src/cppbash_builtin.h \
@@ -227,14 +239,14 @@ libcppbash_la_SOURCES = src/common.h \
 						src/builtins/builtin_exceptions.h \
 						$(GENERATED_PARSER_C) \
 						$(GENERATED_PARSER_H) \
-						src/core/divide_by_zero_error.h \
-						src/core/exceptions.h \
-						src/core/illegal_argument_exception.h \
-						src/core/interpreter_exception.h \
-						src/core/parse_exception.h \
-						src/core/readonly_exception.h \
-						src/core/runtime_exception.h \
-						src/core/unsupported_exception.h \
+						include/divide_by_zero_error.h \
+						include/exceptions.h \
+						include/illegal_argument_exception.h \
+						include/interpreter_exception.h \
+						include/parse_exception.h \
+						include/readonly_exception.h \
+						include/runtime_exception.h \
+						include/unsupported_exception.h \
 						src/core/interpreter.cpp \
 						src/core/interpreter.h \
 						src/core/symbols.hpp \

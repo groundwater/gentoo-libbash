@@ -25,7 +25,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include "builtins/builtin_exceptions.h"
-#include "core/interpreter_exception.h"
+#include "exceptions.h"
 
 int break_builtin::exec(const std::vector<std::string>& bash_args)
 {

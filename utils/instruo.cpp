@@ -53,8 +53,8 @@
 #include <paludis/package_database.hh>
 #include <paludis/metadata_key.hh>
 
-#include "core/exceptions.h"
 #include "command_line.h"
+#include "exceptions.h"
 #include "libbash.h"
 #include "test.h"
 #include "utils/metadata.h"

@@ -36,7 +36,7 @@
 #include <boost/fusion/include/adapt_struct.hpp>
 
 #include "core/bash_ast.h"
-#include "core/exceptions.h"
+#include "exceptions.h"
 #include "libbashLexer.h"
 #include "libbashParser.h"
 

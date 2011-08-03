@@ -30,8 +30,8 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
-#include "core/exceptions.h"
 #include "core/interpreter.h"
+#include "exceptions.h"
 #include "libbashLexer.h"
 #include "libbashParser.h"
 #include "libbashWalker.h"

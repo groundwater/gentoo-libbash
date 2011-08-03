@@ -35,7 +35,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 
-#include "core/exceptions.h"
+#include "exceptions.h"
 
 ///
 /// \class converter

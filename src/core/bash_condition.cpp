@@ -29,8 +29,8 @@
 #include <unistd.h>
 
 #include "core/bash_ast.h"
-#include "core/exceptions.h"
 #include "core/interpreter.h"
+#include "exceptions.h"
 
 namespace
 {

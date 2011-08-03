@@ -23,9 +23,9 @@
 #include <boost/lexical_cast.hpp>
 #include <gtest/gtest.h>
 
-#include "core/exceptions.h"
 #include "core/interpreter.h"
 #include "cppbash_builtin.h"
+#include "exceptions.h"
 
 TEST(shift_builtin_test, bad_argument)
 {

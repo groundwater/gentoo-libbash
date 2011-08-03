@@ -23,9 +23,9 @@
 #include <gtest/gtest.h>
 
 #include "builtins/builtin_exceptions.h"
-#include "core/exceptions.h"
 #include "core/interpreter.h"
 #include "cppbash_builtin.h"
+#include "exceptions.h"
 
 namespace
 {

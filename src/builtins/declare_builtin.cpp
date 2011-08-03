@@ -25,8 +25,8 @@
 #include <algorithm>
 #include <iostream>
 
-#include "core/exceptions.h"
 #include "core/interpreter.h"
+#include "exceptions.h"
 
 int declare_builtin::exec(const std::vector<std::string>& bash_args)
 {
