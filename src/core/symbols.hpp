@@ -267,7 +267,7 @@ public:
 
 /// \brief the specialized constructor for arrays
 /// \param name the variable name
-/// \param value the variable value
+/// \param v the variable value
 /// \param ro whether the variable readonly
 template <>
 inline variable::variable<>(const std::string& name,

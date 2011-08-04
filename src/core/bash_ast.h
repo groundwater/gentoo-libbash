@@ -117,6 +117,7 @@ public:
 
   /// \brief the functor for parser builtin_variable_definitions rule
   /// \param parser the pointer to the parser
+  /// \param local whether to define the variables in local scope
   static pANTLR3_BASE_TREE parser_builtin_variable_definitions(libbashParser_Ctx_struct* parser, bool local);
 
   ///

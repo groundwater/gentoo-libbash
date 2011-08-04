@@ -76,8 +76,8 @@ class interpreter: public boost::noncopyable
 
   /// \brief calculate the correct offset when offset < 0 and check whether
   ///        the real offset is in legal range
-  /// \param[in,out] a value/result argument referring to offset
-  /// \param[in] the original string
+  /// \param[in,out] offset a value/result argument referring to offset
+  /// \param[in] size the size of the original string
   /// \return whether the real offset is in legal range
   bool get_real_offset(long long& offset, const unsigned size) const
   {
@@ -368,6 +368,7 @@ public:
   }
 
   /// \brief perform ${parameter:−word} expansion
+  /// \param cond whether to perform expansion
   /// \param name the name of the parameter
   /// \param value the value of the word
   /// \param index the index of the paramter
@@ -381,6 +382,7 @@ public:
   }
 
   /// \brief perform ${parameter:=word} expansion
+  /// \param cond whether to perform expansion
   /// \param name the name of the parameter
   /// \param value the value of the word
   /// \param index the index of the paramter
@@ -394,9 +396,8 @@ public:
   }
 
   /// \brief perform ${parameter:+word} expansion
-  /// \param name the name of the parameter
+  /// \param cond whether to perform expansion
   /// \param value the value of the word
-  /// \param index the index of the paramter
   /// \return the expansion result
   const std::string do_alternate_expansion(bool cond,
                                            const std::string& value) const
@@ -472,7 +473,7 @@ public:
 
   /// \brief implementation of word splitting
   /// \param word the value of the word
-  //. \param[out] output the splitted result will be appended to output
+  ///.\param[out] output the splitted result will be appended to output
   void split_word(const std::string& word, std::vector<std::string>& output) const;
 
   /// \brief get the status of shell optional behavior
@@ -507,7 +508,7 @@ public:
   long eval_arithmetic(const std::string& expression);
 
   /// \brief shift the positional parameters to the left by n.
-  /// \param the number to be shifted
+  /// \param shift_number the number to be shifted
   /// \return zero unless n is greater than $# or less than zero, non-zero otherwise.
   int shift(int shift_number);
 
