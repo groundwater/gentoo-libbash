@@ -313,7 +313,7 @@ EXTRA_DIST = bashast/bashast.g \
 			 scripts/bar.eclass \
 			 utils/metadata_diff.sh \
 			 utils/isolated-functions.sh \
-			 test_coverage.sh \
+			 test/test_coverage.sh \
 			 autogen.sh \
 			 $(BASH_TESTS) \
 			 $(EBUILD_TESTS) \
@@ -402,5 +402,5 @@ benchmark_parser: callgrind.out
 	callgrind_annotate callgrind.out
 
 test_coverage: dist
-	MAKE=$(MAKE) DIST_ARCHIVES=$(DIST_ARCHIVES) ./test_coverage.sh
+	MAKE=$(MAKE) DIST_ARCHIVES=$(DIST_ARCHIVES) test/test_coverage.sh
 	rm $(DIST_ARCHIVES)
