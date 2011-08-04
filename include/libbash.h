@@ -32,14 +32,16 @@
 #include "common.h"
 #include "exceptions.h"
 
+/// \namespace libbash
+/// \brief public namespace for libbash API
 namespace libbash
 {
   ///
   /// \brief interpret a script specifid by path, return a map filled with
   ///        variables defined in the script
-  /// \param the path of target script
-  /// \param[in, out] we use the map to initialize bash environment and store the result
-  /// \param[out] store the names of the functions defined in the script
+  /// \param target_path the path of target script
+  /// \param[in, out] variables used to initialize bash environment and store the variable values
+  /// \param[out] functions store the names of the functions defined in the script
   /// \return the return status of the script
   int LIBBASH_API interpret(const std::string& target_path,
                             std::unordered_map<std::string, std::vector<std::string>>& variables,
@@ -48,10 +50,10 @@ namespace libbash
   ///
   /// \brief interpret a script specifid by path, return a map filled with
   ///        variables defined in the script
-  /// \param the path of target script
-  /// \param the path of a script that you want to source before interpreting
-  /// \param[in, out] we use the map to initialize bash environment and store the result. The environment will be initialized after preloading.
-  /// \param[out] store the names of the functions defined in the script
+  /// \param target_path the path of target script
+  /// \param preload_path the path of a script that you want to source before interpreting
+  /// \param[in, out] variables used to initialize bash environment and store the variable values. The environment will be initialized after preloading.
+  /// \param[out] functions store the names of the functions defined in the script
   /// \return the return status of the script
   int LIBBASH_API interpret(const std::string& target_path,
                             const std::string& preload_path,
