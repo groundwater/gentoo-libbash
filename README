@@ -25,6 +25,12 @@ bashast/gunit: Grammar gunit tests
 src/: source directory for libbash library
 src/builtins: source directory for built in bash functionality classes
 src/builtins/tests: Unit tests for builtins
+src/core: core runtime for libbash
+src/core/tests: Unit tests for the core runtime
+include/: public headers
+utils/: some utilities that built on libbash
+test/: some general tests for libbash
+scripts/: some bash scripts or ebuilds for testing
 coding_standard/: LaTeX coding standard for the project
 docs/: output folder for Doxygen generated documentation
 
@@ -42,3 +48,9 @@ To generate the coding standard from the latex file (with pdflatex):
 	make coding_standard.pdf
 To generate the doxygen documentation:
 	make doxygen-doc
+To get memory usage statstics of libbash (with Valgrind):
+	make massif
+To get benchmark data for metadata generation (with Valgrind):
+	make benchmark_parser
+To get unit tests coverage:
+	make test_coverage
