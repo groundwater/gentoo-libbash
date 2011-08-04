@@ -1,0 +1,11 @@
+/** \mainpage
+
+This is the libbash API documentation.
+
+To find your way around:
+
+- have a look at the API: <a href="namespacelibbash.html">libbash namespace</a>
+- learn how to use the API by example (source code under utils/)
+- find out what syntax we support now (scripts under scripts/)
+
+*/
