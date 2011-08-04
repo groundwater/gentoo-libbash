@@ -25,6 +25,10 @@
 
 #include "cppbash_builtin.h"
 
+///
+/// \class unset_builtin
+/// \brief the unset builtin for bash
+///
 class unset_builtin : public virtual cppbash_builtin
 {
 public:

@@ -25,6 +25,10 @@
 
 #include "cppbash_builtin.h"
 
+///
+/// \class continue_builtin
+/// \brief the continue builtin for bash
+///
 class continue_builtin : public virtual cppbash_builtin
 {
 public:

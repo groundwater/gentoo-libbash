@@ -25,6 +25,10 @@
 
 #include "cppbash_builtin.h"
 
+///
+/// \class let_builtin
+/// \brief the let builtin for bash
+///
 class let_builtin : public virtual cppbash_builtin
 {
 public:

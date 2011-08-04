@@ -25,6 +25,10 @@
 
 #include "cppbash_builtin.h"
 
+///
+/// \class shift_builtin
+/// \brief the shift builtin for bash
+///
 class shift_builtin : public virtual cppbash_builtin
 {
 public:

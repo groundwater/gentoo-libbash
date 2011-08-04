@@ -25,6 +25,10 @@
 
 #include "cppbash_builtin.h"
 
+///
+/// \class break_builtin
+/// \brief the break builtin for bash
+///
 class break_builtin : public virtual cppbash_builtin
 {
 public:

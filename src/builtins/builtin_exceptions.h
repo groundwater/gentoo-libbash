@@ -39,6 +39,10 @@ public:
     runtime_error("return exception"){}
 };
 
+///
+/// \class loop_control_exception
+/// \brief base class used by break and continue
+///
 class loop_control_exception
 {
   int count;
@@ -64,6 +68,10 @@ public:
   }
 };
 
+///
+/// \class continue_exception
+/// \brief thrown when executing the continue builtin
+///
 class continue_exception: public loop_control_exception
 {
 protected:
@@ -82,6 +90,10 @@ public:
   }
 };
 
+///
+/// \class break_exception
+/// \brief thrown when executing the break builtin
+///
 class break_exception: public loop_control_exception
 {
 protected:

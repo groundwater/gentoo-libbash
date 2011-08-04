@@ -27,7 +27,7 @@
 #include "cppbash_builtin.h"
 
 ///
-/// \class inherit
+/// \class inherit_builtin
 /// \brief the inherit builtin for bash
 ///
 class inherit_builtin: public virtual cppbash_builtin

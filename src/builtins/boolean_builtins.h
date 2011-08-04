@@ -25,12 +25,20 @@
 
 #include "cppbash_builtin.h"
 
+///
+/// \class true_builtin
+/// \brief the true builtin for bash
+///
 struct true_builtin : public virtual cppbash_builtin
 {
   BUILTIN_CONSTRUCTOR(true)
   virtual int exec(const std::vector<std::string>& ) { return 0; }
 };
 
+///
+/// \class false_builtin
+/// \brief the false builtin for bash
+///
 struct false_builtin : public virtual cppbash_builtin
 {
   BUILTIN_CONSTRUCTOR(false)

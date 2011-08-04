@@ -25,6 +25,10 @@
 
 #include "cppbash_builtin.h"
 
+///
+/// \class return_builtin
+/// \brief the return builtin for bash
+///
 class return_builtin : public virtual cppbash_builtin
 {
 public:

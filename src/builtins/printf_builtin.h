@@ -25,6 +25,10 @@
 
 #include "cppbash_builtin.h"
 
+///
+/// \class printf_builtin
+/// \brief the printf builtin for bash
+///
 class printf_builtin : public virtual cppbash_builtin
 {
 public:

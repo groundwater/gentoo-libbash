@@ -39,7 +39,7 @@ struct libbashParser_Ctx_struct;
 struct libbashWalker_Ctx_struct;
 class interpreter;
 
-/// \class bash_ast
+/// \class antlr_pointer
 /// \brief customized unique_ptr for antlr objects.
 template<typename T>
 class antlr_pointer: public std::unique_ptr<T, std::function<void(T*)>>

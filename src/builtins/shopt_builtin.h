@@ -25,6 +25,10 @@
 
 #include "cppbash_builtin.h"
 
+///
+/// \class shopt_builtin
+/// \brief the shopt builtin for bash
+///
 class shopt_builtin : public virtual cppbash_builtin
 {
   void set_opt(const std::vector<std::string>& bash_args, bool value);
