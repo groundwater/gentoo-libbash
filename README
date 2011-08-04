@@ -31,8 +31,9 @@ include/: public headers
 utils/: some utilities that built on libbash
 test/: some general tests for libbash
 scripts/: some bash scripts or ebuilds for testing
-coding_standard/: LaTeX coding standard for the project
-docs/: output folder for Doxygen generated documentation
+doc/: documentation for libbash
+doc/coding_standard/: LaTeX coding standard for the project
+doxygen-doc/: output folder for Doxygen generated documentation
 
 Build Instructions:
 

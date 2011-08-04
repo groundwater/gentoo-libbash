@@ -19,7 +19,7 @@
 # Makefile.am for libbash
 # Author: Nathan Eloe
 ###############################################
-include doxygen.am
+include doc/doxygen.am
 
 ACLOCAL_AMFLAGS = -I m4
 
