@@ -5,6 +5,9 @@ includedir=@includedir@
 
 Name: libbash
 Description: A C++ library for bash
+URL: http://www.gentoo.org/proj/en/libbash/index.xml
 Requires:
 Version: @PACKAGE_VERSION@
 Cflags: -I${includedir}/libbash-@PACKAGE_VERSION@
+Libs: -L${libdir} -lbash
+Libs.private: -L${libdir} -lantlr3c
