@@ -126,7 +126,8 @@ tokens{
 
 	NOT_EQUALS;
 	EQUALS_TO;
-	BUILTIN_LOGIC;
+	BUILTIN_LOGIC_AND;
+	BUILTIN_LOGIC_OR;
 
 	FUNCTION;
 }
@@ -651,13 +652,16 @@ keyword_binary_string_operator
 	|	BLANK!? LESS_THAN BLANK!?
 	|	BLANK!? GREATER_THAN BLANK!?;
 
+
+builtin_condition_and
+	:	builtin_condition_primary (builtin_logic_and^ BLANK! builtin_condition_primary)?;
 builtin_condition
-	:	((BANG) => builtin_negation_primary|builtin_keyword_condition_primary)
-		(BLANK! builtin_logic_operator^ BLANK! builtin_condition)?;
+	:	builtin_condition_and (builtin_logic_or^ BLANK! builtin_condition_and)?;
 builtin_negation_primary
-	:	BANG BLANK builtin_keyword_condition_primary -> ^(NEGATION builtin_keyword_condition_primary);
-builtin_keyword_condition_primary
+	:	BANG BLANK builtin_condition_primary -> ^(NEGATION builtin_condition_primary);
+builtin_condition_primary
 	:	LPAREN! BLANK!? builtin_condition BLANK!? RPAREN!
+	|	(BANG) => builtin_negation_primary
 	|	(unary_operator) => builtin_condition_unary
 	|	builtin_condition_binary;
 builtin_condition_unary
@@ -671,8 +675,18 @@ builtin_binary_string_operator
 	|	BANG EQUALS -> NOT_EQUALS
 	|	ESC_LT
 	|	ESC_GT;
-builtin_logic_operator
-	:	unary_operator -> ^(BUILTIN_LOGIC unary_operator);
+builtin_logic_and
+#ifdef OUTPUT_C
+	:	{LA(1) == BLANK && LA(2) == MINUS && LA(3) == LETTER && "a" == get_string(LT(3))}?=> BLANK MINUS LETTER -> BUILTIN_LOGIC_AND;
+#else
+	:	{LA(1) == BLANK && LA(2) == MINUS && LA(3) == LETTER && "a".equals(get_string(LT(3)))}?=> BLANK MINUS LETTER -> BUILTIN_LOGIC_AND;
+#endif
+builtin_logic_or
+#ifdef OUTPUT_C
+	:	{LA(1) == BLANK && LA(2) == MINUS && LA(3) == LETTER && "o" == get_string(LT(3))}?=> BLANK MINUS LETTER -> BUILTIN_LOGIC_OR;
+#else
+	:	{LA(1) == BLANK && LA(2) == MINUS && LA(3) == LETTER && "o".equals(get_string(LT(3)))}?=> BLANK MINUS LETTER -> BUILTIN_LOGIC_OR;
+#endif
 
 binary_operator
 	:	MINUS! NAME^;

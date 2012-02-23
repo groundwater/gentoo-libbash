@@ -61,3 +61,11 @@ i=1
 [[ a == b && $((i=1)) ]] || echo $i # i should still be 0
 i=1
 [[ a == a && $((i=0)) ]] && echo $i # i should still be 0
+[ -n "a" -o -n "" -a -n "" ] && echo true
+# builtin test doesn't support shortcut
+i=1
+[ 1 -eq 2 -o $((i=0)) ] && echo $i # i should be 0 now
+[ 1 -eq 1 -o $((i=1)) ] && echo $i # i should still be 1
+[ 1 -eq 2 -a $((i=1)) ] || echo $i # i should still be 1
+i=1
+[ 1 -eq 1 -a $((i=0)) ] && echo $i # i should still be 0

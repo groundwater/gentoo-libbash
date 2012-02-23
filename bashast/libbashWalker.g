@@ -786,14 +786,11 @@ keyword_condition returns[bool status]
 
 builtin_condition returns[bool status]
 	:^(NEGATION l=builtin_condition) { $status = !l; }
-	|^(BUILTIN_LOGIC o=LETTER l=builtin_condition r=builtin_condition) {
-		char op = get_char(o);
-		if(op == 'a')
-			$status = l && r;
-		else if(op == 'o')
-			$status = l || r;
-		else
-			throw libbash::parse_exception(std::string("unrecognized operator in built-in test: ") + op);
+	|^(BUILTIN_LOGIC_AND l=builtin_condition r=builtin_condition) {
+		$status = l && r;
+	}
+	|^(BUILTIN_LOGIC_OR l=builtin_condition r=builtin_condition) {
+		$status = l || r;
 	}
 	|s=builtin_condition_primary { $status = s; };
 
