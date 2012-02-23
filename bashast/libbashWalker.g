@@ -763,8 +763,20 @@ common_condition returns[bool status]
 	|string_expr { $status = (!$string_expr.libbash_value.empty()); };
 
 keyword_condition returns[bool status]
-	:^(LOGICOR l=keyword_condition r=keyword_condition) { $status= l || r; }
-	|^(LOGICAND l=keyword_condition r=keyword_condition) { $status= l && r; }
+	:^(LOGICOR l=keyword_condition {
+			if(l){
+				seek_to_next_tree(ctx);
+				SEEK(INDEX() + 1);
+				return true;
+			}
+	} r=keyword_condition) { $status= l || r; }
+	|^(LOGICAND l=keyword_condition {
+			if(!l){
+				seek_to_next_tree(ctx);
+				SEEK(INDEX() + 1);
+				return false;
+			}
+	} r=keyword_condition) { $status= l && r; }
 	|^(NEGATION l=keyword_condition) { $status = !l; }
 	|^(MATCH_REGULAR_EXPRESSION left_str=string_expr right_str=string_expr) {
 		boost::xpressive::sregex re = boost::xpressive::sregex::compile(right_str.libbash_value);

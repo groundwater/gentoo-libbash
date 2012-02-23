@@ -55,3 +55,9 @@ unset i
 [[ =a <=b ]]
 [[ =a >=b ]]
 [[ a == a || c == b && a == b ]] && echo true
+i=1
+[[ a == b || $((i=0)) ]] && echo $i # i should be 0 now
+[[ a == a || $((i=1)) ]] && echo $i # i should still be 0
+[[ a == b && $((i=1)) ]] || echo $i # i should still be 0
+i=1
+[[ a == a && $((i=0)) ]] && echo $i # i should still be 0
