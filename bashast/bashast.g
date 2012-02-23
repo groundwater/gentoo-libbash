@@ -597,12 +597,15 @@ condition_expr
 	|	{LA(1) == NAME && LA(2) == BLANK && "test".equals(get_string(LT(1)))}? => NAME wspace? builtin_condition-> ^(BUILTIN_TEST builtin_condition);
 #endif
 
+keyword_condition_and
+	:	keyword_condition_primary (BLANK!? LOGICAND^ BLANK!? keyword_condition_primary)?;
 keyword_condition
-	:	((BANG) => keyword_negation_primary|keyword_condition_primary) (BLANK!? (LOGICOR^|LOGICAND^) BLANK!? keyword_condition)?;
+	:	keyword_condition_and (BLANK!? LOGICOR^ BLANK!? keyword_condition_and)?;
 keyword_negation_primary
 	:	BANG BLANK keyword_condition_primary -> ^(NEGATION keyword_condition_primary);
 keyword_condition_primary
 	:	LPAREN! BLANK!? keyword_condition BLANK!? RPAREN!
+	|	(BANG) => keyword_negation_primary
 	|	(unary_operator) => keyword_condition_unary
 	|	keyword_condition_binary;
 keyword_condition_unary

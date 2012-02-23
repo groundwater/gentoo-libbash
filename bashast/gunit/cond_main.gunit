@@ -37,3 +37,5 @@ condition_expr:
 "[[ a<b ]]" -> (KEYWORD_TEST (< (STRING a) (STRING b)))
 "[[ a>b ]]" -> (KEYWORD_TEST (> (STRING a) (STRING b)))
 "[[ ${VIRTUALX_REQUIRED} == always || ${VIRTUALX_REQUIRED} == test ]]" -> (KEYWORD_TEST (|| (MATCH_PATTERN (STRING (VAR_REF VIRTUALX_REQUIRED)) (STRING always)) (MATCH_PATTERN (STRING (VAR_REF VIRTUALX_REQUIRED)) (STRING test))))
+"[[ a == b || c == d && e == f ]]" -> (KEYWORD_TEST (|| (MATCH_PATTERN (STRING a) (STRING b)) (&& (MATCH_PATTERN (STRING c) (STRING d)) (MATCH_PATTERN (STRING e) (STRING f)))))
+"[[ a == b && c == d || e == f ]]" -> (KEYWORD_TEST (|| (&& (MATCH_PATTERN (STRING a) (STRING b)) (MATCH_PATTERN (STRING c) (STRING d))) (MATCH_PATTERN (STRING e) (STRING f))))

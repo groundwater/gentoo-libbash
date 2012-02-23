@@ -54,3 +54,4 @@ unset i
 [ abc = bcd -a abc = abc ] || echo true19
 [[ =a <=b ]]
 [[ =a >=b ]]
+[[ a == a || c == b && a == b ]] && echo true
