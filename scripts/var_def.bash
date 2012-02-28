@@ -31,6 +31,10 @@ echo ${ARRAY02[@]}
 ARRAY02[2]=4
 ARRAY02[3]=5
 echo ${ARRAY02[@]}
+ARRAY02[3,2]=4
+echo ${ARRAY02[@]}
+echo ${ARRAY02[2]}
+echo ${ARRAY02[3]}
 EMPTY=
 echo $EMPTY
 PARTIAL[5]=5

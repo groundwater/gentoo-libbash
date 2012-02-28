@@ -68,6 +68,7 @@ tokens{
 	REDIR;
 	ARITHMETIC_CONDITION;
 	ARITHMETIC_EXPRESSION;
+	ARITHMETIC;
 	KEYWORD_TEST;
 	BUILTIN_TEST;
 	MATCH_ANY_EXCEPT;
@@ -525,11 +526,11 @@ for_expr
 			) DO wspace command_list semiel DONE -> ^(FOR name for_each_value* command_list)
 			|	LLPAREN EOL?
 				// initilization
-				(BLANK? init=arithmetic BLANK?|BLANK)?
+				(BLANK? init=arithmetics BLANK?|BLANK)?
 				// condition
-				(SEMIC (BLANK? fcond=arithmetic BLANK?|BLANK)? SEMIC|DOUBLE_SEMIC)
+				(SEMIC (BLANK? fcond=arithmetics BLANK?|BLANK)? SEMIC|DOUBLE_SEMIC)
 				// modification
-				(BLANK? mod=arithmetic)? wspace? RPAREN RPAREN semiel DO wspace command_list semiel DONE
+				(BLANK? mod=arithmetics)? wspace? RPAREN RPAREN semiel DO wspace command_list semiel DONE
 					-> ^(CFOR ^(FOR_INIT $init)? ^(FOR_COND $fcond)? command_list ^(FOR_MOD $mod)?)
 		);
 for_each_value
@@ -585,7 +586,7 @@ current_shell
 	:	LBRACE wspace command_list semiel RBRACE -> ^(CURRENT_SHELL command_list);
 
 arithmetic_expression
-	:	LLPAREN wspace? arithmetic wspace? RPAREN RPAREN -> ^(ARITHMETIC_EXPRESSION arithmetic);
+	:	LLPAREN wspace? arithmetics wspace? RPAREN RPAREN -> ^(ARITHMETIC_EXPRESSION arithmetics);
 condition_comparison
 	:	condition_expr -> ^(COMPOUND_COND condition_expr);
 
@@ -841,9 +842,12 @@ parameter_expansion
 			|	COLON BLANK?
 				(
 					os=explicit_arithmetic (COLON BLANK? len=explicit_arithmetic)?
-						-> ^(OFFSET variable_name $os ^($len)?)
+					// It will make the tree parser's work easier if OFFSET is used as the root of arithmetic.
+					// Otherwise, the tree parser can see several arithmetic expressions but can not tell
+					// which one is for offset and which one is for length.
+						-> ^(OFFSET variable_name ^(OFFSET $os) ^(OFFSET ^($len))?)
 					|	COLON BLANK? len=explicit_arithmetic
-						-> ^(OFFSET variable_name NUMBER["0"] ^($len)?)
+						-> ^(OFFSET variable_name ^(OFFSET NUMBER["0"]) ^(OFFSET ^($len))?)
 				)
 			|	parameter_delete_operator parameter_delete_pattern
 				-> ^(parameter_delete_operator variable_name parameter_delete_pattern)
@@ -962,7 +966,7 @@ arithmetic_part
 	|	DOLLAR LSQUARE BLANK? arithmetics BLANK? RSQUARE -> arithmetics;
 
 arithmetics
-	:	arithmetic (COMMA! BLANK!? arithmetic)*;
+	:	arithmetic (COMMA BLANK? arithmetic)* -> ^(ARITHMETIC arithmetic)+;
 
 arithmetics_test
 	:	arithmetics EOF!;

@@ -19,10 +19,10 @@
 gunit java_libbash;
 
 variable_definition_atom:
-"arr[foo]=\"asdf\"" -> (= (arr (VAR_REF foo)) (STRING (DOUBLE_QUOTED_STRING asdf)))
-"arr=(a b [4]=c)" -> (= arr (ARRAY (STRING a) (STRING b) (= 4 (STRING c))))
-"asdf[idx]=${var}" -> (= (asdf (VAR_REF idx)) (STRING (VAR_REF var)))
-"asdf[++i]=${var}" -> (= (asdf (PRE_INCR (VAR_REF i))) (STRING (VAR_REF var)))
-"asdf[++i,j]=${var}" -> (= (asdf (PRE_INCR (VAR_REF i)) (VAR_REF j)) (STRING (VAR_REF var)))
-"asdf[$((i))]=${var}" -> (= (asdf (VAR_REF i)) (STRING (VAR_REF var)))
+"arr[foo]=\"asdf\"" -> (= (arr (ARITHMETIC (VAR_REF foo))) (STRING (DOUBLE_QUOTED_STRING asdf)))
+"arr=(a b [4]=c)" -> (= arr (ARRAY (STRING a) (STRING b) (= (ARITHMETIC 4) (STRING c))))
+"asdf[idx]=${var}" -> (= (asdf (ARITHMETIC (VAR_REF idx))) (STRING (VAR_REF var)))
+"asdf[++i]=${var}" -> (= (asdf (ARITHMETIC (PRE_INCR (VAR_REF i)))) (STRING (VAR_REF var)))
+"asdf[++i,j]=${var}" -> (= (asdf (ARITHMETIC (PRE_INCR (VAR_REF i))) (ARITHMETIC (VAR_REF j))) (STRING (VAR_REF var)))
+"asdf[$((i))]=${var}" -> (= (asdf (ARITHMETIC (VAR_REF i))) (STRING (VAR_REF var)))
 "asdf[1]=(a b c)" FAIL

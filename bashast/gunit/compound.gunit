@@ -35,8 +35,8 @@ condition_comparison:
 "[ asdf \> qwert ]" -> (COMPOUND_COND (BUILTIN_TEST (\> (STRING asdf) (STRING qwert))))
 
 arithmetic_expression:
-"((5+3))" -> (ARITHMETIC_EXPRESSION (+ 5 3))
-"(( 5+3 ))" -> (ARITHMETIC_EXPRESSION (+ 5 3))
+"((5+3))" -> (ARITHMETIC_EXPRESSION (ARITHMETIC (+ 5 3)))
+"(( 5+3, 2 ))" -> (ARITHMETIC_EXPRESSION (ARITHMETIC (+ 5 3)) (ARITHMETIC 2))
 
 current_shell:
 "{ time cat; }" -> (CURRENT_SHELL (LIST (COMMAND (STRING cat) time)))
@@ -97,10 +97,10 @@ done" -> (for each (STRING (COMMAND_SUB `ls |grep log`)) (LIST (COMMAND (STRING 
 "for i in foo$var bar ; do echo $i; done" -> (for i (STRING foo (VAR_REF var)) (STRING bar) (LIST (COMMAND (STRING echo) (STRING (VAR_REF i)))))
 "for each in `ls |grep log`; do echo file done" FAIL
 
-"for ((5+3;5+3;5+3)); do echo yay; done" -> (CFOR (FOR_INIT (+ 5 3)) (FOR_COND (+ 5 3)) (LIST (COMMAND (STRING echo) (STRING yay))) (FOR_MOD (+ 5 3)))
-"for ((5+3; ;5+3)); do echo yay; done" -> (CFOR (FOR_INIT (+ 5 3)) (LIST (COMMAND (STRING echo) (STRING yay))) (FOR_MOD (+ 5 3)))
-"for ((;5+3 ;5+3)); do echo yay; done" -> (CFOR (FOR_COND (+ 5 3)) (LIST (COMMAND (STRING echo) (STRING yay))) (FOR_MOD (+ 5 3)))
-"for ((5+3;;5+3)); do echo yay; done" -> (CFOR (FOR_INIT (+ 5 3)) (LIST (COMMAND (STRING echo) (STRING yay))) (FOR_MOD (+ 5 3)))
+"for ((5+3,2;5+3;5+3)); do echo yay; done" -> (CFOR (FOR_INIT (ARITHMETIC (+ 5 3)) (ARITHMETIC 2)) (FOR_COND (ARITHMETIC (+ 5 3))) (LIST (COMMAND (STRING echo) (STRING yay))) (FOR_MOD (ARITHMETIC (+ 5 3))))
+"for ((5+3; ;5+3)); do echo yay; done" -> (CFOR (FOR_INIT (ARITHMETIC (+ 5 3))) (LIST (COMMAND (STRING echo) (STRING yay))) (FOR_MOD (ARITHMETIC (+ 5 3))))
+"for ((;5+3 ;5+3)); do echo yay; done" -> (CFOR (FOR_COND (ARITHMETIC (+ 5 3))) (LIST (COMMAND (STRING echo) (STRING yay))) (FOR_MOD (ARITHMETIC (+ 5 3))))
+"for ((5+3;;5+3)); do echo yay; done" -> (CFOR (FOR_INIT (ARITHMETIC (+ 5 3))) (LIST (COMMAND (STRING echo) (STRING yay))) (FOR_MOD (ARITHMETIC (+ 5 3))))
 
 select_expr:
 "select each in `ls |grep log`; do
@@ -143,7 +143,7 @@ while_expr:
 echo \"file found\"
 done" -> (while (LIST (COMMAND (STRING echo) (STRING true))) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found)))))
 "while echo true; do echo \"file found\"; done" -> (while (LIST (COMMAND (STRING echo) (STRING true))) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found)))))
-"while(( 1>0 )); do echo ok; done" -> (while (LIST (COMMAND (ARITHMETIC_EXPRESSION (> 1 0)))) (LIST (COMMAND (STRING echo) (STRING ok))))
+"while(( 1>0 )); do echo ok; done" -> (while (LIST (COMMAND (ARITHMETIC_EXPRESSION (ARITHMETIC (> 1 0))))) (LIST (COMMAND (STRING echo) (STRING ok))))
 "while echo true`; do echo file done" FAIL
 "while [[ -n \"$ver_str\" ]] ; do
 		echo true
@@ -186,12 +186,12 @@ esac" -> (case (STRING (DOUBLE_QUOTED_STRING (VAR_REF 1))) (CASE_PATTERN (BRANCH
 
 command:
 "[[ asdf > qwert ]] > /dev/null" -> (COMMAND (COMPOUND_COND (KEYWORD_TEST (> (STRING asdf) (STRING qwert)))) (REDIR > (STRING / dev / null)))
-"(( 5+3 )) > /dev/null" -> (COMMAND (ARITHMETIC_EXPRESSION (+ 5 3)) (REDIR > (STRING / dev / null)))
+"(( 5+3 )) > /dev/null" -> (COMMAND (ARITHMETIC_EXPRESSION (ARITHMETIC (+ 5 3))) (REDIR > (STRING / dev / null)))
 "{ time cat; } > /dev/null" -> (COMMAND (CURRENT_SHELL (LIST (COMMAND (STRING cat) time))) (REDIR > (STRING / dev / null)))
 "(time cat) > /dev/null" -> (COMMAND (SUBSHELL (LIST (COMMAND (STRING cat) time))) (REDIR > (STRING / dev / null)))
 "case a in esac >/dev/null" -> (COMMAND (case (STRING a) CASE_PATTERN) (REDIR > (STRING / dev / null)))
 "for i in foo$var bar; do echo $i; done >/dev/null" -> (COMMAND (for i (STRING foo (VAR_REF var)) (STRING bar) (LIST (COMMAND (STRING echo) (STRING (VAR_REF i))))) (REDIR > (STRING / dev / null)))
-"for ((5+3;;5+3)); do echo yay; done >/dev/null" -> (COMMAND (CFOR (FOR_INIT (+ 5 3)) (LIST (COMMAND (STRING echo) (STRING yay))) (FOR_MOD (+ 5 3))) (REDIR > (STRING / dev / null)))
+"for ((5+3;;5+3)); do echo yay; done >/dev/null" -> (COMMAND (CFOR (FOR_INIT (ARITHMETIC (+ 5 3))) (LIST (COMMAND (STRING echo) (STRING yay))) (FOR_MOD (ARITHMETIC (+ 5 3)))) (REDIR > (STRING / dev / null)))
 "select each in `ls |grep log`; do echo \"file found\"; done >/dev/null" -> (COMMAND (select each (STRING (COMMAND_SUB `ls |grep log`)) (LIST (COMMAND (STRING echo) (STRING (DOUBLE_QUOTED_STRING file   found))))) (REDIR > (STRING / dev / null)))
 
 "if echo yay2;

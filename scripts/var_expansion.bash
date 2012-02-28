@@ -17,6 +17,8 @@ echo ${FOO009: -2}
 echo ${FOO009:100}
 echo ${FOO009: -100}
 echo ${FOO009:(-5 + 5)}
+echo ${FOO009:(-5 + 5,0)}
+echo ${FOO009:(-5 + 5,1)}
 echo ${NOT_EXIST:0}
 echo ${FOO009:0:2}
 echo ${FOO009:2:2}

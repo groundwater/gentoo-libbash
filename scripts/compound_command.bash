@@ -351,3 +351,8 @@ case $target in
         ;;
 esac
 echo "case end"
+
+for((i=1,j=2;i!=2&&j!=4;++i))
+do
+    echo $i $j
+done

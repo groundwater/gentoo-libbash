@@ -23,4 +23,7 @@ d=2
 e="1+2"
 echo $(($a + $b))
 echo $(($a + $e))
-
+(( a=1 ))
+echo $a
+(( a=(b=2,3) ))
+echo $a $b

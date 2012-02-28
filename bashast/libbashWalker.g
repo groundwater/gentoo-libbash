@@ -506,16 +506,19 @@ var_expansion returns[std::string libbash_value]
 		libbash_value = walker->do_alternate_expansion(walker->is_unset($var_name.libbash_value),
 		                                               libbash_word);
 	}
-	|(^(OFFSET array_name arithmetics arithmetics)) => ^(OFFSET libbash_name=array_name offset=arithmetics length=arithmetics) {
+	|(^(OFFSET array_name ^(OFFSET arithmetics) ^(OFFSET arithmetics))) =>
+		^(OFFSET libbash_name=array_name ^(OFFSET offset=arithmetics) ^(OFFSET length=arithmetics)) {
 		libbash_value = walker->do_subarray_expansion(libbash_name, offset, length);
 	}
-	|(^(OFFSET array_name offset=arithmetics)) => ^(OFFSET libbash_name=array_name offset=arithmetics) {
+	|(^(OFFSET array_name ^(OFFSET offset=arithmetics))) =>
+		^(OFFSET libbash_name=array_name ^(OFFSET offset=arithmetics)) {
 		libbash_value = walker->do_subarray_expansion(libbash_name, offset);
 	}
-	|(^(OFFSET var_name arithmetics arithmetics)) => ^(OFFSET var_name offset=arithmetics length=arithmetics) {
+	|(^(OFFSET var_name ^(OFFSET arithmetics) ^(OFFSET arithmetics))) =>
+		^(OFFSET var_name ^(OFFSET offset=arithmetics) ^(OFFSET length=arithmetics)) {
 		libbash_value = walker->do_substring_expansion($var_name.libbash_value, offset, length, $var_name.index);
 	}
-	|^(OFFSET var_name offset=arithmetics) {
+	|^(OFFSET var_name ^(OFFSET offset=arithmetics)) {
 		libbash_value = walker->do_substring_expansion($var_name.libbash_value, offset, $var_name.index);
 	}
 	|^(POUND(
@@ -1097,7 +1100,18 @@ primary returns[std::string libbash_value, unsigned index]
 
 // shell arithmetic
 // http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_06_04
+
+// We need to branches here because we have to deal with the following two expressions:
+// (( a=123 ))
+// (( a=(b=123, 4) ))
 arithmetics returns[long value]
+	:((ARITHMETIC) => result=arithmetic_part { $value = result; })+
+	|result=arithmetic { $value = result; };
+
+arithmetic_part returns[long value]
+	:^(ARITHMETIC result=arithmetics { $value = result; });
+
+arithmetic returns[long value]
 	:^(LOGICOR l=arithmetics {
 		if(l)
 		{
