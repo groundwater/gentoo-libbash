@@ -1005,7 +1005,7 @@ primary
 	|	arithmetic_expansion
 	|	LPAREN! (arithmetics) RPAREN!;
 pre_post_primary
-	:	primary;
+	:	DQUOTE!? primary DQUOTE!?;
 post_inc_dec
 	:	pre_post_primary ((BLANK) => BLANK)?
 		(

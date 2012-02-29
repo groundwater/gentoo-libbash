@@ -356,3 +356,8 @@ for((i=1,j=2;i!=2&&j!=4;++i))
 do
     echo $i $j
 done
+python_versions=(2.6 2.7 3.0 3.1)
+for ((i = "${#python_versions[@]}"; i >= 0; i--))
+do
+    echo $i
+done
