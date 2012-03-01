@@ -746,6 +746,8 @@ expansion_base
 	|	(ESC TICK) => ESC TICK -> TICK
 	|	(ESC DOLLAR) => ESC DOLLAR -> DOLLAR
 	|	(brace_expansion) => brace_expansion
+	|	(DOLLAR SINGLE_QUOTED_STRING_TOKEN) => DOLLAR SINGLE_QUOTED_STRING_TOKEN
+			-> ^(ANSI_C_QUOTING SINGLE_QUOTED_STRING_TOKEN)
 	|	.;
 
 all_expansions

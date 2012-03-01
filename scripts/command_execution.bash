@@ -84,3 +84,4 @@ variable=a
 echo "${!variable// /_}"
 echo "${!#// /_}"
 echo "${!1// /_}"
+echo "${!variable// /$'\n'}"
