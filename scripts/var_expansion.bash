@@ -130,6 +130,11 @@ foo=
 unset bar
 echo ${bar=abc}
 
+search_paths="a%#b"
+root=123
+echo "${search_paths/%/${root}}"
+echo "${search_paths/#/${root}}"
+
 # This regular expression will cause boost::exception_detail::clone_impl<boost::xpressive::regex_error>
 #[[ "${version_components_groups}" =~ ("*".*" "|" *"|^2.*\ (2|\*)|^3.*\ (3|\*)) ]]
 [[ " ${FUNCNAME[@]:2} " =~ " "(_python_final_sanity_checks|python_execute_function|python_mod_optimize|python_mod_cleanup)" " ]]

@@ -879,7 +879,8 @@ parameter_value_operator
 	|	QMARK -> DISPLAY_ERROR_WHEN_UNSET
 	|	PLUS -> USE_ALTERNATE_WHEN_UNSET;
 parameter_replace_pattern
-	:	((~SLASH) => parameter_pattern_part)+ -> ^(STRING parameter_pattern_part+);
+	:	(SLASH) => -> ^(STRING NAME) // Create an empty string
+	|	((~SLASH) => parameter_pattern_part)+ -> ^(STRING parameter_pattern_part+);
 parameter_delete_pattern
 	:	parameter_pattern_part+ -> ^(STRING parameter_pattern_part+);
 parameter_pattern_part

@@ -90,6 +90,9 @@ variable_reference:
 "${!#/a/bc}" -> (VAR_REF (REPLACE_FIRST (VAR_REF #) (STRING a) (STRING bc)))
 "${!abc/a/bc}" -> (VAR_REF (REPLACE_FIRST (VAR_REF abc) (STRING a) (STRING bc)))
 "${!123/a/bc}" -> (VAR_REF (REPLACE_FIRST (VAR_REF 123) (STRING a) (STRING bc)))
+"${search_paths/%/${root}}" -> (VAR_REF (REPLACE_AT_END search_paths (STRING NAME) (STRING $ { root })))
+"${search_paths/#/${root}}" -> (VAR_REF (REPLACE_AT_START search_paths (STRING NAME) (STRING $ { root })))
+"${search_paths//${root}}" -> (VAR_REF (REPLACE_ALL search_paths (STRING (VAR_REF root))))
 
 variable_definition_atom:
 "MY_PN=${PN/asterisk-}" -> (= MY_PN (STRING (VAR_REF (REPLACE_FIRST PN (STRING asterisk -)))))
