@@ -461,7 +461,18 @@ array_atom
 		);
 
 builtin_variable_definition_item
-	:	((~EOL) => expansion_base)+;
+scope {
+	int parens;
+}
+@init {
+	$builtin_variable_definition_item::parens = 0;
+}
+	:	(
+			(LPAREN) => LPAREN { ++$builtin_variable_definition_item::parens; }
+			|(RPAREN) => RPAREN { --$builtin_variable_definition_item::parens; }
+			|(~EOL) => expansion_base
+			| {LA(1) == EOL && $builtin_variable_definition_item::parens > 0}? => EOL
+		)+;
 
 #ifdef OUTPUT_C
 builtin_variable_definitions[bool local]

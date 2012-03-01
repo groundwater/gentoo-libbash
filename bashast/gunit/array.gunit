@@ -34,6 +34,18 @@ variable_definition_atom:
 builtin_variable_definitions:
 "asdf=(a b c d) ade acd=bde" -> (LIST (COMMAND (VARIABLE_DEFINITIONS (= asdf (ARRAY (STRING a) (STRING b) (STRING c) (STRING d))) (EQUALS ade (STRING (VAR_REF ade))) (= acd (STRING bde)))))
 
+builtin_variable_definition_item:
+"local cmakeargs=(
+    abc
+    def
+    ghi
+)" -> "local   cmakeargs = ( \n      abc \n      def \n      ghi \n )"
+"export cmakeargs=(
+    abc
+    def
+    ghi
+)" -> "export   cmakeargs = ( \n      abc \n      def \n      ghi \n )"
+
 variable_reference:
 "$asdf" -> (VAR_REF asdf)
 "${asdf[0]:-default}" -> (VAR_REF (USE_DEFAULT_WHEN_UNSET_OR_NULL (asdf (ARITHMETIC 0)) (STRING default)))
