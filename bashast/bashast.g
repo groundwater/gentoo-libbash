@@ -860,7 +860,6 @@ parameter_expansion
 				TIMES -> ^(BANG variable_name_for_bang TIMES)
 				|	AT -> ^(BANG variable_name_for_bang AT)
 				|	LSQUARE (op=TIMES|op=AT) RSQUARE -> ^(LIST_EXPAND variable_name_for_bang $op)
-				|	-> ^(VAR_REF variable_name_for_bang)
 			)
 		|	{LA(1) == POUND && LA(2) != RBRACE }? => variable_size_ref;
 parameter_delete_operator
@@ -915,6 +914,7 @@ variable_name
 	:	num
 	|	name LSQUARE AT RSQUARE -> ^(ARRAY name AT)
 	|	name LSQUARE TIMES RSQUARE -> ^(ARRAY name TIMES)
+	|	BANG variable_name_for_bang -> ^(VAR_REF variable_name_for_bang)
 	|	variable_name_no_digit
 	|	DOLLAR
 	|	TIMES
