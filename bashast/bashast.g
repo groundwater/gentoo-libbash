@@ -600,9 +600,9 @@ condition_expr
 #endif
 
 keyword_condition_and
-	:	keyword_condition_primary (BLANK!? LOGICAND^ BLANK!? keyword_condition_primary)?;
+	:	keyword_condition_primary (BLANK!? LOGICAND^ BLANK!? keyword_condition_primary)*;
 keyword_condition
-	:	keyword_condition_and (BLANK!? LOGICOR^ BLANK!? keyword_condition_and)?;
+	:	keyword_condition_and (BLANK!? LOGICOR^ BLANK!? keyword_condition_and)*;
 keyword_negation_primary
 	:	BANG BLANK keyword_condition_primary -> ^(NEGATION keyword_condition_primary);
 keyword_condition_primary
@@ -655,9 +655,9 @@ keyword_binary_string_operator
 
 
 builtin_condition_and
-	:	builtin_condition_primary (builtin_logic_and^ BLANK! builtin_condition_primary)?;
+	:	builtin_condition_primary (builtin_logic_and^ BLANK! builtin_condition_primary)*;
 builtin_condition
-	:	builtin_condition_and (builtin_logic_or^ BLANK! builtin_condition_and)?;
+	:	builtin_condition_and (builtin_logic_or^ BLANK! builtin_condition_and)*;
 builtin_negation_primary
 	:	BANG BLANK builtin_condition_primary -> ^(NEGATION builtin_condition_primary);
 builtin_condition_primary
