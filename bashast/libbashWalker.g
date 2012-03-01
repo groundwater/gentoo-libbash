@@ -447,8 +447,23 @@ var_name returns[std::string libbash_value, unsigned index]
 		$libbash_value = $name.libbash_value;
 		$index = $name.index;
 	}
+	|^(VAR_REF libbash_string=var_name_for_bang) {
+		$libbash_value = walker->resolve<std::string>(libbash_string);
+	}
+	|^(VAR_REF POUND) { // for ${!#}
+		int index = walker->get_array_length("*");
+		$libbash_value = (index != 0 ? "*" : "0");
+	}
 	|MINUS {
 		$libbash_value = "-";
+	};
+
+var_name_for_bang returns[std::string libbash_value]
+	:libbash_string=num {
+		$libbash_value = libbash_string;
+	}
+	|name {
+		$libbash_value = $name.libbash_value;
 	};
 
 array_name returns[std::string libbash_value]
