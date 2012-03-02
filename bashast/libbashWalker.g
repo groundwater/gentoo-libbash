@@ -302,6 +302,7 @@ string_part returns[std::string libbash_value, bool quoted, bool is_raw_string]
 		$libbash_value = transformed.str();
 		$quoted = true;
 	}
+	|(ESCAPED_CHAR) => ESCAPED_CHAR libbash_string=any_string { $libbash_value = "\\" + libbash_string; }
 	|(libbash_string=any_string {
 		$libbash_value = libbash_string;
 	});
@@ -797,7 +798,7 @@ keyword_condition returns[bool status]
 	} r=keyword_condition) { $status= l && r; }
 	|^(NEGATION l=keyword_condition) { $status = !l; }
 	|^(MATCH_REGULAR_EXPRESSION left_str=string_expr right_str=string_expr) {
-		bash_ast ast(std::stringstream(right_str.libbash_value), &bash_ast::parser_all_expansions);
+		bash_ast ast(std::stringstream(right_str.libbash_value), &bash_ast::parser_all_expansions, false);
 		std::string pattern = ast.interpret_with(*walker, &bash_ast::walker_string_expr);
 		boost::xpressive::sregex re = boost::xpressive::sregex::compile(pattern);
 		$status = boost::xpressive::regex_match(left_str.libbash_value, re);

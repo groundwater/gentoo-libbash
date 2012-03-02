@@ -80,6 +80,7 @@ tokens{
 	BRANCH;
 	MATCH_PATTERN;
 	MATCH_REGULAR_EXPRESSION;
+	ESCAPED_CHAR;
 	NOT_MATCH_PATTERN;
 	MATCH_ANY;
 	MATCH_ANY_EXCEPT;
@@ -651,13 +652,20 @@ scope {
 }
 	:(
 		DQUOTE! { $bash_pattern_part::quoted = !$bash_pattern_part::quoted; }
-		|	{$bash_pattern_part::quoted}? => ~DQUOTE
+		|	{$bash_pattern_part::quoted}? => preserved_tokens
 		|	(ESC BLANK) => ESC BLANK
 		|	LPAREN { if(LA(-2) != ESC) $bash_pattern_part::parens++; }
 		|	LLPAREN { if(LA(-2) != ESC) $bash_pattern_part::parens += 2; }
 		|	{$bash_pattern_part::parens != 0}? => RPAREN { if(LA(-2) != ESC) $bash_pattern_part::parens--; }
 		|	~(BLANK|EOL|LOGICAND|LOGICOR|LPAREN|RPAREN|DQUOTE|LLPAREN)
 	 )+;
+
+preserved_tokens
+	:	non_dquote -> ESCAPED_CHAR non_dquote;
+
+non_dquote
+	:	~DQUOTE;
+
 keyword_binary_string_operator
 	:	BLANK! binary_operator BLANK!
 	|	BLANK! EQUALS BLANK!

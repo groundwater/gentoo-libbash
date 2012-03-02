@@ -135,8 +135,6 @@ root=123
 echo "${search_paths/%/${root}}"
 echo "${search_paths/#/${root}}"
 
-# This regular expression will cause boost::exception_detail::clone_impl<boost::xpressive::regex_error>
-#[[ "${version_components_groups}" =~ ("*".*" "|" *"|^2.*\ (2|\*)|^3.*\ (3|\*)) ]]
 [[ " ${FUNCNAME[@]:2} " =~ " "(_python_final_sanity_checks|python_execute_function|python_mod_optimize|python_mod_cleanup)" " ]]
 [[ "$(declare -p PYTHON_SANITY_CHECKS_EXECUTED)" != "declare -- PYTHON_SANITY_CHECKS_EXECUTED="* || " ${FUNCNAME[@]:1} " =~ " "(python_set_active_version|python_pkg_setup)" " && -z "${PYTHON_SKIP_SANITY_CHECKS}" ]]
 [[ " ${FUNCNAME[@]:1} " =~ " "(python_set_active_version|python_pkg_setup)" " ]]
@@ -146,3 +144,4 @@ PYTHON_DEPEND="2:2.6"
 version_components_group_regex="(2|3|\*)(:([[:digit:]]+\.[[:digit:]]+)?(:([[:digit:]]+\.[[:digit:]]+)?)?)?"
 version_components_groups="${PYTHON_DEPEND}"
 [[ "${version_components_groups}" =~ ^((\!)?[[:alnum:]_-]+\?\ )?${version_components_group_regex}(\ ${version_components_group_regex})?$ ]] && echo true
+[[ "${version_components_groups}" =~ ("*".*" "|" *"|^2.*\ (2|\*)|^3.*\ (3|\*)) ]] && echo true

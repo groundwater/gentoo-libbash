@@ -36,31 +36,34 @@
 #include "libbashParser.h"
 #include "libbashWalker.h"
 
-void bash_ast::read_script(const std::istream& source)
+void bash_ast::read_script(const std::istream& source, bool trim)
 {
   std::stringstream stream;
   stream << source.rdbuf();
   script = stream.str();
   boost::algorithm::erase_all(script, "\\\n");
-  boost::trim_if(script, boost::is_any_of(" \t\n"));
+  if(trim)
+    boost::trim_if(script, boost::is_any_of(" \t\n"));
 }
 
 bash_ast::bash_ast(const std::istream& source,
-                   std::function<pANTLR3_BASE_TREE(plibbashParser)> p): parse(p)
+                   std::function<pANTLR3_BASE_TREE(plibbashParser)> p,
+                   bool trim): parse(p)
 {
-  read_script(source);
+  read_script(source, trim);
   init_parser("unknown source");
 }
 
 bash_ast::bash_ast(const std::string& script_path,
-                   std::function<pANTLR3_BASE_TREE(plibbashParser)> p): parse(p)
+                   std::function<pANTLR3_BASE_TREE(plibbashParser)> p,
+                   bool trim): parse(p)
 {
   std::stringstream stream;
   std::ifstream file_stream(script_path);
   if(!file_stream)
     throw libbash::parse_exception(script_path + " can't be read");
 
-  read_script(file_stream);
+  read_script(file_stream, trim);
   init_parser(script_path);
 }
 

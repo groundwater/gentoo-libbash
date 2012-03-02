@@ -67,7 +67,7 @@ class bash_ast: public boost::noncopyable
 
   typedef std::unique_ptr<libbashWalker_Ctx_struct, std::function<void(libbashWalker_Ctx_struct*)>> walker_pointer;
 
-  void read_script(const std::istream& source);
+  void read_script(const std::istream& source, bool trim);
   void init_parser(const std::string& script_path);
   walker_pointer create_walker(interpreter& walker,
                                antlr_pointer<ANTLR3_COMMON_TREE_NODE_STREAM_struct>& nodes);
@@ -77,13 +77,13 @@ public:
   /// \param source input source
   /// \param p the parser rule for building the AST
   bash_ast(const std::istream& source,
-           std::function<pANTLR3_BASE_TREE(libbashParser_Ctx_struct*)> p=parser_start);
+           std::function<pANTLR3_BASE_TREE(libbashParser_Ctx_struct*)> p=parser_start, bool trim=true);
 
   /// \brief build AST from string
   /// \param script_path input source
   /// \param p the parser rule for building the AST
   bash_ast(const std::string& script_path,
-           std::function<pANTLR3_BASE_TREE(libbashParser_Ctx_struct*)> p=parser_start);
+           std::function<pANTLR3_BASE_TREE(libbashParser_Ctx_struct*)> p=parser_start, bool trim=true);
 
   /// \brief the functor for walker start rule
   /// \param tree_parser the pointer to the tree_parser
