@@ -1068,7 +1068,8 @@ case_clause[const std::string& target] returns[bool matched]
 		else
 		{
 			$matched = false;
-			seek_to_next_tree(ctx);
+			if(LA(1) == CASE_COMMAND)
+				seek_to_next_tree(ctx);
 		}
 	})
 	|CASE_PATTERN;

@@ -361,3 +361,15 @@ for ((i = "${#python_versions[@]}"; i >= 0; i--))
 do
     echo $i
 done
+EAPI="4"
+case ${EAPI} in
+    0|1)
+        echo "Unsupported EAPI=${EAPI} (too old) for ruby-ng.eclass" ;;
+    2|3);;
+    4)
+        # S is no longer automatically assigned when it doesn't exist.
+        S="${WORKDIR}"
+        ;;  
+    *)  
+        echo "Unknown EAPI=${EAPI} for ruby-ng.eclass"
+esac
