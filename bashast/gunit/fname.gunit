@@ -77,4 +77,4 @@ condition_expr:
 "[[ x == ab!(gh|i) ]]" -> (KEYWORD_TEST (MATCH_PATTERN (STRING x) (STRING ab (EXTENDED_MATCH_NONE (BRANCH gh) (BRANCH i)))))
 
 double_quoted_string:
-"\"\\\\\"\$\`\"" -> (DOUBLE_QUOTED_STRING \ " \$ \`)
+"\"\\\\\"\$\`\"" -> (DOUBLE_QUOTED_STRING \ \" \$ \`)

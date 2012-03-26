@@ -446,6 +446,7 @@ options {backtrack = true;}
 	:ESC_RPAREN { $libbash_value = ")"; }
 	|ESC_LPAREN { $libbash_value = "("; }
 	|ESC_DOLLAR { $libbash_value = "$"; }
+	|ESC_DQUOTE { $libbash_value = "\""; }
 	|ESC_GT { $libbash_value = ">"; }
 	|ESC_LT { $libbash_value = "<"; }
 	|ESC_TICK { $libbash_value = "`"; }

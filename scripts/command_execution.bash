@@ -89,3 +89,4 @@ echo "${!variable// /_}"
 echo "${!#// /_}"
 echo "${!1// /_}"
 echo "${!variable// /$'\n'}"
+eval abc+=\( \"\$@\" \)

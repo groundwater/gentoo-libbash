@@ -784,7 +784,7 @@ ns_string_part
 	|OTHER|EQUALS|PCT|PCTPCT|PLUS|MINUS|DOT|DOTDOT|COLON
 	|TILDE|LSQUARE|RSQUARE|CARET|POUND|COMMA|EXPORT|LOCAL|AT
 	// Escaped characters
-	|ESC_RPAREN|ESC_LPAREN|ESC_DOLLAR|ESC_GT|ESC_LT|ESC_TICK
+	|ESC_RPAREN|ESC_LPAREN|ESC_DOLLAR|ESC_GT|ESC_LT|ESC_TICK|ESC_DQUOTE
 	// The following is for filename expansion
 	|TIMES|QMARK;
 
@@ -1126,6 +1126,7 @@ AMP_RSHIFT	:	'&>>';
 SEMIC	:	';';
 DOUBLE_SEMIC	:	';;';
 PIPE	:	'|';
+ESC_DQUOTE	:	'\\"';
 DQUOTE	:	'"' { if(LA(-1) != '\\') double_quoted = !double_quoted; };
 SQUOTE	:	{ double_quoted }? => '\'';
 SINGLE_QUOTED_STRING_TOKEN	:	{ !double_quoted }? => '\'' .* '\'';
