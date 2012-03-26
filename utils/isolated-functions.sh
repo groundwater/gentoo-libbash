@@ -19,7 +19,7 @@ EXPORT_FUNCTIONS() {
         die "EXPORT_FUNCTIONS without a defined ECLASS"
         return 1
     fi   
-    __export_funcs_var="$__export_funcs_var $*" 
+    eval $__export_funcs_var+=\" $*\"
 }
 
 use() {

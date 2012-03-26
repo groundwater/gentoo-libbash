@@ -83,8 +83,8 @@ int inherit_builtin::exec(const std::vector<std::string>& bash_args)
   {
     location = eclassdir + *iter + ".eclass";
     _walker.set_value("ECLASS", *iter);
-    export_funcs_var = "__export_functions_" + _walker.resolve<std::string>("ECLASS_DEPTH");
-    _walker.unset(export_funcs_var);
+    _walker.define("__export_funcs_var", "__export_functions_" + _walker.resolve<std::string>("ECLASS_DEPTH"));
+    _walker.unset(_walker.resolve<std::string>("__export_funcs_var"));
 
     // Portage implementation performs actions for overlays here but we don't do it for now
 
@@ -108,7 +108,20 @@ int inherit_builtin::exec(const std::vector<std::string>& bash_args)
     restore_global("RDEPEND", B_RDEPEND);
     restore_global("PDEPEND", B_PDEPEND);
 
-    // Portage implementation exports functions here but we don't do it for now
+    if(!_walker.is_unset(_walker.resolve<std::string>("__export_funcs_var")))
+    {
+      std::stringstream func_names(_walker.resolve<std::string>(_walker.resolve<std::string>("__export_funcs_var")));
+      std::string func_name;
+
+      while(func_names >> func_name)
+      {
+        std::stringstream func;
+        func << func_name << "() { " << _walker.resolve<std::string>("ECLASS") << "_" << func_name
+          << " \"$@\" ; }";
+        _walker.execute_builtin("eval", {func.str()});
+      }
+    }
+    _walker.unset(_walker.resolve<std::string>("__export_funcs_var"));
 
     if(!hasq(*iter, "INHERITED"))
       _walker.set_value("INHERITED", _walker.resolve<std::string>("INHERITED") + " " + *iter);
