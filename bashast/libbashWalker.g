@@ -217,18 +217,33 @@ var_def[bool local]
 		else
 			walker->set_value($name.libbash_value, $string_expr.libbash_value, $name.index);
 	}
-	|^(EQUALS libbash_name=name_base ^(ARRAY (
-										(expr=string_expr
-										|^(EQUALS value=arithmetics {
-												set_index(libbash_name, index, value);
-											} expr=string_expr))
-										{ values[index++] = expr.libbash_value; })*
-									 )){
+	|^(EQUALS libbash_name=name_base array_def_helper[libbash_name, values, index]){
 		if(local)
 			walker->define_local(libbash_name, values);
 		else
 			walker->define(libbash_name, values);
+	}
+	|^(PLUS_ASSIGN libbash_name=name_base {
+		index = walker->get_max_index(libbash_name) + 1;
+		if(index == 1) // The variable is not defined
+			index = 0;
+	} array_def_helper[libbash_name, values, index]){
+		if(local)
+			throw libbash::unsupported_exception("Appending array to local variable is not supported");
+		for(auto iter = values.begin(); iter != values.end(); ++iter)
+			walker->set_value(libbash_name, iter->second, iter->first);
 	};
+
+array_def_helper[const std::string& libbash_name, std::map<unsigned, std::string>& values, unsigned index]
+	:^(ARRAY (
+		(
+			expr=string_expr
+			|^(EQUALS value=arithmetics {
+				set_index(libbash_name, index, value);
+			} expr=string_expr)
+		)
+		{ values[index++] = expr.libbash_value; }
+	)*);
 
 string_expr returns[std::string libbash_value, bool quoted]
 @init {

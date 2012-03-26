@@ -88,3 +88,11 @@ function foo() {
 foo
 bar=@
 echo $bar
+ARRAY11=(1 2 3 [10]=15)
+ARRAY11+=(1 [15]=20)
+echo ${ARRAY11[@]}
+ARRAY12+=(4 5 6)
+echo ${ARRAY12[@]}
+ARRAY13=()
+ARRAY13+=(4 5 6)
+echo ${ARRAY13[@]}

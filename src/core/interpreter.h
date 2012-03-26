@@ -461,6 +461,15 @@ public:
   /// \return the length of the array
   variable::size_type get_array_length(const std::string& name) const;
 
+  /// \brief get the max index of an array
+  /// \param name the name of the array
+  /// \return the max index of the array
+  variable::size_type get_max_index(const std::string& name) const
+  {
+    auto var = resolve_variable(name);
+    return var ? var->get_max_index() : 0;
+  }
+
   /// \brief get all array elements concatenated by space
   /// \param name the name of the array
   /// \param[out] result the concatenated string

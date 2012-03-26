@@ -215,6 +215,11 @@ public:
     return value.size();
   }
 
+  size_type get_max_index() const
+  {
+    return value.size() == 0 ? 0 : value.rbegin()->first;
+  }
+
   /// \brief check whether the value of the variable is null
   /// \return whether the value of the variable is null
   bool is_unset(const unsigned index=0) const

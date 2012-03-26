@@ -146,6 +146,15 @@ TEST(interpreter, get_array_values)
   EXPECT_FALSE(walker.resolve_array("undefined", array_values));
 }
 
+TEST(interpreter, get_max_index)
+{
+  interpreter walker;
+  std::map<unsigned, std::string> values = {{0, "1"}, {1, "2"}, {5, "3"}};
+  walker.define("array", values);
+
+  EXPECT_EQ(5, walker.get_max_index("array"));
+}
+
 TEST(interpreter, unset_arrays)
 {
   interpreter walker;
