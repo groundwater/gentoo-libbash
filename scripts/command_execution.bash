@@ -62,6 +62,9 @@ eval "echo abc" "def" "xyz"
 shopt -s extglob
 printf "%s %s\n" abc def
 printf "%s %s\n" $FOO001, def
+printf "123-%s" 456 789
+printf "\n"
+printf "123-%s"
 ((FOO010=1))
 echo $FOO010
 echo "abc #av### ##" # for comment

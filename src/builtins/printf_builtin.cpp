@@ -41,23 +41,33 @@ int printf_builtin::exec(const std::vector<std::string>& bash_args)
   std::stringstream format_string;
   cppbash_builtin::transform_escapes(*begin, format_string, false);
   boost::format formatter(format_string.str());
+  formatter.exceptions(boost::io::all_error_bits ^ boost::io::too_few_args_bit);
+
+  std::stringstream output;
   for(auto iter = begin + 1; iter != bash_args.end(); ++iter)
-    formatter = formatter % *iter;
+    try
+    {
+      formatter = formatter % *iter;
+    }
+    catch(const boost::io::too_many_args& e)
+    {
+      output << formatter;
+      formatter.parse(format_string.str());
+      formatter = formatter % *iter;
+    }
+  output << formatter;
 
   if(!(bash_args[0][0] == '-'))
   {
-    *_out_stream << formatter;
+    *_out_stream << output.str();
   }
   else if(bash_args[0] == "-v")
   {
-    std::stringstream output;
-    output << formatter;
     _walker.set_value(bash_args[1], output.str());
   }
   else
   {
     throw libbash::illegal_argument_exception("printf: invalid option: " + bash_args[0]);
   }
-
   return 0;
 }
