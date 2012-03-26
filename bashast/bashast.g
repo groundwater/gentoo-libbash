@@ -471,7 +471,7 @@ scope {
 	:	(
 			(LPAREN) => LPAREN { ++$builtin_variable_definition_item::parens; }
 			|(RPAREN) => RPAREN { --$builtin_variable_definition_item::parens; }
-			|(~EOL) => expansion_base
+			|(~(EOL|SEMIC)) => expansion_base
 			| {LA(1) == EOL && $builtin_variable_definition_item::parens > 0}? => EOL
 		)+;
 
