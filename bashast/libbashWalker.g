@@ -282,6 +282,7 @@ string_part returns[std::string libbash_value, bool quoted, bool is_raw_string]
 								})*)
 	|(SINGLE_QUOTED_STRING) => ^(SINGLE_QUOTED_STRING node=SINGLE_QUOTED_STRING_TOKEN) {
 		$libbash_value = get_single_quoted_string(node);
+		$quoted = true;
 	}
 	|(ARITHMETIC_EXPRESSION) =>
 		^(ARITHMETIC_EXPRESSION value=arithmetics {

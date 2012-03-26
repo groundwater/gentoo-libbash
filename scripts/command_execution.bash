@@ -64,6 +64,7 @@ printf "%s %s\n" abc def
 printf "%s %s\n" $FOO001, def
 printf "123-%s" 456 789
 printf "\n"
+printf 'debug-%s ' dvc kbd nla
 printf "123-%s"
 ((FOO010=1))
 echo $FOO010
