@@ -28,6 +28,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/lexical_cast.hpp>
 
 static const std::vector<std::string> metadata_names = {"DEPEND", "RDEPEND", "SLOT", "SRC_URI",
                                                         "RESTRICT",  "HOMEPAGE",  "LICENSE", "DESCRIPTION",
@@ -56,6 +57,11 @@ void write_metadata(std::ostream& output,
                     std::unordered_map<std::string, std::vector<std::string>>& variables,
                     std::vector<std::string>& functions)
 {
+  int EAPI = 0;
+  if(variables.find("EAPI") != variables.end())
+    EAPI = boost::lexical_cast<int>(variables["EAPI"][0]);
+  if(EAPI < 4 && variables.find("RDEPEND") == variables.end() && variables.find("DEPEND") != variables.end())
+    variables["RDEPEND"] = variables["DEPEND"];
   for(auto iter_name = metadata_names.begin(); iter_name != metadata_names.end(); ++iter_name)
   {
     auto iter_value = variables.find(*iter_name);
