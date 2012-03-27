@@ -12,3 +12,4 @@ use_enable
 eerror foo
 debug-print foo
 ewarn foo
+debug-print-function foo bar

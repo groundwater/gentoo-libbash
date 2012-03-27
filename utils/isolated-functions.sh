@@ -50,6 +50,10 @@ debug-print() {
     echo "debug-print: $*"
 }
 
+debug-print-function() {
+    debug-print "${1}: entering function, parameters: ${*:2}"
+}
+
 ewarn() {
     echo "ewarn: $*"
 }
