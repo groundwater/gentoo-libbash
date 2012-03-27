@@ -32,18 +32,18 @@ int declare_builtin::exec(const std::vector<std::string>& bash_args)
 {
   if(bash_args.empty())
   {
-    throw libbash::illegal_argument_exception("Arguments required for declare");
+    throw libbash::illegal_argument_exception("declare: arguments required");
     return 1;
   }
   else if(bash_args[0].size() != 2)
   {
-    throw libbash::unsupported_exception("Multiple arguments are not supported");
+    throw libbash::unsupported_exception("declare: multiple arguments are not supported");
     return 1;
   }
 
   if(bash_args[0][0] != '-' && bash_args[0][0] != '+')
   {
-    throw libbash::illegal_argument_exception("Invalid option for declare builtin");
+    throw libbash::illegal_argument_exception("declare: invalid option");
     return 1;
   }
 
@@ -108,7 +108,7 @@ int declare_builtin::exec(const std::vector<std::string>& bash_args)
       throw libbash::unsupported_exception("declare " + bash_args[0] + " is not supported yet");
       return 1;
     default:
-      throw libbash::illegal_argument_exception("Unrecognized option for declare: " + bash_args[0]);
+      throw libbash::illegal_argument_exception("declare: unrecognized option: " + bash_args[0]);
       return 1;
   }
 }

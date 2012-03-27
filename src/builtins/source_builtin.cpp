@@ -65,7 +65,7 @@ namespace {
 int source_builtin::exec(const std::vector<std::string>& bash_args)
 {
   if(bash_args.size() == 0)
-    throw libbash::illegal_argument_exception("should provide one argument for source builtin");
+    throw libbash::illegal_argument_exception("source: argument required");
 
   const std::string& original_path = _walker.resolve<std::string>("0");
   _walker.define("0", bash_args.front(), true);

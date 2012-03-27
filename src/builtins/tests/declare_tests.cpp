@@ -54,10 +54,10 @@ namespace
 
 TEST(declare_builtin_test, invalid_arguments)
 {
-  test_declare<libbash::illegal_argument_exception>("Arguments required for declare", {});
-  test_declare<libbash::unsupported_exception>("Multiple arguments are not supported", {"-ap"});
-  test_declare<libbash::illegal_argument_exception>("Invalid option for declare builtin", {"_a"});
-  test_declare<libbash::illegal_argument_exception>("Unrecognized option for declare: -L", {"-L"});
+  test_declare<libbash::illegal_argument_exception>("declare: arguments required", {});
+  test_declare<libbash::unsupported_exception>("declare: multiple arguments are not supported", {"-ap"});
+  test_declare<libbash::illegal_argument_exception>("declare: invalid option", {"_a"});
+  test_declare<libbash::illegal_argument_exception>("declare: unrecognized option: -L", {"-L"});
 }
 
 TEST(declare_builtin_test, _F)

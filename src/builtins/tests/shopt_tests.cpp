@@ -69,8 +69,8 @@ TEST(shopt_builtin_test, enable_extglob)
 
 TEST(shopt_builtin_test, invalid_argument)
 {
-  test_shopt_builtin<libbash::illegal_argument_exception>("Arguments required for shopt", {});
-  test_shopt_builtin<libbash::unsupported_exception>("Multiple arguments are not supported", {"-so"});
+  test_shopt_builtin<libbash::illegal_argument_exception>("shopt: arguments required", {});
+  test_shopt_builtin<libbash::unsupported_exception>("shopt: multiple arguments are not supported", {"-so"});
   test_shopt_builtin<libbash::unsupported_exception>("shopt -q is not supported yet", {"-q"});
-  test_shopt_builtin<libbash::illegal_argument_exception>("Unrecognized option for shopt: -d", {"-d"});
+  test_shopt_builtin<libbash::illegal_argument_exception>("shopt: unrecognized option: -d", {"-d"});
 }
