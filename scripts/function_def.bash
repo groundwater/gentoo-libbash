@@ -76,6 +76,21 @@ func_positional_args() {
 func_positional_args 1 2 3
 IFS=" \t\n"
 
+nested_func_override_positional_args() {
+  echo $@
+  set -- 40 50 60
+  echo $@
+}
+func_override_positional_args() {
+  echo $@
+  nested_func_override_positional_args 4 5 6
+  set -- 10 20 30
+  echo $@
+}
+set -- foo bar
+func_override_positional_args 1 2 3
+echo $@
+
 if true; then
     function_in_compound_statement() {
         echo "function_in_compound_statement"

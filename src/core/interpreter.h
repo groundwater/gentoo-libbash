@@ -521,6 +521,9 @@ public:
   /// \return zero unless n is greater than $# or less than zero, non-zero otherwise.
   int shift(int shift_number);
 
+  void define_positional_arguments(const std::vector<std::string>::const_iterator begin,
+                                   const std::vector<std::string>::const_iterator end);
+
   /// \brief perform expansion like ${var//foo/bar}
   /// \param value the value to be expanded
   /// \param pattern the pattern used to match the value

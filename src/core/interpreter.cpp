@@ -312,6 +312,21 @@ void interpreter::define_function_arguments(scope& current_stack,
   current_stack["*"].reset(new variable("*", positional_args));
 }
 
+void interpreter::define_positional_arguments(const std::vector<std::string>::const_iterator begin,
+                                              const std::vector<std::string>::const_iterator end)
+{
+  std::map<unsigned, std::string> positional_args;
+  std::vector<std::string>::const_iterator iter = begin;
+
+  for(auto i = 1u; iter != end ; ++i, ++iter)
+    positional_args[i] = *iter;
+
+  if(local_members.size() < 1)
+    define("*", positional_args);
+  else
+    define_local("*", positional_args);
+}
+
 namespace
 {
   bool check_function_name(const std::string& name)

@@ -649,7 +649,7 @@ execute_command[std::string& name, std::vector<std::string>& libbash_args]
 	bool redirection = false;
 }
 @init {
-	if(name != "local")
+	if(name != "local" && name != "set")
 		current_scope.reset(new interpreter::local_scope(*walker));
 }
 	:var_def[true]* (redirect[out, err, in]{ redirection = true; })* {
