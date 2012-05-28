@@ -41,3 +41,22 @@ TEST(set_builtin_test, positional)
   EXPECT_EQ(0, walker.get_array_length("*"));
   EXPECT_STREQ("", walker.resolve<std::string>("*", 1).c_str());
 }
+
+TEST(set_builtin_test, u_option)
+{
+  interpreter walker;
+
+  EXPECT_EQ(0, cppbash_builtin::exec("set", {"-u"}, std::cout, std::cerr, std::cin, walker));
+  EXPECT_THROW(walker.resolve<std::string>("VAR1").c_str(), libbash::unsupported_exception);
+
+  walker.set_value("ARRAY", "foo");
+  EXPECT_NO_THROW(walker.resolve<std::string>("ARRAY").c_str());
+  EXPECT_THROW(walker.resolve<std::string>("ARRAY", 2).c_str(), libbash::unsupported_exception);
+
+  walker.set_value("ARRAY", "foo", 3);
+  EXPECT_NO_THROW(walker.resolve<std::string>("ARRAY", 3).c_str());
+
+  EXPECT_EQ(0, cppbash_builtin::exec("set", {"+u"}, std::cout, std::cerr, std::cin, walker));
+  EXPECT_NO_THROW(walker.resolve<std::string>("VAR2", 1).c_str());
+
+}

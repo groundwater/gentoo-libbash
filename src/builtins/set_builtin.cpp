@@ -62,6 +62,8 @@ int set_builtin::exec(const std::vector<std::string>& bash_args)
     case 'p':
     case 't':
     case 'u':
+      _walker.set_option('u', bash_args[0][0] == '-');
+      return 0;
     case 'v':
     case 'x':
     case 'B':

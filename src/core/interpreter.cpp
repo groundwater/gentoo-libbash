@@ -248,7 +248,7 @@ std::string::size_type interpreter::get_length(const std::string& name,
                                  const unsigned index) const
 {
   auto var = resolve_variable(name);
-  if(!var)
+  if(!is_valid(var, name))
     return 0;
   return var->get_length(index);
 }
@@ -256,7 +256,7 @@ std::string::size_type interpreter::get_length(const std::string& name,
 variable::size_type interpreter::get_array_length(const std::string& name) const
 {
   auto var = resolve_variable(name);
-  if(!var)
+  if(!is_valid(var, name))
     return 0;
   return var->get_array_length();
 }
@@ -466,6 +466,24 @@ void interpreter::set_additional_option(const std::string& name, bool value)
 {
   auto iter = additional_options.find(name);
   if(iter == additional_options.end())
+    throw libbash::illegal_argument_exception(name + " is not a valid bash option");
+
+  iter->second = value;
+}
+
+bool interpreter::get_option(const char name) const
+{
+  auto iter = options.find(name);
+  if(iter == options.end())
+    throw libbash::illegal_argument_exception("Invalid bash option");
+
+  return iter->second;
+}
+
+void interpreter::set_option(const char name, bool value)
+{
+  auto iter = options.find(name);
+  if(iter == options.end())
     throw libbash::illegal_argument_exception(name + " is not a valid bash option");
 
   iter->second = value;
