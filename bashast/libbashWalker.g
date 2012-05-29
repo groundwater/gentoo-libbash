@@ -736,17 +736,18 @@ argument[std::vector<std::string>& args, bool split]
 		}
 	};
 
-logic_command_list
+logic_command
 @declarations {
 	bool logic_and;
 }
-	:command
-	|^((LOGICAND { logic_and = true; } | LOGICOR { logic_and = false; }) command {
+	: ^((LOGICAND { logic_and = true; } | LOGICOR { logic_and = false; }) logic_command_list {
 		if(logic_and ? !walker->get_status() : walker->get_status())
 			command(ctx);
 		else
 			seek_to_next_tree(ctx);
 	});
+
+logic_command_list: command | logic_command;
 
 command_list: ^(LIST logic_command_list+);
 
