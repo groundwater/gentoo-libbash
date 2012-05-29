@@ -26,6 +26,8 @@
 
 #include "core/interpreter.h"
 
+using namespace boost::xpressive;
+
 int unset_builtin::exec(const std::vector<std::string>& bash_args)
 {
   if(bash_args.empty())
@@ -51,7 +53,14 @@ int unset_builtin::exec(const std::vector<std::string>& bash_args)
    * */
     for_each(bash_args.front() == "-v" ? bash_args.begin() + 1 : bash_args.begin(),
              bash_args.end(),
-             [&](const std::string& name) { _walker.unset(name); });
+             [&](const std::string& name) {
+                static const sregex index_pattern = sregex::compile("^(.*)\\[(\\d*)\\]$");
+                smatch match;
+                if(regex_match(name, match, index_pattern))
+                  _walker.unset(match[1], boost::lexical_cast<unsigned int>(match[2]));
+                else
+                  _walker.unset(name);
+             });
 
   return 0;
 }

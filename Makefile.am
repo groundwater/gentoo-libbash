@@ -107,6 +107,7 @@ cppunittests_SOURCES =  test/run_tests.cpp \
 						src/builtins/tests/return_tests.cpp \
 						src/builtins/tests/read_tests.cpp \
 						src/builtins/tests/set_tests.cpp \
+						src/builtins/tests/unset_tests.cpp \
 						src/builtins/tests/printf_tests.cpp \
 						test/test.h \
 						test/test.cpp \
