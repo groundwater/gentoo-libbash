@@ -57,7 +57,7 @@ cppbash_builtin::cppbash_builtin(BUILTIN_ARGS): _out_stream(&out), _err_stream(&
 }
 
 cppbash_builtin::builtins_type& cppbash_builtin::builtins() {
-  static boost::scoped_ptr<builtins_type> p(new builtins_type {
+  static const std::unique_ptr<builtins_type> p(new builtins_type {
       {"break", boost::factory<break_builtin*>()},
       {"continue", boost::factory<continue_builtin*>()},
       {"echo", boost::factory<echo_builtin*>()},

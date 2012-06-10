@@ -31,7 +31,6 @@
 
 #include <boost/functional/factory.hpp>
 #include <boost/function.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <boost/utility.hpp>
 
 /// shortcut for the arguments of the constructor
@@ -89,7 +88,7 @@ class cppbash_builtin: public boost::noncopyable
                     const std::vector<std::string>& args,
                     BUILTIN_ARGS)
     {
-      boost::scoped_ptr<cppbash_builtin> p(builtins()[builtin](out,err,in,walker));
+      const std::unique_ptr<cppbash_builtin> p(builtins()[builtin](out,err,in,walker));
       return p->exec(args);
     }
 
