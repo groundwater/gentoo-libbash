@@ -299,7 +299,7 @@ file_descriptor
 	|	DIGIT MINUS -> ^(FILE_DESCRIPTOR_MOVE DIGIT);
 
 here_string
-	:	BLANK? HERE_STRING_OP^ BLANK!? (string_expr) => string_expr;
+	:	BLANK!? HERE_STRING_OP^ BLANK!? (string_expr) => string_expr;
 
 here_document
 #ifdef OUTPUT_C
@@ -372,7 +372,7 @@ redirection_operator
 command
 	:	command_atom
 		(
-			redirection here_document? -> ^(COMMAND command_atom redirection here_document?)
+			redirection here_document? -> ^(COMMAND redirection command_atom here_document?)
 			|	here_document -> ^(COMMAND command_atom here_document)
 			|	-> ^(COMMAND command_atom)
 		);
@@ -421,7 +421,7 @@ command_atom
 
 command_name
 	:	string_expr_no_reserved_word
-	|	{LA(1) == GREATER_THAN}? => redirection_atom -> ^(STRING NAME) redirection_atom;
+	|	{LA(1) == GREATER_THAN}? => redirection_atom -> redirection_atom ^(STRING NAME);
 
 variable_definitions
 	:	variable_definition_atom ((BLANK name (LSQUARE|EQUALS|PLUS EQUALS)) => BLANK! variable_definition_atom)* ;

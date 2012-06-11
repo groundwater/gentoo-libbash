@@ -36,9 +36,9 @@ command_atom:
 "function out() { function inner() { :; }; }" -> (FUNCTION (STRING out) (CURRENT_SHELL (LIST (COMMAND (FUNCTION (STRING inner) (CURRENT_SHELL (LIST (COMMAND (STRING :)))))))))
 
 command:
-"function quit { exit; } > /dev/null" -> (COMMAND (FUNCTION (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit))))) (REDIR > (STRING / dev / null)))
+"function quit { exit; } > /dev/null" -> (COMMAND (REDIR > (STRING / dev / null)) (FUNCTION (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit))))))
 "function quit {
     # comment
-    exit; } > /dev/null" -> (COMMAND (FUNCTION (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit))))) (REDIR > (STRING / dev / null)))
-"function help { echo hi; } 2> /dev/null" -> (COMMAND (FUNCTION (STRING help) (CURRENT_SHELL (LIST (COMMAND (STRING echo) (STRING hi))))) (REDIR 2 > (STRING / dev / null)))
+    exit; } > /dev/null" -> (COMMAND (REDIR > (STRING / dev / null)) (FUNCTION (STRING quit) (CURRENT_SHELL (LIST (COMMAND (STRING exit))))))
+"function help { echo hi; } 2> /dev/null" -> (COMMAND (REDIR 2 > (STRING / dev / null)) (FUNCTION (STRING help) (CURRENT_SHELL (LIST (COMMAND (STRING echo) (STRING hi))))))
 "function help { echo 3; } 2> /dev/null > output" OK

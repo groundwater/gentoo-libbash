@@ -96,3 +96,14 @@ eval abc+=\( \"\$@\" \)
 declare MOZILLA_FIVE_HOME="/usr/share/${PN}"
 declare foo=23 empty bar=42
 echo $MOZILLA_FIVE_HOME $foo $lol $bar
+
+FILE=scripts/input_output_test
+echo foo > $FILE
+read line < scripts/input_output_test
+echo $line
+if [ 1 = 1 ]; then
+  read line
+  echo $line
+fi < $FILE
+read string <<< "a b c d"
+echo $string

@@ -191,10 +191,45 @@ public:
     _out = stream;
   }
 
+  /// \brief get current output stream
+  /// \return the pointer to the output stream
+  std::ostream* get_output_stream()
+  {
+    return _out;
+  }
+
   /// \brief restore the current output stream to standard output stream
   void restore_output_stream()
   {
     _out = &std::cout;
+  }
+
+  /// \brief set current error stream
+  /// \param stream the pointer to the error stream
+  void set_error_stream(std::ostream* stream)
+  {
+    _err = stream;
+  }
+
+  /// \brief get current error stream
+  /// \return the pointer to the error stream
+  std::ostream* get_error_stream()
+  {
+    return _err;
+  }
+
+  /// \brief set current input stream
+  /// \param stream the pointer to the input stream
+  void set_input_stream(std::istream* stream)
+  {
+    _in = stream;
+  }
+
+  /// \brief get current input stream
+  /// \return the pointer to the input stream
+  std::istream* get_input_stream()
+  {
+    return _in;
   }
 
   /// \brief check whether a variable is valid and can be used

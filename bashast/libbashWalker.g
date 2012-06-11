@@ -171,6 +171,23 @@ options
 		{
 			return isdigit(target[0]);
 		}
+
+		class current_streams {
+			private:
+				std::ostream* _out;
+				std::ostream* _err;
+				std::istream* _in;
+			public:
+				current_streams(std::ostream* out, std::ostream* err, std::istream* in) :
+					_out(out), _err(err), _in(in) {
+				}
+
+				~current_streams() {
+					walker->set_output_stream(_out);
+					walker->set_error_stream(_err);
+					walker->set_input_stream(_in);
+				}
+		};
 	}
 }
 
@@ -624,7 +641,10 @@ var_ref [bool double_quoted] returns[std::string libbash_value]
 	|^(VAR_REF libbash_string=var_expansion) { $libbash_value = libbash_string; };
 
 command
-	:^(COMMAND command_atom);
+@declarations {
+	current_streams streams(walker->get_output_stream(), walker->get_error_stream(), walker->get_input_stream());
+}
+	:^(COMMAND redirect* command_atom);
 
 command_atom
 	:variable_definitions
@@ -644,24 +664,18 @@ simple_command
 execute_command[std::string& name, std::vector<std::string>& libbash_args]
 @declarations {
 	std::unique_ptr<interpreter::local_scope> current_scope;
-	std::unique_ptr<std::ostream> out;
-	std::unique_ptr<std::ostream> err;
-	std::unique_ptr<std::istream> in;
-	bool redirection = false;
 }
 @init {
 	if(name != "local" && name != "set" && name != "declare" && name != "eval")
 		current_scope.reset(new interpreter::local_scope(*walker));
 }
-	:var_def[true]* (redirect[out, err, in]{ redirection = true; })* {
+	:var_def[true]* {
 		// Empty command, still need to run bash redirection
 		if(name.empty())
 			name = ":";
 
 		if(walker->has_function(name))
 		{
-			if(redirection)
-				std::cerr << "We do not support redirection for function calls." << std::endl;
 			ANTLR3_MARKER command_index = INDEX();
 			try
 			{
@@ -677,7 +691,7 @@ execute_command[std::string& name, std::vector<std::string>& libbash_args]
 		}
 		else if(cppbash_builtin::is_builtin(name))
 		{
-			walker->set_status(walker->execute_builtin(name, libbash_args, out.get(), err.get(), in.get()));
+			walker->set_status(walker->execute_builtin(name, libbash_args));
 		}
 		else
 		{
@@ -687,16 +701,17 @@ execute_command[std::string& name, std::vector<std::string>& libbash_args]
 	}
 	(BANG { walker->set_status(!walker->get_status()); })?;
 
-redirect[std::unique_ptr<std::ostream>& out, std::unique_ptr<std::ostream>& err, std::unique_ptr<std::istream>& in]
-	:^(REDIR LESS_THAN redirect_destination_input[in]) {
+redirect
+	:^(REDIR LESS_THAN redirect_destination_input)
+	|^(REDIR GREATER_THAN redirect_destination_output)
+	|^(REDIR DIGIT LESS_THAN redirect_destination_input) {
 		std::cerr << "Redirection is not supported yet" << std::endl;
 	}
-	|^(REDIR GREATER_THAN redirect_destination_output[out])
-	|^(REDIR DIGIT LESS_THAN redirect_destination_input[in]) {
+	|^(REDIR DIGIT GREATER_THAN redirect_destination_output) {
 		std::cerr << "Redirection is not supported yet" << std::endl;
 	}
-	|^(REDIR DIGIT GREATER_THAN redirect_destination_output[out]) {
-		std::cerr << "Redirection is not supported yet" << std::endl;
+	|^(HERE_STRING_OP string_expr) {
+		walker->set_input_stream(new std::istringstream($string_expr.libbash_value));
 	};
 
 redirect_operator
@@ -704,9 +719,9 @@ redirect_operator
 	|GREATER_THAN
 	|FILE_DESCRIPTOR DIGIT redirect_operator;
 
-redirect_destination_output[std::unique_ptr<std::ostream>& out]
+redirect_destination_output
 	:string_expr {
-		out.reset(new std::ofstream($string_expr.libbash_value, std::ofstream::trunc));
+		walker->set_output_stream(new std::ofstream($string_expr.libbash_value, std::ofstream::trunc));
 	}
 	|FILE_DESCRIPTOR DIGIT {
 		std::cerr << "FILE_DESCRIPTOR redirection is not supported yet" << std::endl;
@@ -715,9 +730,9 @@ redirect_destination_output[std::unique_ptr<std::ostream>& out]
 		std::cerr << "FILE_DESCRIPTOR_MOVE redirection is not supported yet" << std::endl;
 	};
 
-redirect_destination_input[std::unique_ptr<std::istream>& in]
+redirect_destination_input
 	:string_expr {
-		std::cerr << "Input redirection for file is not supported yet" << std::endl;
+	      walker->set_input_stream(new std::ifstream($string_expr.libbash_value, std::ifstream::in));
 	}
 	|FILE_DESCRIPTOR DIGIT {
 		std::cerr << "FILE_DESCRIPTOR redirection is not supported yet" << std::endl;

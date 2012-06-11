@@ -67,3 +67,4 @@ ltmain.sh
 INSTALL
 test_coverage/
 doxygen-doc/
+scripts/input_output_test

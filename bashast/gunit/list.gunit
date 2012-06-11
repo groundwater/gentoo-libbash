@@ -41,6 +41,6 @@ echo \"a b\"" -> (LIST (COMMAND (VARIABLE_DEFINITIONS (= a (STRING asdf)))) (COM
 "FOO='bar' ;" -> (LIST (COMMAND (VARIABLE_DEFINITIONS (= FOO (STRING (SINGLE_QUOTED_STRING 'bar'))))))
 "true;
 true" -> (LIST (COMMAND (STRING true)) (COMMAND (STRING true)))
-"(echo hi > /dev/null) >> 1" -> (LIST (COMMAND (SUBSHELL (LIST (COMMAND (STRING echo) (STRING hi) (REDIR > (STRING / dev / null))))) (REDIR >> (FILE_DESCRIPTOR 1))))
-"{ echo hi > /dev/null; } >> 1" -> (LIST (COMMAND (CURRENT_SHELL (LIST (COMMAND (STRING echo) (STRING hi) (REDIR > (STRING / dev / null))))) (REDIR >> (FILE_DESCRIPTOR 1))))
+"(echo hi > /dev/null) >> 1" -> (LIST (COMMAND (REDIR >> (FILE_DESCRIPTOR 1)) (SUBSHELL (LIST (COMMAND (REDIR > (STRING / dev / null)) (STRING echo) (STRING hi))))))
+"{ echo hi > /dev/null; } >> 1" -> (LIST (COMMAND (REDIR >> (FILE_DESCRIPTOR 1)) (CURRENT_SHELL (LIST (COMMAND (REDIR > (STRING / dev / null)) (STRING echo) (STRING hi))))))
 "test 1 -gt 0 || return 0" -> (LIST (|| (COMMAND (COMPOUND_COND (BUILTIN_TEST (gt (STRING 1) (STRING 0))))) (COMMAND (STRING return) (STRING 0))))

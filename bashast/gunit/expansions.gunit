@@ -27,7 +27,7 @@ command_list:
 "for each in `ls |grep output`; do
 echo $each
 done" -> (LIST (COMMAND (for each (STRING (COMMAND_SUB `ls |grep output`)) (LIST (COMMAND (STRING echo) (STRING (VAR_REF each)))))))
-"wc <(cat /usr/share/dict/linux.words)" -> (LIST (COMMAND (STRING wc) (PROCESS_SUBSTITUTION < (LIST (COMMAND (STRING cat) (STRING / usr / share / dict / linux . words))))))
+"wc <(cat /usr/share/dict/linux.words)" -> (LIST (COMMAND (PROCESS_SUBSTITUTION < (LIST (COMMAND (STRING cat) (STRING / usr / share / dict / linux . words)))) (STRING wc)))
 
 all_expansions:
 "$'abc' abc $(ab) ${ab} $((ab)) `ab` \"ab\" 'ab'" -> (STRING (ANSI_C_QUOTING 'abc')   abc   (COMMAND_SUB $(ab))   (VAR_REF ab)   (ARITHMETIC_EXPRESSION (ARITHMETIC (VAR_REF ab)))   (COMMAND_SUB `ab`)   (DOUBLE_QUOTED_STRING ab)   'ab')

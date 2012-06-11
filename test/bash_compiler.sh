@@ -18,4 +18,5 @@ do
 done
 
 rm -rf $result
+rm -rf scripts/input_output_test
 exit $error

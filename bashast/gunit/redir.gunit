@@ -50,5 +50,5 @@ _EOF_.abc
 ) (REDIR > (STRING / dev / null)))))
 "cat > /dev/null <<-END_LDSCRIPT
 GNU...
-END_LDSCRIPT" -> (LIST (COMMAND (STRING cat) (REDIR > (STRING / dev / null)) (<<- (STRING GNU .. . 
+END_LDSCRIPT" -> (LIST (COMMAND (REDIR > (STRING / dev / null)) (STRING cat) (<<- (STRING GNU .. . 
 ))))
