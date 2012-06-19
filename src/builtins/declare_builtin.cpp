@@ -41,6 +41,8 @@ int declare_builtin::exec(const std::vector<std::string>& bash_args)
   }
 
   int result = 0;
+  bool jump_option = false;
+  bool option_global = false;
 
   std::vector<std::string> tokens;
   boost::split(tokens, bash_args[0], boost::is_any_of(" "));
@@ -50,6 +52,7 @@ int declare_builtin::exec(const std::vector<std::string>& bash_args)
     if(tokens[0].size() > 2)
       throw libbash::unsupported_exception("declare: " + tokens[0] + " is not supported yet");
 
+    jump_option = true;
     switch(tokens[0][1])
     {
       case 'F':
@@ -100,6 +103,10 @@ int declare_builtin::exec(const std::vector<std::string>& bash_args)
         return result;
       case 'a':
       case 'i':
+        break;
+      case 'g':
+        option_global = true;
+        break;
       case 'A':
       case 'f':
       case 'l':
@@ -119,7 +126,11 @@ int declare_builtin::exec(const std::vector<std::string>& bash_args)
   for(auto iter = bash_args.begin(); iter != bash_args.end(); ++iter)
       script << *iter + " ";
 
-  bash_ast ast(script, std::bind(&bash_ast::parser_builtin_variable_definitions, std::placeholders::_1, false));
+  if(jump_option)
+    script.ignore(static_cast<std::streamsize>(tokens[0].size()));
+
+  bool local = _walker.is_local_scope() && !option_global;
+  bash_ast ast(script, std::bind(&bash_ast::parser_builtin_variable_definitions, std::placeholders::_1, local));
   ast.interpret_with(_walker);
 
   return result;

@@ -119,22 +119,37 @@ TEST(declare_built_test, _p)
   EXPECT_EQ("-bash: declare: bar: not found\n-bash: declare: test: not found\n", test_output2.str());
 }
 
+TEST(declare_built_test, _a)
+{
+  interpreter walker;
+  EXPECT_EQ(0, cppbash_builtin::exec("declare", {"-a", "foo"}, std::cout, cerr, cin, walker));
+  walker.set_value("foo", "bar", 3);
+  EXPECT_STREQ("bar", walker.resolve<std::string>("foo", 3).c_str());
+}
+
+TEST(declare_built_test, _g)
+{
+  stringstream expression("function func() { declare -g var1=foo; declare var2=bar; }; func;");
+  interpreter walker;
+  bash_ast ast(expression);
+  ast.interpret_with(walker);
+
+  EXPECT_STREQ("foo", walker.resolve<std::string>("var1").c_str());
+  EXPECT_STREQ("", walker.resolve<std::string>("var2").c_str());
+}
+
 #define TEST_DECLARE(name, expected, ...) \
 	TEST(declare_builtin_test, name) { test_declare<libbash::unsupported_exception>(expected, {__VA_ARGS__}); }
 
-TEST_DECLARE(_a, "declare -a is not supported yet", "-a", "world")
 TEST_DECLARE(_A, "declare -A is not supported yet", "-A", "world")
 TEST_DECLARE(_f, "declare -f is not supported yet", "-f", "world")
-TEST_DECLARE(_i, "declare -i is not supported yet", "-i", "world")
 TEST_DECLARE(_l, "declare -l is not supported yet", "-l", "world")
 TEST_DECLARE(_r, "declare -r is not supported yet", "-r", "world")
 TEST_DECLARE(_t, "declare -t is not supported yet", "-t", "world")
 TEST_DECLARE(_u, "declare -u is not supported yet", "-u", "world")
 TEST_DECLARE(_x, "declare -x is not supported yet", "-x", "world")
-TEST_DECLARE(pa, "declare +a is not supported yet", "+a", "world")
 TEST_DECLARE(pA, "declare +A is not supported yet", "+A", "world")
 TEST_DECLARE(pf, "declare +f is not supported yet", "+f", "world")
-TEST_DECLARE(pi, "declare +i is not supported yet", "+i", "world")
 TEST_DECLARE(pl, "declare +l is not supported yet", "+l", "world")
 TEST_DECLARE(pr, "declare +r is not supported yet", "+r", "world")
 TEST_DECLARE(pt, "declare +t is not supported yet", "+t", "world")

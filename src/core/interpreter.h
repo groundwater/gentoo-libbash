@@ -176,6 +176,14 @@ public:
     return members.end();
   }
 
+  ///
+  /// \brief checks whether the current scope is local or global
+  /// \return whether current scope is local
+  bool is_local_scope() const
+  {
+    return local_members.size() > 0;
+  }
+
   /// \brief set current output stream
   /// \param stream the pointer to the output stream
   void set_output_stream(std::ostream* stream)
