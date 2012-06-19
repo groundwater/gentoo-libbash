@@ -637,7 +637,8 @@ simple_command
 	std::vector<std::string> libbash_args;
 	bool split;
 }
-	:string_expr{ split = ($string_expr.libbash_value != "local" && $string_expr.libbash_value != "export"); }
+	:string_expr{ split = ($string_expr.libbash_value != "local" && $string_expr.libbash_value != "export"
+	                                                             && $string_expr.libbash_value != "declare"); }
 	(argument[libbash_args, split])* execute_command[$string_expr.libbash_value, libbash_args];
 
 execute_command[std::string& name, std::vector<std::string>& libbash_args]
@@ -649,7 +650,7 @@ execute_command[std::string& name, std::vector<std::string>& libbash_args]
 	bool redirection = false;
 }
 @init {
-	if(name != "local" && name != "set")
+	if(name != "local" && name != "set" && name != "declare")
 		current_scope.reset(new interpreter::local_scope(*walker));
 }
 	:var_def[true]* (redirect[out, err, in]{ redirection = true; })* {

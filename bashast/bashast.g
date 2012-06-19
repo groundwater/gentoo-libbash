@@ -398,6 +398,8 @@ command_atom
 			-> ^(STRING EXPORT) ^(STRING builtin_variable_definition_item)
 	|	(LOCAL) => LOCAL BLANK builtin_variable_definition_item
 			-> ^(STRING LOCAL) ^(STRING builtin_variable_definition_item)
+	|	(DECLARE) => DECLARE BLANK builtin_variable_definition_item
+			-> ^(STRING DECLARE) ^(STRING builtin_variable_definition_item)
 	|	command_name
 		(
 			(BLANK? parens) => BLANK? parens wspace? compound_command
@@ -782,7 +784,7 @@ string_part
 ns_string_part
 	:	num|name|escaped_character
 	|OTHER|EQUALS|PCT|PCTPCT|PLUS|MINUS|DOT|DOTDOT|COLON
-	|TILDE|LSQUARE|RSQUARE|CARET|POUND|COMMA|EXPORT|LOCAL|AT
+	|TILDE|LSQUARE|RSQUARE|CARET|POUND|COMMA|EXPORT|LOCAL|DECLARE|AT
 	// Escaped characters
 	|ESC_RPAREN|ESC_LPAREN|ESC_DOLLAR|ESC_GT|ESC_LT|ESC_TICK|ESC_DQUOTE
 	// The following is for filename expansion
@@ -1151,6 +1153,7 @@ QMARK	:	'?';
 
 LOCAL	:	'local';
 EXPORT	:	'export';
+DECLARE	:	'declare';
 LOGICAND	:	'&&';
 LOGICOR	:	'||';
 

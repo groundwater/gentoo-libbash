@@ -55,9 +55,30 @@ namespace
 TEST(declare_builtin_test, invalid_arguments)
 {
   test_declare<libbash::illegal_argument_exception>("declare: arguments required", {});
-  test_declare<libbash::unsupported_exception>("declare: multiple arguments are not supported", {"-ap"});
-  test_declare<libbash::illegal_argument_exception>("declare: invalid option", {"_a"});
+  test_declare<libbash::unsupported_exception>("declare: -ap is not supported yet", {"-ap"});
   test_declare<libbash::illegal_argument_exception>("declare: unrecognized option: -L", {"-L"});
+}
+
+TEST(declare_built_test, declarations)
+{
+  interpreter walker;
+
+  EXPECT_EQ(0, cppbash_builtin::exec("declare", {"var"}, cout, cerr, cin, walker));
+
+  EXPECT_EQ(0, cppbash_builtin::exec("declare", {"foo1=bar"}, cout, cerr, cin, walker));
+  EXPECT_STREQ("bar", walker.resolve<std::string>("foo1").c_str());
+
+  walker.define("foo2", "bar");
+  EXPECT_EQ(0, cppbash_builtin::exec("declare", {"foo2"}, cout, cerr, cin, walker));
+  EXPECT_STREQ("bar", walker.resolve<std::string>("foo2").c_str());
+
+  EXPECT_EQ(0, cppbash_builtin::exec("declare", {"var1=foo var2 var3=bar"}, cout, cerr, cin, walker));
+  EXPECT_STREQ("foo", walker.resolve<std::string>("var1").c_str());
+  EXPECT_STREQ("", walker.resolve<std::string>("var2").c_str());
+  EXPECT_STREQ("bar", walker.resolve<std::string>("var3").c_str());
+
+  EXPECT_EQ(0, cppbash_builtin::exec("declare", {"var=\"foo bar\""}, cout, cerr, cin, walker));
+  EXPECT_STREQ("foo bar", walker.resolve<std::string>("var").c_str());
 }
 
 TEST(declare_builtin_test, _F)
@@ -68,15 +89,15 @@ TEST(declare_builtin_test, _F)
   ast.interpret_with(walker);
 
   stringstream test_output1;
-  EXPECT_EQ(0, cppbash_builtin::exec("declare", {"-F", "foo"}, test_output1, cerr, cin, walker));
+  EXPECT_EQ(0, cppbash_builtin::exec("declare", {"-F foo"}, test_output1, cerr, cin, walker));
   EXPECT_EQ("foo\n", test_output1.str());
 
   stringstream test_output2;
-  EXPECT_EQ(1, cppbash_builtin::exec("declare", {"-F", "foo", "bar", "test"}, test_output2, cerr, cin, walker));
+  EXPECT_EQ(1, cppbash_builtin::exec("declare", {"-F foo bar test"}, test_output2, cerr, cin, walker));
   EXPECT_EQ("foo\nbar\n", test_output2.str());
 
   stringstream test_output3;
-  EXPECT_EQ(0, cppbash_builtin::exec("declare", {"+F", "foo", "bar", "test"}, test_output3, cerr, cin, walker));
+  EXPECT_EQ(0, cppbash_builtin::exec("declare", {"+F foo bar test"}, test_output3, cerr, cin, walker));
   EXPECT_EQ("", test_output3.str());
 
   stringstream test_output4;
@@ -90,11 +111,11 @@ TEST(declare_built_test, _p)
   walker.define("foo", "bar");
 
   stringstream test_output1;
-  EXPECT_EQ(0, cppbash_builtin::exec("declare", {"-p", "foo"}, test_output1, cerr, cin, walker));
+  EXPECT_EQ(0, cppbash_builtin::exec("declare", {"-p foo"}, test_output1, cerr, cin, walker));
   EXPECT_EQ("declare -- foo=\"bar\"\n", test_output1.str());
 
   stringstream test_output2;
-  EXPECT_EQ(1, cppbash_builtin::exec("declare", {"-p", "bar", "test"}, test_output2, cerr, cin, walker));
+  EXPECT_EQ(1, cppbash_builtin::exec("declare", {"-p bar test"}, test_output2, cerr, cin, walker));
   EXPECT_EQ("-bash: declare: bar: not found\n-bash: declare: test: not found\n", test_output2.str());
 }
 

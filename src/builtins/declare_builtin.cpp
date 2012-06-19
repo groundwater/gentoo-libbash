@@ -25,6 +25,10 @@
 #include <algorithm>
 #include <iostream>
 
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
+
+#include "core/bash_ast.h"
 #include "core/interpreter.h"
 #include "exceptions.h"
 
@@ -35,80 +39,88 @@ int declare_builtin::exec(const std::vector<std::string>& bash_args)
     throw libbash::illegal_argument_exception("declare: arguments required");
     return 1;
   }
-  else if(bash_args[0].size() != 2)
-  {
-    throw libbash::unsupported_exception("declare: multiple arguments are not supported");
-    return 1;
-  }
-
-  if(bash_args[0][0] != '-' && bash_args[0][0] != '+')
-  {
-    throw libbash::illegal_argument_exception("declare: invalid option");
-    return 1;
-  }
 
   int result = 0;
-  switch(bash_args[0][1])
+
+  std::vector<std::string> tokens;
+  boost::split(tokens, bash_args[0], boost::is_any_of(" "));
+
+  if(tokens[0][0] == '-' || tokens[0][0] == '+')
   {
-    case 'F':
-      if(bash_args[0][0] == '+')
-        return 0;
-      if(bash_args.size() > 1)
-      {
-        for(auto iter = bash_args.begin() + 1; iter != bash_args.end(); ++iter)
-        {
-          if(_walker.has_function(*iter))
-            *_out_stream << *iter << std::endl;
-          else
-            result = 1;
-        }
-      }
-      else
-      {
-        std::vector<std::string> functions;
+    if(tokens[0].size() > 2)
+      throw libbash::unsupported_exception("declare: " + tokens[0] + " is not supported yet");
 
-        _walker.get_all_function_names(functions);
-        sort(functions.begin(), functions.end());
-
-        for(auto iter = functions.begin(); iter != functions.end(); ++iter)
-          *_out_stream << "declare -f " << *iter << std::endl;
-      }
-      return result;
-    case 'p':
-      if(bash_args.size() > 1)
-      {
-        for(auto iter = bash_args.begin() + 1; iter != bash_args.end(); ++iter)
+    switch(tokens[0][1])
+    {
+      case 'F':
+        if(tokens[0][0] == '+')
+          return 0;
+        if(tokens.size() > 1)
         {
-          // We do not print the type of the variable for now
-          if(!_walker.is_unset(*iter))
+          for(auto iter = tokens.begin() + 1; iter != tokens.end(); ++iter)
           {
-            *_out_stream << "declare -- " << *iter << "=\"" << _walker.resolve<std::string>(*iter) << "\"" << std::endl;
-          }
-          else
-          {
-            *_out_stream << "-bash: declare: " << *iter << ": not found" << std::endl;
-            result = 1;
+            if(_walker.has_function(*iter))
+              *_out_stream << *iter << std::endl;
+            else
+              result = 1;
           }
         }
-      }
-      else
-      {
-        throw libbash::unsupported_exception("We do not support declare -p without arguments for now");
-      }
-      return result;
-    case 'a':
-    case 'A':
-    case 'f':
-    case 'i':
-    case 'l':
-    case 'r':
-    case 't':
-    case 'u':
-    case 'x':
-      throw libbash::unsupported_exception("declare " + bash_args[0] + " is not supported yet");
-      return 1;
-    default:
-      throw libbash::illegal_argument_exception("declare: unrecognized option: " + bash_args[0]);
-      return 1;
+        else
+        {
+          std::vector<std::string> functions;
+
+          _walker.get_all_function_names(functions);
+          sort(functions.begin(), functions.end());
+
+          for(auto iter = functions.begin(); iter != functions.end(); ++iter)
+            *_out_stream << "declare -f " << *iter << std::endl;
+        }
+        return result;
+      case 'p':
+        if(tokens.size() > 1)
+        {
+          for(auto iter = tokens.begin() + 1; iter != tokens.end(); ++iter)
+          {
+            // We do not print the type of the variable for now
+            if(!_walker.is_unset(*iter))
+            {
+              *_out_stream << "declare -- " << *iter << "=\"" << _walker.resolve<std::string>(*iter) << "\"" << std::endl;
+            }
+            else
+            {
+              *_out_stream << "-bash: declare: " << *iter << ": not found" << std::endl;
+              result = 1;
+            }
+          }
+        }
+        else
+        {
+          throw libbash::unsupported_exception("We do not support declare -p without arguments for now");
+        }
+        return result;
+      case 'a':
+      case 'i':
+      case 'A':
+      case 'f':
+      case 'l':
+      case 'r':
+      case 't':
+      case 'u':
+      case 'x':
+        throw libbash::unsupported_exception("declare " + tokens[0] + " is not supported yet");
+        return 1;
+      default:
+        throw libbash::illegal_argument_exception("declare: unrecognized option: " + tokens[0]);
+        return 1;
+    }
   }
+
+  std::stringstream script;
+  for(auto iter = bash_args.begin(); iter != bash_args.end(); ++iter)
+      script << *iter + " ";
+
+  bash_ast ast(script, std::bind(&bash_ast::parser_builtin_variable_definitions, std::placeholders::_1, false));
+  ast.interpret_with(_walker);
+
+  return result;
 }
