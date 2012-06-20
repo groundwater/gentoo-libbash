@@ -52,10 +52,9 @@ class CommandLine :
         paludis::args::AliasArg a_no_color;
         paludis::args::SwitchArg a_force_colour;
         paludis::args::AliasArg a_force_color;
-        paludis::args::StringArg a_repository_directory;
+        paludis::args::StringArg a_package_manager;
         paludis::args::StringArg a_output_directory;
-        paludis::args::StringArg a_master_repository_name;
-        paludis::args::StringSequenceArg a_extra_repository_dir;
+        paludis::args::StringArg a_repository_name;
         paludis::args::StringArg a_report_file;
 };
 

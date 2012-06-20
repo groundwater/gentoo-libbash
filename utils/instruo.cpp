@@ -25,33 +25,37 @@
 #include <iostream>
 #include <map>
 
-#include <paludis/args/do_help.hh>
 #include <paludis/about.hh>
 #include <paludis/action.hh>
-#include <paludis/package_id.hh>
-#include <paludis/generator.hh>
+#include <paludis/args/do_help.hh>
+#include <paludis/environment.hh>
+#include <paludis/environment_factory.hh>
 #include <paludis/filter.hh>
 #include <paludis/filtered_generator.hh>
+#include <paludis/generator.hh>
+#include <paludis/metadata_key.hh>
+#include <paludis/name.hh>
+#include <paludis/package_id.hh>
+#include <paludis/repository.hh>
 #include <paludis/selection.hh>
-#include <paludis/util/system.hh>
+#include <paludis/util/accept_visitor.hh>
+#include <paludis/util/destringify.hh>
+#include <paludis/util/fs_path.hh>
+#include <paludis/util/indirect_iterator-impl.hh>
 #include <paludis/util/join.hh>
 #include <paludis/util/log.hh>
-#include <paludis/util/sequence.hh>
-#include <paludis/util/map.hh>
-#include <paludis/util/visitor_cast.hh>
-#include <paludis/util/set.hh>
 #include <paludis/util/make_named_values.hh>
+#include <paludis/util/map.hh>
 #include <paludis/util/mutex.hh>
-#include <paludis/util/thread_pool.hh>
-#include <paludis/util/destringify.hh>
-#include <paludis/util/safe_ofstream.hh>
 #include <paludis/util/pretty_print.hh>
-#include <paludis/util/indirect_iterator-impl.hh>
+#include <paludis/util/safe_ofstream.hh>
+#include <paludis/util/sequence.hh>
+#include <paludis/util/set.hh>
+#include <paludis/util/system.hh>
+#include <paludis/util/thread_pool.hh>
 #include <paludis/util/timestamp.hh>
-#include <paludis/util/accept_visitor.hh>
-#include <paludis/environments/no_config/no_config_environment.hh>
-#include <paludis/package_database.hh>
-#include <paludis/metadata_key.hh>
+#include <paludis/util/visitor_cast.hh>
+#include <paludis/version_spec.hh>
 
 #include "command_line.h"
 #include "exceptions.h"
@@ -64,7 +68,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
-void worker(const std::shared_ptr<PackageIDSequence> &ids)
+void worker(const std::shared_ptr<PackageIDSequence> &ids, const std::string &repository_path)
 {
   unsigned total(0);
   CategoryNamePart old_cat("OLDCAT");
@@ -99,7 +103,7 @@ void worker(const std::shared_ptr<PackageIDSequence> &ids)
         variables["CATEGORY"].push_back(stringify(id->name().category()));
         std::vector<std::string> functions;
 
-        std::string ebuild_path(CommandLine::get_instance()->a_repository_directory.argument() +
+        std::string ebuild_path(repository_path + "/" +
                                 variables["CATEGORY"][0] + "/" +
                                 variables["PN"][0] + "/" +
                                 variables["PN"][0] + "-" +
@@ -125,6 +129,7 @@ void worker(const std::shared_ptr<PackageIDSequence> &ids)
     }
   }
 }
+
 
 int main(int argc, char** argv)
 {
@@ -153,8 +158,11 @@ int main(int argc, char** argv)
             ))
         throw args::DoHelp("you should specify exactly one action");
 
-    if (! CommandLine::get_instance()->a_repository_directory.specified())
-        CommandLine::get_instance()->a_repository_directory.set_argument(stringify(FSPath::cwd()));
+    if (! CommandLine::get_instance()->a_package_manager.specified())
+        CommandLine::get_instance()->a_package_manager.set_argument("portage");
+
+    if (! CommandLine::get_instance()->a_repository_name.specified())
+        CommandLine::get_instance()->a_repository_name.set_argument("gentoo");
 
     if (CommandLine::get_instance()->a_version.specified())
     {
@@ -170,42 +178,25 @@ int main(int argc, char** argv)
         return EXIT_SUCCESS;
     }
 
-    if ((
-                CommandLine::get_instance()->a_repository_directory.specified() +
-                CommandLine::get_instance()->a_output_directory.specified()
-        ) < 1)
-        throw args::DoHelp("at least one of '--" + CommandLine::get_instance()->a_repository_directory.long_name() + "' or '--"
-                + CommandLine::get_instance()->a_output_directory.long_name() + "' must be specified");
-
     if (! CommandLine::get_instance()->a_output_directory.specified())
         CommandLine::get_instance()->a_output_directory.set_argument(stringify(FSPath::cwd()));
 
-    std::shared_ptr<FSPathSequence> extra_repository_dirs(std::make_shared<FSPathSequence>());
-    for (args::StringSequenceArg::ConstIterator d(CommandLine::get_instance()->a_extra_repository_dir.begin_args()),
-            d_end(CommandLine::get_instance()->a_extra_repository_dir.end_args()) ;
-            d != d_end ; ++d)
-        extra_repository_dirs->push_back(FSPath(*d));
-
-    std::shared_ptr<Map<std::string, std::string> > keys(std::make_shared<Map<std::string, std::string>>());
-    keys->insert("append_repository_name_to_write_cache", "false");
-    NoConfigEnvironment env(make_named_values<no_config_environment::Params>(
-                n::accept_unstable() = true,
-                n::disable_metadata_cache() = true,
-                n::extra_accept_keywords() = "",
-                n::extra_params() = keys,
-                n::extra_repository_dirs() = extra_repository_dirs,
-                n::master_repository_name() = CommandLine::get_instance()->a_master_repository_name.argument(),
-                n::profiles_if_not_auto() = "",
-                n::repository_dir() = CommandLine::get_instance()->a_repository_directory.argument(),
-                n::repository_type() = no_config_environment::ncer_ebuild,
-                n::write_cache() = CommandLine::get_instance()->a_output_directory.argument()
-            ));
-
     FSPath(CommandLine::get_instance()->a_output_directory.argument()).mkdir(0755,  {fspmkdo_ok_if_exists});
 
-    std::shared_ptr<PackageIDSequence> ids(env[selection::AllVersionsSorted(
-                generator::InRepository(env.main_repository()->name()))]);
-    worker(ids);
+    std::shared_ptr<Environment> env(EnvironmentFactory::get_instance()->create(CommandLine::get_instance()->a_package_manager.argument()));
+
+    std::shared_ptr<Repository> repo = env->fetch_repository(RepositoryName(CommandLine::get_instance()->a_repository_name.argument()));
+
+    Repository::MetadataConstIterator distdir_metadata(repo->find_metadata("location"));
+    const MetadataValueKey<FSPath> *path_key;
+    if(distdir_metadata != repo->end_metadata())
+    {
+      path_key = visitor_cast<const MetadataValueKey<FSPath>>(**distdir_metadata);
+
+      std::shared_ptr<PackageIDSequence> ids((*env)[selection::AllVersionsSorted(
+                  generator::InRepository(RepositoryName(CommandLine::get_instance()->a_repository_name.argument())))]);
+      worker(ids, stringify(path_key->parse_value().realpath()));
+    }
   }
   catch (const paludis::args::ArgsError & e)
   {

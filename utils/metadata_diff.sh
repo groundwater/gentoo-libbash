@@ -11,7 +11,7 @@ fi
 
 echo "Generating metadata at $outputdir"
 
-time ./instruo -D ${PORTDIR:-/usr/portage/} -o $outputdir 2>$outputdir/error_output
+time ./instruo -p portage -n gentoo -o $outputdir 2>$outputdir/error_output
 
 echo "Running diff..."
 
