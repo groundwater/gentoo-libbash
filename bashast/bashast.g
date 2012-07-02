@@ -530,11 +530,11 @@ semiel
 for_expr
 	:	FOR BLANK?
 		(
-			name wspace
+			name
 			(
-				IN for_each_value* BLANK? (SEMIC|EOL) wspace?
-				|SEMIC wspace?
-				|
+				wspace IN for_each_value* BLANK? (SEMIC|EOL) wspace?
+				| wspace? SEMIC wspace?
+				| wspace
 			) DO wspace command_list semiel DONE -> ^(FOR name for_each_value* command_list)
 			|	LLPAREN EOL?
 				// initilization

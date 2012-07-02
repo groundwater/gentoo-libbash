@@ -84,6 +84,18 @@ do
     done
 done
 
+function positional_for()
+{
+    for arg; do
+      echo $arg
+    done
+
+    for arg do
+      echo $arg
+    done
+}
+positional_for foo bar
+
 i=0;
 while [ $i != 4 ]
 do
