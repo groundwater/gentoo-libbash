@@ -385,3 +385,25 @@ case ${EAPI} in
     *)  
         echo "Unknown EAPI=${EAPI} for ruby-ng.eclass"
 esac
+
+if [[   1 == 0 ||
+        1 == 0
+|| 1 == 0
+        || 1 == 0 || # Extra space here
+        1 == 1 ]]; then
+        echo or
+fi
+
+if [[   1 == 1 # Extra space here
+        && 1 == 1 && 1 == 1 &&
+        1 == 1&&
+        1 == 1 ]]; then
+        echo and
+fi
+
+if [[   1 == 1 &&
+        1 == 0 || 1 == 1
+        && 1 == 1 ||
+        1 == 1 && 1 == 1 ]]; then
+        echo and or
+fi
