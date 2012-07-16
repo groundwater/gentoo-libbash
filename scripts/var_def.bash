@@ -85,12 +85,15 @@ echo $FOO005
 function foo() {
     local -i foo=1
     local -a bar=(1 2 3)
+    eval local foobar=23
     echo $foo
     echo ${bar[@]}
+    echo foobar
 }
 foo
 bar=@
 echo $bar
+echo $foobar
 ARRAY11=(1 2 3 [10]=15)
 ARRAY11+=(1 [15]=20)
 echo ${ARRAY11[@]}
