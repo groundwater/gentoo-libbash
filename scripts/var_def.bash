@@ -102,6 +102,10 @@ echo ${ARRAY12[@]}
 ARRAY13=()
 ARRAY13+=(4 5 6)
 echo ${ARRAY13[@]}
+ARRAY14=(1)
+ARRAY14+=(3)
+ARRAY14+=(4 5)
+echo ${ARRAY14[@]}
 declare num=42
 echo $num
 unset num

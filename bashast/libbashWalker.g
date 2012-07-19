@@ -242,7 +242,7 @@ var_def[bool local]
 	}
 	|^(PLUS_ASSIGN libbash_name=name_base {
 		index = walker->get_max_index(libbash_name) + 1;
-		if(index == 1) // The variable is not defined
+		if(index == 1 && walker->is_unset_or_null(libbash_name, 0))
 			index = 0;
 	} array_def_helper[libbash_name, values, index]){
 		if(local)
