@@ -466,6 +466,7 @@ options {backtrack = true;}
 	|ESC_LSQUARE { $libbash_value = "["; }
 	|ESC_DOLLAR { $libbash_value = "$"; }
 	|ESC_DQUOTE { $libbash_value = "\""; }
+	|ESC_SQUOTE { $libbash_value = "'"; }
 	|ESC_GT { $libbash_value = ">"; }
 	|ESC_LT { $libbash_value = "<"; }
 	|ESC_TICK { $libbash_value = "`"; }

@@ -96,7 +96,7 @@ eval abc+=\( \"\$@\" \)
 declare MOZILLA_FIVE_HOME="/usr/share/${PN}"
 declare foo=23 empty bar=42
 echo $MOZILLA_FIVE_HOME $foo $lol $bar
-echo \(\)\[\]\$\"\>
+echo \(\)\[\]\$\"\>\'
 
 FILE=scripts/input_output_test
 echo foo > $FILE
