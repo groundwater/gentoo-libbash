@@ -514,13 +514,20 @@ public:
                                           int length) const;
 
   /// \brief perform replacement expansion
-  /// \param name the name of the varaible that needs to be expanded
+  /// \param name the name of the variable that needs to be expanded
   /// \param replacer the function object used to perform expansion
   /// \param index array index, use index=0 if it's not an array
   /// \return the expanded value
   std::string do_replace_expansion(const std::string& name,
                                    std::function<void(std::string&)> replacer,
                                    const unsigned index) const;
+
+  /// \brief perform array replacement expansion
+  /// \param name the name of the array that needs to be expanded
+  /// \param replacer the function object used to perform expansion
+  /// \return the expanded value
+  std::string do_array_replace_expansion(const std::string& name,
+                                   std::function<void(std::string&)> replacer) const;
 
   /// \brief get the length of a string variable
   /// \param name the name of the variable

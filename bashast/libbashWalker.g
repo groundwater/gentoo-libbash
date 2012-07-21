@@ -188,6 +188,14 @@ options
 					walker->set_input_stream(_in);
 				}
 		};
+
+		std::string replace_expansion(const std::string name, int index, std::function<void(std::string&)> replacer)
+		{
+			if(index > -1)
+				return walker->do_replace_expansion(name, replacer, index);
+			else
+				return walker->do_array_replace_expansion(name, replacer);
+		}
 	}
 }
 
@@ -582,48 +590,53 @@ var_expansion returns[std::string libbash_value]
 			libbash_value = boost::lexical_cast<std::string>(walker->get_array_length(libbash_name));
 		}
 	))
-	|^(REPLACE_ALL var_name bash_pattern[replace_pattern, true] (libbash_word=raw_string)?) {
-		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
-													 std::bind(&interpreter::replace_all,
-															   std::placeholders::_1,
-															   replace_pattern,
-															   libbash_word),
-													 $var_name.index);
+	|^(REPLACE_ALL var_or_array_name bash_pattern[replace_pattern, true] (libbash_word=raw_string)?) {
+		libbash_value = replace_expansion($var_or_array_name.libbash_value, $var_or_array_name.index,
+												std::bind(&interpreter::replace_all,
+													std::placeholders::_1,
+													replace_pattern,
+													libbash_word));
 	}
-	|^(REPLACE_AT_END var_name bash_pattern[replace_pattern, true] (libbash_word=raw_string)?) {
+	|^(REPLACE_AT_END var_or_array_name bash_pattern[replace_pattern, true] (libbash_word=raw_string)?) {
 		replace_pattern = sregex(replace_pattern >> eos);
-		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
-													 std::bind(&interpreter::replace_all,
-															   std::placeholders::_1,
-															   replace_pattern,
-															   libbash_word),
-													 $var_name.index);
+		libbash_value = replace_expansion($var_or_array_name.libbash_value, $var_or_array_name.index,
+												std::bind(&interpreter::replace_all,
+													std::placeholders::_1,
+													replace_pattern,
+													libbash_word));
 	}
-	|^(LAZY_REMOVE_AT_END var_name bash_pattern[replace_pattern, false] (libbash_word=raw_string)?) {
+	|^(LAZY_REMOVE_AT_END var_or_array_name bash_pattern[replace_pattern, false] (libbash_word=raw_string)?) {
 		replace_pattern = sregex(bos >> (s1=*_) >> replace_pattern >> eos);
-		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
-													 std::bind(&interpreter::lazy_remove_at_end,
-															   std::placeholders::_1,
-															   replace_pattern),
-													 $var_name.index);
+		libbash_value = replace_expansion($var_or_array_name.libbash_value, $var_or_array_name.index,
+												std::bind(&interpreter::lazy_remove_at_end,
+													std::placeholders::_1,
+													replace_pattern));
 	}
 	|^((REPLACE_AT_START { greedy = true; }|LAZY_REMOVE_AT_START { greedy = false; })
-		var_name bash_pattern[replace_pattern, greedy] (libbash_word=raw_string)?) {
+		var_or_array_name bash_pattern[replace_pattern, greedy] (libbash_word=raw_string)?) {
 		replace_pattern = sregex(bos >> replace_pattern);
-		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
-													 std::bind(&interpreter::replace_all,
-															   std::placeholders::_1,
-															   replace_pattern,
-															   libbash_word),
-													 $var_name.index);
+		libbash_value = replace_expansion($var_or_array_name.libbash_value, $var_or_array_name.index,
+												std::bind(&interpreter::replace_all,
+													std::placeholders::_1,
+													replace_pattern,
+													libbash_word));
 	}
-	|^(REPLACE_FIRST var_name bash_pattern[replace_pattern, true] (libbash_word=raw_string)?) {
-		libbash_value = walker->do_replace_expansion($var_name.libbash_value,
-													 std::bind(&interpreter::replace_first,
-															   std::placeholders::_1,
-															   replace_pattern,
-															   libbash_word),
-													 $var_name.index);
+	|^(REPLACE_FIRST var_or_array_name bash_pattern[replace_pattern, true] (libbash_word=raw_string)?) {
+		libbash_value = replace_expansion($var_or_array_name.libbash_value, $var_or_array_name.index,
+												std::bind(&interpreter::replace_first,
+													std::placeholders::_1,
+													replace_pattern,
+													libbash_word));
+	};
+
+var_or_array_name returns[std::string libbash_value, int index]
+	:libbash_string=array_name {
+		$libbash_value = libbash_string;
+		$index = -1;
+	}
+	|var_name {
+		$libbash_value = $var_name.libbash_value;
+		$index = $var_name.index;
 	};
 
 word returns[std::string libbash_value]

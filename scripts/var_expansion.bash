@@ -79,6 +79,17 @@ echo ${FOO039/*(l)}
 echo ${FOO039/?(l)}
 echo ${FOO039/@([a-c]|[k-m])}
 echo ${FOO039//@([a-c]|[k-m])}
+FOO40=("foo bar" foo bar foobar)
+FOO40=("foo bar foo" bar foo foobar)
+echo ${FOO40[@]/foo/poo}
+echo ${FOO40[@]//foo/poo}
+echo ${FOO40[@]#foo}
+echo ${FOO40[@]##f*o}
+echo ${FOO40[@]%foo}
+echo ${FOO40[@]%%f*o}
+echo ${FOO40[@]/#foo}
+echo ${FOO40[@]/%foo}
+echo ${FOO40[@]}
 target="abc123abc"
 echo "${target##+(ab[c])*([[:digit:]])}"
 function positional_parameter_test(){

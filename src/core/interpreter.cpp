@@ -244,6 +244,16 @@ std::string interpreter::do_replace_expansion(const std::string& name,
   return value;
 }
 
+std::string interpreter::do_array_replace_expansion(const std::string& name,
+                                                    std::function<void(std::string&)> replacer) const
+{
+  std::vector<std::string> array;
+  resolve_array<std::string>(name, array);
+  for(auto i = array.begin(); i != array.end(); ++i)
+    replacer(*i);
+  return boost::algorithm::join(array, resolve<std::string>("IFS").substr(0, 1));
+}
+
 std::string::size_type interpreter::get_length(const std::string& name,
                                  const unsigned index) const
 {
