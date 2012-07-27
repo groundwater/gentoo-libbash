@@ -82,6 +82,20 @@ echo ${array[@]}
 ech\
 o Hello\
  world
+function multiline()
+{
+    declare var1="foo
+bar"
+    export var2="one
+  two
+three"
+    local var3="foo
+bar"
+    echo $var1
+    echo $var2
+    echo $var3
+}
+multiline
 echo \`\(\)\$\>\<\`
 export SRC_URI="${SRC_URI} http://www.oracle.com/technology/products/berkeley-db/db/update/${MY_PV}/patch.${MY_PV}.${i}"
 > /dev/null
