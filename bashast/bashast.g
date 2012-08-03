@@ -481,6 +481,7 @@ scope {
 			|(RPAREN) => RPAREN { --$builtin_variable_definition_item::parens; }
 			|(DQUOTE) => DQUOTE { $builtin_variable_definition_item::dquotes = ! $builtin_variable_definition_item::dquotes; }
 			|(~(EOL|SEMIC)) => expansion_base
+			| {LA(1) == SEMIC && $builtin_variable_definition_item::dquotes}? => SEMIC
 			| {LA(1) == EOL && $builtin_variable_definition_item::parens > 0 || $builtin_variable_definition_item::dquotes}? => EOL
 		)+;
 

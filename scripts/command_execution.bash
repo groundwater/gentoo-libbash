@@ -109,6 +109,7 @@ echo "${!variable// /$'\n'}"
 eval abc+=\( \"\$@\" \)
 declare MOZILLA_FIVE_HOME="/usr/share/${PN}"
 declare foo=23 empty bar=42
+declare var=";; ; foobar"; echo yay
 echo $MOZILLA_FIVE_HOME $foo $lol $bar
 echo \(\)\[\]\$\"\>\'
 
