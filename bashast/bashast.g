@@ -431,8 +431,8 @@ variable_definition_atom
 			-> ^(EQUALS ^(name explicit_arithmetic) string_expr?)
 	|	name EQUALS value? -> ^(EQUALS name value?)
 	|	name PLUS EQUALS array_value -> ^(PLUS_ASSIGN name array_value)
-	|	name PLUS EQUALS string_expr_part?
-			-> ^(EQUALS name ^(STRING ^(VAR_REF name) string_expr_part?));
+	|	name PLUS EQUALS string_expr_part*
+			-> ^(EQUALS name ^(STRING ^(VAR_REF name) string_expr_part*));
 value
 	:	string_expr
 	|	array_value;

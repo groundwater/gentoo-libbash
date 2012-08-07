@@ -82,6 +82,8 @@ FOO005=abc
 echo $FOO005
 FOO005+=def
 echo $FOO005
+FOO005+=-foo-bar
+echo $FOO005
 function foo() {
     local -i foo=1
     local -a bar=(1 2 3)
