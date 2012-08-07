@@ -272,7 +272,7 @@ command_separator
 	|	AMP^
 	|	EOL!;
 pipeline
-	:	time? ((BANG) => (BANG BLANK!))? command^ (BLANK!? PIPE^ BLANK!? command)*;
+	:	time? ((BANG) => (BANG BLANK!))? command^ (BLANK!? PIPE^ wspace!? command)*;
 
 time
 	:	TIME^ BLANK! ((time_posix) => time_posix)?;
