@@ -1132,13 +1132,22 @@ command_substitution returns[std::string libbash_value]
 @declarations {
 	std::string subscript;
 	std::stringstream out;
+	current_streams streams(walker->get_output_stream(), walker->get_error_stream(), walker->get_input_stream());
 }
 	:^(COMMAND_SUB { walker->set_output_stream(&out); } (libbash_string=any_string { subscript += libbash_string; })+) {
-		if(subscript[0] == '`')
-			bash_ast(std::stringstream(subscript.substr(1, subscript.size() - 2))).interpret_with(*walker);
+		if(subscript[0] == '`') {
+			std::string sub = subscript.substr(1, subscript.size() - 2);
+			// Escape \ and ' for nested command substitution
+			size_t pos = 0;
+			while((pos = sub.find("\\\\", pos)) != std::string::npos)
+				sub.erase(pos++, 1);
+			pos = 0;
+			while((pos = sub.find("\\`", pos)) != std::string::npos)
+				sub.erase(pos++, 1);
+			bash_ast(std::stringstream(sub)).interpret_with(*walker);
+		}
 		else
 			bash_ast(std::stringstream(subscript.substr(2, subscript.size() - 3))).interpret_with(*walker);
-		walker->restore_output_stream();
 		$libbash_value = out.str();
 		walker->trim_trailing_eols($libbash_value);
 	};
