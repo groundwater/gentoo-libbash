@@ -466,15 +466,23 @@ array_atom
 builtin_variable_definition_item
 scope {
 	int parens;
+#ifdef OUTPUT_C
+	bool dquotes;
+#else
+	boolean dquotes;
+#endif
 }
 @init {
 	$builtin_variable_definition_item::parens = 0;
+	$builtin_variable_definition_item::dquotes = false;
 }
 	:	(
 			(LPAREN) => LPAREN { ++$builtin_variable_definition_item::parens; }
 			|(RPAREN) => RPAREN { --$builtin_variable_definition_item::parens; }
+			|(DQUOTE) => DQUOTE { $builtin_variable_definition_item::dquotes = ! $builtin_variable_definition_item::dquotes; }
 			|(~(EOL|SEMIC)) => expansion_base
-			| {LA(1) == EOL && $builtin_variable_definition_item::parens > 0}? => EOL
+			| {LA(1) == SEMIC && $builtin_variable_definition_item::dquotes}? => SEMIC
+			| {LA(1) == EOL && $builtin_variable_definition_item::parens > 0 || $builtin_variable_definition_item::dquotes}? => EOL
 		)+;
 
 #ifdef OUTPUT_C
